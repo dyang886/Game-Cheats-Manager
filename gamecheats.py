@@ -2,7 +2,6 @@ import os
 import sys
 import requests
 from bs4 import BeautifulSoup
-import zipfile
 import tkinter as tk
 from tkinter import ttk
 from tkinter import messagebox
@@ -13,6 +12,68 @@ import sv_ttk
 import tempfile
 import json
 import time
+import polib
+import gettext
+import subprocess
+import zipfile
+
+
+def resource_path(relative_path):
+    if hasattr(sys, "_MEIPASS"):
+        return os.path.join(sys._MEIPASS, relative_path)
+    return os.path.join(os.path.abspath("."), relative_path)
+
+
+def apply_settings(settings):
+    with open(SETTINGS_FILE, "w") as f:
+        json.dump(settings, f)
+
+
+def load_settings():
+    try:
+        with open(SETTINGS_FILE, "r") as f:
+            return json.load(f)
+    except FileNotFoundError:
+        # If the settings file doesn't exist, create it with default settings
+        default_settings = {
+            "downloadPath": "Trainers/",
+            "language": "en_US"
+        }
+        with open(SETTINGS_FILE, "w") as f:
+            json.dump(default_settings, f)
+        return default_settings
+
+
+def get_translator():
+    # compile .po files to .mo files
+    for root, dirs, files in os.walk(resource_path("locale/")):
+        for file in files:
+            if file.endswith(".po"):
+                po = polib.pofile(os.path.join(root, file))
+                po.save_as_mofile(os.path.join(
+                    root, os.path.splitext(file)[0] + ".mo"))
+
+    # read settings and apply languages
+    lang = settings["language"]
+    gettext.bindtextdomain("Game Cheats Manager",
+                           resource_path("locale/"))
+    gettext.textdomain("Game Cheats Manager")
+    lang = gettext.translation(
+        "Game Cheats Manager", resource_path("locale/"), languages=[lang])
+    lang.install()
+    return lang.gettext
+
+
+SETTINGS_FILE = os.path.join(
+    os.environ["APPDATA"], "GCM Settings/", "settings.json")
+
+setting_path = os.path.join(
+    os.environ["APPDATA"], "GCM Settings/")
+if not os.path.exists(setting_path):
+    os.makedirs(setting_path)
+
+settings = load_settings()
+_ = get_translator()
 
 
 class GameCheatsManager(tk.Tk):
@@ -20,33 +81,31 @@ class GameCheatsManager(tk.Tk):
     def __init__(self):
         super().__init__()
 
-        self.SETTINGS_FILE = os.path.join(
-            os.environ["APPDATA"], "GCM Settings/", "settings.json")
-
-        setting_path = os.path.join(
-            os.environ["APPDATA"], "GCM Settings/")
-        if not os.path.exists(setting_path):
-            os.makedirs(setting_path)
-
         self.title("Game Cheats Manager")
-        self.iconbitmap(self.resource_path("assets/logo.ico"))
+        self.iconbitmap(resource_path("assets/logo.ico"))
         sv_ttk.set_theme("dark")
         # key = trainer name, value = trainer path
-        self.settings = self.load_settings()
         self.trainers = {}
         self.trainer_urls = {}
         self.trainerPath = os.path.normpath(
-            os.path.abspath(self.load_settings()["downloadPath"]))
+            os.path.abspath(load_settings()["downloadPath"]))
         os.makedirs(self.trainerPath, exist_ok=True)
         self.tempDir = os.path.join(
             tempfile.gettempdir(), "GameCheatsManagerTemp")
-        self.trainerSearchEntryPrompt = "Search for installed"
-        self.downloadSearchEntryPrompt = "Search to download"
+        self.trainerSearchEntryPrompt = _("Search for installed")
+        self.downloadSearchEntryPrompt = _("Search to download")
         self.headers = {
             'User-Agent': 'Mozilla/5.0 (Windows NT 10.0; Win64; x64) AppleWebKit/537.36 (KHTML, like Gecko) Chrome/58.0.3029.110 Safari/537.3'}
 
         self.frame = ttk.Frame(self, padding="30")
         self.frame.grid(row=0, column=0)
+
+        # Menu bar
+        self.menuBar = tk.Menu(self, background="blue", fg='green')
+        self.settingsMenu = tk.Menu(self.menuBar, tearoff=0)
+        self.settingsMenu.add_command(label="Settings")
+        self.menuBar.add_cascade(label="Settings", menu=self.settingsMenu)
+        self.config(menu=self.menuBar)
 
         # ================================================================
         # column 1 - trainers
@@ -58,7 +117,7 @@ class GameCheatsManager(tk.Tk):
         self.trainerSearchFrame.grid(row=0, column=0, pady=(0, 20))
 
         self.searchPhoto = tk.PhotoImage(
-            file=self.resource_path("assets/search.png"))
+            file=resource_path("assets/search.png"))
         search_width = 19
         search_height = 19
         search_width_ratio = self.searchPhoto.width() // search_width
@@ -89,11 +148,11 @@ class GameCheatsManager(tk.Tk):
         self.bottomFrame.grid(row=2, column=0, pady=(20, 0))
 
         self.launchButton = ttk.Button(
-            self.bottomFrame, text="Launch", width=11, command=self.launch_trainer)
+            self.bottomFrame, text=_("Launch"), width=11, command=self.launch_trainer)
         self.launchButton.grid(row=0, column=0, padx=(0, 9))
 
         self.deleteButton = ttk.Button(
-            self.bottomFrame, text="Delete", width=11, command=self.delete_trainer)
+            self.bottomFrame, text=_("Delete"), width=11, command=self.delete_trainer)
         self.deleteButton.grid(row=0, column=1, padx=(9, 0))
 
         # ================================================================
@@ -189,15 +248,24 @@ class GameCheatsManager(tk.Tk):
     def change_path(self, event=None):
         self.disable_all_widgets()
         self.downloadListBox.unbind('<Double-Button-1>')
-        folder = filedialog.askdirectory(title="Change trainer download path")
+        folder = filedialog.askdirectory(
+            title=_("Change trainer download path"))
+
         if folder:
-            self.downloadPathText.set(os.path.normpath(
-                os.path.join(folder, "Trainers/")))
+            changedPath = os.path.normpath(
+                os.path.join(folder, "Trainers/"))
+            if self.downloadPathText.get() == changedPath:
+                messagebox.showerror(
+                    _("Error"), _("Please choose a new path."))
+                self.enable_all_widgets()
+                return
+
+            self.downloadPathText.set(changedPath)
             self.downloadListBox.delete(0, tk.END)
             self.downloadListBox.insert(
-                tk.END, "Trainer download directory changed!")
+                tk.END, _("Trainer download directory changed!"))
             self.downloadListBox.insert(
-                tk.END, "Migrating existing trainers...")
+                tk.END, _("Migrating existing trainers..."))
 
             dst = os.path.join(folder, "Trainers/")
             if not os.path.exists(dst):
@@ -210,10 +278,10 @@ class GameCheatsManager(tk.Tk):
                 shutil.move(src_file, dst_file)
             shutil.rmtree(self.trainerPath)
             self.trainerPath = dst
-            self.settings["downloadPath"] = self.trainerPath
-            self.apply_settings(self.settings)
+            settings["downloadPath"] = self.trainerPath
+            apply_settings(settings)
             self.show_cheats()
-            self.downloadListBox.insert(tk.END, "Migration complete!")
+            self.downloadListBox.insert(tk.END, _("Migration complete!"))
 
         self.enable_all_widgets()
 
@@ -225,11 +293,6 @@ class GameCheatsManager(tk.Tk):
     def on_download_double_click(self, event=None):
         selected_index = self.downloadListBox.curselection()[0]
         self.create_download_thread2(selected_index)
-
-    def resource_path(self, relative_path):
-        if hasattr(sys, "_MEIPASS"):
-            return os.path.join(sys._MEIPASS, relative_path)
-        return os.path.join(os.path.abspath("."), relative_path)
 
     def create_download_thread1(self, keyword):
         download_thread1 = threading.Thread(
@@ -246,9 +309,17 @@ class GameCheatsManager(tk.Tk):
         migration_thread.start()
 
     def launch_trainer(self, event=None):
-        index = self.flingListbox.curselection()[0]
-        trainerName = self.flingListbox.get(index)
-        os.startfile(os.path.normpath(self.trainers[trainerName]))
+        try:
+            selection = self.flingListbox.curselection()
+            if selection:
+                index = selection[0]
+                trainerName = self.flingListbox.get(index)
+                os.startfile(os.path.normpath(self.trainers[trainerName]))
+        except OSError as e:
+            if e.winerror == 1223:
+                print("Operation [Launch Trainer] was canceled by the user.")
+            else:
+                raise
 
     def delete_trainer(self):
         index = self.flingListbox.curselection()[0]
@@ -279,23 +350,6 @@ class GameCheatsManager(tk.Tk):
         self.launchButton.config(state="enabled")
         self.deleteButton.config(state="enabled")
 
-    def apply_settings(self, settings):
-        with open(self.SETTINGS_FILE, "w") as f:
-            json.dump(settings, f)
-
-    def load_settings(self):
-        try:
-            with open(self.SETTINGS_FILE, "r") as f:
-                return json.load(f)
-        except FileNotFoundError:
-            # If the settings file doesn't exist, create it with default settings
-            default_settings = {
-                "downloadPath": "Trainers/"
-            }
-            with open(self.SETTINGS_FILE, "w") as f:
-                json.dump(default_settings, f)
-            return default_settings
-
     def show_cheats(self):
         self.flingListbox.delete(0, tk.END)
         self.trainers = {}
@@ -312,7 +366,7 @@ class GameCheatsManager(tk.Tk):
         self.disable_download_widgets()
         self.downloadListBox.delete(0, tk.END)
         self.downloadListBox.unbind('<Double-Button-1>')
-        self.downloadListBox.insert(tk.END, "Searching...")
+        self.downloadListBox.insert(tk.END, _("Searching..."))
         self.trainer_urls = {}
 
         # Search for results
@@ -323,9 +377,10 @@ class GameCheatsManager(tk.Tk):
 
         # Check if the request was successful
         if reqs.status_code == 200:
-            self.downloadListBox.insert(tk.END, "Request successful!")
+            self.downloadListBox.insert(tk.END, _("Request successful!"))
         else:
-            self.downloadListBox.insert(tk.END, "Request failed with status code: " + str(reqs.status_code))
+            self.downloadListBox.insert(
+                tk.END, _("Request failed with status code: ") + str(reqs.status_code))
 
         # Generate and store search results
         for link in soup1.find_all(rel="bookmark"):
@@ -343,7 +398,7 @@ class GameCheatsManager(tk.Tk):
             count += 1
         if len(self.trainer_urls) == 0:
             self.downloadListBox.unbind('<Double-Button-1>')
-            self.downloadListBox.insert(tk.END, "No results found.")
+            self.downloadListBox.insert(tk.END, _("No results found."))
             self.enable_download_widgets()
             return
 
@@ -351,7 +406,7 @@ class GameCheatsManager(tk.Tk):
         self.disable_download_widgets()
         self.downloadListBox.unbind('<Double-Button-1>')
         self.downloadListBox.delete(0, tk.END)
-        self.downloadListBox.insert(tk.END, "Downloading...")
+        self.downloadListBox.insert(tk.END, _("Downloading..."))
         if os.path.exists(self.tempDir):
             shutil.rmtree(self.tempDir)
 
@@ -361,15 +416,16 @@ class GameCheatsManager(tk.Tk):
         mFilename = filename.replace(':', ' -')
         if "/" in mFilename:
             mFilename = mFilename.split("/")[1]
-        zFilename = mFilename + ".zip"
+
         for trainerPath in self.trainers.keys():
             if mFilename in trainerPath:
                 self.downloadListBox.delete(0, tk.END)
                 self.downloadListBox.insert(
-                    tk.END, "Trainer already exists, aborted download.")
+                    tk.END, _("Trainer already exists, aborted download."))
                 self.enable_download_widgets()
                 return
-        gamereqs = requests.get(self.trainer_urls[filename], headers=self.headers)
+        gamereqs = requests.get(
+            self.trainer_urls[filename], headers=self.headers)
         soup2 = BeautifulSoup(gamereqs.text, 'html.parser')
         targeturl = soup2.find(target="_self").get("href")
 
@@ -378,9 +434,15 @@ class GameCheatsManager(tk.Tk):
             finalreqs = requests.get(targeturl, headers=self.headers)
         except Exception as e:
             messagebox.showerror(
-                "Error", f"An error occurred while getting trainer url: {e}")
+                _("Error"), _("An error occurred while getting trainer url: ") + str(e))
             self.enable_download_widgets()
             return
+
+        # Find compressed file extension
+        fileDownloadLink = finalreqs.url
+        extension = fileDownloadLink[fileDownloadLink.rfind('.'):]
+        zFilename = mFilename + extension
+
         trainerTemp = os.path.join(self.tempDir, zFilename)
         if not os.path.exists(self.tempDir):
             os.mkdir(self.tempDir)
@@ -388,26 +450,33 @@ class GameCheatsManager(tk.Tk):
             f.write(finalreqs.content)
         time.sleep(2)
 
-        # Extract .zip file and rename
+        # Extract compressed file and rename
         try:
-            with zipfile.ZipFile(trainerTemp, 'r') as zip_ref:
-                zip_ref.extractall(self.tempDir)
-
-                # Rename extracted file
-                cnt = 0
-                for t in zip_ref.namelist():
-                    cnt += 1
-                    if "Trainer" in t:
-                        gameRawName = t
-                if cnt > 1:
-                    messagebox.showinfo(
-                        "Attention", "Additional actions required\nPlease check folder for details!")
-                    os.startfile(self.tempDir)
+            if extension == ".rar":
+                unrar = resource_path("dependency/UnRAR.exe")
+                command = [unrar, "x", "-y", trainerTemp, self.tempDir]
+                subprocess.run(command, check=True,
+                               creationflags=subprocess.CREATE_NO_WINDOW)
+            elif extension == ".zip":
+                with zipfile.ZipFile(trainerTemp, 'r') as zip_ref:
+                    zip_ref.extractall(self.tempDir)
         except Exception as e:
             messagebox.showerror(
-                "Error", f"An error occurred while extracting downloaded trainer: {e}")
+                _("Error"), _("An error occurred while extracting downloaded trainer: ") + str(e))
             self.enable_download_widgets()
             return
+
+        # Locate extracted .exe file
+        cnt = 0
+        for filename in os.listdir(self.tempDir):
+            if "Trainer" in filename and filename.endswith(".exe"):
+                gameRawName = filename
+            elif "Trainer" not in filename:
+                cnt += 1
+        if cnt > 1:
+            messagebox.showinfo(
+                _("Attention"), _("Additional actions required\nPlease check folder for details!"))
+            os.startfile(self.tempDir)
 
         os.makedirs(self.trainerPath, exist_ok=True)
         trainer_name = mFilename + ".exe"
@@ -416,7 +485,7 @@ class GameCheatsManager(tk.Tk):
         shutil.move(source_file, destination_file)
         os.remove(trainerTemp)
 
-        self.downloadListBox.insert(tk.END, "Download success!")
+        self.downloadListBox.insert(tk.END, _("Download success!"))
         self.enable_download_widgets()
         self.show_cheats()
 
