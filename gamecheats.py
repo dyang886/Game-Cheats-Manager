@@ -75,6 +75,11 @@ if not os.path.exists(setting_path):
 settings = load_settings()
 _ = get_translator()
 
+language_options = {
+    "English (US)": "en_US",
+    "简体中文": "zh_CN"
+}
+
 
 class GameCheatsManager(tk.Tk):
 
@@ -96,16 +101,22 @@ class GameCheatsManager(tk.Tk):
         self.downloadSearchEntryPrompt = _("Search to download")
         self.headers = {
             'User-Agent': 'Mozilla/5.0 (Windows NT 10.0; Win64; x64) AppleWebKit/537.36 (KHTML, like Gecko) Chrome/58.0.3029.110 Safari/537.3'}
-
-        self.frame = ttk.Frame(self, padding="30")
-        self.frame.grid(row=0, column=0)
+        self.settings_window = None
 
         # Menu bar
-        self.menuBar = tk.Menu(self, background="blue", fg='green')
-        self.settingsMenu = tk.Menu(self.menuBar, tearoff=0)
-        self.settingsMenu.add_command(label="Settings")
-        self.menuBar.add_cascade(label="Settings", menu=self.settingsMenu)
-        self.config(menu=self.menuBar)
+        self.menuBar = tk.Frame(self, background="#2e2e2e")
+        self.settingMenuBtn = tk.Menubutton(
+            self.menuBar, text=_("Options"), background="#2e2e2e")
+        self.settingsMenu = tk.Menu(self.settingMenuBtn, tearoff=0)
+        self.settingsMenu.add_command(
+            label=_("Settings"), command=self.open_settings)
+        self.settingMenuBtn.config(menu=self.settingsMenu)
+        self.settingMenuBtn.pack(side="left")
+        self.menuBar.grid(row=0, column=0, sticky="ew")
+
+        # Main frame
+        self.frame = ttk.Frame(self)
+        self.frame.grid(row=1, column=0, padx=30, pady=(20, 30))
 
         # ================================================================
         # column 1 - trainers
@@ -210,7 +221,62 @@ class GameCheatsManager(tk.Tk):
             '<Double-Button-1>', self.on_download_double_click)
 
         self.show_cheats()
+        self.eval('tk::PlaceWindow . center')
         self.mainloop()
+
+    def open_settings(self):
+        if self.settings_window is None or not self.settings_window.winfo_exists():
+            self.settings_window = tk.Toplevel(self)
+            self.settings_window.title(_("Settings"))
+            self.settings_window.iconbitmap(
+                resource_path("assets/setting.ico"))
+            self.settings_window.columnconfigure(0, weight=1)
+            self.settings_window.rowconfigure(0, weight=1)
+
+            window_width, window_height = 300, 200
+            self.settings_window.geometry(f"{window_width}x{window_height}")
+            self.settings_window.resizable(False, False)
+
+            # Center the settings window to be inside of main app window
+            main_x = self.winfo_x()
+            main_y = self.winfo_y()
+            main_width = self.winfo_width()
+            main_height = self.winfo_height()
+            center_x = int(main_x + (main_width - window_width) / 2)
+            center_y = int(main_y + (main_height - window_height) / 2)
+            self.settings_window.geometry(f"+{center_x}+{center_y}")
+
+            # languages frame
+            self.languages_frame = ttk.Frame(self.settings_window)
+
+            # languages label
+            self.languages_label = ttk.Label(
+                self.languages_frame, text=_("Language:"))
+            self.languages_label.pack(anchor="w")
+
+            # languages combobox
+            self.languages_var = tk.StringVar()
+            for key, value in language_options.items():
+                if value == settings["language"]:
+                    self.languages_var.set(key)
+
+            self.languages_combobox = ttk.Combobox(
+                self.languages_frame, textvariable=self.languages_var, values=list(language_options.keys()), state="readonly", width=20)
+            self.languages_combobox.pack(side=tk.LEFT)
+
+            # apply button
+            apply_button = ttk.Button(
+                self.settings_window, text=_("Apply"), command=self.apply_settings)
+
+            self.languages_frame.grid(row=0, column=0, pady=(20, 0))
+            apply_button.grid(row=2, column=0, padx=(
+                0, 20), pady=(20, 20), sticky=tk.E)
+
+    def apply_settings(self):
+        settings["language"] = language_options[self.languages_var.get()]
+        apply_settings(settings)
+        messagebox.showinfo(_("Attention"), _(
+            "Please restart the application to apply settings"))
 
     def on_trainer_entry_click(self, event):
         if self.trainerSearchEntry.get() == self.trainerSearchEntryPrompt:
@@ -291,8 +357,10 @@ class GameCheatsManager(tk.Tk):
             self.create_download_thread1(keyword)
 
     def on_download_double_click(self, event=None):
-        selected_index = self.downloadListBox.curselection()[0]
-        self.create_download_thread2(selected_index)
+        selection = self.downloadListBox.curselection()
+        if selection:
+            index = selection[0]
+            self.create_download_thread2(index)
 
     def create_download_thread1(self, keyword):
         download_thread1 = threading.Thread(
