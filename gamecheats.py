@@ -1,21 +1,22 @@
-import os
-import sys
-import requests
-from bs4 import BeautifulSoup
-import tkinter as tk
-from tkinter import ttk
-from tkinter import messagebox
-from tkinter import filedialog
-import threading
-import shutil
-import sv_ttk
-import tempfile
 import json
-import time
-import polib
-import gettext
+import os
+import shutil
 import subprocess
+import sys
+import tempfile
+import threading
+import time
+import tkinter as tk
+from tkinter import filedialog, messagebox, ttk
 import zipfile
+
+from bs4 import BeautifulSoup
+import gettext
+import polib
+import requests
+import sv_ttk
+from tendo import singleton
+from ctypes import windll
 
 
 def resource_path(relative_path):
@@ -85,6 +86,12 @@ class GameCheatsManager(tk.Tk):
 
     def __init__(self):
         super().__init__()
+
+        try:
+            self.single_instance_checker = singleton.SingleInstance()
+        except singleton.SingleInstanceException:
+            sys.exit(1)
+        # windll.shcore.SetProcessDpiAwareness(1)
 
         self.title("Game Cheats Manager")
         self.iconbitmap(resource_path("assets/logo.ico"))
@@ -266,13 +273,13 @@ class GameCheatsManager(tk.Tk):
 
             # apply button
             apply_button = ttk.Button(
-                self.settings_window, text=_("Apply"), command=self.apply_settings)
+                self.settings_window, text=_("Apply"), command=self.apply_settings_page)
 
             self.languages_frame.grid(row=0, column=0, pady=(20, 0))
             apply_button.grid(row=2, column=0, padx=(
                 0, 20), pady=(20, 20), sticky=tk.E)
 
-    def apply_settings(self):
+    def apply_settings_page(self):
         settings["language"] = language_options[self.languages_var.get()]
         apply_settings(settings)
         messagebox.showinfo(_("Attention"), _(
