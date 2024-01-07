@@ -17,7 +17,7 @@ import polib
 import requests
 import sv_ttk
 from tendo import singleton
-from ctypes import windll
+from urllib.parse import urljoin, urlparse
 
 
 def resource_path(relative_path):
@@ -92,14 +92,14 @@ class GameCheatsManager(tk.Tk):
             self.single_instance_checker = singleton.SingleInstance()
         except singleton.SingleInstanceException:
             sys.exit(1)
-        # windll.shcore.SetProcessDpiAwareness(1)
 
         self.title("Game Cheats Manager")
         self.iconbitmap(resource_path("assets/logo.ico"))
         sv_ttk.set_theme("dark")
-        # key = trainer name, value = trainer path
-        self.trainers = {}
-        self.trainer_urls = {}
+        # {trainer name, trainer path}
+        self.trainers = {}  # store installed trainers
+        # {trainer name, download link}
+        self.trainer_urls = {}  # store search results
         self.trainerPath = os.path.normpath(
             os.path.abspath(load_settings()["downloadPath"]))
         os.makedirs(self.trainerPath, exist_ok=True)
@@ -449,11 +449,10 @@ class GameCheatsManager(tk.Tk):
         self.downloadListBox.insert(tk.END, _("Searching..."))
         self.trainer_urls = {}
 
-        # Search for results
+        # Search for results from main website
         url = "https://flingtrainer.com/?s=" + keyword.replace(" ", "+")
         reqs = requests.get(url, headers=self.headers)
-        soup1 = BeautifulSoup(reqs.text, 'html.parser')
-        count = 0
+        mainSiteHTML = BeautifulSoup(reqs.text, 'html.parser')
 
         # Check if the request was successful
         if reqs.status_code == 200:
@@ -462,20 +461,42 @@ class GameCheatsManager(tk.Tk):
             self.downloadListBox.insert(
                 tk.END, _("Request failed with status code: ") + str(reqs.status_code))
 
-        # Generate and store search results
-        for link in soup1.find_all(rel="bookmark"):
+        # Generate and store main site search results
+        for link in mainSiteHTML.find_all(rel="bookmark"):
             trainerName = link.get_text()
             if "My Trainers Archive" in trainerName:
                 continue
+            self.trainer_urls[trainerName] = link.get("href")
+
+        # Search for results from archive
+        url = "https://archive.flingtrainer.com/"
+        reqs = requests.get(url, headers=self.headers)
+        archiveHTML = BeautifulSoup(reqs.text, 'html.parser')
+
+        for link in archiveHTML.find_all(target="_self"):
+            # parse trainer name
+            rawTrainerName = link.get_text()
+            parsedTrainerName = re.sub(r' v.*', '', rawTrainerName).replace("_", ": ")
+            trainerName = parsedTrainerName.strip() + " Trainer"
+
+            # search algorithm
+            if len(keyword) >= 3:
+                if re.search(re.escape(keyword), trainerName, re.IGNORECASE):
+                    self.trainer_urls[trainerName] = urljoin(url, link.get("href"))
+
+        self.trainer_urls = dict(sorted(self.trainer_urls.items()))
+
+        count = 0
+        for trainerName in self.trainer_urls.keys():
             if count == 0:
                 self.enable_download_widgets()
                 self.downloadListBox.bind(
                     '<Double-Button-1>', self.on_download_double_click)
                 self.downloadListBox.delete(0, tk.END)
 
-            self.trainer_urls[trainerName] = link.get("href")
             self.downloadListBox.insert(tk.END, f"{str(count)}. {trainerName}")
             count += 1
+
         if len(self.trainer_urls) == 0:
             self.downloadListBox.unbind('<Double-Button-1>')
             self.downloadListBox.insert(tk.END, _("No results found."))
@@ -504,10 +525,14 @@ class GameCheatsManager(tk.Tk):
                     tk.END, _("Trainer already exists, aborted download."))
                 self.enable_download_widgets()
                 return
-        gamereqs = requests.get(
-            self.trainer_urls[filename], headers=self.headers)
-        soup2 = BeautifulSoup(gamereqs.text, 'html.parser')
-        targeturl = soup2.find(target="_self").get("href")
+        
+        # Additional trainer file extraction for trainers from main site
+        targeturl = self.trainer_urls[filename]
+        domain = urlparse(targeturl).netloc
+        if domain == "flingtrainer.com":
+            gamereqs = requests.get(targeturl, headers=self.headers)
+            soup2 = BeautifulSoup(gamereqs.text, 'html.parser')
+            targeturl = soup2.find(target="_self").get("href")
 
         # Download file
         try:
