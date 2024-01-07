@@ -9,6 +9,7 @@ import time
 import tkinter as tk
 from tkinter import filedialog, messagebox, ttk
 import zipfile
+import re
 
 from bs4 import BeautifulSoup
 import gettext
@@ -109,6 +110,8 @@ class GameCheatsManager(tk.Tk):
         self.headers = {
             'User-Agent': 'Mozilla/5.0 (Windows NT 10.0; Win64; x64) AppleWebKit/537.36 (KHTML, like Gecko) Chrome/58.0.3029.110 Safari/537.3'}
         self.settings_window = None
+        self.crackFilePath = resource_path("dependency/app.asar")
+        self.wemodPath = os.path.join(os.getenv("LOCALAPPDATA"), "WeMod/")
 
         # Menu bar
         self.menuBar = tk.Frame(self, background="#2e2e2e")
@@ -117,6 +120,8 @@ class GameCheatsManager(tk.Tk):
         self.settingsMenu = tk.Menu(self.settingMenuBtn, tearoff=0)
         self.settingsMenu.add_command(
             label=_("Settings"), command=self.open_settings)
+        self.settingsMenu.add_command(
+            label=("WeMod Pro"), command=self.wemod_pro)
         self.settingMenuBtn.config(menu=self.settingsMenu)
         self.settingMenuBtn.pack(side="left")
         self.menuBar.grid(row=0, column=0, sticky="ew")
@@ -563,6 +568,64 @@ class GameCheatsManager(tk.Tk):
         self.downloadListBox.insert(tk.END, _("Download success!"))
         self.enable_download_widgets()
         self.show_cheats()
+
+    def wemod_pro(self):
+        newest_version_folder = self.clean_old_versions(self.wemodPath)
+        if not newest_version_folder:
+            messagebox.showerror(_("Error"), _("WeMod not installed."))
+            return
+
+        newest_version_path = os.path.join(self.wemodPath, newest_version_folder)
+        print("Newest Version Folder" + newest_version_path)
+
+        file_to_replace = os.path.join(
+            newest_version_path, "resources/app.asar")
+        try:
+            os.remove(file_to_replace)
+        except Exception:
+            messagebox.showerror(
+                _("Error"), _("WeMod is currently running, please close the application first."))
+            return
+        shutil.copyfile(self.crackFilePath, file_to_replace)
+
+        messagebox.showinfo(
+            _("Success"), _("You have now activated WeMod Pro!\nCurrent WeMod version: v") + newest_version_folder.strip('-app'))
+
+    def identify_and_sort_versions(self, directory):
+        if not os.path.exists(directory):
+            return None
+
+        version_folders = []
+        for item in os.listdir(directory):
+            if os.path.isdir(os.path.join(directory, item)):
+                match = re.match(r'app-(\d+\.\d+\.\d+)', item)
+                if match:
+                    version_info = tuple(
+                        map(int, match.group(1).split('.')))  # (8, 13, 3)
+                    # ((8, 13, 3), 'app-8.13.3')
+                    version_folders.append((version_info, item))
+
+        if not version_folders:
+            return None
+
+        # Sort based on version numbers (major, minor, patch)
+        version_folders.sort(reverse=True)  # Newest first
+        return version_folders
+
+    def clean_old_versions(self, directory):
+        version_folders = self.identify_and_sort_versions(directory)
+        if not version_folders:
+            return None
+
+        # Skip the deletion if there's only one folder found
+        if not len(version_folders) <= 1:
+            # Skip the first one as it's the newest
+            for version_info, folder_name in version_folders[1:]:
+                folder_path = os.path.join(directory, folder_name)
+                shutil.rmtree(folder_path)
+                print(f"Deleted old version folder: {folder_path}")
+
+        return version_folders[0][1]
 
 
 if __name__ == "__main__":
