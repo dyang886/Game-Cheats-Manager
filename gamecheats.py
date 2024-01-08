@@ -449,25 +449,6 @@ class GameCheatsManager(tk.Tk):
         self.downloadListBox.insert(tk.END, _("Searching..."))
         self.trainer_urls = {}
 
-        # Search for results from main website
-        url = "https://flingtrainer.com/?s=" + keyword.replace(" ", "+")
-        reqs = requests.get(url, headers=self.headers)
-        mainSiteHTML = BeautifulSoup(reqs.text, 'html.parser')
-
-        # Check if the request was successful
-        if reqs.status_code == 200:
-            self.downloadListBox.insert(tk.END, _("Request successful!"))
-        else:
-            self.downloadListBox.insert(
-                tk.END, _("Request failed with status code: ") + str(reqs.status_code))
-
-        # Generate and store main site search results
-        for link in mainSiteHTML.find_all(rel="bookmark"):
-            trainerName = link.get_text()
-            if "My Trainers Archive" in trainerName:
-                continue
-            self.trainer_urls[trainerName] = link.get("href")
-
         # Search for results from archive
         url = "https://archive.flingtrainer.com/"
         reqs = requests.get(url, headers=self.headers)
@@ -486,12 +467,32 @@ class GameCheatsManager(tk.Tk):
                     self.trainer_urls[trainerName] = urljoin(
                         url, link.get("href"))
 
+        # Search for results from main website, prioritized, will replace same trainer from archive
+        url = "https://flingtrainer.com/?s=" + keyword.replace(" ", "+")
+        reqs = requests.get(url, headers=self.headers)
+        mainSiteHTML = BeautifulSoup(reqs.text, 'html.parser')
+
+        # Check if the request was successful
+        if reqs.status_code == 200:
+            self.downloadListBox.insert(tk.END, _("Request successful!"))
+        else:
+            self.downloadListBox.insert(
+                tk.END, _("Request failed with status code: ") + str(reqs.status_code))
+
+        # Generate and store main site search results
+        for link in mainSiteHTML.find_all(rel="bookmark"):
+            trainerName = link.get_text()
+            if "My Trainers Archive" in trainerName:
+                continue
+            self.trainer_urls[trainerName] = link.get("href")
+
         # Remove any duplicates from the dict
         new_trainer_urls = {}
         seen_normalized = {}
         for original_name, url in self.trainer_urls.items():
             # Normalize the name
-            norm_name = original_name.replace(":", "").replace("'", "").replace("’", "").replace(" ", "").lower()
+            norm_name = original_name.replace(":", "").replace(
+                "'", "").replace("’", "").replace(" ", "").lower()
             domain = urlparse(url).netloc
 
             # If we haven't seen this normalized name yet, or the new URL is preferred, add/update the new dictionary
