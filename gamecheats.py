@@ -476,15 +476,31 @@ class GameCheatsManager(tk.Tk):
         for link in archiveHTML.find_all(target="_self"):
             # parse trainer name
             rawTrainerName = link.get_text()
-            parsedTrainerName = re.sub(r' v.*', '', rawTrainerName).replace("_", ": ")
+            parsedTrainerName = re.sub(
+                r' v.*| Plus.*', '', rawTrainerName).replace("_", ": ")
             trainerName = parsedTrainerName.strip() + " Trainer"
 
             # search algorithm
             if len(keyword) >= 3:
                 if re.search(re.escape(keyword), trainerName, re.IGNORECASE):
-                    self.trainer_urls[trainerName] = urljoin(url, link.get("href"))
+                    self.trainer_urls[trainerName] = urljoin(
+                        url, link.get("href"))
 
-        self.trainer_urls = dict(sorted(self.trainer_urls.items()))
+        # Remove any duplicates from the dict
+        new_trainer_urls = {}
+        seen_normalized = {}
+        for original_name, url in self.trainer_urls.items():
+            # Normalize the name
+            norm_name = original_name.replace(":", "").replace("'", "").replace("’", "").replace(" ", "").lower()
+            domain = urlparse(url).netloc
+
+            # If we haven't seen this normalized name yet, or the new URL is preferred, add/update the new dictionary
+            if norm_name not in seen_normalized or (seen_normalized[norm_name] != "flingtrainer.com" and domain == "flingtrainer.com"):
+                new_trainer_urls[original_name] = url
+                seen_normalized[norm_name] = domain
+
+        # Sort the dict alphabetically
+        self.trainer_urls = dict(sorted(new_trainer_urls.items()))
 
         count = 0
         for trainerName in self.trainer_urls.keys():
@@ -525,7 +541,7 @@ class GameCheatsManager(tk.Tk):
                     tk.END, _("Trainer already exists, aborted download."))
                 self.enable_download_widgets()
                 return
-        
+
         # Additional trainer file extraction for trainers from main site
         targeturl = self.trainer_urls[filename]
         domain = urlparse(targeturl).netloc
@@ -587,6 +603,19 @@ class GameCheatsManager(tk.Tk):
         trainer_name = mFilename + ".exe"
         source_file = os.path.join(self.tempDir, gameRawName)
         destination_file = os.path.join(self.trainerPath, trainer_name)
+
+        # replace bg music in Documents folder
+        empty_midi = resource_path("dependency/TrainerBGM.mid")
+        username = os.getlogin()
+        documents_path = f"C:/Users/{username}/Documents"
+        bgMusic_path = os.path.join(
+            documents_path, "FLiNGTrainer/TrainerBGM.mid")
+        if os.path.exists(bgMusic_path):
+            shutil.copyfile(empty_midi, bgMusic_path)
+
+        # remove exe bg music
+        self.remove_bgMusic(source_file, ["MID", "MIDI"])
+
         shutil.move(source_file, destination_file)
         os.remove(trainerTemp)
 
@@ -594,13 +623,52 @@ class GameCheatsManager(tk.Tk):
         self.enable_download_widgets()
         self.show_cheats()
 
+    def remove_bgMusic(self, source_exe, resource_type_list):
+        # Base case
+        if not resource_type_list:
+            return
+
+        resource_type = resource_type_list.pop(0)
+
+        # Define paths and files
+        empty_midi = resource_path("dependency/TrainerBGM.mid")
+        resourceHackerPath = resource_path("dependency/ResourceHacker.exe")
+        tempLog = os.path.join(self.tempDir, "rh.log")
+
+        # Remove background music from executable
+        command = [resourceHackerPath, "-open", source_exe, "-save", source_exe,
+                   "-action", "delete", "-mask", f"{resource_type},,", "-log", tempLog]
+        subprocess.run(command, creationflags=subprocess.CREATE_NO_WINDOW)
+
+        # Read the log file
+        with open(tempLog, 'r', encoding='utf-16-le') as file:
+            log_content = file.read()
+
+        # Check for deleted resource in log
+        pattern = r"Deleted:\s*(\w+),(\d+),(\d+)"
+        match = re.search(pattern, log_content)
+
+        if match:
+            # Resource was deleted; prepare to add the empty midi
+            resource_id = match.group(2)
+            locale_id = match.group(3)
+            resource = ",".join([resource_type, resource_id, locale_id])
+            command = [resourceHackerPath, "-open", source_exe, "-save", source_exe,
+                       "-action", "addoverwrite", "-res", empty_midi, "-mask", resource]
+            subprocess.run(command, creationflags=subprocess.CREATE_NO_WINDOW)
+            print(f"Replaced exe bg music: {resource}")
+        else:
+            # Try the next resource type if any remain
+            self.remove_bgMusic(source_exe, resource_type_list)
+
     def wemod_pro(self):
         newest_version_folder = self.clean_old_versions(self.wemodPath)
         if not newest_version_folder:
             messagebox.showerror(_("Error"), _("WeMod not installed."))
             return
 
-        newest_version_path = os.path.join(self.wemodPath, newest_version_folder)
+        newest_version_path = os.path.join(
+            self.wemodPath, newest_version_folder)
         print("Newest Version Folder" + newest_version_path)
 
         file_to_replace = os.path.join(
