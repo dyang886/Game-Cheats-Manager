@@ -49,7 +49,7 @@ def load_settings():
 
         # Default settings
         default_settings = {
-            "downloadPath": "Trainers/",
+            "downloadPath": os.path.join(os.environ["APPDATA"], "GCM Trainers/"),
             "language": app_locale
         }
         with open(SETTINGS_FILE, "w") as f:
@@ -373,7 +373,7 @@ class GameCheatsManager(tk.Tk):
 
         if folder:
             changedPath = os.path.normpath(
-                os.path.join(folder, "Trainers/"))
+                os.path.join(folder, "GCM Trainers/"))
             if self.downloadPathText.get() == changedPath:
                 messagebox.showerror(
                     _("Error"), _("Please choose a new path."))
@@ -387,7 +387,7 @@ class GameCheatsManager(tk.Tk):
             self.downloadListBox.insert(
                 tk.END, _("Migrating existing trainers..."))
 
-            dst = os.path.join(folder, "Trainers/")
+            dst = os.path.join(folder, "GCM Trainers/")
             if not os.path.exists(dst):
                 os.makedirs(dst)
             for filename in os.listdir(self.trainerPath):
