@@ -584,12 +584,15 @@ class GameCheatsManager(tk.Tk):
         # Sort the dict alphabetically
         self.trainer_urls = dict(sorted(self.trainer_urls.items()))
 
+        # Display search results
         self.downloadListBox.insert(tk.END, _("Translating..."))
         count = 0
         for trainerName in self.trainer_urls.keys():
             trainerName = self.translate_trainer_to_zh(trainerName)
             # Clear prior texts
             if count == 0:
+                self.lift()
+                self.focus_force()
                 self.enable_download_widgets()
                 self.downloadListBox.bind(
                     '<Double-Button-1>', self.on_download_double_click)
