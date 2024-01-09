@@ -19,7 +19,10 @@ import sv_ttk
 from tendo import singleton
 from urllib.parse import urljoin, urlparse
 import locale
-import translators as ts
+try:
+    import translators as ts
+except Exception:
+    pass
 
 
 def resource_path(relative_path):
@@ -485,6 +488,23 @@ class GameCheatsManager(tk.Tk):
             # else:
             #     shutil.rmtree(trainer.path)
 
+    def is_internet_connected(self, urls=None, timeout=3):
+        if urls is None:
+            urls = [
+                "https://www.baidu.com/",
+                "https://www.bing.com/",
+                "http://www.google.com/",
+            ]
+
+        for url in urls:
+            try:
+                response = requests.get(url, timeout=timeout)
+                response.raise_for_status()
+                return True
+            except requests.RequestException:
+                continue
+        return False
+
     def translate_trainer_to_zh(self, trainerName):
         if settings["language"] == "zh_CN":
             trans_trainerName = trainerName.rsplit(" Trainer", 1)[0]
@@ -497,12 +517,35 @@ class GameCheatsManager(tk.Tk):
                 pass
         return trainerName
 
+    def keyword_match(self, keyword, targetString):
+        sanitized_keyword = re.sub(r"['\"‘’“”:：.。]", "", keyword).lower()
+        sanitized_targetString = re.sub(r"['\"‘’“”:：.。]", "", targetString).lower()
+
+        return re.search(re.escape(sanitized_keyword), sanitized_targetString) is not None
+
     def download_display(self, keyword):
         self.disable_download_widgets()
         self.downloadListBox.delete(0, tk.END)
         self.downloadListBox.unbind('<Double-Button-1>')
-        self.downloadListBox.insert(tk.END, _("Searching..."))
         self.trainer_urls = {}
+
+        # Check for internet connection before search
+        self.downloadListBox.insert(
+            tk.END, _("Checking for internet connection..."))
+        if not self.is_internet_connected():
+            self.downloadListBox.insert(
+                tk.END, _("No internet connection, search function is disabled."))
+            self.downloadListBox.unbind('<Double-Button-1>')
+            self.enable_download_widgets()
+            return
+        self.downloadListBox.insert(tk.END, _("Searching..."))
+
+        # First time calling ts will pop up a cmd window, address it here
+        try:
+            import translators as ts
+            ts.translate_text(keyword)
+        except Exception:
+            pass
 
         if is_chinese(keyword):
             try:
@@ -536,7 +579,7 @@ class GameCheatsManager(tk.Tk):
 
             # search algorithm
             if len(keyword) >= 2:
-                if re.search(re.escape(keyword), trainerName, re.IGNORECASE):
+                if self.keyword_match(keyword, trainerName):
                     self.trainer_urls[trainerName] = urljoin(
                         url, link.get("href"))
 
@@ -556,7 +599,7 @@ class GameCheatsManager(tk.Tk):
 
                     # search algorithm
                     if len(keyword) >= 2:
-                        if re.search(re.escape(keyword), trainerName, re.IGNORECASE):
+                        if self.keyword_match(keyword, trainerName):
                             self.trainer_urls[trainerName] = link.get("href")
 
         # Remove duplicates
@@ -591,8 +634,6 @@ class GameCheatsManager(tk.Tk):
             trainerName = self.translate_trainer_to_zh(trainerName)
             # Clear prior texts
             if count == 0:
-                self.lift()
-                self.focus_force()
                 self.enable_download_widgets()
                 self.downloadListBox.bind(
                     '<Double-Button-1>', self.on_download_double_click)
