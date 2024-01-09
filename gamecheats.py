@@ -495,6 +495,8 @@ class GameCheatsManager(tk.Tk):
                 trainerName = f"《{trainerName}》修改器"
             except Exception:
                 pass
+        self.lift()
+        self.focus_force()
         return trainerName
 
     def download_display(self, keyword):
@@ -539,7 +541,7 @@ class GameCheatsManager(tk.Tk):
                         url, link.get("href"))
 
         # Search for results from main website, prioritized, will replace same trainer from archive
-        url = "https://flingtrainer.com/?s=" + keyword.replace(" ", "+")
+        url = "https://flingtrainer.com/all-trainers-a-z/"
         reqs = requests.get(url, headers=self.headers)
         mainSiteHTML = BeautifulSoup(reqs.text, 'html.parser')
 
@@ -547,12 +549,15 @@ class GameCheatsManager(tk.Tk):
             self.downloadListBox.insert(
                 tk.END, _("Request failed with status code: ") + str(reqs.status_code))
 
-        # Generate and store main site search results
-        for link in mainSiteHTML.find_all(rel="bookmark"):
-            trainerName = link.get_text()
-            if "My Trainers Archive" in trainerName:
-                continue
-            self.trainer_urls[trainerName] = link.get("href")
+        for ul in mainSiteHTML.find_all('ul'):
+            for li in ul.find_all('li'):
+                for link in li.find_all('a'):
+                    trainerName = link.get_text().strip()
+
+                    # search algorithm
+                    if len(keyword) >= 2:
+                        if re.search(re.escape(keyword), trainerName, re.IGNORECASE):
+                            self.trainer_urls[trainerName] = link.get("href")
 
         # Remove duplicates
         new_trainer_urls = {}
@@ -579,15 +584,16 @@ class GameCheatsManager(tk.Tk):
         # Sort the dict alphabetically
         self.trainer_urls = dict(sorted(self.trainer_urls.items()))
 
+        self.downloadListBox.insert(tk.END, _("Translating..."))
         count = 0
         for trainerName in self.trainer_urls.keys():
+            trainerName = self.translate_trainer_to_zh(trainerName)
+            # Clear prior texts
             if count == 0:
                 self.enable_download_widgets()
                 self.downloadListBox.bind(
                     '<Double-Button-1>', self.on_download_double_click)
                 self.downloadListBox.delete(0, tk.END)
-
-            trainerName = self.translate_trainer_to_zh(trainerName)
             self.downloadListBox.insert(tk.END, f"{str(count)}. {trainerName}")
             count += 1
 
