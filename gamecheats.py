@@ -19,6 +19,7 @@ import sv_ttk
 from tendo import singleton
 from urllib.parse import urljoin, urlparse
 import locale
+import translators as ts
 
 
 def resource_path(relative_path):
@@ -74,6 +75,13 @@ def get_translator():
         "Game Cheats Manager", resource_path("locale/"), languages=[lang])
     lang.install()
     return lang.gettext
+
+
+def is_chinese(text):
+    for char in text:
+        if '\u4e00' <= char <= '\u9fff':
+            return True
+    return False
 
 
 SETTINGS_FILE = os.path.join(
@@ -468,13 +476,26 @@ class GameCheatsManager(tk.Tk):
         self.flingListBox.delete(0, tk.END)
         self.trainers = {}
         for trainer in sorted(os.scandir(self.trainerPath), key=lambda dirent: dirent.name):
-            trainerName = os.path.splitext(os.path.basename(trainer.path))[0]
-            if trainer.is_file() and os.path.getsize(trainer) != 0:
-                if "Trainer" in trainerName:
-                    self.flingListBox.insert(tk.END, trainerName)
-                    self.trainers[trainerName] = trainer.path
+            trainerName, trainerExt = os.path.splitext(
+                os.path.basename(trainer.path))
+            if trainerExt.lower() == ".exe" and os.path.getsize(trainer.path) != 0:
+                # if "Trainer" in trainerName or "修改器" in trainerName:
+                self.flingListBox.insert(tk.END, trainerName)
+                self.trainers[trainerName] = trainer.path
             # else:
             #     shutil.rmtree(trainer.path)
+
+    def translate_trainer_to_zh(self, trainerName):
+        if settings["language"] == "zh_CN":
+            trans_trainerName = trainerName.rsplit(" Trainer", 1)[0]
+            try:
+                trainerName = ts.translate_text(
+                    trans_trainerName, from_language='en', to_language='zh')
+                trainerName = trainerName.replace("《", "").replace("》", "")
+                trainerName = f"《{trainerName}》修改器"
+            except Exception:
+                pass
+        return trainerName
 
     def download_display(self, keyword):
         self.disable_download_widgets()
@@ -482,6 +503,15 @@ class GameCheatsManager(tk.Tk):
         self.downloadListBox.unbind('<Double-Button-1>')
         self.downloadListBox.insert(tk.END, _("Searching..."))
         self.trainer_urls = {}
+
+        if is_chinese(keyword):
+            try:
+                keyword = ts.translate_text(
+                    keyword, from_language='zh', to_language='en')
+                print("Translated keyword: " + keyword)
+            except Exception as e:
+                self.downloadListBox.insert(
+                    tk.END, _("Translation failed: ") + str(e))
 
         # Search for results from archive
         url = "https://archive.flingtrainer.com/"
@@ -499,11 +529,11 @@ class GameCheatsManager(tk.Tk):
             # parse trainer name
             rawTrainerName = link.get_text()
             parsedTrainerName = re.sub(
-                r' v.*| Plus.*', '', rawTrainerName).replace("_", ": ")
+                r' v.*|\bv.*| Plus.*', '', rawTrainerName).replace("_", ": ")
             trainerName = parsedTrainerName.strip() + " Trainer"
 
             # search algorithm
-            if len(keyword) >= 3:
+            if len(keyword) >= 2:
                 if re.search(re.escape(keyword), trainerName, re.IGNORECASE):
                     self.trainer_urls[trainerName] = urljoin(
                         url, link.get("href"))
@@ -528,7 +558,7 @@ class GameCheatsManager(tk.Tk):
         new_trainer_urls = {}
         for original_name, url in self.trainer_urls.items():
             # Normalize the name
-            norm_name = original_name.replace(":", "").replace(
+            norm_name = original_name.replace(":", "").replace(".", "").replace(
                 "'", "").replace("’", "").replace(" ", "").lower()
             domain = urlparse(url).netloc
 
@@ -557,6 +587,7 @@ class GameCheatsManager(tk.Tk):
                     '<Double-Button-1>', self.on_download_double_click)
                 self.downloadListBox.delete(0, tk.END)
 
+            trainerName = self.translate_trainer_to_zh(trainerName)
             self.downloadListBox.insert(tk.END, f"{str(count)}. {trainerName}")
             count += 1
 
@@ -582,7 +613,7 @@ class GameCheatsManager(tk.Tk):
             mFilename = mFilename.split("/")[1]
 
         for trainerPath in self.trainers.keys():
-            if mFilename in trainerPath:
+            if mFilename in trainerPath or self.translate_trainer_to_zh(mFilename) in trainerPath:
                 self.downloadListBox.delete(0, tk.END)
                 self.downloadListBox.insert(
                     tk.END, _("Trainer already exists, aborted download."))
@@ -648,6 +679,7 @@ class GameCheatsManager(tk.Tk):
             os.startfile(self.tempDir)
 
         os.makedirs(self.trainerPath, exist_ok=True)
+        mFilename = self.translate_trainer_to_zh(mFilename)
         trainer_name = mFilename + ".exe"
         source_file = os.path.join(self.tempDir, gameRawName)
         destination_file = os.path.join(self.trainerPath, trainer_name)
