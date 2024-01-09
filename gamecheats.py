@@ -495,8 +495,6 @@ class GameCheatsManager(tk.Tk):
                 trainerName = f"《{trainerName}》修改器"
             except Exception:
                 pass
-        self.lift()
-        self.focus_force()
         return trainerName
 
     def download_display(self, keyword):
@@ -514,6 +512,8 @@ class GameCheatsManager(tk.Tk):
             except Exception as e:
                 self.downloadListBox.insert(
                     tk.END, _("Translation failed: ") + str(e))
+        self.lift()
+        self.focus_force()
 
         # Search for results from archive
         url = "https://archive.flingtrainer.com/"
