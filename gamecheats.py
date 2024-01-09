@@ -454,6 +454,13 @@ class GameCheatsManager(tk.Tk):
         reqs = requests.get(url, headers=self.headers)
         archiveHTML = BeautifulSoup(reqs.text, 'html.parser')
 
+        # Check if the request was successful
+        if reqs.status_code == 200:
+            self.downloadListBox.insert(tk.END, _("Request successful!"))
+        else:
+            self.downloadListBox.insert(
+                tk.END, _("Request failed with status code: ") + str(reqs.status_code))
+
         for link in archiveHTML.find_all(target="_self"):
             # parse trainer name
             rawTrainerName = link.get_text()
@@ -472,10 +479,7 @@ class GameCheatsManager(tk.Tk):
         reqs = requests.get(url, headers=self.headers)
         mainSiteHTML = BeautifulSoup(reqs.text, 'html.parser')
 
-        # Check if the request was successful
-        if reqs.status_code == 200:
-            self.downloadListBox.insert(tk.END, _("Request successful!"))
-        else:
+        if not reqs.status_code == 200:
             self.downloadListBox.insert(
                 tk.END, _("Request failed with status code: ") + str(reqs.status_code))
 
@@ -486,22 +490,30 @@ class GameCheatsManager(tk.Tk):
                 continue
             self.trainer_urls[trainerName] = link.get("href")
 
-        # Remove any duplicates from the dict
+        # Remove duplicates
         new_trainer_urls = {}
-        seen_normalized = {}
         for original_name, url in self.trainer_urls.items():
             # Normalize the name
             norm_name = original_name.replace(":", "").replace(
                 "'", "").replace("’", "").replace(" ", "").lower()
             domain = urlparse(url).netloc
 
-            # If we haven't seen this normalized name yet, or the new URL is preferred, add/update the new dictionary
-            if norm_name not in seen_normalized or (seen_normalized[norm_name] != "flingtrainer.com" and domain == "flingtrainer.com"):
-                new_trainer_urls[original_name] = url
-                seen_normalized[norm_name] = domain
+            # Add or update the entry based on domain preference
+            if norm_name not in new_trainer_urls:
+                new_trainer_urls[norm_name] = (original_name, url)
+            else:
+                # Check if the new URL is from the main site and should replace the existing one
+                existing_url = new_trainer_urls[norm_name][1]
+                existing_domain = urlparse(existing_url).netloc
+                if domain == "flingtrainer.com":
+                    new_trainer_urls[norm_name] = (original_name, url)
+
+        # Convert the dictionary to use original names as keys
+        self.trainer_urls = {original: url for _,
+                             (original, url) in new_trainer_urls.items()}
 
         # Sort the dict alphabetically
-        self.trainer_urls = dict(sorted(new_trainer_urls.items()))
+        self.trainer_urls = dict(sorted(self.trainer_urls.items()))
 
         count = 0
         for trainerName in self.trainer_urls.keys():
@@ -605,16 +617,9 @@ class GameCheatsManager(tk.Tk):
         source_file = os.path.join(self.tempDir, gameRawName)
         destination_file = os.path.join(self.trainerPath, trainer_name)
 
-        # replace bg music in Documents folder
-        empty_midi = resource_path("dependency/TrainerBGM.mid")
-        username = os.getlogin()
-        documents_path = f"C:/Users/{username}/Documents"
-        bgMusic_path = os.path.join(
-            documents_path, "FLiNGTrainer/TrainerBGM.mid")
-        if os.path.exists(bgMusic_path):
-            shutil.copyfile(empty_midi, bgMusic_path)
-
-        # remove exe bg music
+        # remove fling trainer bg music
+        self.modify_fling_settings()  # by changing trainer settings
+        # by removing directly from exe
         self.remove_bgMusic(source_file, ["MID", "MIDI"])
 
         shutil.move(source_file, destination_file)
@@ -623,6 +628,33 @@ class GameCheatsManager(tk.Tk):
         self.downloadListBox.insert(tk.END, _("Download success!"))
         self.enable_download_widgets()
         self.show_cheats()
+
+    def modify_fling_settings(self):
+        # replace bg music in Documents folder
+        empty_midi = resource_path("dependency/TrainerBGM.mid")
+        username = os.getlogin()
+        flingSettings_path = f"C:/Users/{username}/Documents/FLiNGTrainer"
+        bgMusic_path = os.path.join(flingSettings_path, "TrainerBGM.mid")
+        if os.path.exists(bgMusic_path):
+            shutil.copyfile(empty_midi, bgMusic_path)
+
+        # change fling settings to disable startup music
+        settingFile_1 = os.path.join(flingSettings_path, "FLiNGTSettings.ini")
+        settingFile_2 = os.path.join(flingSettings_path, "TrainerSettings.ini")
+
+        for settingFile in [settingFile_1, settingFile_2]:
+            if not os.path.exists(settingFile):
+                return
+            with open(settingFile, 'r', encoding='utf-8') as file:
+                lines = file.readlines()
+
+            # Update the OnLoadMusic setting
+            with open(settingFile, 'w', encoding='utf-8') as file:
+                for line in lines:
+                    if line.strip().startswith('OnLoadMusic'):
+                        file.write('OnLoadMusic=False\n')
+                    else:
+                        file.write(line)
 
     def remove_bgMusic(self, source_exe, resource_type_list):
         # Base case
@@ -657,7 +689,6 @@ class GameCheatsManager(tk.Tk):
             command = [resourceHackerPath, "-open", source_exe, "-save", source_exe,
                        "-action", "addoverwrite", "-res", empty_midi, "-mask", resource]
             subprocess.run(command, creationflags=subprocess.CREATE_NO_WINDOW)
-            print(f"Replaced exe bg music: {resource}")
         else:
             # Try the next resource type if any remain
             self.remove_bgMusic(source_exe, resource_type_list)
