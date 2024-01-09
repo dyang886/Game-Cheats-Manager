@@ -18,6 +18,7 @@ import requests
 import sv_ttk
 from tendo import singleton
 from urllib.parse import urljoin, urlparse
+import locale
 
 
 def resource_path(relative_path):
@@ -36,10 +37,19 @@ def load_settings():
         with open(SETTINGS_FILE, "r") as f:
             return json.load(f)
     except FileNotFoundError:
-        # If the settings file doesn't exist, create it with default settings
+        system_locale = locale.getlocale()[0]
+        locale_mapping = {
+            "English_United States": "en_US",
+            "Chinese (Simplified)_China": "zh_CN",
+            "Chinese (Simplified)_Hong Kong SAR": "zh_CN",
+            "Chinese (Simplified)_Macao SAR": "zh_CN"
+        }
+        app_locale = locale_mapping.get(system_locale, 'en_US')
+
+        # Default settings
         default_settings = {
             "downloadPath": "Trainers/",
-            "language": "en_US"
+            "language": app_locale
         }
         with open(SETTINGS_FILE, "w") as f:
             json.dump(default_settings, f)
@@ -157,7 +167,7 @@ class GameCheatsManager(tk.Tk):
         self.trainerSearchEntry.pack()
         self.trainerSearchEntry.insert(0, self.trainerSearchEntryPrompt)
         self.trainerSearchEntry.config(foreground="grey")
-        self.trainerSearch_var.trace('w', self.update_list)
+        self.trainerSearch_var.trace_add('write', self.update_list)
 
         self.flingScrollbar = ttk.Scrollbar(self.flingFrame)
         self.flingScrollbar.grid(row=1, column=1, sticky='ns')
@@ -283,6 +293,9 @@ class GameCheatsManager(tk.Tk):
             self.languages_frame.grid(row=0, column=0, pady=(20, 0))
             apply_button.grid(row=2, column=0, padx=(
                 0, 20), pady=(20, 20), sticky=tk.E)
+        else:
+            self.settings_window.lift()
+            self.settings_window.focus_force()
 
     def apply_settings_page(self):
         settings["language"] = language_options[self.languages_var.get()]
