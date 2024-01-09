@@ -644,7 +644,7 @@ class GameCheatsManager(tk.Tk):
 
         for settingFile in [settingFile_1, settingFile_2]:
             if not os.path.exists(settingFile):
-                return
+                continue
             with open(settingFile, 'r', encoding='utf-8') as file:
                 lines = file.readlines()
 
