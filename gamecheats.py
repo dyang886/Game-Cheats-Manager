@@ -169,16 +169,27 @@ class GameCheatsManager(tk.Tk):
         self.trainerSearchEntry.config(foreground="grey")
         self.trainerSearch_var.trace_add('write', self.update_list)
 
-        self.flingScrollbar = ttk.Scrollbar(self.flingFrame)
-        self.flingScrollbar.grid(row=1, column=1, sticky='ns')
+        # scroll bar and list box
+        self.flingVScrollbar = ttk.Scrollbar(
+            self.flingFrame, orient="vertical")
+        self.flingVScrollbar.grid(row=1, column=1, sticky='ns')
 
-        self.flingListbox = tk.Listbox(self.flingFrame, highlightthickness=0,
-                                       activestyle="none", width=40, height=15, yscrollcommand=self.flingScrollbar.set)
-        self.flingListbox.grid(row=1, column=0)
-        self.flingScrollbar.config(command=self.flingListbox.yview)
+        self.flingHScrollbar = ttk.Scrollbar(
+            self.flingFrame, orient="horizontal")
+        self.flingHScrollbar.grid(row=2, column=0, sticky='ew')
 
+        self.flingListBox = tk.Listbox(self.flingFrame, highlightthickness=0,
+                                       activestyle="none", width=40, height=15,
+                                       yscrollcommand=self.flingVScrollbar.set,
+                                       xscrollcommand=self.flingHScrollbar.set)
+        self.flingListBox.grid(row=1, column=0)
+
+        self.flingVScrollbar.config(command=self.flingListBox.yview)
+        self.flingHScrollbar.config(command=self.flingListBox.xview)
+
+        # bottom buttons
         self.bottomFrame = ttk.Frame(self.flingFrame)
-        self.bottomFrame.grid(row=2, column=0, pady=(20, 0))
+        self.bottomFrame.grid(row=3, column=0, pady=(10, 0))
 
         self.launchButton = ttk.Button(
             self.bottomFrame, text=_("Launch"), width=11, command=self.launch_trainer)
@@ -208,17 +219,27 @@ class GameCheatsManager(tk.Tk):
         self.downloadSearchEntry.insert(0, self.downloadSearchEntryPrompt)
         self.downloadSearchEntry.config(foreground="grey")
 
-        self.downloadScrollBar = ttk.Scrollbar(self.downloadFrame)
-        self.downloadScrollBar.grid(row=1, column=1, sticky='ns')
+        # scroll bar and list box
+        self.downloadVScrollbar = ttk.Scrollbar(
+            self.downloadFrame, orient="vertical")
+        self.downloadVScrollbar.grid(row=1, column=1, sticky='ns')
 
-        self.downloadListBox = tk.Listbox(
-            self.downloadFrame, width=40, height=15, yscrollcommand=self.downloadScrollBar.set)
+        self.downloadHScrollbar = ttk.Scrollbar(
+            self.downloadFrame, orient="horizontal")
+        self.downloadHScrollbar.grid(row=2, column=0, sticky='ew')
+
+        self.downloadListBox = tk.Listbox(self.downloadFrame, highlightthickness=0,
+                                          activestyle="none", width=40, height=15,
+                                          yscrollcommand=self.downloadVScrollbar.set,
+                                          xscrollcommand=self.downloadHScrollbar.set)
         self.downloadListBox.grid(row=1, column=0)
-        self.downloadListBox.config(activestyle="none", highlightthickness=0)
-        self.downloadScrollBar.config(command=self.downloadListBox.yview)
 
+        self.downloadVScrollbar.config(command=self.downloadListBox.yview)
+        self.downloadHScrollbar.config(command=self.downloadListBox.xview)
+
+        # bottom change download path
         self.changeDownloadPath = ttk.Frame(self.downloadFrame)
-        self.changeDownloadPath.grid(row=2, column=0, pady=(20, 0))
+        self.changeDownloadPath.grid(row=3, column=0, pady=(10, 0))
 
         self.downloadPathText = tk.StringVar()
         self.downloadPathText.set(self.trainerPath)
@@ -233,7 +254,7 @@ class GameCheatsManager(tk.Tk):
         self.trainerSearchEntry.bind('<FocusIn>', self.on_trainer_entry_click)
         self.trainerSearchEntry.bind(
             '<FocusOut>', self.on_trainer_entry_focusout)
-        self.flingListbox.bind('<Double-Button-1>', self.launch_trainer)
+        self.flingListBox.bind('<Double-Button-1>', self.launch_trainer)
         self.downloadSearchEntry.bind(
             '<FocusIn>', self.on_download_entry_click)
         self.downloadSearchEntry.bind(
@@ -331,10 +352,10 @@ class GameCheatsManager(tk.Tk):
             self.show_cheats()
             return
 
-        self.flingListbox.delete(0, tk.END)
+        self.flingListBox.delete(0, tk.END)
         for trainerName in self.trainers.keys():
             if search_text in trainerName.lower():
-                self.flingListbox.insert(tk.END, trainerName)
+                self.flingListBox.insert(tk.END, trainerName)
 
     def change_path(self, event=None):
         self.disable_all_widgets()
@@ -403,10 +424,10 @@ class GameCheatsManager(tk.Tk):
 
     def launch_trainer(self, event=None):
         try:
-            selection = self.flingListbox.curselection()
+            selection = self.flingListBox.curselection()
             if selection:
                 index = selection[0]
-                trainerName = self.flingListbox.get(index)
+                trainerName = self.flingListBox.get(index)
                 os.startfile(os.path.normpath(self.trainers[trainerName]))
         except OSError as e:
             if e.winerror == 1223:
@@ -415,10 +436,10 @@ class GameCheatsManager(tk.Tk):
                 raise
 
     def delete_trainer(self):
-        index = self.flingListbox.curselection()[0]
-        trainerName = self.flingListbox.get(index)
+        index = self.flingListBox.curselection()[0]
+        trainerName = self.flingListBox.get(index)
         os.remove(self.trainers[trainerName])
-        self.flingListbox.delete(index)
+        self.flingListBox.delete(index)
         self.show_cheats()
 
     def disable_download_widgets(self):
@@ -444,16 +465,16 @@ class GameCheatsManager(tk.Tk):
         self.deleteButton.config(state="enabled")
 
     def show_cheats(self):
-        self.flingListbox.delete(0, tk.END)
+        self.flingListBox.delete(0, tk.END)
         self.trainers = {}
         for trainer in sorted(os.scandir(self.trainerPath), key=lambda dirent: dirent.name):
             trainerName = os.path.splitext(os.path.basename(trainer.path))[0]
             if trainer.is_file() and os.path.getsize(trainer) != 0:
                 if "Trainer" in trainerName:
-                    self.flingListbox.insert(tk.END, trainerName)
+                    self.flingListBox.insert(tk.END, trainerName)
                     self.trainers[trainerName] = trainer.path
-            else:
-                shutil.rmtree(trainer.path)
+            # else:
+            #     shutil.rmtree(trainer.path)
 
     def download_display(self, keyword):
         self.disable_download_widgets()
@@ -620,7 +641,8 @@ class GameCheatsManager(tk.Tk):
                 gameRawName = filename
             elif "Trainer" not in filename:
                 cnt += 1
-        if cnt > 1:
+        # Warn user if extra files found
+        if cnt > 0:
             messagebox.showinfo(
                 _("Attention"), _("Additional actions required\nPlease check folder for details!"))
             os.startfile(self.tempDir)
@@ -637,6 +659,9 @@ class GameCheatsManager(tk.Tk):
 
         shutil.move(source_file, destination_file)
         os.remove(trainerTemp)
+        rhLog = os.path.join(self.tempDir, "rh.log")
+        if os.path.exists(rhLog):
+            os.remove(rhLog)
 
         self.downloadListBox.insert(tk.END, _("Download success!"))
         self.enable_download_widgets()
