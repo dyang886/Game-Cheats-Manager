@@ -377,11 +377,22 @@ class GameCheatsManager(tk.Tk):
         if folder:
             changedPath = os.path.normpath(
                 os.path.join(folder, "GCM Trainers/"))
+
+            # Can't change to the same path
             if self.downloadPathText.get() == changedPath:
                 messagebox.showerror(
                     _("Error"), _("Please choose a new path."))
                 self.enable_all_widgets()
                 return
+
+            # check errors when creating the new path
+            try:
+                dst = os.path.join(folder, "GCM Trainers/")
+                if not os.path.exists(dst):
+                    os.makedirs(dst)
+            except Exception as e:
+                messagebox.showerror(_("Error"), _(
+                    "Error creating the new path: " + str(e)))
 
             self.downloadPathText.set(changedPath)
             self.downloadListBox.delete(0, tk.END)
@@ -390,9 +401,6 @@ class GameCheatsManager(tk.Tk):
             self.downloadListBox.insert(
                 tk.END, _("Migrating existing trainers..."))
 
-            dst = os.path.join(folder, "GCM Trainers/")
-            if not os.path.exists(dst):
-                os.makedirs(dst)
             for filename in os.listdir(self.trainerPath):
                 src_file = os.path.join(self.trainerPath, filename)
                 dst_file = os.path.join(dst, filename)
@@ -519,7 +527,8 @@ class GameCheatsManager(tk.Tk):
 
     def keyword_match(self, keyword, targetString):
         sanitized_keyword = re.sub(r"['\"‘’“”:：.。]", "", keyword).lower()
-        sanitized_targetString = re.sub(r"['\"‘’“”:：.。]", "", targetString).lower()
+        sanitized_targetString = re.sub(
+            r"['\"‘’“”:：.。]", "", targetString).lower()
 
         return re.search(re.escape(sanitized_keyword), sanitized_targetString) is not None
 
