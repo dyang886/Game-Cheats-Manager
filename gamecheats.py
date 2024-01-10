@@ -528,9 +528,9 @@ class GameCheatsManager(tk.Tk):
         return trainerName
 
     def keyword_match(self, keyword, targetString):
-        sanitized_keyword = re.sub(r"['\"‘’“”:：.。]", "", keyword).lower()
+        sanitized_keyword = re.sub(r"[\s'\"‘’“”:：.。]", "", keyword).lower()
         sanitized_targetString = re.sub(
-            r"['\"‘’“”:：.。]", "", targetString).lower()
+            r"[\s'\"‘’“”:：.。]", "", targetString).lower()
 
         return re.search(re.escape(sanitized_keyword), sanitized_targetString) is not None
 
