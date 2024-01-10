@@ -392,7 +392,7 @@ class GameCheatsManager(tk.Tk):
                     os.makedirs(dst)
             except Exception as e:
                 messagebox.showerror(_("Error"), _(
-                    "Error creating the new path: " + str(e)))
+                    "Error creating the new path: ") + str(e))
                 self.enable_all_widgets()
                 return
 
