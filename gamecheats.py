@@ -393,6 +393,8 @@ class GameCheatsManager(tk.Tk):
             except Exception as e:
                 messagebox.showerror(_("Error"), _(
                     "Error creating the new path: " + str(e)))
+                self.enable_all_widgets()
+                return
 
             self.downloadPathText.set(changedPath)
             self.downloadListBox.delete(0, tk.END)
