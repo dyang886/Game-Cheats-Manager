@@ -280,6 +280,7 @@ class GameCheatsManager(tk.Tk):
             window_width, window_height = 300, 200
             self.settings_window.geometry(f"{window_width}x{window_height}")
             self.settings_window.resizable(False, False)
+            self.settings_window.transient(self)
 
             # Center the settings window to be inside of main app window
             main_x = self.winfo_x()
@@ -584,14 +585,14 @@ class GameCheatsManager(tk.Tk):
         try:
             global ts
             if "translators" not in sys.modules:
+                self.attributes('-topmost', True)
                 import translators as ts
             ts.translate_text(keyword)
+            self.attributes('-topmost', False)
         except Exception:
             pass
-
+        
         keyword = self.translate_keyword(keyword)
-        self.lift()
-        self.focus_force()
 
         # Search for results from archive
         url = "https://archive.flingtrainer.com/"
@@ -867,6 +868,21 @@ class GameCheatsManager(tk.Tk):
         messagebox.showinfo(
             _("Success"), _("You have now activated WeMod Pro!\nCurrent WeMod version: v") + newest_version_folder.strip('-app'))
 
+    def clean_old_versions(self, directory):
+        version_folders = self.identify_and_sort_versions(directory)
+        if not version_folders:
+            return None
+
+        # Skip the deletion if there's only one folder found
+        if not len(version_folders) <= 1:
+            # Skip the first one as it's the newest
+            for version_info, folder_name in version_folders[1:]:
+                folder_path = os.path.join(directory, folder_name)
+                shutil.rmtree(folder_path)
+                print(f"Deleted old version folder: {folder_path}")
+
+        return version_folders[0][1]
+
     def identify_and_sort_versions(self, directory):
         if not os.path.exists(directory):
             return None
@@ -887,21 +903,6 @@ class GameCheatsManager(tk.Tk):
         # Sort based on version numbers (major, minor, patch)
         version_folders.sort(reverse=True)  # Newest first
         return version_folders
-
-    def clean_old_versions(self, directory):
-        version_folders = self.identify_and_sort_versions(directory)
-        if not version_folders:
-            return None
-
-        # Skip the deletion if there's only one folder found
-        if not len(version_folders) <= 1:
-            # Skip the first one as it's the newest
-            for version_info, folder_name in version_folders[1:]:
-                folder_path = os.path.join(directory, folder_name)
-                shutil.rmtree(folder_path)
-                print(f"Deleted old version folder: {folder_path}")
-
-        return version_folders[0][1]
 
 
 if __name__ == "__main__":

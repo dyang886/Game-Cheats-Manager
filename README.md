@@ -24,7 +24,7 @@ Game Cheats Manager is a one-stop solution for gamers to manage their Fling trai
 
 ## Disclaimer
 
-Game Cheats Manager is not affiliated with, endorsed by, or in any way officially connected with Fling or any of its subsidiaries or affiliates. The official Fling website can be found at [Fling&#39;s website](https://flingtrainer.com/).
+Game Cheats Manager is not affiliated with, endorsed by, or in any way officially connected with Fling or any of its subsidiaries or affiliates. The official Fling website can be found at [Fling’s website](https://flingtrainer.com/).
 
 The trainers downloaded are provided by Fling and are subject to their respective terms and conditions. Game Cheats Manager simply provides a convenient way to manage these trainers and does not host any of the content itself.
 
