@@ -77,13 +77,6 @@ def get_translator():
     return lang.gettext
 
 
-def is_chinese(text):
-    for char in text:
-        if '\u4e00' <= char <= '\u9fff':
-            return True
-    return False
-
-
 SETTINGS_FILE = os.path.join(
     os.environ["APPDATA"], "GCM Settings/", "settings.json")
 
@@ -498,8 +491,8 @@ class GameCheatsManager(tk.Tk):
     def is_internet_connected(self, urls=None, timeout=3):
         if urls is None:
             urls = [
-                "https://www.baidu.com/",
                 "https://www.bing.com/",
+                "https://www.baidu.com/",
                 "http://www.google.com/",
             ]
 
@@ -512,7 +505,34 @@ class GameCheatsManager(tk.Tk):
                 continue
         return False
 
-    def translate_trainer_to_zh(self, trainerName):
+    def translate_keyword(self, keyword):
+        isChinese = False
+        for char in keyword:
+            if '\u4e00' <= char <= '\u9fff':
+                isChinese = True
+
+        # more translation services significantly impact speed, keep it one for now
+        services = ["bing"]
+        translations = []
+        if isChinese:
+            for service in services:
+                try:
+                    translated_keyword = ts.translate_text(
+                        keyword, from_language='zh', to_language='en', translator=service)
+                    translations.append(translated_keyword)
+                    print(
+                        f"Translated keyword using {service}: {translated_keyword}")
+                except Exception as e:
+                    print(f"Translation failed with {service}: {str(e)}")
+
+            if not translations:
+                self.downloadListBox.insert(
+                    tk.END, _("Translation failed: ") + str(e))
+            return translations
+
+        return keyword
+
+    def translate_trainer(self, trainerName):
         if settings["language"] == "zh_CN":
             trans_trainerName = trainerName.rsplit(" Trainer", 1)[0]
             try:
@@ -522,14 +542,26 @@ class GameCheatsManager(tk.Tk):
                 trainerName = f"《{trainerName}》修改器"
             except Exception:
                 pass
+
         return trainerName
 
     def keyword_match(self, keyword, targetString):
-        sanitized_keyword = re.sub(r"[\s'\"‘’“”:：.。]", "", keyword).lower()
-        sanitized_targetString = re.sub(
-            r"[\s'\"‘’“”:：.。]", "", targetString).lower()
+        def sanitize(text):
+            return re.sub(r"[\s'\"‘’“”:：.。,，()（）;；!！?？]", "", text).lower()
 
-        return re.search(re.escape(sanitized_keyword), sanitized_targetString) is not None
+        def is_match(sanitized_keyword, sanitized_targetString):
+            return re.search(re.escape(sanitized_keyword), sanitized_targetString) is not None
+
+        sanitized_targetString = sanitize(targetString)
+        if isinstance(keyword, str):
+            if len(keyword) >= 2:
+                sanitized_keyword = sanitize(keyword)
+                return is_match(sanitized_keyword, sanitized_targetString)
+
+        elif isinstance(keyword, list):
+            return any(is_match(sanitize(kw), sanitized_targetString) for kw in keyword)
+
+        return False
 
     def download_display(self, keyword):
         self.disable_download_widgets()
@@ -557,14 +589,7 @@ class GameCheatsManager(tk.Tk):
         except Exception:
             pass
 
-        if is_chinese(keyword):
-            try:
-                keyword = ts.translate_text(
-                    keyword, from_language='zh', to_language='en')
-                print("Translated keyword: " + keyword)
-            except Exception as e:
-                self.downloadListBox.insert(
-                    tk.END, _("Translation failed: ") + str(e))
+        keyword = self.translate_keyword(keyword)
         self.lift()
         self.focus_force()
 
@@ -588,10 +613,9 @@ class GameCheatsManager(tk.Tk):
             trainerName = parsedTrainerName.strip() + " Trainer"
 
             # search algorithm
-            if len(keyword) >= 2:
-                if self.keyword_match(keyword, trainerName):
-                    self.trainer_urls[trainerName] = urljoin(
-                        url, link.get("href"))
+            if self.keyword_match(keyword, trainerName):
+                self.trainer_urls[trainerName] = urljoin(
+                    url, link.get("href"))
 
         # Search for results from main website, prioritized, will replace same trainer from archive
         url = "https://flingtrainer.com/all-trainers-a-z/"
@@ -608,9 +632,8 @@ class GameCheatsManager(tk.Tk):
                     trainerName = link.get_text().strip()
 
                     # search algorithm
-                    if len(keyword) >= 2:
-                        if self.keyword_match(keyword, trainerName):
-                            self.trainer_urls[trainerName] = link.get("href")
+                    if self.keyword_match(keyword, trainerName):
+                        self.trainer_urls[trainerName] = link.get("href")
 
         # Remove duplicates
         new_trainer_urls = {}
@@ -625,8 +648,6 @@ class GameCheatsManager(tk.Tk):
                 new_trainer_urls[norm_name] = (original_name, url)
             else:
                 # Check if the new URL is from the main site and should replace the existing one
-                existing_url = new_trainer_urls[norm_name][1]
-                existing_domain = urlparse(existing_url).netloc
                 if domain == "flingtrainer.com":
                     new_trainer_urls[norm_name] = (original_name, url)
 
@@ -641,7 +662,7 @@ class GameCheatsManager(tk.Tk):
         self.downloadListBox.insert(tk.END, _("Translating..."))
         count = 0
         for trainerName in self.trainer_urls.keys():
-            trainerName = self.translate_trainer_to_zh(trainerName)
+            trainerName = self.translate_trainer(trainerName)
             # Clear prior texts
             if count == 0:
                 self.enable_download_widgets()
@@ -673,7 +694,7 @@ class GameCheatsManager(tk.Tk):
             mFilename = mFilename.split("/")[1]
 
         for trainerPath in self.trainers.keys():
-            if mFilename in trainerPath or self.translate_trainer_to_zh(mFilename) in trainerPath:
+            if mFilename in trainerPath or self.translate_trainer(mFilename) in trainerPath:
                 self.downloadListBox.delete(0, tk.END)
                 self.downloadListBox.insert(
                     tk.END, _("Trainer already exists, aborted download."))
@@ -739,7 +760,7 @@ class GameCheatsManager(tk.Tk):
             os.startfile(self.tempDir)
 
         os.makedirs(self.trainerPath, exist_ok=True)
-        mFilename = self.translate_trainer_to_zh(mFilename)
+        mFilename = self.translate_trainer(mFilename)
         trainer_name = mFilename + ".exe"
         source_file = os.path.join(self.tempDir, gameRawName)
         destination_file = os.path.join(self.trainerPath, trainer_name)
