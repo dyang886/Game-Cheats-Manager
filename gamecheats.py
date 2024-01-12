@@ -19,10 +19,7 @@ import sv_ttk
 from tendo import singleton
 from urllib.parse import urljoin, urlparse
 import locale
-try:
-    import translators as ts
-except Exception:
-    pass
+ts = None
 
 
 def resource_path(relative_path):
@@ -553,7 +550,9 @@ class GameCheatsManager(tk.Tk):
 
         # First time calling ts will pop up a cmd window, address it here
         try:
-            import translators as ts
+            global ts
+            if "translators" not in sys.modules:
+                import translators as ts
             ts.translate_text(keyword)
         except Exception:
             pass

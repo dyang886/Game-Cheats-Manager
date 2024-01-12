@@ -17,14 +17,14 @@ Game Cheats Manager is a one-stop solution for gamers to manage their Fling trai
 
 ## Usage
 
-1. **Browse Trainers**: On the left column, use the search function or browse the list to find the trainers you need.
-2. **Download**: On the right column, search with keywords and double-click the desired matches to download them directly.
-3. **Manage**: Launch/double-click or delete trainers using the corresponding buttons in the application.
-4. **Settings**: Customize your download path and other preferences in the settings menu.
+1. **Browse Trainers**: In the left column, use the search function or browse the list to find the trainers you need.
+2. **Download Trainers**: In the right column, search with keywords and double-click the desired match to download it directly.
+3. **Manage Trainers**: Launch/double-click or delete trainers using the corresponding buttons in the application.
+4. **Settings**: To customize the trainer download path, click the button with dots in the right corner to select a new path. Other settings can be accessed from "Options" in the menu bar.
 
 ## Disclaimer
 
-Game Cheats Manager is not affiliated with, endorsed by, or in any way officially connected with Fling or any of its subsidiaries or its affiliates. The official Fling website can be found at [Fling's website](https://flingtrainer.com/).
+Game Cheats Manager is not affiliated with, endorsed by, or in any way officially connected with Fling or any of its subsidiaries or affiliates. The official Fling website can be found at [Fling&#39;s website](https://flingtrainer.com/).
 
 The trainers downloaded are provided by Fling and are subject to their respective terms and conditions. Game Cheats Manager simply provides a convenient way to manage these trainers and does not host any of the content itself.
 
