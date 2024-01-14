@@ -9,7 +9,7 @@ import sys
 import tempfile
 import threading
 import time
-from urllib.parse import urljoin, urlparse
+from urllib.parse import urljoin, urlparse, quote, parse_qs
 
 import polib
 import requests
@@ -21,9 +21,12 @@ import tkinter as tk
 from tkinter import filedialog, messagebox, ttk
 import zipfile
 from zhon.hanzi import punctuation as CN_PUNCTUATIONS
+
 ts = None
 
 SEARCH_ENGINE = 'https://bing.com/search?q={search_content}'
+
+STEAM_SEARCH_SUGGESTIONS = 'https://store.steampowered.com/search/suggest?term={search_content}&cc=CN&l=schinese'
 
 
 def resource_path(relative_path):
@@ -533,25 +536,53 @@ class GameCheatsManager(tk.Tk):
 
     def translate_or_find_keyword(self, keyword):
         try:
-            translated_keyword = self.translate_keyword()
+            translated_keyword = [self.translate_keyword(keyword), ]
         except Exception as e:
             translated_keyword = []
 
+        game_en_names = []
         if self.include_chinese(keyword):
             try:
-                game_en_names = self.game_en_name(keyword)
+                game_en_names.extend(self.game_en_name_powered_by_steam(keyword))
             except Exception as e:
-                game_en_names = []
-        else:
-            game_en_names = []
+                pass
 
+            try:
+                game_en_names.extend(self.game_en_name(keyword))
+            except Exception as e:
+                pass
+
+        print(f'{[*translated_keyword, *game_en_names]=}')
         return [*translated_keyword, *game_en_names]
+
+    def game_en_name_powered_by_steam(self, name: str):
+        result = []
+
+        url = requests.utils.requote_uri(STEAM_SEARCH_SUGGESTIONS.format(search_content=quote(name)))
+        print(url)
+        try:
+            response = requests.get(
+                url,
+                # 不能用 self.headers
+                headers=self.headers
+            )
+
+            archiveHTML = BeautifulSoup(response.text, 'html.parser')
+        except Exception as e:
+            print(f'get game en name which powered by steam went to something wrong: {repr(e)}')
+            return result  # 空列表
+
+        for li_element in archiveHTML.find_all('li'):
+            text = li_element.get_text()
+            result.append(text)
+
+        return result
 
     def game_en_name(self, name: str):
         result = []
 
-        search_content = f'{name} site:store.steampowered.com OR site:store.epicgames.com'
-        url = requests.utils.requote_uri(SEARCH_ENGINE.format(search_content=search_content))
+        search_content = f'{name} site:store.steampowered.com'
+        url = requests.utils.requote_uri(SEARCH_ENGINE.format(search_content=quote(search_content)))
         print(url)
         try:
             response = requests.get(
@@ -564,43 +595,81 @@ class GameCheatsManager(tk.Tk):
 
             archiveHTML = BeautifulSoup(response.text, 'html.parser')
         except Exception as e:
-            print(f'get game en name went to something wrong: {repr(e)}')
+            print(f'Get game en name went to something wrong: {repr(e)}')
             return result  # 空列表
 
         i = 0
         for element in archiveHTML.find_all('a', target="_blank"):
             text: str = element.get_text()
-            if 'store.epicgames.com' in element.get('href'):
+
+            children = element.findChildren('cite')
+            if len(children) > 0:
+                href: str = children[0].get_text().lower()
+            else:
+                href = element.get('href', '').lower()
+
+            # if href.startswith('https://store.epicgames.com'):
+            #     parsed_url = urlparse(href)
+            #     split_url_path = parsed_url.path.split('/')
+            #     print(f'{split_url_path=}')
+            #     if len(split_url_path) <= 1:
+            #         continue
+            #     elif split_url_path[-2].lower() != 'p':
+            #         continue
+            #
+            #     en_name = split_url_path[-1].replace('-', ' ') \
+            #             .replace('™', '').replace('®', '')
+            if href.startswith('https://store.steampowered.com'):
+                parsed_url = urlparse(href)
+                split_url_path = parsed_url.path.split('/')
+                if len(split_url_path) <= 1:
+                    continue
+                elif split_url_path[-2].lower() != 'app':
+                    continue
+                elif not split_url_path[-1].isnumeric():
+                    continue
+
+                game_id = int(split_url_path[-1])
+                try:
+                    response = requests.get(f'https://store.steampowered.com/api/appdetails/?appids={game_id}')
+                    en_name = response.json()[str(game_id)]['data']['name'].replace('_', ' ') \
+                        .replace('™', '').replace('®', '')
+                except Exception as e:
+                    print('Get steam app info error' + repr(e))
+                    continue
+            elif 'bing.com' in href:
+                continue  # 跳过
+
                 lower_text = text.lower()
-                if ' | ' in lower_text:
-                    en_name = self.replace_chinese(text.split(' | ', 2)[0]).strip()
-                elif ' - ' in lower_text:
-                    en_name = self.replace_chinese(text.split(' - ', 2)[0]).strip()
+                if 'epic' in lower_text:
+                    if ' | ' in lower_text:
+                        en_name = self.replace_chinese(text.split(' | ', 2)[0]).strip()
+                    elif ' - ' in lower_text:
+                        en_name = self.replace_chinese(text.split(' - ', 2)[0]).strip()
+                    else:
+                        continue
+                elif text.strip().lower().startswith('Steam 上的 '):
+                    en_name = self.replace_chinese(text.strip()[9:]).strip()
                 else:
                     continue
-            elif 'store.steampowered.com' in element.get('href') and text.strip().lower().startswith('Steam 上的 '):
-                en_name = self.replace_chinese(text.strip()[9:]).strip()
             else:
                 continue
 
             if len(en_name) < 2:
                 continue
-            elif en_name.lower().strip().startswith('epic game'):
+            elif en_name.lower().strip().startswith('epic game') or en_name.lower().strip().startswith('steam'):
                 continue
-            print(text)
 
             i += 1
             result.append(en_name)
 
             if i > 3:
                 break
-
-        print(f'{result=}')
         return result
 
     @staticmethod
     def is_chinese(char: str) -> bool:
-        assert len(char) <= 1, 'char must only one character at a time'
+        assert len(char) <= 1, 'Char must only one character at a time'
 
         return '\u4e00' <= char <= '\u9fff' or char in CN_PUNCTUATIONS
 
@@ -924,7 +993,7 @@ class GameCheatsManager(tk.Tk):
 
         # Convert the dictionary to use original names as keys
         self.trainer_urls = {original: url for _,
-                             (original, url) in new_trainer_urls.items()}
+        (original, url) in new_trainer_urls.items()}
 
         # Sort the dict alphabetically
         self.trainer_urls = dict(sorted(self.trainer_urls.items()))
@@ -1013,7 +1082,8 @@ class GameCheatsManager(tk.Tk):
                     zip_ref.extractall(self.tempDir)
         except Exception as e:
             messagebox.showerror(
-                tk_translator("Error"), tk_translator("An error occurred while extracting downloaded trainer: ") + str(e))
+                tk_translator("Error"),
+                tk_translator("An error occurred while extracting downloaded trainer: ") + str(e))
             self.enable_download_widgets()
             return
 
@@ -1027,7 +1097,8 @@ class GameCheatsManager(tk.Tk):
         # Warn user if extra files found
         if cnt > 0:
             messagebox.showinfo(
-                tk_translator("Attention"), tk_translator("Additional actions required\nPlease check folder for details!"))
+                tk_translator("Attention"),
+                tk_translator("Additional actions required\nPlease check folder for details!"))
             os.startfile(self.tempDir)
 
         os.makedirs(self.trainerPath, exist_ok=True)
@@ -1094,12 +1165,15 @@ class GameCheatsManager(tk.Tk):
             os.remove(file_to_replace)
         except Exception:
             messagebox.showerror(
-                tk_translator("Error"), tk_translator("WeMod is currently running, please close the application first."))
+                tk_translator("Error"),
+                tk_translator("WeMod is currently running, please close the application first."))
             return
         shutil.copyfile(self.crackFilePath, file_to_replace)
 
         messagebox.showinfo(
-            tk_translator("Success"), tk_translator("You have now activated WeMod Pro!\nCurrent WeMod version: v") + newest_version_folder.strip('-app'))
+            tk_translator("Success"),
+            tk_translator("You have now activated WeMod Pro!\nCurrent WeMod version: v") + newest_version_folder.strip(
+                '-app'))
 
 
 if __name__ == "__main__":
