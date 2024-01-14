@@ -1,24 +1,25 @@
+import gettext
 import json
+import locale
 import os
+import re
 import shutil
 import subprocess
 import sys
 import tempfile
 import threading
 import time
-import tkinter as tk
-from tkinter import filedialog, messagebox, ttk
-import zipfile
-import re
+from urllib.parse import urljoin, urlparse
 
-from bs4 import BeautifulSoup
-import gettext
 import polib
 import requests
 import sv_ttk
+from bs4 import BeautifulSoup
+from PIL import Image, ImageTk
 from tendo import singleton
-from urllib.parse import urljoin, urlparse
-import locale
+import tkinter as tk
+from tkinter import filedialog, messagebox, ttk
+import zipfile
 ts = None
 
 
@@ -34,27 +35,34 @@ def apply_settings(settings):
 
 
 def load_settings():
+    system_locale = locale.getlocale()[0]
+    locale_mapping = {
+        "en_US": "English_United States",
+        "zh_CN": "Chinese (Simplified)_China",
+        "zh_HK": "Chinese (Simplified)_Hong Kong SAR",
+        "zh_MO": "Chinese (Simplified)_Macao SAR"
+    }
+    app_locale = locale_mapping.get(system_locale, 'en_US')
+
+    default_settings = {
+        "downloadPath": os.path.join(os.environ["APPDATA"], "GCM Trainers/"),
+        "language": app_locale,
+        "enSearchResults": False,
+    }
+
     try:
         with open(SETTINGS_FILE, "r") as f:
-            return json.load(f)
+            settings = json.load(f)
     except FileNotFoundError:
-        system_locale = locale.getlocale()[0]
-        locale_mapping = {
-            "English_United States": "en_US",
-            "Chinese (Simplified)_China": "zh_CN",
-            "Chinese (Simplified)_Hong Kong SAR": "zh_CN",
-            "Chinese (Simplified)_Macao SAR": "zh_CN"
-        }
-        app_locale = locale_mapping.get(system_locale, 'en_US')
+        settings = default_settings
+    else:
+        for key, value in default_settings.items():
+            settings.setdefault(key, value)
 
-        # Default settings
-        default_settings = {
-            "downloadPath": os.path.join(os.environ["APPDATA"], "GCM Trainers/"),
-            "language": app_locale
-        }
-        with open(SETTINGS_FILE, "w") as f:
-            json.dump(default_settings, f)
-        return default_settings
+    with open(SETTINGS_FILE, "w") as f:
+        json.dump(settings, f)
+
+    return settings
 
 
 def get_translator():
@@ -99,30 +107,41 @@ class GameCheatsManager(tk.Tk):
     def __init__(self):
         super().__init__()
 
+        # Single instance check and basic UI setup
         try:
             self.single_instance_checker = singleton.SingleInstance()
         except singleton.SingleInstanceException:
             sys.exit(1)
-
         self.title("Game Cheats Manager")
         self.iconbitmap(resource_path("assets/logo.ico"))
         sv_ttk.set_theme("dark")
-        # {trainer name, trainer path}
-        self.trainers = {}  # store installed trainers
-        # {trainer name, download link}
-        self.trainer_urls = {}  # store search results
-        self.trainerPath = os.path.normpath(
-            os.path.abspath(load_settings()["downloadPath"]))
-        os.makedirs(self.trainerPath, exist_ok=True)
-        self.tempDir = os.path.join(
-            tempfile.gettempdir(), "GameCheatsManagerTemp")
+
+        # Version, user prompts, and links
+        self.appVersion = "1.2.2"
+        self.githubLink = "https://github.com/dyang886/Game-Cheats-Manager"
         self.trainerSearchEntryPrompt = _("Search for installed")
         self.downloadSearchEntryPrompt = _("Search to download")
-        self.headers = {
-            'User-Agent': 'Mozilla/5.0 (Windows NT 10.0; Win64; x64) AppleWebKit/537.36 (KHTML, like Gecko) Chrome/58.0.3029.110 Safari/537.3'}
-        self.settings_window = None
+
+        # Paths and trainer management
+        settings = load_settings()  # Load settings once and use it throughout
+        self.trainerPath = os.path.normpath(
+            os.path.abspath(settings["downloadPath"]))
+        os.makedirs(self.trainerPath, exist_ok=True)
+        self.tempDir = os.path.join(
+            tempfile.gettempdir(), "GameCheatsManagerTemp/")
         self.crackFilePath = resource_path("dependency/app.asar")
         self.wemodPath = os.path.join(os.getenv("LOCALAPPDATA"), "WeMod/")
+        self.trainers = {}  # Store installed trainers: {trainer name: trainer path}
+        self.trainer_urls = {}  # Store search results: {trainer name: download link}
+
+        # Networking
+        self.headers = {
+            'User-Agent': 'Mozilla/5.0 (Windows NT 10.0; Win64; x64) AppleWebKit/537.36 (KHTML, like Gecko) Chrome/58.0.3029.110 Safari/537.3'
+        }
+
+        # Window references
+        self.settings_window = None
+        self.about_window = None
 
         # Menu bar
         self.menuBar = tk.Frame(self, background="#2e2e2e")
@@ -133,6 +152,8 @@ class GameCheatsManager(tk.Tk):
             label=_("Settings"), command=self.open_settings)
         self.settingsMenu.add_command(
             label=("WeMod Pro"), command=self.wemod_pro)
+        self.settingsMenu.add_command(
+            label=_("About"), command=self.open_about)
         self.settingMenuBtn.config(menu=self.settingsMenu)
         self.settingMenuBtn.pack(side="left")
         self.menuBar.grid(row=0, column=0, sticky="ew")
@@ -141,9 +162,9 @@ class GameCheatsManager(tk.Tk):
         self.frame = ttk.Frame(self)
         self.frame.grid(row=1, column=0, padx=30, pady=(20, 30))
 
-        # ================================================================
+        # ===========================================================================
         # column 1 - trainers
-        # ================================================================
+        # ===========================================================================
         self.flingFrame = ttk.Frame(self.frame)
         self.flingFrame.grid(row=0, column=0)
 
@@ -200,9 +221,9 @@ class GameCheatsManager(tk.Tk):
             self.bottomFrame, text=_("Delete"), width=11, command=self.delete_trainer)
         self.deleteButton.grid(row=0, column=1, padx=(9, 0))
 
-        # ================================================================
+        # ===========================================================================
         # column 2 - downloads
-        # ================================================================
+        # ===========================================================================
         self.downloadFrame = ttk.Frame(self.frame)
         self.downloadFrame.grid(row=0, column=1, padx=(30, 0))
 
@@ -268,64 +289,155 @@ class GameCheatsManager(tk.Tk):
         self.eval('tk::PlaceWindow . center')
         self.mainloop()
 
+    # ===========================================================================
+    # menu bar windows
+    # ===========================================================================
+    def center_window(self, window):
+        window.update()
+        main_x = self.winfo_x()
+        main_y = self.winfo_y()
+        main_width = self.winfo_width()
+        main_height = self.winfo_height()
+        window_width = window.winfo_width()
+        window_height = window.winfo_height()
+        center_x = int(main_x + (main_width - window_width) / 2)
+        center_y = int(main_y + (main_height - window_height) / 2)
+        window.geometry(f"+{center_x}+{center_y}")
+
+    def apply_settings_page(self):
+        settings["language"] = language_options[self.languages_var.get()]
+        settings["enSearchResults"] = self.en_results_var.get()
+        apply_settings(settings)
+        messagebox.showinfo(_("Attention"), _(
+            "Please restart the application to apply settings"))
+
     def open_settings(self):
         if self.settings_window is None or not self.settings_window.winfo_exists():
             self.settings_window = tk.Toplevel(self)
             self.settings_window.title(_("Settings"))
             self.settings_window.iconbitmap(
                 resource_path("assets/setting.ico"))
-            self.settings_window.columnconfigure(0, weight=1)
-            self.settings_window.rowconfigure(0, weight=1)
-
-            window_width, window_height = 300, 200
-            self.settings_window.geometry(f"{window_width}x{window_height}")
-            self.settings_window.resizable(False, False)
             self.settings_window.transient(self)
 
-            # Center the settings window to be inside of main app window
-            main_x = self.winfo_x()
-            main_y = self.winfo_y()
-            main_width = self.winfo_width()
-            main_height = self.winfo_height()
-            center_x = int(main_x + (main_width - window_width) / 2)
-            center_y = int(main_y + (main_height - window_height) / 2)
-            self.settings_window.geometry(f"+{center_x}+{center_y}")
+            settings_frame = ttk.Frame(self.settings_window)
+            settings_frame.grid(row=0, column=0, sticky='nsew',
+                                padx=(80, 80), pady=(30, 20))
 
+            # ===========================================================================
             # languages frame
-            self.languages_frame = ttk.Frame(self.settings_window)
+            languages_frame = ttk.Frame(settings_frame)
+            languages_frame.grid(row=0, column=0, pady=(20, 0), sticky="we")
 
-            # languages label
-            self.languages_label = ttk.Label(
-                self.languages_frame, text=_("Language:"))
-            self.languages_label.pack(anchor="w")
+            languages_label = ttk.Label(languages_frame, text=_("Language:"))
+            languages_label.pack(anchor="w")
 
-            # languages combobox
             self.languages_var = tk.StringVar()
             for key, value in language_options.items():
                 if value == settings["language"]:
                     self.languages_var.set(key)
 
-            self.languages_combobox = ttk.Combobox(
-                self.languages_frame, textvariable=self.languages_var, values=list(language_options.keys()), state="readonly", width=20)
-            self.languages_combobox.pack(side=tk.LEFT)
+            languages_combobox = ttk.Combobox(
+                languages_frame,
+                textvariable=self.languages_var,
+                values=list(language_options.keys()),
+                state="readonly", width=20
+            )
+            languages_combobox.pack(side=tk.LEFT)
 
+            # ===========================================================================
+            # english search results frame
+            en_results_frame = ttk.Frame(settings_frame)
+            en_results_frame.grid(row=1, column=0, pady=(20, 0), sticky="we")
+
+            en_results_label = ttk.Label(
+                en_results_frame,
+                text=_("Always show search results in English:"),
+                wraplength=130
+            )
+            en_results_label.pack(side=tk.LEFT)
+
+            self.en_results_var = tk.BooleanVar()
+            self.en_results_var.set(settings["enSearchResults"])
+            en_results_checkbox = ttk.Checkbutton(
+                en_results_frame,
+                variable=self.en_results_var
+            )
+            en_results_checkbox.pack(side=tk.RIGHT, padx=(10, 0))
+
+            # ===========================================================================
             # apply button
             apply_button = ttk.Button(
-                self.settings_window, text=_("Apply"), command=self.apply_settings_page)
+                self.settings_window, text=_("Apply"),
+                command=self.apply_settings_page
+            )
+            apply_button.grid(row=1, column=0, padx=(
+                0, 20), pady=(20, 20), sticky="e")
 
-            self.languages_frame.grid(row=0, column=0, pady=(20, 0))
-            apply_button.grid(row=2, column=0, padx=(
-                0, 20), pady=(20, 20), sticky=tk.E)
+            self.center_window(self.settings_window)
         else:
             self.settings_window.lift()
             self.settings_window.focus_force()
 
-    def apply_settings_page(self):
-        settings["language"] = language_options[self.languages_var.get()]
-        apply_settings(settings)
-        messagebox.showinfo(_("Attention"), _(
-            "Please restart the application to apply settings"))
+    def open_about(self):
+        if self.about_window is None or not self.about_window.winfo_exists():
+            self.about_window = tk.Toplevel(self)
+            self.about_window.title(_("About"))
+            self.about_window.iconbitmap(
+                resource_path("assets/logo.ico"))
+            self.about_window.transient(self)
 
+            about_frame = ttk.Frame(self.about_window)
+            about_frame.grid(row=0, column=0, sticky='nsew',
+                             padx=(50, 50), pady=(30, 40))
+
+            # ===========================================================================
+            # app logo
+            original_image = Image.open(resource_path("assets/logo.png"))
+            resized_image = original_image.resize((100, 100))
+            logo_image = ImageTk.PhotoImage(resized_image)
+            logo_label = ttk.Label(about_frame, image=logo_image)
+            logo_label.image = logo_image  # Keep a reference
+            logo_label.grid(row=0, column=0)
+
+            # ===========================================================================
+            # app name and version
+            appInfo_frame = ttk.Frame(about_frame)
+            appInfo_frame.grid(row=0, column=1)
+
+            app_name_label = ttk.Label(
+                appInfo_frame, text="Game Cheats Manager", font=("TkDefaultFont", 16))
+            app_name_label.grid(row=0, column=0, pady=(0, 15))
+
+            app_version_label = ttk.Label(
+                appInfo_frame, text=_("Version: ") + self.appVersion)
+            app_version_label.grid(row=1, column=0)
+
+            # ===========================================================================
+            # links
+            def open_link(event, url):
+                import webbrowser
+                webbrowser.open_new(url)
+
+            links_frame = ttk.Frame(about_frame)
+            links_frame.grid(row=1, column=0, columnspan=2, pady=(20, 0))
+
+            github_label = ttk.Label(links_frame, text="GitHub: ")
+            github_label.pack(side=tk.LEFT)
+
+            github_link = ttk.Label(
+                links_frame, text=self.githubLink, cursor="hand2", foreground="#284fff")
+            github_link.pack(side=tk.LEFT)
+            github_link.bind(
+                "<Button-1>", lambda e: open_link(e, self.githubLink))
+
+            self.center_window(self.about_window)
+        else:
+            self.about_window.lift()
+            self.about_window.focus_force()
+
+    # ===========================================================================
+    # event functions
+    # ===========================================================================
     def on_trainer_entry_click(self, event):
         if self.trainerSearchEntry.get() == self.trainerSearchEntryPrompt:
             self.trainerSearchEntry.delete(0, tk.END)
@@ -348,6 +460,198 @@ class GameCheatsManager(tk.Tk):
             self.downloadSearchEntry.insert(0, self.downloadSearchEntryPrompt)
             self.downloadSearchEntry.config(foreground="grey")
 
+    def on_enter_press(self, event=None):
+        keyword = self.downloadSearchEntry.get()
+        if keyword:
+            self.create_download_thread1(keyword)
+
+    def on_download_double_click(self, event=None):
+        selection = self.downloadListBox.curselection()
+        if selection:
+            index = selection[0]
+            self.create_download_thread2(index)
+
+    def create_download_thread1(self, keyword):
+        download_thread1 = threading.Thread(
+            target=self.download_display, args=(keyword,))
+        download_thread1.start()
+
+    def create_download_thread2(self, index):
+        download_thread2 = threading.Thread(
+            target=self.download_trainer, args=(index,))
+        download_thread2.start()
+
+    def create_migration_thread(self):
+        migration_thread = threading.Thread(target=self.change_path)
+        migration_thread.start()
+
+    # ===========================================================================
+    # core helper functions
+    # ===========================================================================
+    def disable_download_widgets(self):
+        self.downloadSearchEntry.config(state="disabled")
+        self.fileDialogButton.config(state="disabled")
+
+    def enable_download_widgets(self):
+        self.downloadSearchEntry.config(state="enabled")
+        self.fileDialogButton.config(state="enabled")
+
+    def disable_all_widgets(self):
+        self.downloadSearchEntry.config(state="disabled")
+        self.fileDialogButton.config(state="disabled")
+        self.trainerSearchEntry.config(state="disabled")
+        self.launchButton.config(state="disabled")
+        self.deleteButton.config(state="disabled")
+
+    def enable_all_widgets(self):
+        self.downloadSearchEntry.config(state="enabled")
+        self.fileDialogButton.config(state="enabled")
+        self.trainerSearchEntry.config(state="enabled")
+        self.launchButton.config(state="enabled")
+        self.deleteButton.config(state="enabled")
+
+    def is_internet_connected(self, urls=None, timeout=3):
+        if urls is None:
+            urls = [
+                "https://www.bing.com/",
+                "https://www.baidu.com/",
+                "http://www.google.com/",
+            ]
+
+        for url in urls:
+            try:
+                response = requests.get(url, timeout=timeout)
+                response.raise_for_status()
+                return True
+            except requests.RequestException:
+                continue
+        return False
+
+    def translate_keyword(self, keyword):
+        isChinese = False
+        for char in keyword:
+            if '\u4e00' <= char <= '\u9fff':
+                isChinese = True
+
+        # more translation services significantly impact speed, keep it one for now
+        services = ["bing"]
+        translations = []
+        if isChinese:
+            for service in services:
+                try:
+                    translated_keyword = ts.translate_text(
+                        keyword, from_language='zh', to_language='en', translator=service)
+                    translations.append(translated_keyword)
+                    print(
+                        f"Translated keyword using {service}: {translated_keyword}")
+                except Exception as e:
+                    print(f"Translation failed with {service}: {str(e)}")
+
+            if not translations:
+                self.downloadListBox.insert(
+                    tk.END, _("Translation failed: ") + str(e))
+            return translations
+
+        return keyword
+
+    def translate_trainer(self, trainerName):
+        if settings["language"] == "zh_CN" and not settings["enSearchResults"]:
+            trans_trainerName = trainerName.rsplit(" Trainer", 1)[0]
+            try:
+                trainerName = ts.translate_text(
+                    trans_trainerName, from_language='en', to_language='zh')
+                trainerName = trainerName.replace("《", "").replace("》", "")
+                trainerName = f"《{trainerName}》修改器"
+            except Exception:
+                pass
+
+        return trainerName
+
+    def keyword_match(self, keyword, targetString):
+        def sanitize(text):
+            return re.sub(r"[\s'\"‘’“”:：.。,，()（）;；!！?？]", "", text).lower()
+
+        def is_match(sanitized_keyword, sanitized_targetString):
+            return re.search(re.escape(sanitized_keyword), sanitized_targetString) is not None
+
+        sanitized_targetString = sanitize(targetString)
+        if isinstance(keyword, str):
+            if len(keyword) >= 2:
+                sanitized_keyword = sanitize(keyword)
+                return is_match(sanitized_keyword, sanitized_targetString)
+
+        elif isinstance(keyword, list):
+            return any(is_match(sanitize(kw), sanitized_targetString) for kw in keyword)
+
+        return False
+
+    def modify_fling_settings(self):
+        # replace bg music in Documents folder
+        empty_midi = resource_path("dependency/TrainerBGM.mid")
+        username = os.getlogin()
+        flingSettings_path = f"C:/Users/{username}/Documents/FLiNGTrainer"
+        bgMusic_path = os.path.join(flingSettings_path, "TrainerBGM.mid")
+        if os.path.exists(bgMusic_path):
+            shutil.copyfile(empty_midi, bgMusic_path)
+
+        # change fling settings to disable startup music
+        settingFile_1 = os.path.join(flingSettings_path, "FLiNGTSettings.ini")
+        settingFile_2 = os.path.join(flingSettings_path, "TrainerSettings.ini")
+
+        for settingFile in [settingFile_1, settingFile_2]:
+            if not os.path.exists(settingFile):
+                continue
+            with open(settingFile, 'r', encoding='utf-8') as file:
+                lines = file.readlines()
+
+            # Update the OnLoadMusic setting
+            with open(settingFile, 'w', encoding='utf-8') as file:
+                for line in lines:
+                    if line.strip().startswith('OnLoadMusic'):
+                        file.write('OnLoadMusic=False\n')
+                    else:
+                        file.write(line)
+
+    def remove_bgMusic(self, source_exe, resource_type_list):
+        # Base case
+        if not resource_type_list:
+            return
+
+        resource_type = resource_type_list.pop(0)
+
+        # Define paths and files
+        empty_midi = resource_path("dependency/TrainerBGM.mid")
+        resourceHackerPath = resource_path("dependency/ResourceHacker.exe")
+        tempLog = os.path.join(self.tempDir, "rh.log")
+
+        # Remove background music from executable
+        command = [resourceHackerPath, "-open", source_exe, "-save", source_exe,
+                   "-action", "delete", "-mask", f"{resource_type},,", "-log", tempLog]
+        subprocess.run(command, creationflags=subprocess.CREATE_NO_WINDOW)
+
+        # Read the log file
+        with open(tempLog, 'r', encoding='utf-16-le') as file:
+            log_content = file.read()
+
+        # Check for deleted resource in log
+        pattern = r"Deleted:\s*(\w+),(\d+),(\d+)"
+        match = re.search(pattern, log_content)
+
+        if match:
+            # Resource was deleted; prepare to add the empty midi
+            resource_id = match.group(2)
+            locale_id = match.group(3)
+            resource = ",".join([resource_type, resource_id, locale_id])
+            command = [resourceHackerPath, "-open", source_exe, "-save", source_exe,
+                       "-action", "addoverwrite", "-res", empty_midi, "-mask", resource]
+            subprocess.run(command, creationflags=subprocess.CREATE_NO_WINDOW)
+        else:
+            # Try the next resource type if any remain
+            self.remove_bgMusic(source_exe, resource_type_list)
+
+    # ===========================================================================
+    # core functions
+    # ===========================================================================
     def update_list(self, *args):
         search_text = self.trainerSearch_var.get().lower()
         if search_text == self.trainerSearchEntryPrompt.lower() or search_text == "":
@@ -358,6 +662,39 @@ class GameCheatsManager(tk.Tk):
         for trainerName in self.trainers.keys():
             if search_text in trainerName.lower():
                 self.flingListBox.insert(tk.END, trainerName)
+
+    def show_cheats(self):
+        self.flingListBox.delete(0, tk.END)
+        self.trainers = {}
+        for trainer in sorted(os.scandir(self.trainerPath), key=lambda dirent: dirent.name):
+            trainerName, trainerExt = os.path.splitext(
+                os.path.basename(trainer.path))
+            if trainerExt.lower() == ".exe" and os.path.getsize(trainer.path) != 0:
+                # if "Trainer" in trainerName or "修改器" in trainerName:
+                self.flingListBox.insert(tk.END, trainerName)
+                self.trainers[trainerName] = trainer.path
+            # else:
+            #     shutil.rmtree(trainer.path)
+
+    def launch_trainer(self, event=None):
+        try:
+            selection = self.flingListBox.curselection()
+            if selection:
+                index = selection[0]
+                trainerName = self.flingListBox.get(index)
+                os.startfile(os.path.normpath(self.trainers[trainerName]))
+        except OSError as e:
+            if e.winerror == 1223:
+                print("Operation [Launch Trainer] was canceled by the user.")
+            else:
+                raise
+
+    def delete_trainer(self):
+        index = self.flingListBox.curselection()[0]
+        trainerName = self.flingListBox.get(index)
+        os.remove(self.trainers[trainerName])
+        self.flingListBox.delete(index)
+        self.show_cheats()
 
     def change_path(self, event=None):
         self.disable_all_widgets()
@@ -409,161 +746,6 @@ class GameCheatsManager(tk.Tk):
 
         self.enable_all_widgets()
 
-    def on_enter_press(self, event=None):
-        keyword = self.downloadSearchEntry.get()
-        if keyword:
-            self.create_download_thread1(keyword)
-
-    def on_download_double_click(self, event=None):
-        selection = self.downloadListBox.curselection()
-        if selection:
-            index = selection[0]
-            self.create_download_thread2(index)
-
-    def create_download_thread1(self, keyword):
-        download_thread1 = threading.Thread(
-            target=self.download_display, args=(keyword,))
-        download_thread1.start()
-
-    def create_download_thread2(self, index):
-        download_thread2 = threading.Thread(
-            target=self.download_trainer, args=(index,))
-        download_thread2.start()
-
-    def create_migration_thread(self):
-        migration_thread = threading.Thread(target=self.change_path)
-        migration_thread.start()
-
-    def launch_trainer(self, event=None):
-        try:
-            selection = self.flingListBox.curselection()
-            if selection:
-                index = selection[0]
-                trainerName = self.flingListBox.get(index)
-                os.startfile(os.path.normpath(self.trainers[trainerName]))
-        except OSError as e:
-            if e.winerror == 1223:
-                print("Operation [Launch Trainer] was canceled by the user.")
-            else:
-                raise
-
-    def delete_trainer(self):
-        index = self.flingListBox.curselection()[0]
-        trainerName = self.flingListBox.get(index)
-        os.remove(self.trainers[trainerName])
-        self.flingListBox.delete(index)
-        self.show_cheats()
-
-    def disable_download_widgets(self):
-        self.downloadSearchEntry.config(state="disabled")
-        self.fileDialogButton.config(state="disabled")
-
-    def enable_download_widgets(self):
-        self.downloadSearchEntry.config(state="enabled")
-        self.fileDialogButton.config(state="enabled")
-
-    def disable_all_widgets(self):
-        self.downloadSearchEntry.config(state="disabled")
-        self.fileDialogButton.config(state="disabled")
-        self.trainerSearchEntry.config(state="disabled")
-        self.launchButton.config(state="disabled")
-        self.deleteButton.config(state="disabled")
-
-    def enable_all_widgets(self):
-        self.downloadSearchEntry.config(state="enabled")
-        self.fileDialogButton.config(state="enabled")
-        self.trainerSearchEntry.config(state="enabled")
-        self.launchButton.config(state="enabled")
-        self.deleteButton.config(state="enabled")
-
-    def show_cheats(self):
-        self.flingListBox.delete(0, tk.END)
-        self.trainers = {}
-        for trainer in sorted(os.scandir(self.trainerPath), key=lambda dirent: dirent.name):
-            trainerName, trainerExt = os.path.splitext(
-                os.path.basename(trainer.path))
-            if trainerExt.lower() == ".exe" and os.path.getsize(trainer.path) != 0:
-                # if "Trainer" in trainerName or "修改器" in trainerName:
-                self.flingListBox.insert(tk.END, trainerName)
-                self.trainers[trainerName] = trainer.path
-            # else:
-            #     shutil.rmtree(trainer.path)
-
-    def is_internet_connected(self, urls=None, timeout=3):
-        if urls is None:
-            urls = [
-                "https://www.bing.com/",
-                "https://www.baidu.com/",
-                "http://www.google.com/",
-            ]
-
-        for url in urls:
-            try:
-                response = requests.get(url, timeout=timeout)
-                response.raise_for_status()
-                return True
-            except requests.RequestException:
-                continue
-        return False
-
-    def translate_keyword(self, keyword):
-        isChinese = False
-        for char in keyword:
-            if '\u4e00' <= char <= '\u9fff':
-                isChinese = True
-
-        # more translation services significantly impact speed, keep it one for now
-        services = ["bing"]
-        translations = []
-        if isChinese:
-            for service in services:
-                try:
-                    translated_keyword = ts.translate_text(
-                        keyword, from_language='zh', to_language='en', translator=service)
-                    translations.append(translated_keyword)
-                    print(
-                        f"Translated keyword using {service}: {translated_keyword}")
-                except Exception as e:
-                    print(f"Translation failed with {service}: {str(e)}")
-
-            if not translations:
-                self.downloadListBox.insert(
-                    tk.END, _("Translation failed: ") + str(e))
-            return translations
-
-        return keyword
-
-    def translate_trainer(self, trainerName):
-        if settings["language"] == "zh_CN":
-            trans_trainerName = trainerName.rsplit(" Trainer", 1)[0]
-            try:
-                trainerName = ts.translate_text(
-                    trans_trainerName, from_language='en', to_language='zh')
-                trainerName = trainerName.replace("《", "").replace("》", "")
-                trainerName = f"《{trainerName}》修改器"
-            except Exception:
-                pass
-
-        return trainerName
-
-    def keyword_match(self, keyword, targetString):
-        def sanitize(text):
-            return re.sub(r"[\s'\"‘’“”:：.。,，()（）;；!！?？]", "", text).lower()
-
-        def is_match(sanitized_keyword, sanitized_targetString):
-            return re.search(re.escape(sanitized_keyword), sanitized_targetString) is not None
-
-        sanitized_targetString = sanitize(targetString)
-        if isinstance(keyword, str):
-            if len(keyword) >= 2:
-                sanitized_keyword = sanitize(keyword)
-                return is_match(sanitized_keyword, sanitized_targetString)
-
-        elif isinstance(keyword, list):
-            return any(is_match(sanitize(kw), sanitized_targetString) for kw in keyword)
-
-        return False
-
     def download_display(self, keyword):
         self.disable_download_widgets()
         self.downloadListBox.delete(0, tk.END)
@@ -591,7 +773,7 @@ class GameCheatsManager(tk.Tk):
             self.attributes('-topmost', False)
         except Exception:
             pass
-        
+
         keyword = self.translate_keyword(keyword)
 
         # Search for results from archive
@@ -781,80 +963,43 @@ class GameCheatsManager(tk.Tk):
         self.enable_download_widgets()
         self.show_cheats()
 
-    def modify_fling_settings(self):
-        # replace bg music in Documents folder
-        empty_midi = resource_path("dependency/TrainerBGM.mid")
-        username = os.getlogin()
-        flingSettings_path = f"C:/Users/{username}/Documents/FLiNGTrainer"
-        bgMusic_path = os.path.join(flingSettings_path, "TrainerBGM.mid")
-        if os.path.exists(bgMusic_path):
-            shutil.copyfile(empty_midi, bgMusic_path)
-
-        # change fling settings to disable startup music
-        settingFile_1 = os.path.join(flingSettings_path, "FLiNGTSettings.ini")
-        settingFile_2 = os.path.join(flingSettings_path, "TrainerSettings.ini")
-
-        for settingFile in [settingFile_1, settingFile_2]:
-            if not os.path.exists(settingFile):
-                continue
-            with open(settingFile, 'r', encoding='utf-8') as file:
-                lines = file.readlines()
-
-            # Update the OnLoadMusic setting
-            with open(settingFile, 'w', encoding='utf-8') as file:
-                for line in lines:
-                    if line.strip().startswith('OnLoadMusic'):
-                        file.write('OnLoadMusic=False\n')
-                    else:
-                        file.write(line)
-
-    def remove_bgMusic(self, source_exe, resource_type_list):
-        # Base case
-        if not resource_type_list:
-            return
-
-        resource_type = resource_type_list.pop(0)
-
-        # Define paths and files
-        empty_midi = resource_path("dependency/TrainerBGM.mid")
-        resourceHackerPath = resource_path("dependency/ResourceHacker.exe")
-        tempLog = os.path.join(self.tempDir, "rh.log")
-
-        # Remove background music from executable
-        command = [resourceHackerPath, "-open", source_exe, "-save", source_exe,
-                   "-action", "delete", "-mask", f"{resource_type},,", "-log", tempLog]
-        subprocess.run(command, creationflags=subprocess.CREATE_NO_WINDOW)
-
-        # Read the log file
-        with open(tempLog, 'r', encoding='utf-16-le') as file:
-            log_content = file.read()
-
-        # Check for deleted resource in log
-        pattern = r"Deleted:\s*(\w+),(\d+),(\d+)"
-        match = re.search(pattern, log_content)
-
-        if match:
-            # Resource was deleted; prepare to add the empty midi
-            resource_id = match.group(2)
-            locale_id = match.group(3)
-            resource = ",".join([resource_type, resource_id, locale_id])
-            command = [resourceHackerPath, "-open", source_exe, "-save", source_exe,
-                       "-action", "addoverwrite", "-res", empty_midi, "-mask", resource]
-            subprocess.run(command, creationflags=subprocess.CREATE_NO_WINDOW)
-        else:
-            # Try the next resource type if any remain
-            self.remove_bgMusic(source_exe, resource_type_list)
-
     def wemod_pro(self):
-        newest_version_folder = self.clean_old_versions(self.wemodPath)
-        if not newest_version_folder:
+        if not os.path.exists(self.wemodPath):
             messagebox.showerror(_("Error"), _("WeMod not installed."))
             return
+
+        version_folders = []
+        for item in os.listdir(self.wemodPath):
+            if os.path.isdir(os.path.join(self.wemodPath, item)):
+                match = re.match(r'app-(\d+\.\d+\.\d+)', item)
+                if match:
+                    version_info = tuple(
+                        map(int, match.group(1).split('.')))  # (8, 13, 3)
+                    # ((8, 13, 3), 'app-8.13.3')
+                    version_folders.append((version_info, item))
+
+        if not version_folders:
+            messagebox.showerror(_("Error"), _("WeMod not installed."))
+            return
+
+        # Sort based on version numbers (major, minor, patch)
+        version_folders.sort(reverse=True)  # Newest first
+
+        # Skip the deletion if there's only one folder found
+        if not len(version_folders) <= 1:
+            # Skip the first one as it's the newest
+            for version_info, folder_name in version_folders[1:]:
+                folder_path = os.path.join(self.wemodPath, folder_name)
+                shutil.rmtree(folder_path)
+                print(f"Deleted old version folder: {folder_path}")
+
+        newest_version_folder = version_folders[0][1]
 
         newest_version_path = os.path.join(
             self.wemodPath, newest_version_folder)
         print("Newest Version Folder" + newest_version_path)
 
+        # Apply patch
         file_to_replace = os.path.join(
             newest_version_path, "resources/app.asar")
         try:
@@ -867,42 +1012,6 @@ class GameCheatsManager(tk.Tk):
 
         messagebox.showinfo(
             _("Success"), _("You have now activated WeMod Pro!\nCurrent WeMod version: v") + newest_version_folder.strip('-app'))
-
-    def clean_old_versions(self, directory):
-        version_folders = self.identify_and_sort_versions(directory)
-        if not version_folders:
-            return None
-
-        # Skip the deletion if there's only one folder found
-        if not len(version_folders) <= 1:
-            # Skip the first one as it's the newest
-            for version_info, folder_name in version_folders[1:]:
-                folder_path = os.path.join(directory, folder_name)
-                shutil.rmtree(folder_path)
-                print(f"Deleted old version folder: {folder_path}")
-
-        return version_folders[0][1]
-
-    def identify_and_sort_versions(self, directory):
-        if not os.path.exists(directory):
-            return None
-
-        version_folders = []
-        for item in os.listdir(directory):
-            if os.path.isdir(os.path.join(directory, item)):
-                match = re.match(r'app-(\d+\.\d+\.\d+)', item)
-                if match:
-                    version_info = tuple(
-                        map(int, match.group(1).split('.')))  # (8, 13, 3)
-                    # ((8, 13, 3), 'app-8.13.3')
-                    version_folders.append((version_info, item))
-
-        if not version_folders:
-            return None
-
-        # Sort based on version numbers (major, minor, patch)
-        version_folders.sort(reverse=True)  # Newest first
-        return version_folders
 
 
 if __name__ == "__main__":
