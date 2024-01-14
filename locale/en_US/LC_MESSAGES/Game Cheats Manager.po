@@ -1,0 +1,123 @@
+msgid ""
+msgstr ""
+"Project-Id-Version: Game Cheats Manager\n"
+"POT-Creation-Date: \n"
+"PO-Revision-Date: \n"
+"Last-Translator: \n"
+"Language-Team: \n"
+"Language: en_US\n"
+"MIME-Version: 1.0\n"
+"Content-Type: text/plain; charset=UTF-8\n"
+"Content-Transfer-Encoding: 8bit\n"
+"Plural-Forms: nplurals=1; plural=0;\n"
+"X-Generator: Poedit 3.4.2\n"
+
+msgid "Options"
+msgstr "Options"
+
+msgid "Settings"
+msgstr "Settings"
+
+msgid "Search for installed"
+msgstr "Search for installed"
+
+msgid "Search to download"
+msgstr "Search to download"
+
+msgid "Launch"
+msgstr "Launch"
+
+msgid "Delete"
+msgstr "Delete"
+
+msgid "Language:"
+msgstr "Language:"
+
+msgid "Apply"
+msgstr "Apply"
+
+msgid "Please restart the application to apply settings"
+msgstr "Please restart the application to apply settings"
+
+msgid "Change trainer download path"
+msgstr "Change trainer download path"
+
+msgid "Error"
+msgstr "Error"
+
+msgid "Please choose a new path."
+msgstr "Please choose a new path."
+
+msgid "Error creating the new path: "
+msgstr "Error creating the new path: "
+
+msgid "Trainer download directory changed!"
+msgstr "Trainer download directory changed!"
+
+msgid "Migrating existing trainers..."
+msgstr "Migrating existing trainers..."
+
+msgid "Migration complete!"
+msgstr "Migration complete!"
+
+msgid "Checking for internet connection..."
+msgstr "Checking for internet connection..."
+
+msgid "No internet connection, search function is disabled."
+msgstr "No internet connection, search function is disabled."
+
+msgid "Searching..."
+msgstr "Searching..."
+
+msgid "Translation failed: "
+msgstr "Translation failed: "
+
+msgid "Request successful!"
+msgstr "Request successful!"
+
+msgid "Request failed with status code: "
+msgstr "Request failed with status code: "
+
+msgid "Translating..."
+msgstr "Translating..."
+
+msgid "No results found."
+msgstr "No results found."
+
+msgid "Downloading..."
+msgstr "Downloading..."
+
+msgid "Trainer already exists, aborted download."
+msgstr "Trainer already exists, aborted download."
+
+msgid "An error occurred while getting trainer url: "
+msgstr "An error occurred while getting trainer url: "
+
+msgid "Attention"
+msgstr "Attention"
+
+msgid ""
+"Additional actions required\n"
+"Please check folder for details!"
+msgstr ""
+"Additional actions required\n"
+"Please check folder for details!"
+
+msgid "An error occurred while extracting downloaded trainer: "
+msgstr "An error occurred while extracting downloaded trainer: "
+
+msgid "WeMod not installed."
+msgstr "WeMod not installed."
+
+msgid "WeMod is currently running, please close the application first."
+msgstr "WeMod is currently running, please close the application first."
+
+msgid "Success"
+msgstr "Success"
+
+msgid ""
+"You have now activated WeMod Pro!\n"
+"Current WeMod version: v"
+msgstr ""
+"You have now activated WeMod Pro!\n"
+"Current WeMod version: v"
