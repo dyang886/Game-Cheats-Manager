@@ -20,7 +20,10 @@ from tendo import singleton
 import tkinter as tk
 from tkinter import filedialog, messagebox, ttk
 import zipfile
+from zhon.hanzi import punctuation as CN_PUNCTUATIONS
 ts = None
+
+SEARCH_ENGINE = 'https://bing.com/search?q={search_content}'
 
 
 def resource_path(relative_path):
@@ -94,7 +97,7 @@ if not os.path.exists(setting_path):
     os.makedirs(setting_path)
 
 settings = load_settings()
-_ = get_translator()
+tk_translator = get_translator()
 
 language_options = {
     "English (US)": "en_US",
@@ -119,8 +122,8 @@ class GameCheatsManager(tk.Tk):
         # Version, user prompts, and links
         self.appVersion = "1.2.2"
         self.githubLink = "https://github.com/dyang886/Game-Cheats-Manager"
-        self.trainerSearchEntryPrompt = _("Search for installed")
-        self.downloadSearchEntryPrompt = _("Search to download")
+        self.trainerSearchEntryPrompt = tk_translator("Search for installed")
+        self.downloadSearchEntryPrompt = tk_translator("Search to download")
 
         # Paths and trainer management
         settings = load_settings()  # Load settings once and use it throughout
@@ -136,7 +139,8 @@ class GameCheatsManager(tk.Tk):
 
         # Networking
         self.headers = {
-            'User-Agent': 'Mozilla/5.0 (Windows NT 10.0; Win64; x64) AppleWebKit/537.36 (KHTML, like Gecko) Chrome/58.0.3029.110 Safari/537.3'
+            'User-Agent': 'Mozilla/5.0 (Windows NT 10.0; Win64; x64) AppleWebKit/537.36 (KHTML, like Gecko) '
+                          'Chrome/58.0.3029.110 Safari/537.3'
         }
 
         # Window references
@@ -146,14 +150,14 @@ class GameCheatsManager(tk.Tk):
         # Menu bar
         self.menuBar = tk.Frame(self, background="#2e2e2e")
         self.settingMenuBtn = tk.Menubutton(
-            self.menuBar, text=_("Options"), background="#2e2e2e")
+            self.menuBar, text=tk_translator("Options"), background="#2e2e2e")
         self.settingsMenu = tk.Menu(self.settingMenuBtn, tearoff=0)
         self.settingsMenu.add_command(
-            label=_("Settings"), command=self.open_settings)
+            label=tk_translator("Settings"), command=self.open_settings)
         self.settingsMenu.add_command(
             label=("WeMod Pro"), command=self.wemod_pro)
         self.settingsMenu.add_command(
-            label=_("About"), command=self.open_about)
+            label=tk_translator("About"), command=self.open_about)
         self.settingMenuBtn.config(menu=self.settingsMenu)
         self.settingMenuBtn.pack(side="left")
         self.menuBar.grid(row=0, column=0, sticky="ew")
@@ -214,11 +218,11 @@ class GameCheatsManager(tk.Tk):
         self.bottomFrame.grid(row=3, column=0, pady=(10, 0))
 
         self.launchButton = ttk.Button(
-            self.bottomFrame, text=_("Launch"), width=11, command=self.launch_trainer)
+            self.bottomFrame, text=tk_translator("Launch"), width=11, command=self.launch_trainer)
         self.launchButton.grid(row=0, column=0, padx=(0, 9))
 
         self.deleteButton = ttk.Button(
-            self.bottomFrame, text=_("Delete"), width=11, command=self.delete_trainer)
+            self.bottomFrame, text=tk_translator("Delete"), width=11, command=self.delete_trainer)
         self.deleteButton.grid(row=0, column=1, padx=(9, 0))
 
         # ===========================================================================
@@ -308,13 +312,13 @@ class GameCheatsManager(tk.Tk):
         settings["language"] = language_options[self.languages_var.get()]
         settings["enSearchResults"] = self.en_results_var.get()
         apply_settings(settings)
-        messagebox.showinfo(_("Attention"), _(
+        messagebox.showinfo(tk_translator("Attention"), tk_translator(
             "Please restart the application to apply settings"))
 
     def open_settings(self):
         if self.settings_window is None or not self.settings_window.winfo_exists():
             self.settings_window = tk.Toplevel(self)
-            self.settings_window.title(_("Settings"))
+            self.settings_window.title(tk_translator("Settings"))
             self.settings_window.iconbitmap(
                 resource_path("assets/setting.ico"))
             self.settings_window.transient(self)
@@ -328,7 +332,7 @@ class GameCheatsManager(tk.Tk):
             languages_frame = ttk.Frame(settings_frame)
             languages_frame.grid(row=0, column=0, pady=(20, 0), sticky="we")
 
-            languages_label = ttk.Label(languages_frame, text=_("Language:"))
+            languages_label = ttk.Label(languages_frame, text=tk_translator("Language:"))
             languages_label.pack(anchor="w")
 
             self.languages_var = tk.StringVar()
@@ -351,7 +355,7 @@ class GameCheatsManager(tk.Tk):
 
             en_results_label = ttk.Label(
                 en_results_frame,
-                text=_("Always show search results in English:"),
+                text=tk_translator("Always show search results in English:"),
                 wraplength=130
             )
             en_results_label.pack(side=tk.LEFT)
@@ -367,7 +371,7 @@ class GameCheatsManager(tk.Tk):
             # ===========================================================================
             # apply button
             apply_button = ttk.Button(
-                self.settings_window, text=_("Apply"),
+                self.settings_window, text=tk_translator("Apply"),
                 command=self.apply_settings_page
             )
             apply_button.grid(row=1, column=0, padx=(
@@ -381,10 +385,9 @@ class GameCheatsManager(tk.Tk):
     def open_about(self):
         if self.about_window is None or not self.about_window.winfo_exists():
             self.about_window = tk.Toplevel(self)
-            self.about_window.title(_("About"))
+            self.about_window.title(tk_translator("About"))
             self.about_window.iconbitmap(
                 resource_path("assets/logo.ico"))
-            self.about_window.transient(self)
 
             about_frame = ttk.Frame(self.about_window)
             about_frame.grid(row=0, column=0, sticky='nsew',
@@ -409,8 +412,9 @@ class GameCheatsManager(tk.Tk):
             app_name_label.grid(row=0, column=0, pady=(0, 15))
 
             app_version_label = ttk.Label(
-                appInfo_frame, text=_("Version: ") + self.appVersion)
+                appInfo_frame, text=tk_translator("Version: ") + self.appVersion)
             app_version_label.grid(row=1, column=0)
+            self.about_window.transient(self)
 
             # ===========================================================================
             # links
@@ -527,11 +531,87 @@ class GameCheatsManager(tk.Tk):
                 continue
         return False
 
+    def translate_or_find_keyword(self, keyword):
+        try:
+            translated_keyword = self.translate_keyword()
+        except Exception as e:
+            translated_keyword = []
+
+        if self.include_chinese(keyword):
+            try:
+                game_en_names = self.game_en_name(keyword)
+            except Exception as e:
+                game_en_names = []
+        else:
+            game_en_names = []
+
+        return [*translated_keyword, *game_en_names]
+
+    def game_en_name(self, name: str):
+        result = []
+
+        search_content = f'{name} site:store.steampowered.com OR site:store.epicgames.com'
+        url = requests.utils.requote_uri(SEARCH_ENGINE.format(search_content=search_content))
+        print(url)
+        try:
+            response = requests.get(
+                url,
+                # 不能用 self.headers
+                headers={
+                    'User-Agent': 'Mozilla/5.0 (Windows NT 10.0; Win64; x64) AppleWebKit/537.36 (KHTML, like Gecko) Chrome/120.0.0.0 Safari/537.36 Edg/120.0.0.0',
+                }
+            )
+
+            archiveHTML = BeautifulSoup(response.text, 'html.parser')
+        except Exception as e:
+            print(f'get game en name went to something wrong: {repr(e)}')
+            return result  # 空列表
+
+        i = 0
+        for element in archiveHTML.find_all('a', target="_blank"):
+            text: str = element.get_text()
+            if 'store.epicgames.com' in element.get('href'):
+                lower_text = text.lower()
+                if ' | ' in lower_text:
+                    en_name = self.replace_chinese(text.split(' | ', 2)[0]).strip()
+                elif ' - ' in lower_text:
+                    en_name = self.replace_chinese(text.split(' - ', 2)[0]).strip()
+                else:
+                    continue
+            elif 'store.steampowered.com' in element.get('href') and text.strip().lower().startswith('Steam 上的 '):
+                en_name = self.replace_chinese(text.strip()[9:]).strip()
+            else:
+                continue
+
+            if len(en_name) < 2:
+                continue
+            elif en_name.lower().strip().startswith('epic game'):
+                continue
+            print(text)
+
+            i += 1
+            result.append(en_name)
+
+            if i > 3:
+                break
+
+        print(f'{result=}')
+        return result
+
+    @staticmethod
+    def is_chinese(char: str) -> bool:
+        assert len(char) <= 1, 'char must only one character at a time'
+
+        return '\u4e00' <= char <= '\u9fff' or char in CN_PUNCTUATIONS
+
+    def include_chinese(self, string: str) -> bool:
+        return any(self.is_chinese(char) for char in string)
+
+    def replace_chinese(self, string: str) -> str:
+        return ''.join('' if self.is_chinese(char) else char for char in string)
+
     def translate_keyword(self, keyword):
-        isChinese = False
-        for char in keyword:
-            if '\u4e00' <= char <= '\u9fff':
-                isChinese = True
+        isChinese = self.include_chinese(keyword)
 
         # more translation services significantly impact speed, keep it one for now
         services = ["bing"]
@@ -549,7 +629,7 @@ class GameCheatsManager(tk.Tk):
 
             if not translations:
                 self.downloadListBox.insert(
-                    tk.END, _("Translation failed: ") + str(e))
+                    tk.END, tk_translator("Translation failed: ") + str(e))
             return translations
 
         return keyword
@@ -580,7 +660,7 @@ class GameCheatsManager(tk.Tk):
                 sanitized_keyword = sanitize(keyword)
                 return is_match(sanitized_keyword, sanitized_targetString)
 
-        elif isinstance(keyword, list):
+        elif isinstance(keyword, (list, tuple)):
             return any(is_match(sanitize(kw), sanitized_targetString) for kw in keyword)
 
         return False
@@ -700,7 +780,7 @@ class GameCheatsManager(tk.Tk):
         self.disable_all_widgets()
         self.downloadListBox.unbind('<Double-Button-1>')
         folder = filedialog.askdirectory(
-            title=_("Change trainer download path"))
+            title=tk_translator("Change trainer download path"))
 
         if folder:
             changedPath = os.path.normpath(
@@ -709,7 +789,7 @@ class GameCheatsManager(tk.Tk):
             # Can't change to the same path
             if self.downloadPathText.get() == changedPath:
                 messagebox.showerror(
-                    _("Error"), _("Please choose a new path."))
+                    tk_translator("Error"), tk_translator("Please choose a new path."))
                 self.enable_all_widgets()
                 return
 
@@ -719,7 +799,7 @@ class GameCheatsManager(tk.Tk):
                 if not os.path.exists(dst):
                     os.makedirs(dst)
             except Exception as e:
-                messagebox.showerror(_("Error"), _(
+                messagebox.showerror(tk_translator("Error"), tk_translator(
                     "Error creating the new path: ") + str(e))
                 self.enable_all_widgets()
                 return
@@ -727,9 +807,9 @@ class GameCheatsManager(tk.Tk):
             self.downloadPathText.set(changedPath)
             self.downloadListBox.delete(0, tk.END)
             self.downloadListBox.insert(
-                tk.END, _("Trainer download directory changed!"))
+                tk.END, tk_translator("Trainer download directory changed!"))
             self.downloadListBox.insert(
-                tk.END, _("Migrating existing trainers..."))
+                tk.END, tk_translator("Migrating existing trainers..."))
 
             for filename in os.listdir(self.trainerPath):
                 src_file = os.path.join(self.trainerPath, filename)
@@ -742,7 +822,7 @@ class GameCheatsManager(tk.Tk):
             settings["downloadPath"] = self.trainerPath
             apply_settings(settings)
             self.show_cheats()
-            self.downloadListBox.insert(tk.END, _("Migration complete!"))
+            self.downloadListBox.insert(tk.END, tk_translator("Migration complete!"))
 
         self.enable_all_widgets()
 
@@ -754,14 +834,14 @@ class GameCheatsManager(tk.Tk):
 
         # Check for internet connection before search
         self.downloadListBox.insert(
-            tk.END, _("Checking for internet connection..."))
+            tk.END, tk_translator("Checking for internet connection..."))
         if not self.is_internet_connected():
             self.downloadListBox.insert(
-                tk.END, _("No internet connection, search function is disabled."))
+                tk.END, tk_translator("No internet connection, search function is disabled."))
             self.downloadListBox.unbind('<Double-Button-1>')
             self.enable_download_widgets()
             return
-        self.downloadListBox.insert(tk.END, _("Searching..."))
+        self.downloadListBox.insert(tk.END, tk_translator("Searching..."))
 
         # First time calling ts will pop up a cmd window, address it here
         try:
@@ -774,7 +854,7 @@ class GameCheatsManager(tk.Tk):
         except Exception:
             pass
 
-        keyword = self.translate_keyword(keyword)
+        keyword = self.translate_or_find_keyword(keyword)
 
         # Search for results from archive
         url = "https://archive.flingtrainer.com/"
@@ -783,10 +863,10 @@ class GameCheatsManager(tk.Tk):
 
         # Check if the request was successful
         if reqs.status_code == 200:
-            self.downloadListBox.insert(tk.END, _("Request successful!"))
+            self.downloadListBox.insert(tk.END, tk_translator("Request successful!"))
         else:
             self.downloadListBox.insert(
-                tk.END, _("Request failed with status code: ") + str(reqs.status_code))
+                tk.END, tk_translator("Request failed with status code: ") + str(reqs.status_code))
 
         for link in archiveHTML.find_all(target="_self"):
             # parse trainer name
@@ -807,7 +887,7 @@ class GameCheatsManager(tk.Tk):
 
         if not reqs.status_code == 200:
             self.downloadListBox.insert(
-                tk.END, _("Request failed with status code: ") + str(reqs.status_code))
+                tk.END, tk_translator("Request failed with status code: ") + str(reqs.status_code))
 
         for ul in mainSiteHTML.find_all('ul'):
             for li in ul.find_all('li'):
@@ -865,7 +945,7 @@ class GameCheatsManager(tk.Tk):
         self.disable_download_widgets()
         self.downloadListBox.unbind('<Double-Button-1>')
         self.downloadListBox.delete(0, tk.END)
-        self.downloadListBox.insert(tk.END, _("Downloading..."))
+        self.downloadListBox.insert(tk.END, tk_translator("Downloading..."))
         if os.path.exists(self.tempDir):
             shutil.rmtree(self.tempDir)
 
@@ -880,7 +960,7 @@ class GameCheatsManager(tk.Tk):
             if mFilename in trainerPath or self.translate_trainer(mFilename) in trainerPath:
                 self.downloadListBox.delete(0, tk.END)
                 self.downloadListBox.insert(
-                    tk.END, _("Trainer already exists, aborted download."))
+                    tk.END, tk_translator("Trainer already exists, aborted download."))
                 self.enable_download_widgets()
                 return
 
@@ -897,7 +977,7 @@ class GameCheatsManager(tk.Tk):
             finalreqs = requests.get(targeturl, headers=self.headers)
         except Exception as e:
             messagebox.showerror(
-                _("Error"), _("An error occurred while getting trainer url: ") + str(e))
+                tk_translator("Error"), tk_translator("An error occurred while getting trainer url: ") + str(e))
             self.enable_download_widgets()
             return
 
@@ -925,7 +1005,7 @@ class GameCheatsManager(tk.Tk):
                     zip_ref.extractall(self.tempDir)
         except Exception as e:
             messagebox.showerror(
-                _("Error"), _("An error occurred while extracting downloaded trainer: ") + str(e))
+                tk_translator("Error"), tk_translator("An error occurred while extracting downloaded trainer: ") + str(e))
             self.enable_download_widgets()
             return
 
@@ -939,7 +1019,7 @@ class GameCheatsManager(tk.Tk):
         # Warn user if extra files found
         if cnt > 0:
             messagebox.showinfo(
-                _("Attention"), _("Additional actions required\nPlease check folder for details!"))
+                tk_translator("Attention"), tk_translator("Additional actions required\nPlease check folder for details!"))
             os.startfile(self.tempDir)
 
         os.makedirs(self.trainerPath, exist_ok=True)
@@ -959,13 +1039,13 @@ class GameCheatsManager(tk.Tk):
         if os.path.exists(rhLog):
             os.remove(rhLog)
 
-        self.downloadListBox.insert(tk.END, _("Download success!"))
+        self.downloadListBox.insert(tk.END, tk_translator("Download success!"))
         self.enable_download_widgets()
         self.show_cheats()
 
     def wemod_pro(self):
         if not os.path.exists(self.wemodPath):
-            messagebox.showerror(_("Error"), _("WeMod not installed."))
+            messagebox.showerror(tk_translator("Error"), tk_translator("WeMod not installed."))
             return
 
         version_folders = []
@@ -979,7 +1059,7 @@ class GameCheatsManager(tk.Tk):
                     version_folders.append((version_info, item))
 
         if not version_folders:
-            messagebox.showerror(_("Error"), _("WeMod not installed."))
+            messagebox.showerror(tk_translator("Error"), tk_translator("WeMod not installed."))
             return
 
         # Sort based on version numbers (major, minor, patch)
@@ -1006,12 +1086,12 @@ class GameCheatsManager(tk.Tk):
             os.remove(file_to_replace)
         except Exception:
             messagebox.showerror(
-                _("Error"), _("WeMod is currently running, please close the application first."))
+                tk_translator("Error"), tk_translator("WeMod is currently running, please close the application first."))
             return
         shutil.copyfile(self.crackFilePath, file_to_replace)
 
         messagebox.showinfo(
-            _("Success"), _("You have now activated WeMod Pro!\nCurrent WeMod version: v") + newest_version_folder.strip('-app'))
+            tk_translator("Success"), tk_translator("You have now activated WeMod Pro!\nCurrent WeMod version: v") + newest_version_folder.strip('-app'))
 
 
 if __name__ == "__main__":
