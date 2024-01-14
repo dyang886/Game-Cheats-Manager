@@ -6,6 +6,7 @@ Game Cheats Manager is a one-stop solution for gamers to manage their Fling trai
 
 - **Trainer Browsing**: Easily browse and search for the installed Fling trainers.
 - **One-Click Downloads**: Quickly search and download trainers directly from the Fling website.
+- **Trainer Optimizations:** Automatically removes distracting background music upon launching older Fling trainers.
 - **Manage Trainers**: Launch and delete trainers from a single, unified interface.
 - **User-Friendly Interface**: Enjoy a clean, intuitive interface that simplifies your gaming setup.
 
