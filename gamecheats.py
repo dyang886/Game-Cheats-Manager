@@ -536,9 +536,9 @@ class GameCheatsManager(tk.Tk):
 
     def translate_or_find_keyword(self, keyword):
         try:
-            translated_keyword = [self.translate_keyword(keyword), ]
+            translated_keyword = [self.translate_keyword(keyword), keyword, ]
         except Exception as e:
-            translated_keyword = []
+            translated_keyword = [keyword, ]
 
         game_en_names = []
         if self.include_chinese(keyword):
@@ -631,7 +631,7 @@ class GameCheatsManager(tk.Tk):
 
                 game_id = int(split_url_path[-1])
                 try:
-                    response = requests.get(f'https://store.steampowered.com/api/appdetails/?appids={game_id}')
+                    response = requests.get(f'https://store.steampowered.com/api/appdetails/?appids={game_id}&l=english')
                     en_name = response.json()[str(game_id)]['data']['name'].replace('_', ' ') \
                         .replace('™', '').replace('®', '')
                 except Exception as e:
