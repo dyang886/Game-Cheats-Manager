@@ -827,6 +827,14 @@ class GameCheatsManager(tk.Tk):
         self.enable_all_widgets()
 
     def download_display(self, keyword):
+        try:
+            self.download_display_uncaught(keyword)
+        except Exception as e:
+            print(f'Request failed: {repr(e)}')
+            self.downloadListBox.insert(
+                tk.END, tk_translator("An error occurred while getting trainer url: ") + repr(e))
+
+    def download_display_uncaught(self, keyword):
         self.disable_download_widgets()
         self.downloadListBox.delete(0, tk.END)
         self.downloadListBox.unbind('<Double-Button-1>')
