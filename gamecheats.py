@@ -554,6 +554,7 @@ class GameCheatsManager(tk.Tk):
             sanitized_enName = self.sanitize(enName)
             sanitized_trainerName = self.sanitize(trainerName)
             match = sanitized_enName == sanitized_trainerName
+            # print("Match:", sanitized_trainerName, "&", sanitized_enName, "=>", match)
 
             zhName = xhhData['result']['name']
             if match and self.is_chinese(zhName):
@@ -659,7 +660,8 @@ class GameCheatsManager(tk.Tk):
                         original_trainerName, from_language='en', to_language='zh')
 
                 # strip any game names that have their english names at the end
-                pattern = r'(\（[A-Za-z0-9\s：&]+)\）$|[A-Za-z0-9\s]+(?![\u4e00-\u9fff])$'
+                print(trans_trainerName)
+                pattern = r'(\（[A-Za-z\s：&]+[A-Za-z0-9\s：&]*\）)$|[A-Za-z\s]+(?![\u4e00-\u9fff])$'
                 trans_trainerName = re.sub(pattern, '', trans_trainerName)
                 trans_trainerName = trans_trainerName.replace(
                     "《", "").replace("》", "")
@@ -890,7 +892,7 @@ class GameCheatsManager(tk.Tk):
             # parse trainer name
             rawTrainerName = link.get_text()
             parsedTrainerName = re.sub(
-                r' v.*|\.\bv.*| Plus\s\d+.*|Build\s\d+.*|(\d+\.\d+-Update.*)|Update\s\d+.*| Early Access .*', '', rawTrainerName).replace("_", ": ")
+                r' v.*|\.\bv.*| Plus\s\d+.*|Build\s\d+.*|(\d+\.\d+-Update.*)|Update\s\d+.*|\(Update\s.*| Early Access .*', '', rawTrainerName).replace("_", ": ")
             trainerName = parsedTrainerName.strip() + " Trainer"
 
             # search algorithm
