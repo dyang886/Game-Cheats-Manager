@@ -119,7 +119,7 @@ class GameCheatsManager(tk.Tk):
         sv_ttk.set_theme("dark")
 
         # Version, user prompts, and links
-        self.appVersion = "1.2.3"
+        self.appVersion = "1.2.4"
         self.githubLink = "https://github.com/dyang886/Game-Cheats-Manager"
         self.trainerSearchEntryPrompt = _("Search for installed")
         self.downloadSearchEntryPrompt = _("Search to download")
