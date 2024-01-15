@@ -891,7 +891,7 @@ class GameCheatsManager(tk.Tk):
             # parse trainer name
             rawTrainerName = link.get_text()
             parsedTrainerName = re.sub(
-                r' v.*|\.\bv.*| Plus\s\d+.*|Build\s\d+.*|(\d+\.\d+-Update.*)|Update\s\d+.*|\(Update\s.*| Early Access .*', '', rawTrainerName).replace("_", ": ")
+                r' v.*|\.\bv.*| \d+\.\d+\.\d+.*| Plus\s\d+.*|Build\s\d+.*|(\d+\.\d+-Update.*)|Update\s\d+.*|\(Update\s.*| Early Access .*', '', rawTrainerName).replace("_", ": ")
             trainerName = parsedTrainerName.strip() + " Trainer"
 
             # search algorithm
