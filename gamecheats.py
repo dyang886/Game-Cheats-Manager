@@ -10,6 +10,8 @@ import tempfile
 import threading
 import time
 from urllib.parse import urljoin, urlparse
+import concurrent.futures
+import ctypes
 
 import polib
 import requests
@@ -117,7 +119,7 @@ class GameCheatsManager(tk.Tk):
         sv_ttk.set_theme("dark")
 
         # Version, user prompts, and links
-        self.appVersion = "1.2.2"
+        self.appVersion = "1.2.3"
         self.githubLink = "https://github.com/dyang886/Game-Cheats-Manager"
         self.trainerSearchEntryPrompt = _("Search for installed")
         self.downloadSearchEntryPrompt = _("Search to download")
@@ -527,63 +529,150 @@ class GameCheatsManager(tk.Tk):
                 continue
         return False
 
-    def translate_keyword(self, keyword):
-        isChinese = False
+    def xhh_enName(self, appid):
+        xhhGameDetailUrl = f"https://api.xiaoheihe.cn/game/get_game_detail/?h_src=game_rec_a&appid={appid}"
+        response = requests.get(xhhGameDetailUrl, headers=self.headers)
+        xhhData = response.json()
+
+        if 'name_en' in xhhData['result']:
+            return xhhData['result']['name_en']
+        else:
+            return None
+
+    def xhh_zhName(self, appid, trainerName):
+        xhhGameDetailUrl = f"https://api.xiaoheihe.cn/game/get_game_detail/?h_src=game_rec_a&appid={appid}"
+        response = requests.get(xhhGameDetailUrl, headers=self.headers)
+        xhhData = response.json()
+
+        enName = ""
+        if 'name_en' in xhhData['result']:
+            enName = xhhData['result']['name_en']
+
+        sanitized_enName = self.sanitize(enName)
+        sanitized_trainerName = self.sanitize(trainerName)
+        match_found = sanitized_enName == sanitized_trainerName
+        # print("Match:", sanitized_trainerName, "&", sanitized_enName, "->", match_found)
+        zhName = xhhData['result']['name']
+        if enName and match_found and self.is_chinese(zhName):
+            return zhName
+        else:
+            return None
+
+    def is_chinese(self, keyword):
         for char in keyword:
             if '\u4e00' <= char <= '\u9fff':
-                isChinese = True
+                return True
+        return False
 
-        # more translation services significantly impact speed, keep it one for now
-        services = ["bing"]
+    def translate_keyword(self, keyword):
         translations = []
-        if isChinese:
+        if self.is_chinese(keyword):
+            # Direct translation
+            services = ["bing"]
             for service in services:
                 try:
                     translated_keyword = ts.translate_text(
-                        keyword, from_language='zh', to_language='en', translator=service)
+                        keyword,
+                        from_language='zh',
+                        to_language='en',
+                        translator=service
+                    )
                     translations.append(translated_keyword)
                     print(
                         f"Translated keyword using {service}: {translated_keyword}")
                 except Exception as e:
                     print(f"Translation failed with {service}: {str(e)}")
 
+            # Using XiaoHeiHe search to get list of english names
+            xhhSearchUrl = f"https://api.xiaoheihe.cn/bbs/app/api/general/search/v1?search_type=game&q={keyword}"
+            reqs = requests.get(xhhSearchUrl, headers=self.headers)
+            xhhData = reqs.json()
+            steam_appids = []
+
+            # XiaoHeiHe search
+            if not reqs.status_code == 200:
+                print("Xiao Hei He request failed")
+            elif 'result' in xhhData and 'items' in xhhData['result']:
+                steam_appids = [item['info']['steam_appid']
+                                for item in xhhData['result']['items']
+                                if 'steam_appid' in item['info']]
+            else:
+                print("No items found for Xiao Hei He request or incorrect JSON format")
+
+            # Get every english game name from steam app id
+            if steam_appids:
+                with concurrent.futures.ThreadPoolExecutor() as executor:
+                    future_to_appid = {executor.submit(
+                        self.xhh_enName, appid): appid for appid in steam_appids[:10]}
+
+                    for future in concurrent.futures.as_completed(future_to_appid):
+                        name_en = future.result()
+                        if name_en:
+                            translations.append(name_en)
+
             if not translations:
                 self.downloadListBox.insert(
-                    tk.END, _("Translation failed: ") + str(e))
+                    tk.END, _("No translations found."))
+
+            print("Keyword translations:", translations)
             return translations
 
-        return keyword
+        return [keyword]
 
     def translate_trainer(self, trainerName):
-        if settings["language"] == "zh_CN" and not settings["enSearchResults"]:
-            trans_trainerName = trainerName.rsplit(" Trainer", 1)[0]
-            try:
-                trainerName = ts.translate_text(
-                    trans_trainerName, from_language='en', to_language='zh')
-                trainerName = trainerName.replace("《", "").replace("》", "")
-                trainerName = f"《{trainerName}》修改器"
-            except Exception:
-                pass
+        trans_trainerName = trainerName
+        found_translation = False
 
-        return trainerName
+        if settings["language"] == "zh_CN" and not settings["enSearchResults"]:
+            original_trainerName = trainerName.rsplit(" Trainer", 1)[0]
+
+            try:
+                # Using Xiao Hei He search to get list of chinese names
+                xhhSearchUrl = f"https://api.xiaoheihe.cn/bbs/app/api/general/search/v1?search_type=game&q={original_trainerName}"
+                reqs = requests.get(xhhSearchUrl, headers=self.headers)
+                xhhData = reqs.json()
+
+                steam_appids = [item['info']['steam_appid']
+                                for item in xhhData['result']['items']
+                                if 'steam_appid' in item['info']]
+
+                if steam_appids:
+                    with concurrent.futures.ThreadPoolExecutor() as executor:
+                        future_to_appid = {executor.submit(
+                            self.xhh_zhName, appid, original_trainerName): appid for appid in steam_appids[:3]}
+
+                        for future in concurrent.futures.as_completed(future_to_appid):
+                            result = future.result()
+                            if result != None:
+                                trans_trainerName = result
+                                found_translation = True
+                                break
+
+                # Use direct translation if couldn't find a match
+                if not found_translation:
+                    print(
+                        "No matches found, using direct translation for: " + original_trainerName)
+                    trans_trainerName = ts.translate_text(
+                        original_trainerName, from_language='en', to_language='zh')
+
+                trans_trainerName = trans_trainerName.replace(
+                    "《", "").replace("》", "")
+                trans_trainerName = f"《{trans_trainerName}》修改器"
+            except Exception as e:
+                print(f"An error occurred: {str(e)}")
+
+        return trans_trainerName
+
+    def sanitize(self, text):
+        return re.sub(r"[\-\s\"'‘’“”:：.。,，()（）<>《》;；!！?？@#$%^&™®_+*=~`|]", "", text).lower()
 
     def keyword_match(self, keyword, targetString):
-        def sanitize(text):
-            return re.sub(r"[\s'\"‘’“”:：.。,，()（）;；!！?？]", "", text).lower()
-
         def is_match(sanitized_keyword, sanitized_targetString):
             return re.search(re.escape(sanitized_keyword), sanitized_targetString) is not None
 
-        sanitized_targetString = sanitize(targetString)
-        if isinstance(keyword, str):
-            if len(keyword) >= 2:
-                sanitized_keyword = sanitize(keyword)
-                return is_match(sanitized_keyword, sanitized_targetString)
+        sanitized_targetString = self.sanitize(targetString)
 
-        elif isinstance(keyword, list):
-            return any(is_match(sanitize(kw), sanitized_targetString) for kw in keyword)
-
-        return False
+        return any(is_match(self.sanitize(kw), sanitized_targetString) for kw in keyword if len(kw) >= 2)
 
     def modify_fling_settings(self):
         # replace bg music in Documents folder
@@ -763,7 +852,7 @@ class GameCheatsManager(tk.Tk):
             return
         self.downloadListBox.insert(tk.END, _("Searching..."))
 
-        # First time calling ts will pop up a cmd window, address it here
+        # ts initialization will pop up a cmd window
         try:
             global ts
             if "translators" not in sys.modules:
@@ -792,7 +881,7 @@ class GameCheatsManager(tk.Tk):
             # parse trainer name
             rawTrainerName = link.get_text()
             parsedTrainerName = re.sub(
-                r' v.*|\bv.*| Plus.*', '', rawTrainerName).replace("_", ": ")
+                r' v.*|\bv.*| Plus.*|Build\s\d+.*|(\d+\.\d+-Update.*)', '', rawTrainerName).replace("_", ": ")
             trainerName = parsedTrainerName.strip() + " Trainer"
 
             # search algorithm
@@ -843,17 +932,30 @@ class GameCheatsManager(tk.Tk):
 
         # Display search results
         self.downloadListBox.insert(tk.END, _("Translating..."))
-        count = 0
-        for trainerName in self.trainer_urls.keys():
-            trainerName = self.translate_trainer(trainerName)
-            # Clear prior texts
-            if count == 0:
-                self.enable_download_widgets()
-                self.downloadListBox.bind(
-                    '<Double-Button-1>', self.on_download_double_click)
-                self.downloadListBox.delete(0, tk.END)
-            self.downloadListBox.insert(tk.END, f"{str(count)}. {trainerName}")
-            count += 1
+        trainer_names = list(self.trainer_urls.keys())
+
+        # Using a dictionary to store future and its corresponding original trainer name
+        max_threads = 10
+        with concurrent.futures.ThreadPoolExecutor(max_workers=max_threads) as executor:
+            future_to_trainerName = {executor.submit(
+                self.translate_trainer, trainerName): trainerName for trainerName in trainer_names}
+
+        translated_names = {}
+        for future in concurrent.futures.as_completed(future_to_trainerName):
+            original_trainerName = future_to_trainerName[future]
+            translated_trainerName = future.result()
+            translated_names[original_trainerName] = translated_trainerName
+
+        # Clear prior texts and rebind events
+        self.enable_download_widgets()
+        self.downloadListBox.bind(
+            '<Double-Button-1>', self.on_download_double_click)
+        self.downloadListBox.delete(0, tk.END)
+
+        # Display results in the original order
+        for count, trainerName in enumerate(trainer_names):
+            self.downloadListBox.insert(
+                tk.END, f"{str(count)}. {translated_names[trainerName]}")
 
         if len(self.trainer_urls) == 0:
             self.downloadListBox.unbind('<Double-Button-1>')
@@ -875,9 +977,10 @@ class GameCheatsManager(tk.Tk):
         mFilename = filename.replace(':', ' -')
         if "/" in mFilename:
             mFilename = mFilename.split("/")[1]
+        trans_mFilename = self.translate_trainer(mFilename)
 
         for trainerPath in self.trainers.keys():
-            if mFilename in trainerPath or self.translate_trainer(mFilename) in trainerPath:
+            if mFilename in trainerPath or trans_mFilename in trainerPath:
                 self.downloadListBox.delete(0, tk.END)
                 self.downloadListBox.insert(
                     tk.END, _("Trainer already exists, aborted download."))
@@ -943,8 +1046,7 @@ class GameCheatsManager(tk.Tk):
             os.startfile(self.tempDir)
 
         os.makedirs(self.trainerPath, exist_ok=True)
-        mFilename = self.translate_trainer(mFilename)
-        trainer_name = mFilename + ".exe"
+        trainer_name = trans_mFilename + ".exe"
         source_file = os.path.join(self.tempDir, gameRawName)
         destination_file = os.path.join(self.trainerPath, trainer_name)
 
@@ -953,11 +1055,17 @@ class GameCheatsManager(tk.Tk):
         # by removing directly from exe
         self.remove_bgMusic(source_file, ["MID", "MIDI"])
 
-        shutil.move(source_file, destination_file)
-        os.remove(trainerTemp)
-        rhLog = os.path.join(self.tempDir, "rh.log")
-        if os.path.exists(rhLog):
-            os.remove(rhLog)
+        try:
+            shutil.move(source_file, destination_file)
+            os.remove(trainerTemp)
+            rhLog = os.path.join(self.tempDir, "rh.log")
+            if os.path.exists(rhLog):
+                os.remove(rhLog)
+        except Exception as e:
+            messagebox.showerror(_("Error"), _(
+                "Could not find the downloaded trainer file, please try turning your antivirus software off."))
+            self.enable_download_widgets()
+            return
 
         self.downloadListBox.insert(tk.END, _("Download success!"))
         self.enable_download_widgets()
