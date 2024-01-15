@@ -11,7 +11,7 @@ import threading
 import time
 from urllib.parse import urljoin, urlparse
 import concurrent.futures
-import ctypes
+from fuzzywuzzy import fuzz
 
 import polib
 import requests
@@ -544,19 +544,17 @@ class GameCheatsManager(tk.Tk):
         response = requests.get(xhhGameDetailUrl, headers=self.headers)
         xhhData = response.json()
 
-        enName = ""
         if 'name_en' in xhhData['result']:
             enName = xhhData['result']['name_en']
+            sanitized_enName = self.sanitize(enName)
+            sanitized_trainerName = self.sanitize(trainerName)
+            match = sanitized_enName == sanitized_trainerName
 
-        sanitized_enName = self.sanitize(enName)
-        sanitized_trainerName = self.sanitize(trainerName)
-        match_found = sanitized_enName == sanitized_trainerName
-        # print("Match:", sanitized_trainerName, "&", sanitized_enName, "->", match_found)
-        zhName = xhhData['result']['name']
-        if enName and match_found and self.is_chinese(zhName):
-            return zhName
-        else:
-            return None
+            zhName = xhhData['result']['name']
+            if match and self.is_chinese(zhName):
+                return zhName
+            else:
+                return None
 
     def is_chinese(self, keyword):
         for char in keyword:
@@ -668,11 +666,14 @@ class GameCheatsManager(tk.Tk):
 
     def keyword_match(self, keyword, targetString):
         def is_match(sanitized_keyword, sanitized_targetString):
-            return re.search(re.escape(sanitized_keyword), sanitized_targetString) is not None
+            similarity_threshold = 80
+            similarity = fuzz.partial_ratio(
+                sanitized_keyword, sanitized_targetString)
+            return similarity >= similarity_threshold
 
         sanitized_targetString = self.sanitize(targetString)
 
-        return any(is_match(self.sanitize(kw), sanitized_targetString) for kw in keyword if len(kw) >= 2)
+        return any(is_match(self.sanitize(kw), sanitized_targetString) for kw in keyword if len(kw) >= 2 and len(sanitized_targetString) >= 2)
 
     def modify_fling_settings(self):
         # replace bg music in Documents folder
@@ -881,7 +882,7 @@ class GameCheatsManager(tk.Tk):
             # parse trainer name
             rawTrainerName = link.get_text()
             parsedTrainerName = re.sub(
-                r' v.*|\bv.*| Plus.*|Build\s\d+.*|(\d+\.\d+-Update.*)', '', rawTrainerName).replace("_", ": ")
+                r' v.*|\.\bv.*| Plus\s\d+.*|Build\s\d+.*|(\d+\.\d+-Update.*)|Update\s\d+.*| Early Access .*', '', rawTrainerName).replace("_", ": ")
             trainerName = parsedTrainerName.strip() + " Trainer"
 
             # search algorithm
