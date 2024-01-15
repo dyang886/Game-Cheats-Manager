@@ -548,6 +548,8 @@ class GameCheatsManager(tk.Tk):
         # Special cases, add as needed
         if trainerName == "Assassin's Creed 3":
             trainerName = "Assassin's Creed III"
+        elif trainerName == "Halo Infinite (Campaign)":
+            trainerName = "Halo Infinite"
 
         if 'name_en' in xhhData['result']:
             enName = xhhData['result']['name_en']
