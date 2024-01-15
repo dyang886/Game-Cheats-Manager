@@ -659,9 +659,9 @@ class GameCheatsManager(tk.Tk):
                     trans_trainerName = ts.translate_text(
                         original_trainerName, from_language='en', to_language='zh')
 
-                # strip any game names that have their english names at the end
-                pattern = r'(\（[A-Za-z\s：&]+[A-Za-z0-9\s：&]*\）)$|[A-Za-z\s]+(?![\u4e00-\u9fff])$'
-                trans_trainerName = re.sub(pattern, '', trans_trainerName)
+                # strip any game names that have their english names
+                pattern = r'[A-Za-z0-9\s：&]+（([^\）]*)\）|\（[A-Za-z\s：&]+\）$|[A-Za-z\s：&]+$'
+                trans_trainerName = re.sub(pattern, lambda m: m.group(1) if m.group(1) else '', trans_trainerName)
                 trans_trainerName = trans_trainerName.replace(
                     "《", "").replace("》", "")
                 trans_trainerName = f"《{trans_trainerName}》修改器"
@@ -912,9 +912,11 @@ class GameCheatsManager(tk.Tk):
             for li in ul.find_all('li'):
                 for link in li.find_all('a'):
                     trainerName = link.get_text().strip()
+                    if trainerName in ["Home", "Trainers", "Log In", "All Trainers (A-Z)", "Privacy Policy"]:
+                        continue
 
                     # search algorithm
-                    if self.keyword_match(keyword, trainerName):
+                    if trainerName and self.keyword_match(keyword, trainerName):
                         self.trainer_urls[trainerName] = link.get("href")
 
         # Remove duplicates
