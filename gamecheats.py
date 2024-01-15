@@ -1,3 +1,4 @@
+import concurrent.futures
 import gettext
 import json
 import locale
@@ -10,14 +11,13 @@ import tempfile
 import threading
 import time
 from urllib.parse import urljoin, urlparse
-import concurrent.futures
-from fuzzywuzzy import fuzz
 
 import polib
 import requests
-import sv_ttk
 from bs4 import BeautifulSoup
+from fuzzywuzzy import fuzz
 from PIL import Image, ImageTk
+import sv_ttk
 from tendo import singleton
 import tkinter as tk
 from tkinter import filedialog, messagebox, ttk
@@ -544,6 +544,11 @@ class GameCheatsManager(tk.Tk):
         response = requests.get(xhhGameDetailUrl, headers=self.headers)
         xhhData = response.json()
 
+        # =======================================
+        # Special cases, add as needed
+        if trainerName == "Assassin's Creed 3":
+            trainerName = "Assassin's Creed III"
+
         if 'name_en' in xhhData['result']:
             enName = xhhData['result']['name_en']
             sanitized_enName = self.sanitize(enName)
@@ -653,6 +658,9 @@ class GameCheatsManager(tk.Tk):
                     trans_trainerName = ts.translate_text(
                         original_trainerName, from_language='en', to_language='zh')
 
+                # strip any game names that have their english names at the end
+                pattern = r'(\（[A-Za-z0-9\s：&]+)\）$|[A-Za-z0-9\s]+(?![\u4e00-\u9fff])$'
+                trans_trainerName = re.sub(pattern, '', trans_trainerName)
                 trans_trainerName = trans_trainerName.replace(
                     "《", "").replace("》", "")
                 trans_trainerName = f"《{trans_trainerName}》修改器"
