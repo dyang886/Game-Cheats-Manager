@@ -629,7 +629,7 @@ class GameCheatsManager(tk.Tk):
         # =======================================================
         # Special cases
         if trainerName == "Bright.Memory.Episode.1 Trainer":
-            trainerName = "Bright Memory Episode 1 Trainer"
+            trainerName = "Bright Memory: Episode 1 Trainer"
 
         trans_trainerName = trainerName
         found_translation = False
