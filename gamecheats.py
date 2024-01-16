@@ -544,8 +544,8 @@ class GameCheatsManager(tk.Tk):
         response = requests.get(xhhGameDetailUrl, headers=self.headers)
         xhhData = response.json()
 
-        # =======================================
-        # Special cases, add as needed
+        # =======================================================
+        # Special cases to match with Xiao Hei He game names
         if trainerName == "Assassin's Creed 3":
             trainerName = "Assassin's Creed III"
         elif trainerName == "Halo Infinite (Campaign)":
@@ -626,6 +626,11 @@ class GameCheatsManager(tk.Tk):
         return [keyword]
 
     def translate_trainer(self, trainerName):
+        # =======================================================
+        # Special cases
+        if trainerName == "Bright.Memory.Episode.1 Trainer":
+            trainerName = "Bright Memory Episode 1 Trainer"
+
         trans_trainerName = trainerName
         found_translation = False
 
@@ -682,7 +687,7 @@ class GameCheatsManager(tk.Tk):
                 sanitized_keyword, sanitized_targetString)
             return similarity >= similarity_threshold
 
-        sanitized_targetString = self.sanitize(targetString)
+        sanitized_targetString = self.sanitize(targetString.rsplit(" Trainer", 1)[0])
 
         return any(is_match(self.sanitize(kw), sanitized_targetString) for kw in keyword if len(kw) >= 2 and len(sanitized_targetString) >= 2)
 
@@ -893,7 +898,7 @@ class GameCheatsManager(tk.Tk):
             # parse trainer name
             rawTrainerName = link.get_text()
             parsedTrainerName = re.sub(
-                r' v.*|\.\bv.*| \d+\.\d+\.\d+.*| Plus\s\d+.*|Build\s\d+.*|(\d+\.\d+-Update.*)|Update\s\d+.*|\(Update\s.*| Early Access .*', '', rawTrainerName).replace("_", ": ")
+                r' v.*|\.\bv.*| \d+\.\d+\.\d+.*| Plus\s\d+.*|Build\s\d+.*|(\d+\.\d+-Update.*)|Update\s\d+.*|\(Update\s.*| Early Access .*|\.Early.Access.*', '', rawTrainerName).replace("_", ": ")
             trainerName = parsedTrainerName.strip() + " Trainer"
 
             # search algorithm
@@ -949,7 +954,7 @@ class GameCheatsManager(tk.Tk):
         trainer_names = list(self.trainer_urls.keys())
 
         # Using a dictionary to store future and its corresponding original trainer name
-        max_threads = 10
+        max_threads = 5
         with concurrent.futures.ThreadPoolExecutor(max_workers=max_threads) as executor:
             future_to_trainerName = {executor.submit(
                 self.translate_trainer, trainerName): trainerName for trainerName in trainer_names}
