@@ -10,18 +10,19 @@ import sys
 import tempfile
 import threading
 import time
+import tkinter as tk
+from tkinter import filedialog, messagebox, ttk
 from urllib.parse import urljoin, urlparse
+import zipfile
+from ctypes import windll
 
-import polib
-import requests
 from bs4 import BeautifulSoup
 from fuzzywuzzy import fuzz
 from PIL import Image, ImageTk
+import polib
+import requests
 import sv_ttk
 from tendo import singleton
-import tkinter as tk
-from tkinter import filedialog, messagebox, ttk
-import zipfile
 ts = None
 
 
@@ -50,6 +51,7 @@ def load_settings():
         "downloadPath": os.path.join(os.environ["APPDATA"], "GCM Trainers/"),
         "language": app_locale,
         "enSearchResults": False,
+        "WeModPath": os.path.join(os.environ["LOCALAPPDATA"], "WeMod/")
     }
 
     try:
@@ -95,13 +97,14 @@ setting_path = os.path.join(
 if not os.path.exists(setting_path):
     os.makedirs(setting_path)
 
-settings = load_settings()
-_ = get_translator()
-
 language_options = {
     "English (US)": "en_US",
     "简体中文": "zh_CN"
 }
+
+windll.shcore.SetProcessDpiAwareness(1)
+settings = load_settings()
+_ = get_translator()
 
 
 class GameCheatsManager(tk.Tk):
@@ -117,14 +120,15 @@ class GameCheatsManager(tk.Tk):
         self.title("Game Cheats Manager")
         self.iconbitmap(resource_path("assets/logo.ico"))
         sv_ttk.set_theme("dark")
+        self.resizable(False, False)
 
         # Version, user prompts, and links
-        self.appVersion = "1.2.4"
+        self.appVersion = "1.2.5"
         self.githubLink = "https://github.com/dyang886/Game-Cheats-Manager"
         self.trainerSearchEntryPrompt = _("Search for installed")
         self.downloadSearchEntryPrompt = _("Search to download")
 
-        # Paths and trainer management
+        # Paths and variable management
         settings = load_settings()  # Load settings once and use it throughout
         self.trainerPath = os.path.normpath(
             os.path.abspath(settings["downloadPath"]))
@@ -132,9 +136,9 @@ class GameCheatsManager(tk.Tk):
         self.tempDir = os.path.join(
             tempfile.gettempdir(), "GameCheatsManagerTemp/")
         self.crackFilePath = resource_path("dependency/app.asar")
-        self.wemodPath = os.path.join(os.getenv("LOCALAPPDATA"), "WeMod/")
         self.trainers = {}  # Store installed trainers: {trainer name: trainer path}
         self.trainer_urls = {}  # Store search results: {trainer name: download link}
+        self.text_size = 11
 
         # Networking
         self.headers = {
@@ -144,6 +148,11 @@ class GameCheatsManager(tk.Tk):
         # Window references
         self.settings_window = None
         self.about_window = None
+
+        # Widget styles
+        style = ttk.Style()
+        style.configure("TButton", font=("Helvetica", self.text_size), padding=5)
+        style.configure('TEntry', padding=5)
 
         # Menu bar
         self.menuBar = tk.Frame(self, background="#2e2e2e")
@@ -162,7 +171,7 @@ class GameCheatsManager(tk.Tk):
 
         # Main frame
         self.frame = ttk.Frame(self)
-        self.frame.grid(row=1, column=0, padx=30, pady=(20, 30))
+        self.frame.grid(row=1, column=0, padx=50, pady=(30, 50))
 
         # ===========================================================================
         # column 1 - trainers
@@ -175,8 +184,8 @@ class GameCheatsManager(tk.Tk):
 
         self.searchPhoto = tk.PhotoImage(
             file=resource_path("assets/search.png"))
-        search_width = 19
-        search_height = 19
+        search_width = 25
+        search_height = 25
         search_width_ratio = self.searchPhoto.width() // search_width
         search_height_ratio = self.searchPhoto.height() // search_height
         self.searchPhoto = self.searchPhoto.subsample(
@@ -187,7 +196,7 @@ class GameCheatsManager(tk.Tk):
 
         self.trainerSearch_var = tk.StringVar()
         self.trainerSearchEntry = ttk.Entry(
-            self.trainerSearchFrame, textvariable=self.trainerSearch_var)
+            self.trainerSearchFrame, textvariable=self.trainerSearch_var, style="TEntry", font=("Helvetica", self.text_size))
         self.trainerSearchEntry.pack()
         self.trainerSearchEntry.insert(0, self.trainerSearchEntryPrompt)
         self.trainerSearchEntry.config(foreground="grey")
@@ -203,7 +212,8 @@ class GameCheatsManager(tk.Tk):
         self.flingHScrollbar.grid(row=2, column=0, sticky='ew')
 
         self.flingListBox = tk.Listbox(self.flingFrame, highlightthickness=0,
-                                       activestyle="none", width=40, height=15,
+                                       activestyle="none", width=30, height=15,
+                                       font=("Helvetica", self.text_size),
                                        yscrollcommand=self.flingVScrollbar.set,
                                        xscrollcommand=self.flingHScrollbar.set)
         self.flingListBox.grid(row=1, column=0)
@@ -213,15 +223,17 @@ class GameCheatsManager(tk.Tk):
 
         # bottom buttons
         self.bottomFrame = ttk.Frame(self.flingFrame)
-        self.bottomFrame.grid(row=3, column=0, pady=(10, 0))
+        self.bottomFrame.grid(row=3, column=0, pady=(10, 0), sticky="ew")
+        self.bottomFrame.columnconfigure(0, weight=1)
+        self.bottomFrame.columnconfigure(1, weight=1)
 
         self.launchButton = ttk.Button(
-            self.bottomFrame, text=_("Launch"), width=11, command=self.launch_trainer)
-        self.launchButton.grid(row=0, column=0, padx=(0, 9))
+            self.bottomFrame, text=_("Launch"), width=11, command=self.launch_trainer, style="TButton")
+        self.launchButton.grid(row=0, column=0, padx=(0, 9), sticky="ew")
 
         self.deleteButton = ttk.Button(
-            self.bottomFrame, text=_("Delete"), width=11, command=self.delete_trainer)
-        self.deleteButton.grid(row=0, column=1, padx=(9, 0))
+            self.bottomFrame, text=_("Delete"), width=11, command=self.delete_trainer, style="TButton")
+        self.deleteButton.grid(row=0, column=1, padx=(9, 0), sticky="ew")
 
         # ===========================================================================
         # column 2 - downloads
@@ -238,7 +250,7 @@ class GameCheatsManager(tk.Tk):
 
         self.downloadSearch_var = tk.StringVar()
         self.downloadSearchEntry = ttk.Entry(
-            self.downloadSearchFrame, textvariable=self.downloadSearch_var)
+            self.downloadSearchFrame, textvariable=self.downloadSearch_var, style="TEntry", font=("Helvetica", self.text_size))
         self.downloadSearchEntry.pack()
         self.downloadSearchEntry.insert(0, self.downloadSearchEntryPrompt)
         self.downloadSearchEntry.config(foreground="grey")
@@ -253,7 +265,8 @@ class GameCheatsManager(tk.Tk):
         self.downloadHScrollbar.grid(row=2, column=0, sticky='ew')
 
         self.downloadListBox = tk.Listbox(self.downloadFrame, highlightthickness=0,
-                                          activestyle="none", width=40, height=15,
+                                          activestyle="none", width=30, height=15,
+                                          font=("Helvetica", self.text_size),
                                           yscrollcommand=self.downloadVScrollbar.set,
                                           xscrollcommand=self.downloadHScrollbar.set)
         self.downloadListBox.grid(row=1, column=0)
@@ -263,17 +276,28 @@ class GameCheatsManager(tk.Tk):
 
         # bottom change download path
         self.changeDownloadPath = ttk.Frame(self.downloadFrame)
-        self.changeDownloadPath.grid(row=3, column=0, pady=(10, 0))
+        self.changeDownloadPath.grid(row=3, column=0, pady=(10, 0), sticky="ew")
+        self.changeDownloadPath.columnconfigure(0, weight=3)
+        self.changeDownloadPath.columnconfigure(1, weight=1)
 
         self.downloadPathText = tk.StringVar()
         self.downloadPathText.set(self.trainerPath)
         self.downloadPathEntry = ttk.Entry(
-            self.changeDownloadPath, width=21, state="readonly", textvariable=self.downloadPathText)
-        self.downloadPathEntry.pack(side=tk.LEFT, padx=(0, 15))
+            self.changeDownloadPath, 
+            state="readonly", 
+            textvariable=self.downloadPathText, 
+            style="TEntry", 
+            font=("Helvetica", self.text_size)
+        )
+        self.downloadPathEntry.grid(row=0, column=0, sticky="ew", padx=(0, 15))
 
         self.fileDialogButton = ttk.Button(
-            self.changeDownloadPath, text="...", width=2, command=self.create_migration_thread)
-        self.fileDialogButton.pack(side=tk.LEFT)
+            self.changeDownloadPath, 
+            text="...", 
+            command=self.create_migration_thread, 
+            style="TButton"
+        )
+        self.fileDialogButton.grid(row=0, column=1, sticky="ew")
 
         self.trainerSearchEntry.bind('<FocusIn>', self.on_trainer_entry_click)
         self.trainerSearchEntry.bind(
@@ -309,6 +333,7 @@ class GameCheatsManager(tk.Tk):
     def apply_settings_page(self):
         settings["language"] = language_options[self.languages_var.get()]
         settings["enSearchResults"] = self.en_results_var.get()
+        settings["WeModPath"] = self.wemod_path_var.get()
         apply_settings(settings)
         messagebox.showinfo(_("Attention"), _(
             "Please restart the application to apply settings"))
@@ -323,14 +348,18 @@ class GameCheatsManager(tk.Tk):
 
             settings_frame = ttk.Frame(self.settings_window)
             settings_frame.grid(row=0, column=0, sticky='nsew',
-                                padx=(80, 80), pady=(30, 20))
+                                padx=(80, 80), pady=(50, 20))
 
             # ===========================================================================
             # languages frame
             languages_frame = ttk.Frame(settings_frame)
-            languages_frame.grid(row=0, column=0, pady=(20, 0), sticky="we")
+            languages_frame.grid(row=0, column=0, sticky="we")
 
-            languages_label = ttk.Label(languages_frame, text=_("Language:"))
+            languages_label = ttk.Label(
+                languages_frame,
+                text=_("Language:"),
+                font=("Helvetica", self.text_size)
+            )
             languages_label.pack(anchor="w")
 
             self.languages_var = tk.StringVar()
@@ -342,19 +371,21 @@ class GameCheatsManager(tk.Tk):
                 languages_frame,
                 textvariable=self.languages_var,
                 values=list(language_options.keys()),
-                state="readonly", width=20
+                state="readonly",
+                font=("Helvetica", self.text_size),
             )
-            languages_combobox.pack(side=tk.LEFT)
+            languages_combobox.pack(side=tk.LEFT, expand=True, fill="x")
 
             # ===========================================================================
             # english search results frame
             en_results_frame = ttk.Frame(settings_frame)
-            en_results_frame.grid(row=1, column=0, pady=(20, 0), sticky="we")
+            en_results_frame.grid(row=1, column=0, pady=(30, 0), sticky="we")
 
             en_results_label = ttk.Label(
                 en_results_frame,
                 text=_("Always show search results in English:"),
-                wraplength=130
+                wraplength=270,
+                font=("Helvetica", self.text_size)
             )
             en_results_label.pack(side=tk.LEFT)
 
@@ -367,13 +398,46 @@ class GameCheatsManager(tk.Tk):
             en_results_checkbox.pack(side=tk.RIGHT, padx=(10, 0))
 
             # ===========================================================================
+            # WeMod path frame
+            wemod_path_frame = ttk.Frame(settings_frame)
+            wemod_path_frame.grid(row=2, column=0, pady=(30, 0), sticky="we")
+
+            wemod_path_label = ttk.Label(
+                wemod_path_frame,
+                text=_("WeMod installation path:"),
+                font=("Helvetica", self.text_size)
+            )
+            wemod_path_label.pack(anchor="w")
+
+            self.wemod_path_var = tk.StringVar()
+            self.wemod_path_var.set(os.path.normpath(settings["WeModPath"]))
+            wemod_path_entry = ttk.Entry(
+                wemod_path_frame,
+                state="readonly",
+                style="TEntry",
+                font=("Helvetica", self.text_size),
+                textvariable=self.wemod_path_var
+            )
+            wemod_path_entry.pack(side=tk.LEFT, padx=(0, 10), expand=True, fill="x")
+
+            wemod_path_button = ttk.Button(
+                wemod_path_frame,
+                text="...",
+                command=self.change_wemod_path,
+                style="TButton"
+            )
+            wemod_path_button.pack(side=tk.LEFT, expand=True, fill="x")
+
+            # ===========================================================================
             # apply button
             apply_button = ttk.Button(
                 self.settings_window, text=_("Apply"),
-                command=self.apply_settings_page
+                command=self.apply_settings_page,
+                style="TButton",
+                width=10
             )
-            apply_button.grid(row=1, column=0, padx=(
-                0, 20), pady=(20, 20), sticky="e")
+            apply_button.grid(row=3, column=0, padx=(
+                0, 30), pady=(30, 30), sticky="e")
 
             self.center_window(self.settings_window)
         else:
@@ -390,7 +454,7 @@ class GameCheatsManager(tk.Tk):
 
             about_frame = ttk.Frame(self.about_window)
             about_frame.grid(row=0, column=0, sticky='nsew',
-                             padx=(50, 50), pady=(30, 40))
+                             padx=(70, 70), pady=(70, 70))
 
             # ===========================================================================
             # app logo
@@ -407,11 +471,11 @@ class GameCheatsManager(tk.Tk):
             appInfo_frame.grid(row=0, column=1)
 
             app_name_label = ttk.Label(
-                appInfo_frame, text="Game Cheats Manager", font=("TkDefaultFont", 16))
-            app_name_label.grid(row=0, column=0, pady=(0, 15))
+                appInfo_frame, text="Game Cheats Manager", font=("Helvetica", 20))
+            app_name_label.grid(row=0, column=0, pady=(0, 20))
 
             app_version_label = ttk.Label(
-                appInfo_frame, text=_("Version: ") + self.appVersion)
+                appInfo_frame, text=_("Version: ") + self.appVersion, font=("Helvetica", self.text_size))
             app_version_label.grid(row=1, column=0)
 
             # ===========================================================================
@@ -421,13 +485,13 @@ class GameCheatsManager(tk.Tk):
                 webbrowser.open_new(url)
 
             links_frame = ttk.Frame(about_frame)
-            links_frame.grid(row=1, column=0, columnspan=2, pady=(20, 0))
+            links_frame.grid(row=1, column=0, columnspan=2, pady=(40, 0))
 
-            github_label = ttk.Label(links_frame, text="GitHub: ")
+            github_label = ttk.Label(links_frame, text="GitHub: ", font=("Helvetica", self.text_size))
             github_label.pack(side=tk.LEFT)
 
             github_link = ttk.Label(
-                links_frame, text=self.githubLink, cursor="hand2", foreground="#284fff")
+                links_frame, text=self.githubLink, cursor="hand2", foreground="#284fff", font=("Helvetica", self.text_size))
             github_link.pack(side=tk.LEFT)
             github_link.bind(
                 "<Button-1>", lambda e: open_link(e, self.githubLink))
@@ -511,6 +575,15 @@ class GameCheatsManager(tk.Tk):
         self.trainerSearchEntry.config(state="enabled")
         self.launchButton.config(state="enabled")
         self.deleteButton.config(state="enabled")
+    
+    def change_wemod_path(self):
+        selected_path = filedialog.askdirectory(
+            initialdir=self.wemod_path_var.get(),
+            title=_("Select WeMod installation path")
+        )
+
+        if selected_path:
+            self.wemod_path_var.set(os.path.normpath(selected_path))
 
     def is_internet_connected(self, urls=None, timeout=3):
         if urls is None:
@@ -1091,13 +1164,14 @@ class GameCheatsManager(tk.Tk):
         self.show_cheats()
 
     def wemod_pro(self):
-        if not os.path.exists(self.wemodPath):
-            messagebox.showerror(_("Error"), _("WeMod not installed."))
+        wemodPath = os.path.normpath(settings["WeModPath"])
+        if not os.path.exists(wemodPath):
+            messagebox.showerror(_("Error"), _("WeMod not installed or invalid installation path.\nPlease choose a correct WeMod installation path in settings."))
             return
 
         version_folders = []
-        for item in os.listdir(self.wemodPath):
-            if os.path.isdir(os.path.join(self.wemodPath, item)):
+        for item in os.listdir(wemodPath):
+            if os.path.isdir(os.path.join(wemodPath, item)):
                 match = re.match(r'app-(\d+\.\d+\.\d+)', item)
                 if match:
                     version_info = tuple(
@@ -1106,7 +1180,7 @@ class GameCheatsManager(tk.Tk):
                     version_folders.append((version_info, item))
 
         if not version_folders:
-            messagebox.showerror(_("Error"), _("WeMod not installed."))
+            messagebox.showerror(_("Error"), _("WeMod not installed or invalid installation path.\nPlease choose a correct WeMod installation path in settings."))
             return
 
         # Sort based on version numbers (major, minor, patch)
@@ -1116,14 +1190,14 @@ class GameCheatsManager(tk.Tk):
         if not len(version_folders) <= 1:
             # Skip the first one as it's the newest
             for version_info, folder_name in version_folders[1:]:
-                folder_path = os.path.join(self.wemodPath, folder_name)
+                folder_path = os.path.join(wemodPath, folder_name)
                 shutil.rmtree(folder_path)
                 print(f"Deleted old version folder: {folder_path}")
 
         newest_version_folder = version_folders[0][1]
 
         newest_version_path = os.path.join(
-            self.wemodPath, newest_version_folder)
+            wemodPath, newest_version_folder)
         print("Newest Version Folder" + newest_version_path)
 
         # Apply patch

@@ -42,6 +42,12 @@ msgstr "Language:"
 msgid "Always show search results in English:"
 msgstr "Always show search results in English:"
 
+msgid "WeMod installation path:"
+msgstr "WeMod installation path:"
+
+msgid "Select WeMod installation path"
+msgstr "Select WeMod installation path"
+
 msgid "Apply"
 msgstr "Apply"
 
@@ -121,8 +127,12 @@ msgstr "Could not find the downloaded trainer file, please try turning your anti
 msgid "Download success!"
 msgstr "Download success!"
 
-msgid "WeMod not installed."
-msgstr "WeMod not installed."
+msgid ""
+"WeMod not installed or invalid installation path.\n"
+"Please choose a correct WeMod installation path in settings."
+msgstr ""
+"WeMod not installed or invalid installation path.\n"
+"Please choose a correct WeMod installation path in settings."
 
 msgid "WeMod is currently running, please close the application first."
 msgstr "WeMod is currently running, please close the application first."

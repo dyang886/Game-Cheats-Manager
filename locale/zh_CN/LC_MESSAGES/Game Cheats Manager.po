@@ -42,6 +42,12 @@ msgstr "语言："
 msgid "Always show search results in English:"
 msgstr "始终以英语显示搜索结果："
 
+msgid "WeMod installation path:"
+msgstr "WeMod 安装路径："
+
+msgid "Select WeMod installation path"
+msgstr "选择 WeMod 安装路径"
+
 msgid "Apply"
 msgstr "应用"
 
@@ -121,8 +127,12 @@ msgstr "找不到下载的修改器，请尝试关闭杀毒软件。"
 msgid "Download success!"
 msgstr "下载成功！"
 
-msgid "WeMod not installed."
-msgstr "未安装 WeMod。"
+msgid ""
+"WeMod not installed or invalid installation path.\n"
+"Please choose a correct WeMod installation path in settings."
+msgstr ""
+"WeMod 未安装或安装路径无效。\n"
+"请在设置中选择正确的 WeMod 安装路径。"
 
 msgid "WeMod is currently running, please close the application first."
 msgstr "WeMod 正在运行中，请先关闭应用程序。"

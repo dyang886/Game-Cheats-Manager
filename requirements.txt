@@ -1,0 +1,8 @@
+polib
+requests
+beautifulsoup4
+fuzzywuzzy
+Pillow
+sv_ttk
+tendo
+translators
