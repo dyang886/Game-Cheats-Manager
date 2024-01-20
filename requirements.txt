@@ -2,6 +2,7 @@ polib
 requests
 beautifulsoup4
 fuzzywuzzy
+python-Levenshtein
 Pillow
 sv_ttk
 tendo

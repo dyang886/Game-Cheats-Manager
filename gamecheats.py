@@ -710,7 +710,10 @@ class GameCheatsManager(tk.Tk):
         if trainerName == "Bright.Memory.Episode.1 Trainer":
             trainerName = "Bright Memory: Episode 1 Trainer"
 
+        if "/" in trainerName:
+            trainerName = trainerName.split("/")[1]
         trans_trainerName = trainerName
+
         found_translation = False
 
         if settings["language"] == "zh_CN" and not settings["enSearchResults"]:
