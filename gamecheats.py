@@ -123,7 +123,7 @@ class GameCheatsManager(tk.Tk):
         self.resizable(False, False)
 
         # Version, user prompts, and links
-        self.appVersion = "1.2.5"
+        self.appVersion = "1.2.6"
         self.githubLink = "https://github.com/dyang886/Game-Cheats-Manager"
         self.trainerSearchEntryPrompt = _("Search for installed")
         self.downloadSearchEntryPrompt = _("Search to download")
@@ -151,8 +151,9 @@ class GameCheatsManager(tk.Tk):
 
         # Widget styles
         style = ttk.Style()
-        style.configure("TButton", font=("Helvetica", self.text_size), padding=5)
-        style.configure('TEntry', padding=5)
+        style.configure("TButton", font=("Helvetica", self.text_size), padding=8)
+        style.configure("TEntry", padding=6)
+        style.configure("TCombobox", padding=6)
 
         # Menu bar
         self.menuBar = tk.Frame(self, background="#2e2e2e")
@@ -184,8 +185,8 @@ class GameCheatsManager(tk.Tk):
 
         self.searchPhoto = tk.PhotoImage(
             file=resource_path("assets/search.png"))
-        search_width = 25
-        search_height = 25
+        search_width = 27
+        search_height = 27
         search_width_ratio = self.searchPhoto.width() // search_width
         search_height_ratio = self.searchPhoto.height() // search_height
         self.searchPhoto = self.searchPhoto.subsample(
@@ -354,13 +355,14 @@ class GameCheatsManager(tk.Tk):
             # languages frame
             languages_frame = ttk.Frame(settings_frame)
             languages_frame.grid(row=0, column=0, sticky="we")
+            languages_frame.grid_columnconfigure(0, weight=1)
 
             languages_label = ttk.Label(
                 languages_frame,
                 text=_("Language:"),
                 font=("Helvetica", self.text_size)
             )
-            languages_label.pack(anchor="w")
+            languages_label.grid(row=0, column=0, sticky="w")
 
             self.languages_var = tk.StringVar()
             for key, value in language_options.items():
@@ -373,21 +375,23 @@ class GameCheatsManager(tk.Tk):
                 values=list(language_options.keys()),
                 state="readonly",
                 font=("Helvetica", self.text_size),
+                style="TCombobox"
             )
-            languages_combobox.pack(side=tk.LEFT, expand=True, fill="x")
+            languages_combobox.grid(row=1, column=0, sticky="we")
 
             # ===========================================================================
             # english search results frame
             en_results_frame = ttk.Frame(settings_frame)
             en_results_frame.grid(row=1, column=0, pady=(30, 0), sticky="we")
+            en_results_frame.grid_columnconfigure(0, weight=1)
 
             en_results_label = ttk.Label(
                 en_results_frame,
                 text=_("Always show search results in English:"),
-                wraplength=270,
+                wraplength=400,
                 font=("Helvetica", self.text_size)
             )
-            en_results_label.pack(side=tk.LEFT)
+            en_results_label.grid(row=0, column=0, sticky="w")
 
             self.en_results_var = tk.BooleanVar()
             self.en_results_var.set(settings["enSearchResults"])
@@ -395,19 +399,20 @@ class GameCheatsManager(tk.Tk):
                 en_results_frame,
                 variable=self.en_results_var
             )
-            en_results_checkbox.pack(side=tk.RIGHT, padx=(10, 0))
+            en_results_checkbox.grid(row=0, column=1, padx=(10, 0))
 
             # ===========================================================================
             # WeMod path frame
             wemod_path_frame = ttk.Frame(settings_frame)
             wemod_path_frame.grid(row=2, column=0, pady=(30, 0), sticky="we")
+            wemod_path_frame.grid_columnconfigure(0, weight=1)
 
             wemod_path_label = ttk.Label(
                 wemod_path_frame,
                 text=_("WeMod installation path:"),
                 font=("Helvetica", self.text_size)
             )
-            wemod_path_label.pack(anchor="w")
+            wemod_path_label.grid(row=0, column=0, sticky="w")
 
             self.wemod_path_var = tk.StringVar()
             self.wemod_path_var.set(os.path.normpath(settings["WeModPath"]))
@@ -416,17 +421,18 @@ class GameCheatsManager(tk.Tk):
                 state="readonly",
                 style="TEntry",
                 font=("Helvetica", self.text_size),
-                textvariable=self.wemod_path_var
+                textvariable=self.wemod_path_var,
             )
-            wemod_path_entry.pack(side=tk.LEFT, padx=(0, 10), expand=True, fill="x")
+            wemod_path_entry.grid(row=1, column=0, padx=(0, 10), sticky="we")
 
             wemod_path_button = ttk.Button(
                 wemod_path_frame,
                 text="...",
                 command=self.change_wemod_path,
-                style="TButton"
+                style="TButton",
+                width=2
             )
-            wemod_path_button.pack(side=tk.LEFT, expand=True, fill="x")
+            wemod_path_button.grid(row=1, column=1)
 
             # ===========================================================================
             # apply button
@@ -454,12 +460,12 @@ class GameCheatsManager(tk.Tk):
 
             about_frame = ttk.Frame(self.about_window)
             about_frame.grid(row=0, column=0, sticky='nsew',
-                             padx=(70, 70), pady=(70, 70))
+                             padx=(70, 70), pady=(50, 70))
 
             # ===========================================================================
             # app logo
             original_image = Image.open(resource_path("assets/logo.png"))
-            resized_image = original_image.resize((100, 100))
+            resized_image = original_image.resize((150, 150))
             logo_image = ImageTk.PhotoImage(resized_image)
             logo_label = ttk.Label(about_frame, image=logo_image)
             logo_label.image = logo_image  # Keep a reference
@@ -471,7 +477,7 @@ class GameCheatsManager(tk.Tk):
             appInfo_frame.grid(row=0, column=1)
 
             app_name_label = ttk.Label(
-                appInfo_frame, text="Game Cheats Manager", font=("Helvetica", 20))
+                appInfo_frame, text="Game Cheats Manager", font=("Helvetica", 18))
             app_name_label.grid(row=0, column=0, pady=(0, 20))
 
             app_version_label = ttk.Label(
