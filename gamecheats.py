@@ -744,10 +744,19 @@ class GameCheatsManager(tk.Tk):
                         "No matches found, using direct translation for: " + original_trainerName)
                     trans_trainerName = ts.translate_text(
                         original_trainerName, from_language='en', to_language='zh')
-
+                
                 # strip any game names that have their english names
-                pattern = r'[A-Za-z0-9\s：&]+（([^\）]*)\）|\（[A-Za-z\s：&]+\）$|[A-Za-z\s：&]+$'
+                pattern = r'[A-Za-z0-9\s：&]+（([^\）]*)\）|\（[A-Za-z\s：&]+\）$'
                 trans_trainerName = re.sub(pattern, lambda m: m.group(1) if m.group(1) else '', trans_trainerName)
+
+                # do not alter if game name ends with roman numerics
+                def is_roman_numeral(s):
+                    return bool(re.match(r'^(?=[MDCLXVI])M?(CM|CD|D?C{0,3})(XC|XL|L?X{0,3})(IX|IV|V?I{0,3})$', s.strip()))
+
+                if not is_roman_numeral(trans_trainerName.split(" ")[-1]):
+                    pattern = r'[A-Za-z\s：&]+$'
+                    trans_trainerName = re.sub(pattern, '', trans_trainerName)
+
                 trans_trainerName = trans_trainerName.replace(
                     "《", "").replace("》", "")
                 trans_trainerName = f"《{trans_trainerName}》修改器"
