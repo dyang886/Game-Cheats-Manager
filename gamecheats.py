@@ -40,10 +40,11 @@ def apply_settings(settings):
 def load_settings():
     system_locale = locale.getlocale()[0]
     locale_mapping = {
-        "en_US": "English_United States",
-        "zh_CN": "Chinese (Simplified)_China",
-        "zh_HK": "Chinese (Simplified)_Hong Kong SAR",
-        "zh_MO": "Chinese (Simplified)_Macao SAR"
+        "English_United States": "en_US",
+        "Chinese (Simplified)_China": "zh_CN",
+        "Chinese (Simplified)_Hong Kong SAR": "zh_CN",
+        "Chinese (Simplified)_Macao SAR": "zh_CN",
+        "Chinese (Simplified)_Singapore": "zh_CN"
     }
     app_locale = locale_mapping.get(system_locale, 'en_US')
 
