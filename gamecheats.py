@@ -38,6 +38,7 @@ def apply_settings(settings):
 
 
 def load_settings():
+    locale.setlocale(locale.LC_ALL, '')
     system_locale = locale.getlocale()[0]
     locale_mapping = {
         "English_United States": "en_US",
