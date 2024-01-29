@@ -11,7 +11,7 @@ import tempfile
 import threading
 import time
 import tkinter as tk
-from tkinter import filedialog, messagebox, ttk
+from tkinter import filedialog, font, messagebox, ttk
 from urllib.parse import urljoin, urlparse
 import zipfile
 import ctypes
@@ -151,18 +151,23 @@ class GameCheatsManager(tk.Tk):
         self.about_window = None
 
         # Widget fonts and styles
-        ctypes.windll.gdi32.AddFontResourceW(resource_path("assets/NotoSans-Regular.ttf"))
-        ctypes.windll.gdi32.AddFontResourceW(resource_path("assets/NotoSansSC-Regular.ttf"))
-        # Broadcasts a system-wide message that a new font has been added
-        ctypes.windll.user32.SendMessageW(0xffff, 0x1D, 0, 0)
-        if settings["language"] == "en_US":
-            self.font = "Noto Sans"
-        elif settings["language"] == "zh_CN":
-            self.font = "Noto Sans SC"
-        self.default_font = (self.font, 10)
-        self.menu_font = (self.font, 9)
-        style = ttk.Style()
+        font_config = {
+            "en_US": ("Noto Sans", "assets/NotoSans-Regular.ttf"),
+            "zh_CN": ("Noto Sans SC", "assets/NotoSansSC-Regular.ttf")
+        }
 
+        def is_font_installed(font_name):
+            return font_name in font.families()
+
+        font_name, font_path = font_config[settings["language"]]
+        if font_path and not is_font_installed(font_name):
+            ctypes.windll.gdi32.AddFontResourceW(resource_path(font_path))
+            # Broadcasts a system-wide message if a new font has been added
+            ctypes.windll.user32.SendMessageW(0xffff, 0x1D, 0, 0)
+
+        self.default_font = (font_name, 10)
+        self.menu_font = (font_name, 9)
+        style = ttk.Style()
         style.configure("TButton", font=self.default_font, padding=8)
         style.configure("TEntry", padding=6)
         style.configure("TCombobox", padding=6)
