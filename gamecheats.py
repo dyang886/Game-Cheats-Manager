@@ -14,7 +14,7 @@ import tkinter as tk
 from tkinter import filedialog, messagebox, ttk
 from urllib.parse import urljoin, urlparse
 import zipfile
-from ctypes import windll
+import ctypes
 
 from bs4 import BeautifulSoup
 from fuzzywuzzy import fuzz
@@ -104,7 +104,7 @@ language_options = {
     "简体中文": "zh_CN"
 }
 
-windll.shcore.SetProcessDpiAwareness(1)
+ctypes.windll.shcore.SetProcessDpiAwareness(1)
 settings = load_settings()
 _ = get_translator()
 
@@ -125,7 +125,7 @@ class GameCheatsManager(tk.Tk):
         self.resizable(False, False)
 
         # Version, user prompts, and links
-        self.appVersion = "1.2.6"
+        self.appVersion = "1.2.7"
         self.githubLink = "https://github.com/dyang886/Game-Cheats-Manager"
         self.trainerSearchEntryPrompt = _("Search for installed")
         self.downloadSearchEntryPrompt = _("Search to download")
@@ -140,7 +140,6 @@ class GameCheatsManager(tk.Tk):
         self.crackFilePath = resource_path("dependency/app.asar")
         self.trainers = {}  # Store installed trainers: {trainer name: trainer path}
         self.trainer_urls = {}  # Store search results: {trainer name: download link}
-        self.text_size = 11
 
         # Networking
         self.headers = {
@@ -151,17 +150,28 @@ class GameCheatsManager(tk.Tk):
         self.settings_window = None
         self.about_window = None
 
-        # Widget styles
+        # Widget fonts and styles
+        ctypes.windll.gdi32.AddFontResourceW(resource_path("assets/NotoSans-Regular.ttf"))
+        ctypes.windll.gdi32.AddFontResourceW(resource_path("assets/NotoSansSC-Regular.ttf"))
+        # Broadcasts a system-wide message that a new font has been added
+        ctypes.windll.user32.SendMessageW(0xffff, 0x1D, 0, 0)
+        if settings["language"] == "en_US":
+            self.font = "Noto Sans"
+        elif settings["language"] == "zh_CN":
+            self.font = "Noto Sans SC"
+        self.default_font = (self.font, 10)
+        self.menu_font = (self.font, 9)
         style = ttk.Style()
-        style.configure("TButton", font=("Helvetica", self.text_size), padding=8)
+
+        style.configure("TButton", font=self.default_font, padding=8)
         style.configure("TEntry", padding=6)
         style.configure("TCombobox", padding=6)
 
         # Menu bar
         self.menuBar = tk.Frame(self, background="#2e2e2e")
         self.settingMenuBtn = tk.Menubutton(
-            self.menuBar, text=_("Options"), background="#2e2e2e")
-        self.settingsMenu = tk.Menu(self.settingMenuBtn, tearoff=0)
+            self.menuBar, text=_("Options"), background="#2e2e2e", font=self.menu_font)
+        self.settingsMenu = tk.Menu(self.settingMenuBtn, tearoff=0, font=self.menu_font)
         self.settingsMenu.add_command(
             label=_("Settings"), command=self.open_settings)
         self.settingsMenu.add_command(
@@ -199,7 +209,7 @@ class GameCheatsManager(tk.Tk):
 
         self.trainerSearch_var = tk.StringVar()
         self.trainerSearchEntry = ttk.Entry(
-            self.trainerSearchFrame, textvariable=self.trainerSearch_var, style="TEntry", font=("Helvetica", self.text_size))
+            self.trainerSearchFrame, textvariable=self.trainerSearch_var, style="TEntry", font=self.default_font)
         self.trainerSearchEntry.pack()
         self.trainerSearchEntry.insert(0, self.trainerSearchEntryPrompt)
         self.trainerSearchEntry.config(foreground="grey")
@@ -215,8 +225,8 @@ class GameCheatsManager(tk.Tk):
         self.flingHScrollbar.grid(row=2, column=0, sticky='ew')
 
         self.flingListBox = tk.Listbox(self.flingFrame, highlightthickness=0,
-                                       activestyle="none", width=30, height=15,
-                                       font=("Helvetica", self.text_size),
+                                       activestyle="none", width=33, height=13,
+                                       font=self.default_font,
                                        yscrollcommand=self.flingVScrollbar.set,
                                        xscrollcommand=self.flingHScrollbar.set)
         self.flingListBox.grid(row=1, column=0)
@@ -253,7 +263,7 @@ class GameCheatsManager(tk.Tk):
 
         self.downloadSearch_var = tk.StringVar()
         self.downloadSearchEntry = ttk.Entry(
-            self.downloadSearchFrame, textvariable=self.downloadSearch_var, style="TEntry", font=("Helvetica", self.text_size))
+            self.downloadSearchFrame, textvariable=self.downloadSearch_var, style="TEntry", font=self.default_font)
         self.downloadSearchEntry.pack()
         self.downloadSearchEntry.insert(0, self.downloadSearchEntryPrompt)
         self.downloadSearchEntry.config(foreground="grey")
@@ -268,8 +278,8 @@ class GameCheatsManager(tk.Tk):
         self.downloadHScrollbar.grid(row=2, column=0, sticky='ew')
 
         self.downloadListBox = tk.Listbox(self.downloadFrame, highlightthickness=0,
-                                          activestyle="none", width=30, height=15,
-                                          font=("Helvetica", self.text_size),
+                                          activestyle="none", width=33, height=13,
+                                          font=self.default_font,
                                           yscrollcommand=self.downloadVScrollbar.set,
                                           xscrollcommand=self.downloadHScrollbar.set)
         self.downloadListBox.grid(row=1, column=0)
@@ -290,7 +300,7 @@ class GameCheatsManager(tk.Tk):
             state="readonly", 
             textvariable=self.downloadPathText, 
             style="TEntry", 
-            font=("Helvetica", self.text_size)
+            font=self.default_font
         )
         self.downloadPathEntry.grid(row=0, column=0, sticky="ew", padx=(0, 15))
 
@@ -362,7 +372,7 @@ class GameCheatsManager(tk.Tk):
             languages_label = ttk.Label(
                 languages_frame,
                 text=_("Language:"),
-                font=("Helvetica", self.text_size)
+                font=self.default_font
             )
             languages_label.grid(row=0, column=0, sticky="w")
 
@@ -376,7 +386,7 @@ class GameCheatsManager(tk.Tk):
                 textvariable=self.languages_var,
                 values=list(language_options.keys()),
                 state="readonly",
-                font=("Helvetica", self.text_size),
+                font=self.default_font,
                 style="TCombobox"
             )
             languages_combobox.grid(row=1, column=0, sticky="we")
@@ -391,7 +401,7 @@ class GameCheatsManager(tk.Tk):
                 en_results_frame,
                 text=_("Always show search results in English:"),
                 wraplength=400,
-                font=("Helvetica", self.text_size)
+                font=self.default_font
             )
             en_results_label.grid(row=0, column=0, sticky="w")
 
@@ -412,7 +422,7 @@ class GameCheatsManager(tk.Tk):
             wemod_path_label = ttk.Label(
                 wemod_path_frame,
                 text=_("WeMod installation path:"),
-                font=("Helvetica", self.text_size)
+                font=self.default_font
             )
             wemod_path_label.grid(row=0, column=0, sticky="w")
 
@@ -422,7 +432,7 @@ class GameCheatsManager(tk.Tk):
                 wemod_path_frame,
                 state="readonly",
                 style="TEntry",
-                font=("Helvetica", self.text_size),
+                font=self.default_font,
                 textvariable=self.wemod_path_var,
             )
             wemod_path_entry.grid(row=1, column=0, padx=(0, 10), sticky="we")
@@ -483,7 +493,7 @@ class GameCheatsManager(tk.Tk):
             app_name_label.grid(row=0, column=0, pady=(0, 20))
 
             app_version_label = ttk.Label(
-                appInfo_frame, text=_("Version: ") + self.appVersion, font=("Helvetica", self.text_size))
+                appInfo_frame, text=_("Version: ") + self.appVersion, font=self.default_font)
             app_version_label.grid(row=1, column=0)
 
             # ===========================================================================
@@ -495,11 +505,11 @@ class GameCheatsManager(tk.Tk):
             links_frame = ttk.Frame(about_frame)
             links_frame.grid(row=1, column=0, columnspan=2, pady=(40, 0))
 
-            github_label = ttk.Label(links_frame, text="GitHub: ", font=("Helvetica", self.text_size))
+            github_label = ttk.Label(links_frame, text="GitHub: ", font=self.default_font)
             github_label.pack(side=tk.LEFT)
 
             github_link = ttk.Label(
-                links_frame, text=self.githubLink, cursor="hand2", foreground="#284fff", font=("Helvetica", self.text_size))
+                links_frame, text=self.githubLink, cursor="hand2", foreground="#284fff", font=self.default_font)
             github_link.pack(side=tk.LEFT)
             github_link.bind(
                 "<Button-1>", lambda e: open_link(e, self.githubLink))
