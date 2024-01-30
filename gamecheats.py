@@ -1,4 +1,5 @@
 import concurrent.futures
+import ctypes
 import gettext
 import json
 import locale
@@ -14,7 +15,6 @@ import tkinter as tk
 from tkinter import filedialog, font, messagebox, ttk
 from urllib.parse import urljoin, urlparse
 import zipfile
-import ctypes
 
 from bs4 import BeautifulSoup
 from fuzzywuzzy import fuzz
@@ -608,12 +608,14 @@ class GameCheatsManager(tk.Tk):
         if selected_path:
             self.wemod_path_var.set(os.path.normpath(selected_path))
 
-    def is_internet_connected(self, urls=None, timeout=3):
+    def is_internet_connected(self, urls=None, timeout=5):
         if urls is None:
             urls = [
                 "https://www.bing.com/",
                 "https://www.baidu.com/",
                 "http://www.google.com/",
+                "https://www.apple.com/",
+                "https://www.wechat.com/"
             ]
 
         for url in urls:
@@ -964,6 +966,7 @@ class GameCheatsManager(tk.Tk):
         self.disable_download_widgets()
         self.downloadListBox.delete(0, tk.END)
         self.downloadListBox.unbind('<Double-Button-1>')
+        self.downloadSearchEntry.unbind('<Return>')
         self.trainer_urls = {}
 
         # Check for internet connection before search
@@ -972,8 +975,8 @@ class GameCheatsManager(tk.Tk):
         if not self.is_internet_connected():
             self.downloadListBox.insert(
                 tk.END, _("No internet connection, search function is disabled."))
-            self.downloadListBox.unbind('<Double-Button-1>')
             self.enable_download_widgets()
+            self.downloadSearchEntry.bind('<Return>', self.on_enter_press)
             return
         self.downloadListBox.insert(tk.END, _("Searching..."))
 
@@ -1073,10 +1076,7 @@ class GameCheatsManager(tk.Tk):
             translated_trainerName = future.result()
             translated_names[original_trainerName] = translated_trainerName
 
-        # Clear prior texts and rebind events
-        self.enable_download_widgets()
-        self.downloadListBox.bind(
-            '<Double-Button-1>', self.on_download_double_click)
+        # Clear prior texts
         self.downloadListBox.delete(0, tk.END)
 
         # Display results in the original order
@@ -1085,14 +1085,20 @@ class GameCheatsManager(tk.Tk):
                 tk.END, f"{str(count)}. {translated_names[trainerName]}")
 
         if len(self.trainer_urls) == 0:
-            self.downloadListBox.unbind('<Double-Button-1>')
             self.downloadListBox.insert(tk.END, _("No results found."))
             self.enable_download_widgets()
+            self.downloadSearchEntry.bind('<Return>', self.on_enter_press)
             return
+        
+        self.enable_download_widgets()
+        self.downloadSearchEntry.bind('<Return>', self.on_enter_press)
+        self.downloadListBox.bind(
+            '<Double-Button-1>', self.on_download_double_click)
 
     def download_trainer(self, index):
         self.disable_download_widgets()
         self.downloadListBox.unbind('<Double-Button-1>')
+        self.downloadSearchEntry.unbind('<Return>')
         self.downloadListBox.delete(0, tk.END)
         self.downloadListBox.insert(tk.END, _("Downloading..."))
         if os.path.exists(self.tempDir):
@@ -1112,6 +1118,7 @@ class GameCheatsManager(tk.Tk):
                 self.downloadListBox.insert(
                     tk.END, _("Trainer already exists, aborted download."))
                 self.enable_download_widgets()
+                self.downloadSearchEntry.bind('<Return>', self.on_enter_press)
                 return
 
         # Additional trainer file extraction for trainers from main site
@@ -1129,6 +1136,7 @@ class GameCheatsManager(tk.Tk):
             messagebox.showerror(
                 _("Error"), _("An error occurred while getting trainer url: ") + str(e))
             self.enable_download_widgets()
+            self.downloadSearchEntry.bind('<Return>', self.on_enter_press)
             return
 
         # Find compressed file extension
@@ -1157,6 +1165,7 @@ class GameCheatsManager(tk.Tk):
             messagebox.showerror(
                 _("Error"), _("An error occurred while extracting downloaded trainer: ") + str(e))
             self.enable_download_widgets()
+            self.downloadSearchEntry.bind('<Return>', self.on_enter_press)
             return
 
         # Locate extracted .exe file
@@ -1192,10 +1201,12 @@ class GameCheatsManager(tk.Tk):
             messagebox.showerror(_("Error"), _(
                 "Could not find the downloaded trainer file, please try turning your antivirus software off."))
             self.enable_download_widgets()
+            self.downloadSearchEntry.bind('<Return>', self.on_enter_press)
             return
 
         self.downloadListBox.insert(tk.END, _("Download success!"))
         self.enable_download_widgets()
+        self.downloadSearchEntry.bind('<Return>', self.on_enter_press)
         self.show_cheats()
 
     def wemod_pro(self):
