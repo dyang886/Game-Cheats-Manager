@@ -127,6 +127,7 @@ class GameCheatsManager(tk.Tk):
         # Version, user prompts, and links
         self.appVersion = "1.2.7"
         self.githubLink = "https://github.com/dyang886/Game-Cheats-Manager"
+        self.updateLink = "https://api.github.com/repos/dyang886/Game-Cheats-Manager/releases/latest"
         self.trainerSearchEntryPrompt = _("Search for installed")
         self.downloadSearchEntryPrompt = _("Search to download")
 
@@ -167,6 +168,7 @@ class GameCheatsManager(tk.Tk):
 
         self.default_font = (font_name, 10)
         self.menu_font = (font_name, 9)
+        self.title_font = (font_name, 20)
         style = ttk.Style()
         style.configure("TButton", font=self.default_font, padding=8)
         style.configure("TEntry", padding=6)
@@ -176,7 +178,8 @@ class GameCheatsManager(tk.Tk):
         self.menuBar = tk.Frame(self, background="#2e2e2e")
         self.settingMenuBtn = tk.Menubutton(
             self.menuBar, text=_("Options"), background="#2e2e2e", font=self.menu_font)
-        self.settingsMenu = tk.Menu(self.settingMenuBtn, tearoff=0, font=self.menu_font)
+        self.settingsMenu = tk.Menu(
+            self.settingMenuBtn, tearoff=0, font=self.menu_font)
         self.settingsMenu.add_command(
             label=_("Settings"), command=self.open_settings)
         self.settingsMenu.add_command(
@@ -214,7 +217,10 @@ class GameCheatsManager(tk.Tk):
 
         self.trainerSearch_var = tk.StringVar()
         self.trainerSearchEntry = ttk.Entry(
-            self.trainerSearchFrame, textvariable=self.trainerSearch_var, style="TEntry", font=self.default_font)
+            self.trainerSearchFrame,
+            textvariable=self.trainerSearch_var,
+            style="TEntry", font=self.default_font
+        )
         self.trainerSearchEntry.pack()
         self.trainerSearchEntry.insert(0, self.trainerSearchEntryPrompt)
         self.trainerSearchEntry.config(foreground="grey")
@@ -229,11 +235,13 @@ class GameCheatsManager(tk.Tk):
             self.flingFrame, orient="horizontal")
         self.flingHScrollbar.grid(row=2, column=0, sticky='ew')
 
-        self.flingListBox = tk.Listbox(self.flingFrame, highlightthickness=0,
-                                       activestyle="none", width=33, height=13,
-                                       font=self.default_font,
-                                       yscrollcommand=self.flingVScrollbar.set,
-                                       xscrollcommand=self.flingHScrollbar.set)
+        self.flingListBox = tk.Listbox(
+            self.flingFrame, highlightthickness=0,
+            activestyle="none", width=33, height=13,
+            font=self.default_font,
+            yscrollcommand=self.flingVScrollbar.set,
+            xscrollcommand=self.flingHScrollbar.set
+        )
         self.flingListBox.grid(row=1, column=0)
 
         self.flingVScrollbar.config(command=self.flingListBox.yview)
@@ -268,7 +276,10 @@ class GameCheatsManager(tk.Tk):
 
         self.downloadSearch_var = tk.StringVar()
         self.downloadSearchEntry = ttk.Entry(
-            self.downloadSearchFrame, textvariable=self.downloadSearch_var, style="TEntry", font=self.default_font)
+            self.downloadSearchFrame,
+            textvariable=self.downloadSearch_var,
+            style="TEntry", font=self.default_font
+        )
         self.downloadSearchEntry.pack()
         self.downloadSearchEntry.insert(0, self.downloadSearchEntryPrompt)
         self.downloadSearchEntry.config(foreground="grey")
@@ -282,11 +293,13 @@ class GameCheatsManager(tk.Tk):
             self.downloadFrame, orient="horizontal")
         self.downloadHScrollbar.grid(row=2, column=0, sticky='ew')
 
-        self.downloadListBox = tk.Listbox(self.downloadFrame, highlightthickness=0,
-                                          activestyle="none", width=33, height=13,
-                                          font=self.default_font,
-                                          yscrollcommand=self.downloadVScrollbar.set,
-                                          xscrollcommand=self.downloadHScrollbar.set)
+        self.downloadListBox = tk.Listbox(
+            self.downloadFrame, highlightthickness=0,
+            activestyle="none", width=33, height=13,
+            font=self.default_font,
+            yscrollcommand=self.downloadVScrollbar.set,
+            xscrollcommand=self.downloadHScrollbar.set
+        )
         self.downloadListBox.grid(row=1, column=0)
 
         self.downloadVScrollbar.config(command=self.downloadListBox.yview)
@@ -294,25 +307,26 @@ class GameCheatsManager(tk.Tk):
 
         # bottom change download path
         self.changeDownloadPath = ttk.Frame(self.downloadFrame)
-        self.changeDownloadPath.grid(row=3, column=0, pady=(10, 0), sticky="ew")
+        self.changeDownloadPath.grid(
+            row=3, column=0, pady=(10, 0), sticky="ew")
         self.changeDownloadPath.columnconfigure(0, weight=3)
         self.changeDownloadPath.columnconfigure(1, weight=1)
 
         self.downloadPathText = tk.StringVar()
         self.downloadPathText.set(self.trainerPath)
         self.downloadPathEntry = ttk.Entry(
-            self.changeDownloadPath, 
-            state="readonly", 
-            textvariable=self.downloadPathText, 
-            style="TEntry", 
+            self.changeDownloadPath,
+            state="readonly",
+            textvariable=self.downloadPathText,
+            style="TEntry",
             font=self.default_font
         )
         self.downloadPathEntry.grid(row=0, column=0, sticky="ew", padx=(0, 15))
 
         self.fileDialogButton = ttk.Button(
-            self.changeDownloadPath, 
-            text="...", 
-            command=self.create_migration_thread, 
+            self.changeDownloadPath,
+            text="...",
+            command=self.create_migration_thread,
             style="TButton"
         )
         self.fileDialogButton.grid(row=0, column=1, sticky="ew")
@@ -363,6 +377,7 @@ class GameCheatsManager(tk.Tk):
             self.settings_window.iconbitmap(
                 resource_path("assets/setting.ico"))
             self.settings_window.transient(self)
+            self.settings_window.resizable(False, False)
 
             settings_frame = ttk.Frame(self.settings_window)
             settings_frame.grid(row=0, column=0, sticky='nsew',
@@ -474,6 +489,7 @@ class GameCheatsManager(tk.Tk):
             self.about_window.iconbitmap(
                 resource_path("assets/logo.ico"))
             self.about_window.transient(self)
+            self.about_window.resizable(False, False)
 
             about_frame = ttk.Frame(self.about_window)
             about_frame.grid(row=0, column=0, sticky='nsew',
@@ -494,7 +510,7 @@ class GameCheatsManager(tk.Tk):
             appInfo_frame.grid(row=0, column=1)
 
             app_name_label = ttk.Label(
-                appInfo_frame, text="Game Cheats Manager", font=("Helvetica", 18))
+                appInfo_frame, text="Game Cheats Manager", font=self.title_font)
             app_name_label.grid(row=0, column=0, pady=(0, 20))
 
             app_version_label = ttk.Label(
@@ -510,7 +526,8 @@ class GameCheatsManager(tk.Tk):
             links_frame = ttk.Frame(about_frame)
             links_frame.grid(row=1, column=0, columnspan=2, pady=(40, 0))
 
-            github_label = ttk.Label(links_frame, text="GitHub: ", font=self.default_font)
+            github_label = ttk.Label(
+                links_frame, text="GitHub: ", font=self.default_font)
             github_label.pack(side=tk.LEFT)
 
             github_link = ttk.Label(
@@ -598,7 +615,7 @@ class GameCheatsManager(tk.Tk):
         self.trainerSearchEntry.config(state="enabled")
         self.launchButton.config(state="enabled")
         self.deleteButton.config(state="enabled")
-    
+
     def change_wemod_path(self):
         selected_path = filedialog.askdirectory(
             initialdir=self.wemod_path_var.get(),
@@ -766,10 +783,11 @@ class GameCheatsManager(tk.Tk):
                         "No matches found, using direct translation for: " + original_trainerName)
                     trans_trainerName = ts.translate_text(
                         original_trainerName, from_language='en', to_language='zh')
-                
+
                 # strip any game names that have their english names
                 pattern = r'[A-Za-z0-9\s：&]+（([^\）]*)\）|\（[A-Za-z\s：&]+\）$'
-                trans_trainerName = re.sub(pattern, lambda m: m.group(1) if m.group(1) else '', trans_trainerName)
+                trans_trainerName = re.sub(pattern, lambda m: m.group(
+                    1) if m.group(1) else '', trans_trainerName)
 
                 # do not alter if game name ends with roman numerics
                 def is_roman_numeral(s):
@@ -797,7 +815,8 @@ class GameCheatsManager(tk.Tk):
                 sanitized_keyword, sanitized_targetString)
             return similarity >= similarity_threshold
 
-        sanitized_targetString = self.sanitize(targetString.rsplit(" Trainer", 1)[0])
+        sanitized_targetString = self.sanitize(
+            targetString.rsplit(" Trainer", 1)[0])
 
         return any(is_match(self.sanitize(kw), sanitized_targetString) for kw in keyword if len(kw) >= 2 and len(sanitized_targetString) >= 2)
 
@@ -1089,7 +1108,7 @@ class GameCheatsManager(tk.Tk):
             self.enable_download_widgets()
             self.downloadSearchEntry.bind('<Return>', self.on_enter_press)
             return
-        
+
         self.enable_download_widgets()
         self.downloadSearchEntry.bind('<Return>', self.on_enter_press)
         self.downloadListBox.bind(
@@ -1212,7 +1231,8 @@ class GameCheatsManager(tk.Tk):
     def wemod_pro(self):
         wemodPath = os.path.normpath(settings["WeModPath"])
         if not os.path.exists(wemodPath):
-            messagebox.showerror(_("Error"), _("WeMod not installed or invalid installation path.\nPlease choose a correct WeMod installation path in settings."))
+            messagebox.showerror(_("Error"), _(
+                "WeMod not installed or invalid installation path.\nPlease choose a correct WeMod installation path in settings."))
             return
 
         version_folders = []
@@ -1226,7 +1246,8 @@ class GameCheatsManager(tk.Tk):
                     version_folders.append((version_info, item))
 
         if not version_folders:
-            messagebox.showerror(_("Error"), _("WeMod not installed or invalid installation path.\nPlease choose a correct WeMod installation path in settings."))
+            messagebox.showerror(_("Error"), _(
+                "WeMod not installed or invalid installation path.\nPlease choose a correct WeMod installation path in settings."))
             return
 
         # Sort based on version numbers (major, minor, patch)
