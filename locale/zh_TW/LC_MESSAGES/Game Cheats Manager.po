@@ -13,103 +13,103 @@ msgstr ""
 "X-Generator: Poedit 3.4.2\n"
 
 msgid "Options"
-msgstr "选项"
+msgstr "選項"
 
 msgid "Settings"
-msgstr "设置"
+msgstr "設定"
 
 msgid "About"
-msgstr "关于"
+msgstr "關於"
 
 msgid "Version: "
 msgstr "版本："
 
 msgid "Search for installed"
-msgstr "搜索已安装修改器"
+msgstr "搜尋已安裝"
 
 msgid "Search to download"
-msgstr "下载修改器"
+msgstr "下載修改器"
 
 msgid "Launch"
-msgstr "启动"
+msgstr "啟動"
 
 msgid "Delete"
-msgstr "删除"
+msgstr "刪除"
 
 msgid "Language:"
-msgstr "语言："
+msgstr "語言："
 
 msgid "Always show search results in English:"
-msgstr "始终以英语显示搜索结果："
+msgstr "始終以英文顯示搜尋結果："
 
 msgid "WeMod installation path:"
-msgstr "WeMod 安装路径："
+msgstr "WeMod 安裝路徑："
 
 msgid "Select WeMod installation path"
-msgstr "选择 WeMod 安装路径"
+msgstr "選擇 WeMod 安裝路徑"
 
 msgid "Translation request failed with status code: "
-msgstr "翻译请求失败，状态代码为："
+msgstr "翻譯請求失敗，狀態碼為："
 
 msgid "Apply"
-msgstr "应用"
+msgstr "應用"
 
 msgid "Please restart the application to apply settings"
-msgstr "请重新启动应用程序以应用设置"
+msgstr "請重新啟動應用程式以應用設定"
 
 msgid "Change trainer download path"
-msgstr "更改修改器下载路径"
+msgstr "更改修改器下載路徑"
 
 msgid "Error"
-msgstr "错误"
+msgstr "錯誤"
 
 msgid "Please choose a new path."
-msgstr "请选择一个新路径。"
+msgstr "請選擇一個新路徑。"
 
 msgid "Error creating the new path: "
-msgstr "创建新路径时出错："
+msgstr "建立新路徑時出錯："
 
 msgid "Trainer download directory changed!"
-msgstr "修改器下载目录已更改！"
+msgstr "修改器下載目錄已更改！"
 
 msgid "Migrating existing trainers..."
-msgstr "正在迁移现有修改器..."
+msgstr "正在遷移現有修改器..."
 
 msgid "Migration complete!"
-msgstr "迁移完成！"
+msgstr "遷移完成！"
 
 msgid "Checking for internet connection..."
-msgstr "正在检查互联网连接..."
+msgstr "正在檢查網際網路連接..."
 
 msgid "No internet connection, search function is disabled."
-msgstr "未连接互联网，搜索功能已被禁用。"
+msgstr "未連接網際網路，搜尋功能已被禁用。"
 
 msgid "Searching..."
-msgstr "搜索中..."
+msgstr "搜尋中..."
 
 msgid "No translations found."
-msgstr "未找到翻译。"
+msgstr "未找到翻譯。"
 
 msgid "Request successful!"
-msgstr "请求成功！"
+msgstr "請求成功！"
 
 msgid "Request failed with status code: "
-msgstr "请求失败，状态代码为："
+msgstr "請求失敗，狀態碼為："
 
 msgid "Translating..."
-msgstr "翻译中..."
+msgstr "翻譯中..."
 
 msgid "No results found."
-msgstr "未找到结果。"
+msgstr "找不到結果。"
 
 msgid "Downloading..."
-msgstr "下载中..."
+msgstr "下載中..."
 
 msgid "Trainer already exists, aborted download."
-msgstr "修改器已存在，已中止下载。"
+msgstr "修改器已存在，已中止下載。"
 
 msgid "An error occurred while getting trainer url: "
-msgstr "获取修改器地址时出错："
+msgstr "獲取修改器地址時出錯："
 
 msgid "Attention"
 msgstr "警告"
@@ -118,27 +118,27 @@ msgid ""
 "Additional actions required\n"
 "Please check folder for details!"
 msgstr ""
-"需要执行其他操作\n"
-"详情请查看文件夹！"
+"需要執行其他操作\n"
+"詳情請查看資料夾！"
 
 msgid "An error occurred while extracting downloaded trainer: "
-msgstr "解压下载的修改器时出错："
+msgstr "解壓下載修改器時出錯："
 
 msgid "Could not find the downloaded trainer file, please try turning your antivirus software off."
-msgstr "找不到下载的修改器，请尝试关闭杀毒软件。"
+msgstr "找不到下載的修改器，請嘗試關閉防毒軟體。"
 
 msgid "Download success!"
-msgstr "下载成功！"
+msgstr "下載成功！"
 
 msgid ""
 "WeMod not installed or invalid installation path.\n"
 "Please choose a correct WeMod installation path in settings."
 msgstr ""
-"WeMod 未安装或安装路径无效。\n"
-"请在设置中选择正确的 WeMod 安装路径。"
+"WeMod 未安裝或安裝路徑無效。\n"
+"請在設定中選擇正確的 WeMod 安裝路徑。"
 
 msgid "WeMod is currently running, please close the application first."
-msgstr "WeMod 正在运行中，请先关闭应用程序。"
+msgstr "WeMod 目前正在運行中，請先關閉應用程式。"
 
 msgid "Success"
 msgstr "成功"
@@ -147,5 +147,5 @@ msgid ""
 "You have now activated WeMod Pro!\n"
 "Current WeMod version: v"
 msgstr ""
-"您已激活 WeMod Pro！\n"
-"当前 WeMod 版本：v"
+"您已啟用 WeMod Pro！\n"
+"當前 WeMod 版本：v"
