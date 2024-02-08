@@ -48,6 +48,9 @@ msgstr "WeMod installation path:"
 msgid "Select WeMod installation path"
 msgstr "Select WeMod installation path"
 
+msgid "Translation request failed with status code: "
+msgstr "Translation request failed with status code: "
+
 msgid "Apply"
 msgstr "Apply"
 

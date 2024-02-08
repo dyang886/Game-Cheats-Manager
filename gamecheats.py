@@ -45,7 +45,10 @@ def load_settings():
         "Chinese (Simplified)_China": "zh_CN",
         "Chinese (Simplified)_Hong Kong SAR": "zh_CN",
         "Chinese (Simplified)_Macao SAR": "zh_CN",
-        "Chinese (Simplified)_Singapore": "zh_CN"
+        "Chinese (Simplified)_Singapore": "zh_CN",
+        "Chinese (Traditional)_Hong Kong SAR": "zh_TW",
+        "Chinese (Traditional)_Macao SAR": "zh_TW",
+        "Chinese (Traditional)_Taiwan": "zh_TW"
     }
     app_locale = locale_mapping.get(system_locale, 'en_US')
 
@@ -101,7 +104,8 @@ if not os.path.exists(setting_path):
 
 language_options = {
     "English (US)": "en_US",
-    "简体中文": "zh_CN"
+    "简体中文": "zh_CN",
+    "繁體中文": "zh_TW"
 }
 
 ctypes.windll.shcore.SetProcessDpiAwareness(1)
@@ -154,7 +158,8 @@ class GameCheatsManager(tk.Tk):
         # Widget fonts and styles
         font_config = {
             "en_US": ("Noto Sans", "assets/NotoSans-Regular.ttf"),
-            "zh_CN": ("Noto Sans SC", "assets/NotoSansSC-Regular.ttf")
+            "zh_CN": ("Noto Sans SC", "assets/NotoSansSC-Regular.ttf"),
+            "zh_TW": ("Noto Sans TC", "assets/NotoSansTC-Regular.ttf")
         }
 
         def is_font_installed(font_name):
@@ -646,8 +651,12 @@ class GameCheatsManager(tk.Tk):
 
     def xhh_enName(self, appid):
         xhhGameDetailUrl = f"https://api.xiaoheihe.cn/game/get_game_detail/?h_src=game_rec_a&appid={appid}"
-        response = requests.get(xhhGameDetailUrl, headers=self.headers)
-        xhhData = response.json()
+        reqs = requests.get(xhhGameDetailUrl, headers=self.headers)
+        xhhData = reqs.json()
+
+        if reqs.status_code != 200:
+            self.downloadListBox.insert(
+                tk.END, _("Translation request failed with status code: ") + str(reqs.status_code))
 
         if 'name_en' in xhhData['result']:
             return xhhData['result']['name_en']
@@ -656,8 +665,12 @@ class GameCheatsManager(tk.Tk):
 
     def xhh_zhName(self, appid, trainerName):
         xhhGameDetailUrl = f"https://api.xiaoheihe.cn/game/get_game_detail/?h_src=game_rec_a&appid={appid}"
-        response = requests.get(xhhGameDetailUrl, headers=self.headers)
-        xhhData = response.json()
+        reqs = requests.get(xhhGameDetailUrl, headers=self.headers)
+        xhhData = reqs.json()
+
+        if reqs.status_code != 200:
+            self.downloadListBox.insert(
+                tk.END, _("Translation request failed with status code: ") + str(reqs.status_code))
 
         # =======================================================
         # Special cases to match with Xiao Hei He game names
@@ -711,7 +724,9 @@ class GameCheatsManager(tk.Tk):
             steam_appids = []
 
             # XiaoHeiHe search
-            if not reqs.status_code == 200:
+            if reqs.status_code != 200:
+                self.downloadListBox.insert(
+                    tk.END, _("Translation request failed with status code: ") + str(reqs.status_code))
                 print("Xiao Hei He request failed")
             elif 'result' in xhhData and 'items' in xhhData['result']:
                 steam_appids = [item['info']['steam_appid']
@@ -760,6 +775,10 @@ class GameCheatsManager(tk.Tk):
                 xhhSearchUrl = f"https://api.xiaoheihe.cn/bbs/app/api/general/search/v1?search_type=game&q={original_trainerName}"
                 reqs = requests.get(xhhSearchUrl, headers=self.headers)
                 xhhData = reqs.json()
+
+                if reqs.status_code != 200:
+                    self.downloadListBox.insert(
+                        tk.END, _("Translation request failed with status code: ") + str(reqs.status_code))
 
                 steam_appids = [item['info']['steam_appid']
                                 for item in xhhData['result']['items']
@@ -1007,9 +1026,9 @@ class GameCheatsManager(tk.Tk):
                 import translators as ts
             ts.translate_text(keyword)
             self.attributes('-topmost', False)
-        except Exception:
-            pass
-
+        except Exception as e:
+            print("import translators failed or error occurred while translating: " + str(e))
+        
         keyword = self.translate_keyword(keyword)
 
         # Search for results from archive
@@ -1041,7 +1060,7 @@ class GameCheatsManager(tk.Tk):
         reqs = requests.get(url, headers=self.headers)
         mainSiteHTML = BeautifulSoup(reqs.text, 'html.parser')
 
-        if not reqs.status_code == 200:
+        if reqs.status_code != 200:
             self.downloadListBox.insert(
                 tk.END, _("Request failed with status code: ") + str(reqs.status_code))
 
@@ -1099,7 +1118,7 @@ class GameCheatsManager(tk.Tk):
         self.downloadListBox.delete(0, tk.END)
 
         # Display results in the original order
-        for count, trainerName in enumerate(trainer_names):
+        for count, trainerName in enumerate(trainer_names, start=1):
             self.downloadListBox.insert(
                 tk.END, f"{str(count)}. {translated_names[trainerName]}")
 
