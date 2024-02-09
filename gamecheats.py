@@ -383,10 +383,13 @@ class GameCheatsManager(tk.Tk):
                 resource_path("assets/setting.ico"))
             self.settings_window.transient(self)
             self.settings_window.resizable(False, False)
+            self.settings_window.grid_columnconfigure(0, weight=1)
+            self.settings_window.minsize(width=550, height=0)
 
             settings_frame = ttk.Frame(self.settings_window)
             settings_frame.grid(row=0, column=0, sticky='nsew',
                                 padx=(80, 80), pady=(50, 20))
+            settings_frame.grid_columnconfigure(0, weight=1)
 
             # ===========================================================================
             # languages frame
@@ -767,7 +770,7 @@ class GameCheatsManager(tk.Tk):
 
         found_translation = False
 
-        if settings["language"] == "zh_CN" and not settings["enSearchResults"]:
+        if (settings["language"] == "zh_CN" or settings["language"] == "zh_TW") and not settings["enSearchResults"]:
             original_trainerName = trainerName.rsplit(" Trainer", 1)[0]
 
             try:

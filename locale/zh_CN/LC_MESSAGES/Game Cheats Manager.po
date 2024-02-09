@@ -40,7 +40,7 @@ msgid "Language:"
 msgstr "语言："
 
 msgid "Always show search results in English:"
-msgstr "始终以英语显示搜索结果："
+msgstr "始终以英文显示搜索结果："
 
 msgid "WeMod installation path:"
 msgstr "WeMod 安装路径："
