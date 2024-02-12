@@ -28,8 +28,17 @@ ts = None
 
 def resource_path(relative_path):
     if hasattr(sys, "_MEIPASS"):
-        return os.path.join(sys._MEIPASS, relative_path)
-    return os.path.join(os.path.abspath("."), relative_path)
+        full_path = os.path.join(sys._MEIPASS, relative_path)
+    else:
+        full_path = os.path.join(os.path.abspath("."), relative_path)
+
+    if not os.path.exists(full_path):
+        resource_name = os.path.basename(relative_path)
+        formatted_message = _("Couldn't find {missing_resource}. Please try reinstalling the application.").format(missing_resource=resource_name)
+        messagebox.showerror(_("Missing resource file"), formatted_message)
+        sys.exit(1)
+
+    return full_path
 
 
 def apply_settings(settings):
@@ -129,7 +138,7 @@ class GameCheatsManager(tk.Tk):
         self.resizable(False, False)
 
         # Version, user prompts, and links
-        self.appVersion = "1.2.7"
+        self.appVersion = "1.2.8"
         self.githubLink = "https://github.com/dyang886/Game-Cheats-Manager"
         self.updateLink = "https://api.github.com/repos/dyang886/Game-Cheats-Manager/releases/latest"
         self.trainerSearchEntryPrompt = _("Search for installed")
@@ -142,7 +151,10 @@ class GameCheatsManager(tk.Tk):
         os.makedirs(self.trainerPath, exist_ok=True)
         self.tempDir = os.path.join(
             tempfile.gettempdir(), "GameCheatsManagerTemp/")
-        self.crackFilePath = resource_path("dependency/app.asar")
+        self.unrar_path = resource_path("dependency/UnRAR.exe")
+        self.resourceHacker_path = resource_path("dependency/ResourceHacker.exe")
+        self.emptyMidi_path = resource_path("dependency/TrainerBGM.mid")
+        self.crackFile_path = resource_path("dependency/app.asar")
         self.trainers = {}  # Store installed trainers: {trainer name: trainer path}
         self.trainer_urls = {}  # Store search results: {trainer name: download link}
 
@@ -844,12 +856,11 @@ class GameCheatsManager(tk.Tk):
 
     def modify_fling_settings(self):
         # replace bg music in Documents folder
-        empty_midi = resource_path("dependency/TrainerBGM.mid")
         username = os.getlogin()
         flingSettings_path = f"C:/Users/{username}/Documents/FLiNGTrainer"
         bgMusic_path = os.path.join(flingSettings_path, "TrainerBGM.mid")
         if os.path.exists(bgMusic_path):
-            shutil.copyfile(empty_midi, bgMusic_path)
+            shutil.copyfile(self.emptyMidi_path, bgMusic_path)
 
         # change fling settings to disable startup music
         settingFile_1 = os.path.join(flingSettings_path, "FLiNGTSettings.ini")
@@ -877,12 +888,10 @@ class GameCheatsManager(tk.Tk):
         resource_type = resource_type_list.pop(0)
 
         # Define paths and files
-        empty_midi = resource_path("dependency/TrainerBGM.mid")
-        resourceHackerPath = resource_path("dependency/ResourceHacker.exe")
         tempLog = os.path.join(self.tempDir, "rh.log")
 
         # Remove background music from executable
-        command = [resourceHackerPath, "-open", source_exe, "-save", source_exe,
+        command = [self.resourceHacker_path, "-open", source_exe, "-save", source_exe,
                    "-action", "delete", "-mask", f"{resource_type},,", "-log", tempLog]
         subprocess.run(command, creationflags=subprocess.CREATE_NO_WINDOW)
 
@@ -899,8 +908,8 @@ class GameCheatsManager(tk.Tk):
             resource_id = match.group(2)
             locale_id = match.group(3)
             resource = ",".join([resource_type, resource_id, locale_id])
-            command = [resourceHackerPath, "-open", source_exe, "-save", source_exe,
-                       "-action", "addoverwrite", "-res", empty_midi, "-mask", resource]
+            command = [self.resourceHacker_path, "-open", source_exe, "-save", source_exe,
+                       "-action", "addoverwrite", "-res", self.emptyMidi_path, "-mask", resource]
             subprocess.run(command, creationflags=subprocess.CREATE_NO_WINDOW)
         else:
             # Try the next resource type if any remain
@@ -1195,8 +1204,7 @@ class GameCheatsManager(tk.Tk):
         # Extract compressed file and rename
         try:
             if extension == ".rar":
-                unrar = resource_path("dependency/UnRAR.exe")
-                command = [unrar, "x", "-y", trainerTemp, self.tempDir]
+                command = [self.unrar_path, "x", "-y", trainerTemp, self.tempDir]
                 subprocess.run(command, check=True,
                                creationflags=subprocess.CREATE_NO_WINDOW)
             elif extension == ".zip":
@@ -1294,11 +1302,13 @@ class GameCheatsManager(tk.Tk):
             newest_version_path, "resources/app.asar")
         try:
             os.remove(file_to_replace)
+        except FileNotFoundError:
+            pass
         except Exception:
             messagebox.showerror(
                 _("Error"), _("WeMod is currently running, please close the application first."))
             return
-        shutil.copyfile(self.crackFilePath, file_to_replace)
+        shutil.copyfile(self.crackFile_path, file_to_replace)
 
         messagebox.showinfo(
             _("Success"), _("You have now activated WeMod Pro!\nCurrent WeMod version: v") + newest_version_folder.strip('-app'))

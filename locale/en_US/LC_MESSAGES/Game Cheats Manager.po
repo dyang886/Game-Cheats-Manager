@@ -12,6 +12,12 @@ msgstr ""
 "Plural-Forms: nplurals=1; plural=0;\n"
 "X-Generator: Poedit 3.4.2\n"
 
+msgid "Missing resource file"
+msgstr "Missing resource file"
+
+msgid "Couldn't find {missing_resource}. Please try reinstalling the application."
+msgstr "Couldn't find {missing_resource}. Please try reinstalling the application."
+
 msgid "Options"
 msgstr "Options"
 
