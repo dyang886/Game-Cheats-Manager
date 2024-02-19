@@ -84,7 +84,6 @@ def load_settings():
 
 
 def get_translator():
-    # compile .po files to .mo files
     for root, dirs, files in os.walk(resource_path("locale/")):
         for file in files:
             if file.endswith(".po"):
@@ -92,7 +91,6 @@ def get_translator():
                 po.save_as_mofile(os.path.join(
                     root, os.path.splitext(file)[0] + ".mo"))
 
-    # read settings and apply languages
     lang = settings["language"]
     gettext.bindtextdomain("Game Cheats Manager",
                            resource_path("locale/"))
@@ -145,7 +143,6 @@ class GameCheatsManager(tk.Tk):
         self.downloadSearchEntryPrompt = _("Search to download")
 
         # Paths and variable management
-        settings = load_settings()  # Load settings once and use it throughout
         self.trainerPath = os.path.normpath(
             os.path.abspath(settings["downloadPath"]))
         os.makedirs(self.trainerPath, exist_ok=True)
@@ -169,9 +166,9 @@ class GameCheatsManager(tk.Tk):
 
         # Widget fonts and styles
         font_config = {
-            "en_US": ("Noto Sans", "assets/NotoSans-Regular.ttf"),
-            "zh_CN": ("Noto Sans SC", "assets/NotoSansSC-Regular.ttf"),
-            "zh_TW": ("Noto Sans TC", "assets/NotoSansTC-Regular.ttf")
+            "en_US": ("Noto Sans", resource_path("assets/NotoSans-Regular.ttf")),
+            "zh_CN": ("Noto Sans SC", resource_path("assets/NotoSansSC-Regular.ttf")),
+            "zh_TW": ("Noto Sans TC", resource_path("assets/NotoSansTC-Regular.ttf"))
         }
 
         def is_font_installed(font_name):
