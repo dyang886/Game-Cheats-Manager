@@ -84,12 +84,13 @@ def load_settings():
 
 
 def get_translator():
-    for root, dirs, files in os.walk(resource_path("locale/")):
-        for file in files:
-            if file.endswith(".po"):
-                po = polib.pofile(os.path.join(root, file))
-                po.save_as_mofile(os.path.join(
-                    root, os.path.splitext(file)[0] + ".mo"))
+    if not hasattr(sys, 'frozen'):
+        for root, dirs, files in os.walk(resource_path("locale/")):
+            for file in files:
+                if file.endswith(".po"):
+                    po = polib.pofile(os.path.join(root, file))
+                    po.save_as_mofile(os.path.join(
+                        root, os.path.splitext(file)[0] + ".mo"))
 
     lang = settings["language"]
     gettext.bindtextdomain("Game Cheats Manager",
