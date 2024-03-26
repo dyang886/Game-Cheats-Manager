@@ -1,3 +1,4 @@
+#
 msgid ""
 msgstr ""
 "Project-Id-Version: Game Cheats Manager\n"
@@ -12,35 +13,23 @@ msgstr ""
 "Plural-Forms: nplurals=1; plural=0;\n"
 "X-Generator: Poedit 3.4.2\n"
 
-msgid "Missing resource file"
-msgstr "Missing resource file"
-
 msgid "Couldn't find {missing_resource}. Please try reinstalling the application."
 msgstr "Couldn't find {missing_resource}. Please try reinstalling the application."
 
-msgid "Options"
-msgstr "Options"
+msgid "Missing resource file"
+msgstr "Missing resource file"
+
+msgid "Black"
+msgstr "Black"
+
+msgid "white"
+msgstr "white"
 
 msgid "Settings"
 msgstr "Settings"
 
-msgid "About"
-msgstr "About"
-
-msgid "Version: "
-msgstr "Version: "
-
-msgid "Search for installed"
-msgstr "Search for installed"
-
-msgid "Search to download"
-msgstr "Search to download"
-
-msgid "Launch"
-msgstr "Launch"
-
-msgid "Delete"
-msgstr "Delete"
+msgid "Theme:"
+msgstr "Theme:"
 
 msgid "Language:"
 msgstr "Language:"
@@ -48,77 +37,77 @@ msgstr "Language:"
 msgid "Always show search results in English:"
 msgstr "Always show search results in English:"
 
-msgid "WeMod installation path:"
-msgstr "WeMod installation path:"
-
-msgid "Select WeMod installation path"
-msgstr "Select WeMod installation path"
-
-msgid "Translation request failed with status code: "
-msgstr "Translation request failed with status code: "
+msgid "WeMod path:"
+msgstr "WeMod path:"
 
 msgid "Apply"
 msgstr "Apply"
 
-msgid "Please restart the application to apply settings"
-msgstr "Please restart the application to apply settings"
+msgid "Select WeMod Installation Path"
+msgstr "Select WeMod Installation Path"
 
-msgid "Change trainer download path"
-msgstr "Change trainer download path"
+msgid "Attention"
+msgstr "Attention"
 
-msgid "Error"
-msgstr "Error"
+msgid "Please restart the application to apply theme and language settings."
+msgstr "Please restart the application to apply theme and language settings."
 
-msgid "Please choose a new path."
-msgstr "Please choose a new path."
+msgid "About"
+msgstr "About"
 
-msgid "Error creating the new path: "
-msgstr "Error creating the new path: "
+msgid "Version:"
+msgstr "Version:"
 
-msgid "Trainer download directory changed!"
-msgstr "Trainer download directory changed!"
-
-msgid "Migrating existing trainers..."
-msgstr "Migrating existing trainers..."
-
-msgid "Migration complete!"
-msgstr "Migration complete!"
+msgid "Translation request failed with status code:"
+msgstr "Translation request failed with status code:"
 
 msgid "Checking for internet connection..."
 msgstr "Checking for internet connection..."
 
-msgid "No internet connection, search function is disabled."
-msgstr "No internet connection, search function is disabled."
+msgid "No internet connection, search failed."
+msgstr "No internet connection, search failed."
+
+msgid "Initializing translator..."
+msgstr "Initializing translator..."
 
 msgid "Searching..."
 msgstr "Searching..."
 
-msgid "No translations found."
-msgstr "No translations found."
-
-msgid "Request successful!"
-msgstr "Request successful!"
-
-msgid "Request failed with status code: "
-msgstr "Request failed with status code: "
-
-msgid "Translating..."
-msgstr "Translating..."
+msgid "Translating search results..."
+msgstr "Translating search results..."
 
 msgid "No results found."
 msgstr "No results found."
 
-msgid "Downloading..."
-msgstr "Downloading..."
+msgid "Translating keywords..."
+msgstr "Translating keywords..."
+
+msgid "No translations found."
+msgstr "No translations found."
+
+msgid "Request success!"
+msgstr "Request success!"
+
+msgid "Request failed with status code:"
+msgstr "Request failed with status code:"
+
+msgid "Translating trainer name..."
+msgstr "Translating trainer name..."
 
 msgid "Trainer already exists, aborted download."
 msgstr "Trainer already exists, aborted download."
 
-msgid "An error occurred while getting trainer url: "
-msgstr "An error occurred while getting trainer url: "
+msgid "Downloading..."
+msgstr "Downloading..."
 
-msgid "Attention"
-msgstr "Attention"
+msgid "An error occurred while downloading trainer:"
+msgstr "An error occurred while downloading trainer:"
+
+msgid "Decompressing..."
+msgstr "Decompressing..."
+
+msgid "An error occurred while extracting downloaded trainer:"
+msgstr "An error occurred while extracting downloaded trainer:"
 
 msgid ""
 "Additional actions required\n"
@@ -127,14 +116,53 @@ msgstr ""
 "Additional actions required\n"
 "Please check folder for details!"
 
-msgid "An error occurred while extracting downloaded trainer: "
-msgstr "An error occurred while extracting downloaded trainer: "
+msgid "Removing trainer background music..."
+msgstr "Removing trainer background music..."
+
+msgid "Error"
+msgstr "Error"
 
 msgid "Could not find the downloaded trainer file, please try turning your antivirus software off."
 msgstr "Could not find the downloaded trainer file, please try turning your antivirus software off."
 
 msgid "Download success!"
 msgstr "Download success!"
+
+msgid "Search for installed"
+msgstr "Search for installed"
+
+msgid "Search to download"
+msgstr "Search to download"
+
+msgid "Options"
+msgstr "Options"
+
+msgid "WeMod Pro"
+msgstr "WeMod Pro"
+
+msgid "Launch"
+msgstr "Launch"
+
+msgid "Delete"
+msgstr "Delete"
+
+msgid "Change trainer download path"
+msgstr "Change trainer download path"
+
+msgid "Please choose a new path."
+msgstr "Please choose a new path."
+
+msgid "Migrating existing trainers..."
+msgstr "Migrating existing trainers..."
+
+msgid "No path selected."
+msgstr "No path selected."
+
+msgid "Migration complete!"
+msgstr "Migration complete!"
+
+msgid "Error creating the new path:"
+msgstr "Error creating the new path:"
 
 msgid ""
 "WeMod not installed or invalid installation path.\n"

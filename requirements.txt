@@ -1,9 +1,6 @@
-polib
-requests
 beautifulsoup4
 fuzzywuzzy
-python-Levenshtein
-Pillow
-sv_ttk
+polib
+PyQt6
+requests
 tendo
-translators

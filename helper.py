@@ -1,25 +1,24 @@
+import concurrent.futures
 import gettext
 import json
 import locale
 import os
 import re
+import shutil
 import subprocess
 import sys
-import shutil
-import concurrent.futures
 import tempfile
 import time
 from urllib.parse import urljoin, urlparse
-from abc import ABC, abstractmethod
 import zipfile
 
-from PyQt6.QtWidgets import QApplication, QDialog, QColorDialog, QMessageBox, QTextEdit, QTabWidget, QListWidgetItem, QLineEdit, QCheckBox, QSlider, QLayout, QMainWindow, QWidget, QVBoxLayout, QHBoxLayout, QGridLayout, QPushButton, QComboBox, QLabel, QFileDialog, QListWidget
-from PyQt6.QtCore import Qt, QEvent, QThread, pyqtSignal, QByteArray, QSize
-from PyQt6.QtGui import QIcon, QDragEnterEvent, QDropEvent, QColor, QPainter, QFontDatabase, QFont, QAction, QTextCursor, QPixmap, QCursor
 from bs4 import BeautifulSoup
-import polib
-import requests
 from fuzzywuzzy import fuzz
+import polib
+from PyQt6.QtCore import Qt, QThread, pyqtSignal
+from PyQt6.QtGui import QIcon, QPixmap
+from PyQt6.QtWidgets import QDialog, QCheckBox, QVBoxLayout, QHBoxLayout, QPushButton, QComboBox, QLabel, QLineEdit, QMessageBox, QFileDialog
+import requests
 
 
 def resource_path(relative_path):
@@ -60,11 +59,11 @@ def load_settings():
     app_locale = locale_mapping.get(system_locale, 'en_US')
 
     default_settings = {
-        "downloadPath": os.path.join(os.environ["APPDATA"], "GCM Trainers/"),
+        "downloadPath": os.path.join(os.environ["APPDATA"], "GCM Trainers"),
         "language": app_locale,
-        "theme": "dark",
+        "theme": "black",
         "enSearchResults": False,
-        "WeModPath": os.path.join(os.environ["LOCALAPPDATA"], "WeMod/")
+        "WeModPath": os.path.join(os.environ["LOCALAPPDATA"], "WeMod")
     }
 
     try:
@@ -119,8 +118,8 @@ language_options = {
 }
 
 theme_options = {
-    tr("Dark"): "dark",
-    tr("Light"): "light"
+    tr("Black"): "black",
+    tr("white"): "white"
 }
 
 
@@ -652,6 +651,7 @@ class DownloadTrainersThread(DownloadBaseThread):
         mFilename = filename.replace(':', ' -')
         if "/" in mFilename:
             mFilename = mFilename.split("/")[1]
+        self.message.emit(tr("Translating trainer name..."), None)
         trans_mFilename = self.translate_trainer(mFilename)
 
         for trainerPath in self.trainers.keys():

@@ -3,9 +3,9 @@ import re
 import shutil
 import sys
 
-from PyQt6.QtWidgets import QApplication, QMessageBox, QLineEdit, QMainWindow, QWidget, QVBoxLayout, QHBoxLayout, QGridLayout, QPushButton, QLabel, QFileDialog, QListWidget
 from PyQt6.QtCore import Qt
-from PyQt6.QtGui import QIcon, QFontDatabase, QFont, QAction, QPixmap
+from PyQt6.QtGui import QAction, QColor, QFont, QFontDatabase, QIcon, QPixmap
+from PyQt6.QtWidgets import QApplication, QFileDialog, QGridLayout, QHBoxLayout, QLabel, QLineEdit, QListWidgetItem, QMainWindow, QMessageBox, QPushButton, QVBoxLayout, QWidget, QListWidget
 from tendo import singleton
 
 from helper import *
@@ -173,10 +173,10 @@ class GameCheatsManager(QMainWindow):
     # Core functions
     # ===========================================================================
     def init_settings(self):
-        if settings["theme"] == "dark":
-            style = style_sheet.dark
-        elif settings["theme"] == "light":
-            style = style_sheet.light
+        if settings["theme"] == "black":
+            style = style_sheet.black
+        elif settings["theme"] == "white":
+            style = style_sheet.white
 
         style = style.format(
             drop_down_arrow=self.dropDownArrow_path,
@@ -303,14 +303,18 @@ class GameCheatsManager(QMainWindow):
         self.download_thread.start()
 
     def on_message(self, message, type=None):
+        item = QListWidgetItem(message)
+
         if type == "clear":
             self.downloadListBox.clear()
         elif type == "success":
-            self.downloadListBox.addItem(message)
+            item.setForeground(QColor('green'))
+            self.downloadListBox.addItem(item)
         elif type == "failure":
-            self.downloadListBox.addItem(message)
+            item.setForeground(QColor('red'))
+            self.downloadListBox.addItem(item)
         else:
-            self.downloadListBox.addItem(message)
+            self.downloadListBox.addItem(item)
 
     def on_display_finished(self, status):
         # 0: success; 1: failure

@@ -1,4 +1,4 @@
-light = """
+white = """
     QPushButton {{
         padding: 6px;
     }}
@@ -12,7 +12,7 @@ light = """
     }}
 """
 
-dark = """
+black = """
     QMainWindow {{
         background-color: #1c1c1c;
     }}

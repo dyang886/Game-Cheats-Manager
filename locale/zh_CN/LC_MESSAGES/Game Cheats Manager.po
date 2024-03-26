@@ -1,3 +1,4 @@
+#
 msgid ""
 msgstr ""
 "Project-Id-Version: Game Cheats Manager\n"
@@ -12,35 +13,23 @@ msgstr ""
 "Plural-Forms: nplurals=1; plural=0;\n"
 "X-Generator: Poedit 3.4.2\n"
 
-msgid "Missing resource file"
-msgstr "缺少资源文件"
-
 msgid "Couldn't find {missing_resource}. Please try reinstalling the application."
 msgstr "找不到 {missing_resource}。请尝试重新安装应用程序。"
 
-msgid "Options"
-msgstr "选项"
+msgid "Missing resource file"
+msgstr "缺少资源文件"
+
+msgid "Black"
+msgstr "黑色"
+
+msgid "white"
+msgstr "白色"
 
 msgid "Settings"
 msgstr "设置"
 
-msgid "About"
-msgstr "关于"
-
-msgid "Version: "
-msgstr "版本："
-
-msgid "Search for installed"
-msgstr "搜索已安装修改器"
-
-msgid "Search to download"
-msgstr "下载修改器"
-
-msgid "Launch"
-msgstr "启动"
-
-msgid "Delete"
-msgstr "删除"
+msgid "Theme:"
+msgstr "主题："
 
 msgid "Language:"
 msgstr "语言："
@@ -48,77 +37,77 @@ msgstr "语言："
 msgid "Always show search results in English:"
 msgstr "始终以英文显示搜索结果："
 
-msgid "WeMod installation path:"
-msgstr "WeMod 安装路径："
-
-msgid "Select WeMod installation path"
-msgstr "选择 WeMod 安装路径"
-
-msgid "Translation request failed with status code: "
-msgstr "翻译请求失败，状态代码为："
+msgid "WeMod path:"
+msgstr "WeMod 路径："
 
 msgid "Apply"
 msgstr "应用"
 
-msgid "Please restart the application to apply settings"
-msgstr "请重新启动应用程序以应用设置"
+msgid "Select WeMod Installation Path"
+msgstr "选择 WeMod 安装路径"
 
-msgid "Change trainer download path"
-msgstr "更改修改器下载路径"
+msgid "Attention"
+msgstr "警告"
 
-msgid "Error"
-msgstr "错误"
+msgid "Please restart the application to apply theme and language settings."
+msgstr "请重新启动应用程序以应用主题和语言设置。"
 
-msgid "Please choose a new path."
-msgstr "请选择一个新路径。"
+msgid "About"
+msgstr "关于"
 
-msgid "Error creating the new path: "
-msgstr "创建新路径时出错："
+msgid "Version:"
+msgstr "版本："
 
-msgid "Trainer download directory changed!"
-msgstr "修改器下载目录已更改！"
-
-msgid "Migrating existing trainers..."
-msgstr "正在迁移现有修改器..."
-
-msgid "Migration complete!"
-msgstr "迁移完成！"
+msgid "Translation request failed with status code:"
+msgstr "翻译请求失败，状态代码为："
 
 msgid "Checking for internet connection..."
-msgstr "正在检查互联网连接..."
+msgstr "检查互联网连接中..."
 
-msgid "No internet connection, search function is disabled."
-msgstr "未连接互联网，搜索功能已被禁用。"
+msgid "No internet connection, search failed."
+msgstr "未连接到互联网，搜索失败。"
+
+msgid "Initializing translator..."
+msgstr "初始化翻译..."
 
 msgid "Searching..."
 msgstr "搜索中..."
 
-msgid "No translations found."
-msgstr "未找到翻译。"
-
-msgid "Request successful!"
-msgstr "请求成功！"
-
-msgid "Request failed with status code: "
-msgstr "请求失败，状态代码为："
-
-msgid "Translating..."
-msgstr "翻译中..."
+msgid "Translating search results..."
+msgstr "翻译搜索结果中..."
 
 msgid "No results found."
 msgstr "未找到结果。"
 
-msgid "Downloading..."
-msgstr "下载中..."
+msgid "Translating keywords..."
+msgstr "翻译关键词中..."
+
+msgid "No translations found."
+msgstr "未找到翻译。"
+
+msgid "Request success!"
+msgstr "请求成功！"
+
+msgid "Request failed with status code:"
+msgstr "请求失败，状态代码为："
+
+msgid "Translating trainer name..."
+msgstr "翻译修改器中..."
 
 msgid "Trainer already exists, aborted download."
 msgstr "修改器已存在，已中止下载。"
 
-msgid "An error occurred while getting trainer url: "
-msgstr "获取修改器地址时出错："
+msgid "Downloading..."
+msgstr "下载中..."
 
-msgid "Attention"
-msgstr "警告"
+msgid "An error occurred while downloading trainer:"
+msgstr "下载修改器时出错："
+
+msgid "Decompressing..."
+msgstr "解压中..."
+
+msgid "An error occurred while extracting downloaded trainer:"
+msgstr "解压下载的修改器时出错："
 
 msgid ""
 "Additional actions required\n"
@@ -127,14 +116,53 @@ msgstr ""
 "需要执行其他操作\n"
 "详情请查看文件夹！"
 
-msgid "An error occurred while extracting downloaded trainer: "
-msgstr "解压下载的修改器时出错："
+msgid "Removing trainer background music..."
+msgstr "删除修改器背景音乐中..."
+
+msgid "Error"
+msgstr "错误"
 
 msgid "Could not find the downloaded trainer file, please try turning your antivirus software off."
 msgstr "找不到下载的修改器，请尝试关闭杀毒软件。"
 
 msgid "Download success!"
 msgstr "下载成功！"
+
+msgid "Search for installed"
+msgstr "搜索已安装修改器"
+
+msgid "Search to download"
+msgstr "下载修改器"
+
+msgid "Options"
+msgstr "选项"
+
+msgid "WeMod Pro"
+msgstr "WeMod Pro"
+
+msgid "Launch"
+msgstr "启动"
+
+msgid "Delete"
+msgstr "删除"
+
+msgid "Change trainer download path"
+msgstr "更改修改器下载路径"
+
+msgid "Please choose a new path."
+msgstr "请选择一个新路径。"
+
+msgid "Migrating existing trainers..."
+msgstr "正在迁移现有修改器..."
+
+msgid "No path selected."
+msgstr "未选择路径。"
+
+msgid "Migration complete!"
+msgstr "迁移完成！"
+
+msgid "Error creating the new path:"
+msgstr "创建新路径时出错："
 
 msgid ""
 "WeMod not installed or invalid installation path.\n"
