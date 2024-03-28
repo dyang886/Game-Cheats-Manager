@@ -70,12 +70,29 @@ class GameCheatsManager(QMainWindow):
         menu.setFont(menuFont)
 
         optionMenu = menu.addMenu(tr("Options"))
+
+        # Add Import option
+        importAction = QAction(tr("Import Trainers"), self)
+        importAction.setFont(menuFont)
+        importAction.triggered.connect(self.import_file)  # Connect the action to the import_file method
+        optionMenu.addAction(importAction)
+
+        openDirectoryAction = QAction(tr("Open Download Path"), self)
+        openDirectoryAction.setFont(menuFont)
+        openDirectoryAction.triggered.connect(self.open_gcm_trainers_directory)
+        optionMenu.addAction(openDirectoryAction)
+
         settingsAction = QAction(tr("Settings"), self)
         settingsAction.setFont(menuFont)
         settingsAction.triggered.connect(self.open_settings)
         optionMenu.addAction(settingsAction)
 
-        wemodAction = QAction(tr("WeMod Pro"), self)
+        openSettingsFileAction = QAction(tr("Open Settings File"), self)
+        openSettingsFileAction.setFont(menuFont)
+        openSettingsFileAction.triggered.connect(self.open_settings_file)
+        optionMenu.addAction(openSettingsFileAction)
+
+        wemodAction = QAction(tr("Unlock WeMod Pro"), self)
         wemodAction.setFont(menuFont)
         wemodAction.triggered.connect(self.wemod_pro)
         optionMenu.addAction(wemodAction)
@@ -398,6 +415,28 @@ class GameCheatsManager(QMainWindow):
         else:
             self.settings_window = SettingsDialog(self)
             self.settings_window.show()
+
+    def import_file(self):
+        file_names, _ = QFileDialog.getOpenFileNames(self, "Import trainers", "", "Executable Files (*.exe)")
+        if file_names:
+            for file_name in file_names:
+                dest_path = os.path.join(self.trainerPath, os.path.basename(file_name))
+                shutil.copy2(file_name, dest_path)
+                print("File imported and copied:", file_name)
+        self.update_list()
+
+    def open_gcm_trainers_directory(self):
+        if os.path.exists(self.trainerPath):
+            os.startfile(self.trainerPath)
+        else:
+            QMessageBox.warning(self, "Directory not found", "The GCM Trainers directory was not found.")
+
+    def open_settings_file(self):
+        settings_file_path = os.path.join(os.environ["APPDATA"], "GCM Settings/", "settings.json")
+        if os.path.exists(settings_file_path):
+            subprocess.run(["notepad.exe", settings_file_path])
+        else:
+            QMessageBox.warning(self, "File not found", "The settings.json file was not found.")
 
     def open_about(self):
         if self.about_window is not None and self.about_window.isVisible():

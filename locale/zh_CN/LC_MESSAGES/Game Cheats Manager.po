@@ -186,3 +186,15 @@ msgid ""
 msgstr ""
 "您已激活 WeMod Pro！\n"
 "当前 WeMod 版本：v"
+
+msgid "Import Trainers"
+msgstr "导入修改器"
+
+msgid "Open Download Path"
+msgstr "打开下载目录"
+
+msgid "Open Settings File"
+msgstr "打开配置文件"
+
+msgid "Unlock WeMod Pro"
+msgstr "解锁WeMod Pro"
