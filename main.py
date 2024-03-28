@@ -70,10 +70,17 @@ class GameCheatsManager(QMainWindow):
         menu.setFont(menuFont)
 
         optionMenu = menu.addMenu(tr("Options"))
+
         settingsAction = QAction(tr("Settings"), self)
         settingsAction.setFont(menuFont)
         settingsAction.triggered.connect(self.open_settings)
         optionMenu.addAction(settingsAction)
+
+        # Add Import option
+        importAction = QAction(tr("Import"), self)
+        importAction.setFont(menuFont)
+        importAction.triggered.connect(self.import_file)  # Connect the action to the import_file method
+        optionMenu.addAction(importAction)
 
         wemodAction = QAction(tr("WeMod Pro"), self)
         wemodAction.setFont(menuFont)
@@ -398,6 +405,16 @@ class GameCheatsManager(QMainWindow):
         else:
             self.settings_window = SettingsDialog(self)
             self.settings_window.show()
+
+    def import_file(self):
+        file_names, _ = QFileDialog.getOpenFileNames(self, "Import trainers", "", "Executable Files (*.exe)")
+        if file_names:
+            for file_name in file_names:
+                # Move the selected files to the GCM Trainers directory
+                dest_path = os.path.join(self.trainerPath, os.path.basename(file_name))
+                shutil.move(file_name, dest_path)
+                print("File imported and moved:", file_name)
+        self.update_list()
 
     def open_about(self):
         if self.about_window is not None and self.about_window.isVisible():
