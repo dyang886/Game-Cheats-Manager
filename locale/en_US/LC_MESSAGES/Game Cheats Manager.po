@@ -58,6 +58,9 @@ msgstr "About"
 msgid "Version:"
 msgstr "Version:"
 
+msgid "Please complete any security checks..."
+msgstr "Please complete any security checks..."
+
 msgid "Translation request failed with status code:"
 msgstr "Translation request failed with status code:"
 
@@ -85,11 +88,11 @@ msgstr "Translating keywords..."
 msgid "No translations found."
 msgstr "No translations found."
 
-msgid "Request success!"
-msgstr "Request success!"
+msgid "Connection success!"
+msgstr "Connection success!"
 
-msgid "Request failed with status code:"
-msgstr "Request failed with status code:"
+msgid "Connection failed."
+msgstr "Connection failed."
 
 msgid "Translating trainer name..."
 msgstr "Translating trainer name..."

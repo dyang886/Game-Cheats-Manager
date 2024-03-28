@@ -3,7 +3,7 @@ import re
 import shutil
 import sys
 
-from PyQt6.QtCore import Qt
+from PyQt6.QtCore import Qt, QTimer
 from PyQt6.QtGui import QAction, QColor, QFont, QFontDatabase, QIcon, QPixmap
 from PyQt6.QtWidgets import QApplication, QFileDialog, QGridLayout, QHBoxLayout, QLabel, QLineEdit, QListWidgetItem, QMainWindow, QMessageBox, QPushButton, QVBoxLayout, QWidget, QListWidget
 from tendo import singleton
@@ -27,7 +27,7 @@ class GameCheatsManager(QMainWindow):
         self.setFixedSize(self.size())
 
         # Version, user prompts, and links
-        self.appVersion = "2.0.0"
+        self.appVersion = "2.0.0-beta"
         self.githubLink = "https://github.com/dyang886/Game-Cheats-Manager"
         self.updateLink = "https://api.github.com/repos/dyang886/Game-Cheats-Manager/releases/latest"
         self.trainerSearchEntryPrompt = tr("Search for installed")
@@ -169,6 +169,12 @@ class GameCheatsManager(QMainWindow):
 
         self.show_cheats()
 
+        # Check for trainer update timer
+        self.timer = QTimer(self)
+        self.timer.timeout.connect(self.on_check_update)
+        self.on_check_update()
+        self.timer.start(300000)
+
     # ===========================================================================
     # Core functions
     # ===========================================================================
@@ -277,6 +283,38 @@ class GameCheatsManager(QMainWindow):
             self.downloadListBox.addItem(tr("No path selected."))
             self.enable_all_widgets()
             return
+        
+    def on_check_update(self):
+        # The binary pattern representing "FLiNGTrainerNamedPipe_" followed by some null bytes and the date
+        pattern_hex = '46 00 4c 00 69 00 4E 00 47 00 54 00 72 00 61 00 69 00 6E 00 65 00 72 00 4E 00 61 00 6D 00 65 00 64 00 50 00 69 00 70 00 65 00 5F'
+        # Convert the hex pattern to binary
+        pattern = bytes.fromhex(''.join(pattern_hex.split()))
+
+        for index, trainerPath in enumerate(self.trainers.values()):
+            trainerBuildDate = ""
+            checkUpdateUrl = "https://flingtrainer.com/tag/"
+
+            with open(trainerPath, 'rb') as file:
+                content = file.read()
+                pattern_index = content.find(pattern)
+
+                if pattern_index == -1:
+                    continue
+
+                # Find the start of the date string after the pattern and skip null bytes (00)
+                start_index = pattern_index + len(pattern)
+                while content[start_index] == 0:
+                    start_index += 1
+
+                # The date could be "Mar  8 2024" or "Dec 10 2022"
+                date_match = re.search(rb'\b(?:Jan|Feb|Mar|Apr|May|Jun|Jul|Aug|Sep|Oct|Nov|Dec)\s+\d{1,2}\s+\d{4}\b', content[start_index:])
+                
+                if date_match:
+                    trainerBuildDate = date_match.group().decode('utf-8')
+                    # print(trainerBuildDate)
+
+                    # extract trainer name
+
 
     def on_migration_finished(self, new_path):
         self.trainerPath = new_path
@@ -297,10 +335,10 @@ class GameCheatsManager(QMainWindow):
         self.downloadable = False
         self.searchable = False
 
-        self.download_thread = DownloadDisplayThread(keyword, self)
-        self.download_thread.message.connect(self.on_message)
-        self.download_thread.finished.connect(self.on_display_finished)
-        self.download_thread.start()
+        display_thread = DownloadDisplayThread(keyword, self)
+        display_thread.message.connect(self.on_message)
+        display_thread.finished.connect(self.on_display_finished)
+        display_thread.start()
 
     def on_message(self, message, type=None):
         item = QListWidgetItem(message)
@@ -332,10 +370,17 @@ class GameCheatsManager(QMainWindow):
         self.downloadable = False
         self.searchable = False
 
-        self.download_thread = DownloadTrainersThread(index, self.trainerPath, self.trainers, self)
-        self.download_thread.message.connect(self.on_message)
-        self.download_thread.finished.connect(self.on_download_finished)
-        self.download_thread.start()
+        download_thread = DownloadTrainersThread(index, self.trainerPath, self.trainers, self)
+        download_thread.message.connect(self.on_message)
+        download_thread.messageBox.connect(self.on_message_box)
+        download_thread.finished.connect(self.on_download_finished)
+        download_thread.start()
+
+    def on_message_box(self, type, title, text):
+        if type == "info":
+            QMessageBox.information(self, title, text)
+        elif type == "error":
+            QMessageBox.critical(self, title, text)
     
     def on_download_finished(self, status):
         self.downloadable = False

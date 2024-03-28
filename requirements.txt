@@ -2,5 +2,7 @@ beautifulsoup4
 fuzzywuzzy
 polib
 PyQt6
+PyQt6-WebEngine
+python-Levenshtein
 requests
 tendo

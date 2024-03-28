@@ -58,6 +58,9 @@ msgstr "关于"
 msgid "Version:"
 msgstr "版本："
 
+msgid "Please complete any security checks..."
+msgstr "请完成所有安全检查..."
+
 msgid "Translation request failed with status code:"
 msgstr "翻译请求失败，状态代码为："
 
@@ -85,11 +88,11 @@ msgstr "翻译关键词中..."
 msgid "No translations found."
 msgstr "未找到翻译。"
 
-msgid "Request success!"
-msgstr "请求成功！"
+msgid "Connection success!"
+msgstr "连接成功！"
 
-msgid "Request failed with status code:"
-msgstr "请求失败，状态代码为："
+msgid "Connection failed."
+msgstr "连接失败。"
 
 msgid "Translating trainer name..."
 msgstr "翻译修改器中..."

@@ -15,8 +15,9 @@ import zipfile
 from bs4 import BeautifulSoup
 from fuzzywuzzy import fuzz
 import polib
-from PyQt6.QtCore import Qt, QThread, pyqtSignal
+from PyQt6.QtCore import Qt, QEventLoop, QThread, QTimer, pyqtSignal, QUrl
 from PyQt6.QtGui import QIcon, QPixmap
+from PyQt6.QtWebEngineWidgets import QWebEngineView
 from PyQt6.QtWidgets import QDialog, QCheckBox, QVBoxLayout, QHBoxLayout, QPushButton, QComboBox, QLabel, QLineEdit, QMessageBox, QFileDialog
 import requests
 
@@ -286,14 +287,86 @@ class PathChangeThread(QThread):
             self.error.emit(str(e))
 
 
+class BrowserDialog(QDialog):
+    content_ready = pyqtSignal(str)
+
+    def __init__(self, parent=None):
+        super().__init__(parent)
+        self.browser = QWebEngineView(self)
+        layout = QVBoxLayout(self)
+        layout.addWidget(self.browser)
+        self.setLayout(layout)
+        self.resize(800, 600)
+        self.setWindowTitle(tr("Please complete any security checks..."))
+        self.setWindowIcon(QIcon(resource_path("assets/logo.ico")))
+
+        self.check_timer = QTimer(self)
+        self.found_content = False
+        self.check_count = 0
+
+    def load_url(self, url, target_text):
+        self.url = url
+        self.target_text = target_text
+        self.found_content = False
+        self.check_count = 0
+        self.browser.loadFinished.connect(self.on_load_finished)
+        self.browser.load(QUrl(self.url))
+        self.hide()
+
+    def on_load_finished(self, success):
+        self.check_timer.timeout.connect(self.check_content)
+        self.check_timer.start(1000)
+
+    def check_content(self):
+        if self.check_count >= 3:
+            self.show()
+        self.check_count += 1
+        self.browser.page().toHtml(self.handle_html)
+
+    def handle_html(self, html):
+        if self.target_text in html:
+            self.found_content = True
+            self.check_timer.stop()
+            self.content_ready.emit(html)
+            self.close()
+    
+    def closeEvent(self, event):
+        if not self.found_content:
+            self.check_timer.stop()
+            self.browser.loadFinished.disconnect(self.on_load_finished)
+            self.content_ready.emit("")
+        event.accept()
+
+
 class DownloadBaseThread(QThread):
     message = pyqtSignal(str, str)
+    messageBox = pyqtSignal(str, str, str)
     finished = pyqtSignal(int)
+    loadUrl = pyqtSignal(str, str)
 
     trainer_urls = {}  # Store search results: {trainer name: download link}
     headers = {
-        'User-Agent': 'Mozilla/5.0 (Windows NT 10.0; Win64; x64) AppleWebKit/537.36 (KHTML, like Gecko) Chrome/58.0.3029.110 Safari/537.3'
+        'User-Agent': 'Mozilla/5.0 (Windows NT 10.0; Win64; x64) AppleWebKit/537.36 (KHTML, like Gecko) Chrome/58.0.3029.110 Safari/537.3',
     }
+    
+    def __init__(self, parent=None):
+        super().__init__(parent)
+        self.html_content = ""
+        self.browser_dialog = BrowserDialog()
+        self.loadUrl.connect(self.browser_dialog.load_url)
+        self.browser_dialog.content_ready.connect(self.handle_content_ready)
+
+    def get_webpage_content(self, url, target_text):
+        self.loop = QEventLoop()
+        self.loadUrl.emit(url, target_text)
+        self.loop.exec()
+
+        return BeautifulSoup(self.html_content, 'html.parser')
+
+    def handle_content_ready(self, html_content):
+        self.html_content = html_content
+        if self.loop.isRunning():
+            self.loop.quit()
 
     def is_internet_connected(self, urls=None, timeout=5):
         if urls is None:
@@ -446,7 +519,6 @@ class DownloadDisplayThread(DownloadBaseThread):
             self.finished.emit(1)
             return
 
-        # ts initialization will pop up a cmd window
         try:
             global ts
             if "translators" not in sys.modules:
@@ -510,7 +582,7 @@ class DownloadDisplayThread(DownloadBaseThread):
 
         if len(DownloadBaseThread.trainer_urls) == 0:
             self.message.emit(tr("No results found."), "failure")
-            self.finished(1)
+            self.finished.emit(1)
             return
         
         self.finished.emit(0)
@@ -574,14 +646,13 @@ class DownloadDisplayThread(DownloadBaseThread):
     def search_from_archive(self, keywordList):
         # Search for results from fling archive
         url = "https://archive.flingtrainer.com/"
-        reqs = requests.get(url, headers=self.headers)
-        archiveHTML = BeautifulSoup(reqs.text, 'html.parser')
+        archiveHTML = self.get_webpage_content(url, "FLiNG Trainers Archive")
 
         # Check if the request was successful
-        if reqs.status_code == 200:
-            self.message.emit(tr("Request success!") + " 1/2", "success")
+        if archiveHTML.find():
+            self.message.emit(tr("Connection success!") + " 1/2", "success")
         else:
-            self.message.emit(tr("Request failed with status code: ") + str(reqs.status_code), "failure")
+            self.message.emit(tr("Connection failed.") + " 1/2", "failure")
 
         for link in archiveHTML.find_all(target="_self"):
             # parse trainer name
@@ -598,13 +669,13 @@ class DownloadDisplayThread(DownloadBaseThread):
     def search_from_main_site(self, keywordList):
         # Search for results from fling main site, prioritized, will replace same trainer from archive
         url = "https://flingtrainer.com/all-trainers-a-z/"
-        reqs = requests.get(url, headers=self.headers)
-        mainSiteHTML = BeautifulSoup(reqs.text, 'html.parser')
+        mainSiteHTML = self.get_webpage_content(url, "All Trainers (A-Z)")
 
-        if reqs.status_code == 200:
-            self.message.emit(tr("Request success!") + " 2/2", "success")
+        if mainSiteHTML.find():
+            self.message.emit(tr("Connection success!") + " 2/2", "success")
         else:
-            self.message.emit(tr("Request failed with status code: ") + str(reqs.status_code), "failure")
+            self.message.emit(tr("Connection failed.") + " 2/2", "failure")
+        time.sleep(0.5)
 
         for ul in mainSiteHTML.find_all('ul'):
             for li in ul.find_all('li'):
@@ -715,7 +786,7 @@ class DownloadTrainersThread(DownloadBaseThread):
                 cnt += 1
         # Warn user if extra files found
         if cnt > 0:
-            QMessageBox.information(self, tr("Attention"), tr("Additional actions required\nPlease check folder for details!"))
+            self.messageBox.emit("info", tr("Attention"), tr("Additional actions required\nPlease check folder for details!"))
             os.startfile(self.tempDir)
 
         os.makedirs(self.trainerPath, exist_ok=True)
@@ -737,7 +808,7 @@ class DownloadTrainersThread(DownloadBaseThread):
                 os.remove(rhLog)
 
         except Exception as e:
-            QMessageBox.critical(self, tr("Error"), tr("Could not find the downloaded trainer file, please try turning your antivirus software off."))
+            self.messageBox.emit("error", tr("Error"), tr("Could not find the downloaded trainer file, please try turning your antivirus software off."))
             self.finished.emit(1)
             return
         
