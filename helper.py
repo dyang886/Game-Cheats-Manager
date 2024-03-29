@@ -17,6 +17,7 @@ from fuzzywuzzy import fuzz
 import polib
 from PyQt6.QtCore import Qt, QEventLoop, QThread, QTimer, pyqtSignal, QUrl
 from PyQt6.QtGui import QIcon, QPixmap
+from PyQt6.QtWebEngineCore import QWebEngineDownloadRequest
 from PyQt6.QtWebEngineWidgets import QWebEngineView
 from PyQt6.QtWidgets import QDialog, QCheckBox, QVBoxLayout, QHBoxLayout, QPushButton, QComboBox, QLabel, QLineEdit, QMessageBox, QFileDialog
 import requests
@@ -289,6 +290,7 @@ class PathChangeThread(QThread):
 
 class BrowserDialog(QDialog):
     content_ready = pyqtSignal(str)
+    download_completed = pyqtSignal(str)
 
     def __init__(self, parent=None):
         super().__init__(parent)
@@ -301,8 +303,10 @@ class BrowserDialog(QDialog):
         self.setWindowIcon(QIcon(resource_path("assets/logo.ico")))
 
         self.check_timer = QTimer(self)
-        self.found_content = False
+        self.found_content = None
         self.check_count = 0
+        self.download_path = ""
+        self.file_name = ""
 
     def load_url(self, url, target_text):
         self.url = url
@@ -315,10 +319,10 @@ class BrowserDialog(QDialog):
 
     def on_load_finished(self, success):
         self.check_timer.timeout.connect(self.check_content)
-        self.check_timer.start(1000)
+        self.check_timer.start(500)
 
     def check_content(self):
-        if self.check_count >= 3:
+        if self.check_count >= 5:
             self.show()
         self.check_count += 1
         self.browser.page().toHtml(self.handle_html)
@@ -331,11 +335,35 @@ class BrowserDialog(QDialog):
             self.close()
     
     def closeEvent(self, event):
-        if not self.found_content:
+        if not self.found_content == None and not self.found_content:
             self.check_timer.stop()
             self.browser.loadFinished.disconnect(self.on_load_finished)
             self.content_ready.emit("")
         event.accept()
+    
+    def handle_download(self, url, download_path, file_name):
+        self.download_path = download_path
+        self.file_name = file_name
+        self.browser.page().profile().downloadRequested.connect(self.on_download_requested)
+        self.browser.load(QUrl(url))
+
+    def on_download_requested(self, download):
+        suggested_filename = download.downloadFileName()
+        extension = os.path.splitext(suggested_filename)[1]
+        file_name = self.file_name + extension
+
+        download.setDownloadDirectory(self.download_path)
+        download.setDownloadFileName(file_name)
+        download.accept()
+
+        file_path = os.path.join(self.download_path, file_name)
+        download.stateChanged.connect(lambda state: self.on_download_state_changed(state, file_path))
+    
+    def on_download_state_changed(self, state, file_path):
+        if state == QWebEngineDownloadRequest.DownloadState.DownloadCompleted:
+            self.browser.page().profile().downloadRequested.disconnect(self.on_download_requested)
+            self.download_completed.emit(file_path)
+            self.close()
 
 
 class DownloadBaseThread(QThread):
@@ -343,6 +371,7 @@ class DownloadBaseThread(QThread):
     messageBox = pyqtSignal(str, str, str)
     finished = pyqtSignal(int)
     loadUrl = pyqtSignal(str, str)
+    downloadFile = pyqtSignal(str, str, str)
 
     trainer_urls = {}  # Store search results: {trainer name: download link}
     headers = {
@@ -352,9 +381,12 @@ class DownloadBaseThread(QThread):
     def __init__(self, parent=None):
         super().__init__(parent)
         self.html_content = ""
+        self.downloaded_file_path = ""
         self.browser_dialog = BrowserDialog()
         self.loadUrl.connect(self.browser_dialog.load_url)
         self.browser_dialog.content_ready.connect(self.handle_content_ready)
+        self.downloadFile.connect(self.browser_dialog.handle_download)
+        self.browser_dialog.download_completed.connect(self.handle_download_completed)
 
     def get_webpage_content(self, url, target_text):
         self.loop = QEventLoop()
@@ -365,6 +397,18 @@ class DownloadBaseThread(QThread):
 
     def handle_content_ready(self, html_content):
         self.html_content = html_content
+        if self.loop.isRunning():
+            self.loop.quit()
+
+    def request_download(self, url, download_path, file_name):
+        self.loop = QEventLoop()
+        self.downloadFile.emit(url, download_path, file_name)
+        self.loop.exec()
+
+        return self.downloaded_file_path
+
+    def handle_download_completed(self, file_path):
+        self.downloaded_file_path = file_path
         if self.loop.isRunning():
             self.loop.quit()
 
@@ -707,7 +751,7 @@ class DownloadTrainersThread(DownloadBaseThread):
         self.index = index
         self.trainerPath = trainerPath
         self.trainers = trainers
-        self.tempDir = os.path.join(tempfile.gettempdir(), "GameCheatsManagerTemp/")
+        self.tempDir = os.path.join(tempfile.gettempdir(), "GameCheatsManagerTemp")
         self.resourceHacker_path = resource_path("dependency/ResourceHacker.exe")
         self.unrar_path = resource_path("dependency/UnRAR.exe")
         self.emptyMidi_path = resource_path("dependency/TrainerBGM.mid")
@@ -735,34 +779,24 @@ class DownloadTrainersThread(DownloadBaseThread):
         self.message.emit(tr("Downloading..."), None)
         try:
             # Additional trainer file extraction for trainers from main site
-            targeturl = DownloadBaseThread.trainer_urls[filename]
-            domain = urlparse(targeturl).netloc
+            targetUrl = DownloadBaseThread.trainer_urls[filename]
+            domain = urlparse(targetUrl).netloc
             if domain == "flingtrainer.com":
-                gamereqs = requests.get(targeturl, headers=self.headers)
-                soup2 = BeautifulSoup(gamereqs.text, 'html.parser')
-                targeturl = soup2.find(target="_self").get("href")
+                trainerPage = self.get_webpage_content(targetUrl, "FLiNG Trainer")
+                targetUrl = trainerPage.find(target="_self").get("href")
             
-            finalreqs = requests.get(targeturl, headers=self.headers)
+            os.makedirs(self.tempDir, exist_ok=True)
+            trainerTemp = self.request_download(targetUrl, self.tempDir, mFilename)
+            time.sleep(2)
 
         except Exception as e:
             self.message.emit(tr("An error occurred while downloading trainer: ") + str(e), "failure")
             self.finished.emit(1)
             return
 
-        # Find compressed file extension
-        fileDownloadLink = finalreqs.url
-        extension = fileDownloadLink[fileDownloadLink.rfind('.'):]
-        zFilename = mFilename + extension
-
-        trainerTemp = os.path.join(self.tempDir, zFilename)
-        if not os.path.exists(self.tempDir):
-            os.mkdir(self.tempDir)
-        with open(trainerTemp, "wb") as f:
-            f.write(finalreqs.content)
-        time.sleep(2)
-
         # Extract compressed file and rename
         self.message.emit(tr("Decompressing..."), None)
+        extension = os.path.splitext(trainerTemp)[1]
         try:
             if extension == ".rar":
                 command = [self.unrar_path, "x", "-y", trainerTemp, self.tempDir]

@@ -55,14 +55,14 @@ msgstr "Please restart the application to apply theme and language settings."
 msgid "About"
 msgstr "About"
 
-msgid "Version:"
-msgstr "Version:"
+msgid "Version: "
+msgstr "Version: "
 
 msgid "Please complete any security checks..."
 msgstr "Please complete any security checks..."
 
-msgid "Translation request failed with status code:"
-msgstr "Translation request failed with status code:"
+msgid "Translation request failed with status code: "
+msgstr "Translation request failed with status code: "
 
 msgid "Checking for internet connection..."
 msgstr "Checking for internet connection..."
@@ -103,14 +103,14 @@ msgstr "Trainer already exists, aborted download."
 msgid "Downloading..."
 msgstr "Downloading..."
 
-msgid "An error occurred while downloading trainer:"
-msgstr "An error occurred while downloading trainer:"
+msgid "An error occurred while downloading trainer: "
+msgstr "An error occurred while downloading trainer: "
 
 msgid "Decompressing..."
 msgstr "Decompressing..."
 
-msgid "An error occurred while extracting downloaded trainer:"
-msgstr "An error occurred while extracting downloaded trainer:"
+msgid "An error occurred while extracting downloaded trainer: "
+msgstr "An error occurred while extracting downloaded trainer: "
 
 msgid ""
 "Additional actions required\n"
@@ -140,8 +140,14 @@ msgstr "Search to download"
 msgid "Options"
 msgstr "Options"
 
-msgid "WeMod Pro"
-msgstr "WeMod Pro"
+msgid "Import Trainers"
+msgstr "Import Trainers"
+
+msgid "Open Trainer Download Path"
+msgstr "Open Trainer Download Path"
+
+msgid "Unlock WeMod Pro"
+msgstr "Unlock WeMod Pro"
 
 msgid "Launch"
 msgstr "Launch"
@@ -164,8 +170,14 @@ msgstr "No path selected."
 msgid "Migration complete!"
 msgstr "Migration complete!"
 
-msgid "Error creating the new path:"
-msgstr "Error creating the new path:"
+msgid "Error creating the new path: "
+msgstr "Error creating the new path: "
+
+msgid "Import trainers"
+msgstr "Import trainers"
+
+msgid "Executable Files (*.exe)"
+msgstr "Executable Files (*.exe)"
 
 msgid ""
 "WeMod not installed or invalid installation path.\n"

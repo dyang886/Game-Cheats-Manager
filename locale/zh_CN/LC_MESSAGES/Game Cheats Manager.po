@@ -55,13 +55,13 @@ msgstr "请重新启动应用程序以应用主题和语言设置。"
 msgid "About"
 msgstr "关于"
 
-msgid "Version:"
+msgid "Version: "
 msgstr "版本："
 
 msgid "Please complete any security checks..."
 msgstr "请完成所有安全检查..."
 
-msgid "Translation request failed with status code:"
+msgid "Translation request failed with status code: "
 msgstr "翻译请求失败，状态代码为："
 
 msgid "Checking for internet connection..."
@@ -103,13 +103,13 @@ msgstr "修改器已存在，已中止下载。"
 msgid "Downloading..."
 msgstr "下载中..."
 
-msgid "An error occurred while downloading trainer:"
+msgid "An error occurred while downloading trainer: "
 msgstr "下载修改器时出错："
 
 msgid "Decompressing..."
 msgstr "解压中..."
 
-msgid "An error occurred while extracting downloaded trainer:"
+msgid "An error occurred while extracting downloaded trainer: "
 msgstr "解压下载的修改器时出错："
 
 msgid ""
@@ -140,8 +140,14 @@ msgstr "下载修改器"
 msgid "Options"
 msgstr "选项"
 
-msgid "WeMod Pro"
-msgstr "WeMod Pro"
+msgid "Import Trainers"
+msgstr "导入修改器"
+
+msgid "Open Trainer Download Path"
+msgstr "打开修改器下载路径"
+
+msgid "Unlock WeMod Pro"
+msgstr "解锁 WeMod Pro"
 
 msgid "Launch"
 msgstr "启动"
@@ -164,8 +170,14 @@ msgstr "未选择路径。"
 msgid "Migration complete!"
 msgstr "迁移完成！"
 
-msgid "Error creating the new path:"
+msgid "Error creating the new path: "
 msgstr "创建新路径时出错："
+
+msgid "Import trainers"
+msgstr "导入修改器"
+
+msgid "Executable Files (*.exe)"
+msgstr "可执行文件（*.exe）"
 
 msgid ""
 "WeMod not installed or invalid installation path.\n"
@@ -186,15 +198,3 @@ msgid ""
 msgstr ""
 "您已激活 WeMod Pro！\n"
 "当前 WeMod 版本：v"
-
-msgid "Import Trainers"
-msgstr "导入修改器"
-
-msgid "Open Download Path"
-msgstr "打开下载目录"
-
-msgid "Open Settings File"
-msgstr "打开配置文件"
-
-msgid "Unlock WeMod Pro"
-msgstr "解锁WeMod Pro"

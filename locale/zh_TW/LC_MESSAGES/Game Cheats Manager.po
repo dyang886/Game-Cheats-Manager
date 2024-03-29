@@ -55,13 +55,13 @@ msgstr "請重新啟動應用程式以應用外觀和語言設置。"
 msgid "About"
 msgstr "關於"
 
-msgid "Version:"
-msgstr "版本:"
+msgid "Version: "
+msgstr "版本: "
 
 msgid "Please complete any security checks..."
 msgstr "請完成所有安全檢查..."
 
-msgid "Translation request failed with status code:"
+msgid "Translation request failed with status code: "
 msgstr "翻譯請求失敗，狀態碼為："
 
 msgid "Checking for internet connection..."
@@ -103,13 +103,13 @@ msgstr "修改器已存在，已中止下載。"
 msgid "Downloading..."
 msgstr "下載中..."
 
-msgid "An error occurred while downloading trainer:"
+msgid "An error occurred while downloading trainer: "
 msgstr "下載修改器時出錯："
 
 msgid "Decompressing..."
 msgstr "正在解壓..."
 
-msgid "An error occurred while extracting downloaded trainer:"
+msgid "An error occurred while extracting downloaded trainer: "
 msgstr "解壓下載修改器時出錯："
 
 msgid ""
@@ -140,8 +140,14 @@ msgstr "下載修改器"
 msgid "Options"
 msgstr "選項"
 
-msgid "WeMod Pro"
-msgstr "WeMod Pro"
+msgid "Import Trainers"
+msgstr "導入修改器"
+
+msgid "Open Trainer Download Path"
+msgstr "打開修改器下載路徑"
+
+msgid "Unlock WeMod Pro"
+msgstr "解鎖 WeMod Pro"
 
 msgid "Launch"
 msgstr "啟動"
@@ -164,8 +170,14 @@ msgstr "未選擇路徑。"
 msgid "Migration complete!"
 msgstr "遷移完成！"
 
-msgid "Error creating the new path:"
+msgid "Error creating the new path: "
 msgstr "建立新路徑時出錯："
+
+msgid "Import trainers"
+msgstr "導入修改器"
+
+msgid "Executable Files (*.exe)"
+msgstr "可執行檔案（*.exe）"
 
 msgid ""
 "WeMod not installed or invalid installation path.\n"

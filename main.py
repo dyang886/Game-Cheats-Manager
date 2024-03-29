@@ -27,7 +27,7 @@ class GameCheatsManager(QMainWindow):
         self.setFixedSize(self.size())
 
         # Version, user prompts, and links
-        self.appVersion = "2.0.0-beta"
+        self.appVersion = "2.0.0-beta2"
         self.githubLink = "https://github.com/dyang886/Game-Cheats-Manager"
         self.updateLink = "https://api.github.com/repos/dyang886/Game-Cheats-Manager/releases/latest"
         self.trainerSearchEntryPrompt = tr("Search for installed")
@@ -71,26 +71,20 @@ class GameCheatsManager(QMainWindow):
 
         optionMenu = menu.addMenu(tr("Options"))
 
-        # Add Import option
-        importAction = QAction(tr("Import Trainers"), self)
-        importAction.setFont(menuFont)
-        importAction.triggered.connect(self.import_file)  # Connect the action to the import_file method
-        optionMenu.addAction(importAction)
-
-        openDirectoryAction = QAction(tr("Open Download Path"), self)
-        openDirectoryAction.setFont(menuFont)
-        openDirectoryAction.triggered.connect(self.open_gcm_trainers_directory)
-        optionMenu.addAction(openDirectoryAction)
-
         settingsAction = QAction(tr("Settings"), self)
         settingsAction.setFont(menuFont)
         settingsAction.triggered.connect(self.open_settings)
         optionMenu.addAction(settingsAction)
 
-        openSettingsFileAction = QAction(tr("Open Settings File"), self)
-        openSettingsFileAction.setFont(menuFont)
-        openSettingsFileAction.triggered.connect(self.open_settings_file)
-        optionMenu.addAction(openSettingsFileAction)
+        importAction = QAction(tr("Import Trainers"), self)
+        importAction.setFont(menuFont)
+        importAction.triggered.connect(self.import_files)
+        optionMenu.addAction(importAction)
+
+        openDirectoryAction = QAction(tr("Open Trainer Download Path"), self)
+        openDirectoryAction.setFont(menuFont)
+        openDirectoryAction.triggered.connect(self.open_trainer_directory)
+        optionMenu.addAction(openDirectoryAction)
 
         wemodAction = QAction(tr("Unlock WeMod Pro"), self)
         wemodAction.setFont(menuFont)
@@ -416,27 +410,17 @@ class GameCheatsManager(QMainWindow):
             self.settings_window = SettingsDialog(self)
             self.settings_window.show()
 
-    def import_file(self):
-        file_names, _ = QFileDialog.getOpenFileNames(self, "Import trainers", "", "Executable Files (*.exe)")
+    def import_files(self):
+        file_names, _ = QFileDialog.getOpenFileNames(self, tr("Import trainers"), "", tr("Executable Files (*.exe)"))
         if file_names:
             for file_name in file_names:
                 dest_path = os.path.join(self.trainerPath, os.path.basename(file_name))
-                shutil.copy2(file_name, dest_path)
-                print("File imported and copied:", file_name)
-        self.update_list()
+                shutil.move(file_name, dest_path)
+                print("Trainer moved: ", file_name)
+            self.show_cheats()
 
-    def open_gcm_trainers_directory(self):
-        if os.path.exists(self.trainerPath):
-            os.startfile(self.trainerPath)
-        else:
-            QMessageBox.warning(self, "Directory not found", "The GCM Trainers directory was not found.")
-
-    def open_settings_file(self):
-        settings_file_path = os.path.join(os.environ["APPDATA"], "GCM Settings/", "settings.json")
-        if os.path.exists(settings_file_path):
-            subprocess.run(["notepad.exe", settings_file_path])
-        else:
-            QMessageBox.warning(self, "File not found", "The settings.json file was not found.")
+    def open_trainer_directory(self):
+        os.startfile(self.trainerPath)
 
     def open_about(self):
         if self.about_window is not None and self.about_window.isVisible():
