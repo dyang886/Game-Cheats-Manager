@@ -824,6 +824,12 @@ class DownloadTrainersThread(DownloadBaseThread):
             self.messageBox.emit("info", tr("Attention"), tr("Additional actions required\nPlease check folder for details!"))
             os.startfile(self.tempDir)
 
+        # Check if gameRawName is None
+        if gameRawName is None:
+            self.messageBox.emit("error", tr("Error"), tr("Could not find the downloaded trainer file, please try turning your antivirus software off."))
+            self.finished.emit(1)
+            return
+
         os.makedirs(self.trainerPath, exist_ok=True)
         trainer_name = trans_mFilename + ".exe"
         source_file = os.path.join(self.tempDir, gameRawName)
