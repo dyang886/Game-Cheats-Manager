@@ -813,6 +813,7 @@ class DownloadTrainersThread(DownloadBaseThread):
 
         # Locate extracted .exe file
         cnt = 0
+        gameRawName = None
         for filename in os.listdir(self.tempDir):
             if "Trainer" in filename and filename.endswith(".exe"):
                 gameRawName = filename
