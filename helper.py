@@ -813,6 +813,7 @@ class DownloadTrainersThread(DownloadBaseThread):
 
         # Locate extracted .exe file
         cnt = 0
+        gameRawName = None
         for filename in os.listdir(self.tempDir):
             if "Trainer" in filename and filename.endswith(".exe"):
                 gameRawName = filename
@@ -822,6 +823,12 @@ class DownloadTrainersThread(DownloadBaseThread):
         if cnt > 0:
             self.messageBox.emit("info", tr("Attention"), tr("Additional actions required\nPlease check folder for details!"))
             os.startfile(self.tempDir)
+
+        # Check if gameRawName is None
+        if gameRawName is None:
+            self.messageBox.emit("error", tr("Error"), tr("Could not find the downloaded trainer file, please try turning your antivirus software off."))
+            self.finished.emit(1)
+            return
 
         os.makedirs(self.trainerPath, exist_ok=True)
         trainer_name = trans_mFilename + ".exe"
