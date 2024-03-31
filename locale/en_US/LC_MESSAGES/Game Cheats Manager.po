@@ -106,6 +106,9 @@ msgstr "Downloading..."
 msgid "An error occurred while downloading trainer: "
 msgstr "An error occurred while downloading trainer: "
 
+msgid "Downloaded file not found."
+msgstr "Downloaded file not found."
+
 msgid "Decompressing..."
 msgstr "Decompressing..."
 
@@ -119,14 +122,14 @@ msgstr ""
 "Additional actions required\n"
 "Please check folder for details!"
 
-msgid "Removing trainer background music..."
-msgstr "Removing trainer background music..."
-
 msgid "Error"
 msgstr "Error"
 
 msgid "Could not find the downloaded trainer file, please try turning your antivirus software off."
 msgstr "Could not find the downloaded trainer file, please try turning your antivirus software off."
+
+msgid "Removing trainer background music..."
+msgstr "Removing trainer background music..."
 
 msgid "Download success!"
 msgstr "Download success!"

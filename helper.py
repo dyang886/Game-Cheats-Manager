@@ -787,10 +787,21 @@ class DownloadTrainersThread(DownloadBaseThread):
             
             os.makedirs(self.tempDir, exist_ok=True)
             trainerTemp = self.request_download(targetUrl, self.tempDir, mFilename)
-            time.sleep(2)
 
         except Exception as e:
             self.message.emit(tr("An error occurred while downloading trainer: ") + str(e), "failure")
+            self.finished.emit(1)
+            return
+        
+        # Ensure file is successfully downloaded
+        found_trainer = False
+        for i in range(10):
+            if os.path.exists(trainerTemp):
+                found_trainer = True
+                break
+            time.sleep(1)
+        if not found_trainer:
+            self.message.emit(tr("Downloaded file not found."), "failure")
             self.finished.emit(1)
             return
 
@@ -825,7 +836,7 @@ class DownloadTrainersThread(DownloadBaseThread):
             os.startfile(self.tempDir)
 
         # Check if gameRawName is None
-        if gameRawName is None:
+        if not gameRawName:
             self.messageBox.emit("error", tr("Error"), tr("Could not find the downloaded trainer file, please try turning your antivirus software off."))
             self.finished.emit(1)
             return

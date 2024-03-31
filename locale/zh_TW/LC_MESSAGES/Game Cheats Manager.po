@@ -106,6 +106,9 @@ msgstr "下載中..."
 msgid "An error occurred while downloading trainer: "
 msgstr "下載修改器時出錯："
 
+msgid "Downloaded file not found."
+msgstr "未找到下載的檔。"
+
 msgid "Decompressing..."
 msgstr "正在解壓..."
 
@@ -119,14 +122,14 @@ msgstr ""
 "需要執行其他操作\n"
 "詳情請查看資料夾！"
 
-msgid "Removing trainer background music..."
-msgstr "刪除修改器背景音樂..."
-
 msgid "Error"
 msgstr "錯誤"
 
 msgid "Could not find the downloaded trainer file, please try turning your antivirus software off."
 msgstr "找不到下載的修改器，請嘗試關閉防毒軟體。"
+
+msgid "Removing trainer background music..."
+msgstr "刪除修改器背景音樂..."
 
 msgid "Download success!"
 msgstr "下載成功！"
