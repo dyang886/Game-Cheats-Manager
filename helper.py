@@ -795,7 +795,7 @@ class DownloadTrainersThread(DownloadBaseThread):
         
         # Ensure file is successfully downloaded
         found_trainer = False
-        for i in range(10):
+        for i in range(30):
             if os.path.exists(trainerTemp):
                 found_trainer = True
                 break
