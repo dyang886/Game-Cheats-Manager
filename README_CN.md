@@ -20,7 +20,7 @@ Game Cheats Manager 为玩家提供了一个高效管理游戏修改器的一站
 
 1. **下载安装程序**: 前往 [latest release](https://github.com/dyang886/Game-Cheats-Manager/releases) 并下载适用于 Windows 的安装程序。
 2. **运行安装程序**: 运行安装程序，并按照说明来安装 Game Cheats Manager。
-3. **启动应用程序**: 从应用程序文件夹或开始菜单中打开游戏存档管理器。
+3. **启动应用程序**: 从应用程序文件夹或开始菜单中打开 Game Cheats Manager。
 
 ## 免责声明
 
