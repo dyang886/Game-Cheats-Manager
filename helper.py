@@ -389,9 +389,14 @@ class DownloadBaseThread(QThread):
         self.browser_dialog.download_completed.connect(self.handle_download_completed)
 
     def get_webpage_content(self, url, target_text):
-        self.loop = QEventLoop()
-        self.loadUrl.emit(url, target_text)
-        self.loop.exec()
+        req = requests.get(url, headers=self.headers)
+
+        if req.status_code != 200:
+            self.loop = QEventLoop()
+            self.loadUrl.emit(url, target_text)
+            self.loop.exec()
+        else:
+            self.html_content = req.text
 
         return BeautifulSoup(self.html_content, 'html.parser')
 
@@ -401,9 +406,18 @@ class DownloadBaseThread(QThread):
             self.loop.quit()
 
     def request_download(self, url, download_path, file_name):
-        self.loop = QEventLoop()
-        self.downloadFile.emit(url, download_path, file_name)
-        self.loop.exec()
+        req = requests.get(url, headers=self.headers)
+        
+        if req.status_code != 200:
+            self.loop = QEventLoop()
+            self.downloadFile.emit(url, download_path, file_name)
+            self.loop.exec()
+        else:
+            extension = os.path.splitext(urlparse(req.url).path)[1]
+            trainerTemp = os.path.join(download_path, file_name + extension)
+            with open(trainerTemp, "wb") as f:
+                f.write(req.content)
+            self.downloaded_file_path = trainerTemp
 
         return self.downloaded_file_path
 

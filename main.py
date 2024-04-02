@@ -27,7 +27,7 @@ class GameCheatsManager(QMainWindow):
         self.setFixedSize(self.size())
 
         # Version, user prompts, and links
-        self.appVersion = "2.0.0-beta.3"
+        self.appVersion = "2.0.0-beta.4"
         self.githubLink = "https://github.com/dyang886/Game-Cheats-Manager"
         self.updateLink = "https://api.github.com/repos/dyang886/Game-Cheats-Manager/releases/latest"
         self.trainerSearchEntryPrompt = tr("Search for installed")
