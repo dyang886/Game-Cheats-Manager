@@ -1,14 +1,20 @@
 # Game Cheats Manager
 
-Game Cheats Manager is a one-stop solution for gamers to manage their Fling trainers efficiently. It allows users to browse, download, and manage all their favorite Fling trainers from one convenient location. Each trainer, typically a standalone executable, can be launched or deleted directly through the app, simplifying your gaming experience by keeping everything organized and accessible.
+English | [简体中文](./README_CN.md)
 
-## Features
+Game Cheats Manager is a one-stop solution for gamers to manage their trainers efficiently. It allows users to browse, download, and manage all their trainers from one convenient location. Each trainer, typically a standalone executable, can be launched or deleted directly through the app, simplifying your gaming experience by keeping everything organized and accessible.
 
-- **Trainer Browsing**: Easily browse and search for the installed Fling trainers.
-- **One-Click Downloads**: Quickly search and download trainers directly from the Fling website.
-- **Trainer Optimizations:** Automatically removes distracting background music upon launching older Fling trainers.
-- **Manage Trainers**: Launch and delete trainers from a single, unified interface.
-- **User-Friendly Interface**: Enjoy a clean, intuitive interface that simplifies your gaming setup.
+## Usage
+
+1. **Browse Trainers**: In the left column, use the search bar or browse the list to find the downloaded trainers.
+2. **Download Trainers**: In the right column, search with keywords and double-click the desired match to download it directly. You can also change the trainer download path by clicking `...` next to the path currently displayed.
+3. **Manage Trainers**: Launch/double-click or delete trainers using the corresponding buttons in the application.
+4. **Options**: The `Options` menu bar consists of the following functionalities:
+   1. **Settings**: Adjust settings like themes and languages.
+   2. **Import trainers**: Select trainers that you want to import from the file selection window.
+   3. **Open the trainer download path**: View the folder to which the trainers are downloaded.
+   4. **Unlock WeMod Pro**: Activates the ability to use WeMod Pro. (You must install WeMod first)
+   5. **About**: View app version and GitHub repository link.
 
 ## Installation
 
@@ -16,20 +22,12 @@ Game Cheats Manager is a one-stop solution for gamers to manage their Fling trai
 2. **Run the Installer**: Execute the downloaded file and follow the on-screen instructions to install Game Cheats Manager.
 3. **Launch the Application**: Open Game Cheats Manager from your applications folder or start menu.
 
-## Usage
-
-1. **Browse Trainers**: In the left column, use the search function or browse the list to find the trainers you need.
-2. **Download Trainers**: In the right column, search with keywords and double-click the desired match to download it directly.
-3. **Manage Trainers**: Launch/double-click or delete trainers using the corresponding buttons in the application.
-4. **Settings**: To customize the trainer download path, click the button with dots in the right corner to select a new path. Other settings can be accessed from "Options" in the menu bar.
-
 ## Disclaimer
 
-Game Cheats Manager is not affiliated with, endorsed by, or in any way officially connected with Fling or any of its subsidiaries or affiliates. The official Fling website can be found at [Fling’s website](https://flingtrainer.com/).
+Game Cheats Manager is an independent tool that is not affiliated with any external trainer providers. The trainers downloaded are subject to their respective terms and conditions. This software simply provides a convenient way to manage these trainers and does not host any of the content itself. You can find their official websites below:
 
-The trainers downloaded are provided by Fling and are subject to their respective terms and conditions. Game Cheats Manager simply provides a convenient way to manage these trainers and does not host any of the content itself.
-
-Please use trainers responsibly and ensure they are used in accordance with the game's End User License Agreement (EULA). The developers of Game Cheats Manager are not responsible for any consequences that arise from the use of this software.
+- **FLiNG**: https://flingtrainer.com
+- **WeMod**: https://www.wemod.com
 
 ## Support
 

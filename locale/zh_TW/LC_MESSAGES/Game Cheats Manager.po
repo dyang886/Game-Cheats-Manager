@@ -176,8 +176,8 @@ msgstr "遷移完成！"
 msgid "Error creating the new path: "
 msgstr "建立新路徑時出錯："
 
-msgid "Import trainers"
-msgstr "導入修改器"
+msgid "Select trainers you want to import"
+msgstr "選擇要導入的修改器"
 
 msgid "Executable Files (*.exe)"
 msgstr "可執行檔案（*.exe）"
