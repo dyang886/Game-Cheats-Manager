@@ -10,11 +10,19 @@ white = """
     QLineEdit {{
         padding: 5px;
     }}
+
+    QStatusBar::item {{
+        border: none;
+    }}
 """
 
 black = """
     QMainWindow {{
         background-color: #1c1c1c;
+    }}
+
+    QStatusBar::item {{
+        border: none;
     }}
 
     QMenuBar {{
@@ -43,6 +51,10 @@ black = """
 
     QMenu::item:selected {{
         background-color: #484848;
+    }}
+
+    QStatusBar {{
+        color: white;
     }}
 
     QPushButton {{

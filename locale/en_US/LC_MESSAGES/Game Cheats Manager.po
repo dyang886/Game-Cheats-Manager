@@ -61,17 +61,29 @@ msgstr "Version: "
 msgid "Please complete any security checks..."
 msgstr "Please complete any security checks..."
 
+msgid "Initializing translator..."
+msgstr "Initializing translator..."
+
 msgid "Translation request failed with status code: "
 msgstr "Translation request failed with status code: "
+
+msgid "Updating data from FLiNG"
+msgstr "Updating data from FLiNG"
+
+msgid "Update from FLiGN failed"
+msgstr "Update from FLiGN failed"
+
+msgid "Fetching trainer translations"
+msgstr "Fetching trainer translations"
+
+msgid "Fetch trainer translations failed"
+msgstr "Fetch trainer translations failed"
 
 msgid "Checking for internet connection..."
 msgstr "Checking for internet connection..."
 
 msgid "No internet connection, search failed."
 msgstr "No internet connection, search failed."
-
-msgid "Initializing translator..."
-msgstr "Initializing translator..."
 
 msgid "Searching..."
 msgstr "Searching..."
@@ -88,11 +100,11 @@ msgstr "Translating keywords..."
 msgid "No translations found."
 msgstr "No translations found."
 
-msgid "Connection success!"
-msgstr "Connection success!"
+msgid "Search success!"
+msgstr "Search success!"
 
-msgid "Connection failed."
-msgstr "Connection failed."
+msgid "Search failed, please wait until all data is updated from FLiNG."
+msgstr "Search failed, please wait until all data is updated from FLiNG."
 
 msgid "Translating trainer name..."
 msgstr "Translating trainer name..."
@@ -178,9 +190,6 @@ msgstr "Error creating the new path: "
 
 msgid "Select trainers you want to import"
 msgstr "Select trainers you want to import"
-
-msgid "Executable Files (*.exe)"
-msgstr "Executable Files (*.exe)"
 
 msgid ""
 "WeMod not installed or invalid installation path.\n"

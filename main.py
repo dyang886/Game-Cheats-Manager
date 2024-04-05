@@ -5,7 +5,7 @@ import sys
 
 from PyQt6.QtCore import Qt, QTimer
 from PyQt6.QtGui import QAction, QColor, QFont, QFontDatabase, QIcon, QPixmap
-from PyQt6.QtWidgets import QApplication, QFileDialog, QGridLayout, QHBoxLayout, QLabel, QLineEdit, QListWidgetItem, QMainWindow, QMessageBox, QPushButton, QVBoxLayout, QWidget, QListWidget
+from PyQt6.QtWidgets import QApplication, QFileDialog, QGridLayout, QHBoxLayout, QLabel, QLineEdit, QListWidgetItem, QMainWindow, QMessageBox, QPushButton, QStatusBar, QSizePolicy, QVBoxLayout, QWidget, QListWidget
 from tendo import singleton
 
 from helper import *
@@ -59,11 +59,11 @@ class GameCheatsManager(QMainWindow):
         self.setCentralWidget(centralWidget)
         mainLayout = QGridLayout(centralWidget)
         mainLayout.setSpacing(15)
-        mainLayout.setContentsMargins(30, 20, 30, 30)
+        mainLayout.setContentsMargins(30, 20, 30, 10)
         centralWidget.setLayout(mainLayout)
         self.init_settings()
 
-        # Menu Setup
+        # Menu setup
         menuFont = self.font()
         menuFont.setPointSize(9)
         menu = self.menuBar()
@@ -95,6 +95,10 @@ class GameCheatsManager(QMainWindow):
         aboutAction.setFont(menuFont)
         aboutAction.triggered.connect(self.open_about)
         optionMenu.addAction(aboutAction)
+
+        # Status bar setup
+        self.statusbar = QStatusBar()
+        self.setStatusBar(self.statusbar)
 
         # ===========================================================================
         # Column 1 - trainers
@@ -182,8 +186,8 @@ class GameCheatsManager(QMainWindow):
 
         # Check for trainer update timer
         self.timer = QTimer(self)
-        self.timer.timeout.connect(self.on_check_update)
-        self.on_check_update()
+        self.timer.timeout.connect(self.on_main_interval)
+        self.on_main_interval()
         self.timer.start(300000)
 
     # ===========================================================================
@@ -271,6 +275,12 @@ class GameCheatsManager(QMainWindow):
             os.remove(self.trainers[trainerName])
             self.flingListBox.takeItem(index)
             self.show_cheats()
+    
+    def findWidgetInStatusBar(self, statusbar, widgetName):
+        for widget in statusbar.children():
+            if widget.objectName() == widgetName:
+                return widget
+        return None
 
     def change_path(self):
         self.downloadListBox.clear()
@@ -294,38 +304,6 @@ class GameCheatsManager(QMainWindow):
             self.downloadListBox.addItem(tr("No path selected."))
             self.enable_all_widgets()
             return
-        
-    def on_check_update(self):
-        # The binary pattern representing "FLiNGTrainerNamedPipe_" followed by some null bytes and the date
-        pattern_hex = '46 00 4c 00 69 00 4E 00 47 00 54 00 72 00 61 00 69 00 6E 00 65 00 72 00 4E 00 61 00 6D 00 65 00 64 00 50 00 69 00 70 00 65 00 5F'
-        # Convert the hex pattern to binary
-        pattern = bytes.fromhex(''.join(pattern_hex.split()))
-
-        for index, trainerPath in enumerate(self.trainers.values()):
-            trainerBuildDate = ""
-            checkUpdateUrl = "https://flingtrainer.com/tag/"
-
-            with open(trainerPath, 'rb') as file:
-                content = file.read()
-                pattern_index = content.find(pattern)
-
-                if pattern_index == -1:
-                    continue
-
-                # Find the start of the date string after the pattern and skip null bytes (00)
-                start_index = pattern_index + len(pattern)
-                while content[start_index] == 0:
-                    start_index += 1
-
-                # The date could be "Mar  8 2024" or "Dec 10 2022"
-                date_match = re.search(rb'\b(?:Jan|Feb|Mar|Apr|May|Jun|Jul|Aug|Sep|Oct|Nov|Dec)\s+\d{1,2}\s+\d{4}\b', content[start_index:])
-                
-                if date_match:
-                    trainerBuildDate = date_match.group().decode('utf-8')
-                    # print(trainerBuildDate)
-
-                    # extract trainer name
-
 
     def on_migration_finished(self, new_path):
         self.trainerPath = new_path
@@ -399,6 +377,36 @@ class GameCheatsManager(QMainWindow):
         self.enable_download_widgets()
         self.show_cheats()
 
+    def on_main_interval(self):
+        fetch_main_site_thread = FetchFlingSite(self)
+        fetch_main_site_thread.message.connect(self.on_status_load)
+        fetch_main_site_thread.update.connect(self.on_status_update)
+        fetch_main_site_thread.error.connect(self.on_status_error)
+        fetch_main_site_thread.finished.connect(self.on_interval_finished)
+        fetch_main_site_thread.start()
+
+        fetch_main_site_thread = FetchTrainerDetails(self)
+        fetch_main_site_thread.message.connect(self.on_status_load)
+        fetch_main_site_thread.messageBox.connect(self.on_message_box)
+        fetch_main_site_thread.finished.connect(self.on_interval_finished)
+        fetch_main_site_thread.start()
+
+    def on_status_load(self, message):
+        statusWidget = StatusMessageWidget(message, "load")
+        self.statusbar.addWidget(statusWidget)
+    
+    def on_status_error(self, message):
+        statusWidget = StatusMessageWidget(message, "error")
+        self.statusbar.addWidget(statusWidget)
+
+    def on_status_update(self, widgetName, newMessage):
+        target = self.findWidgetInStatusBar(self.statusbar, widgetName)
+        target.update_message(newMessage)
+
+    def on_interval_finished(self, widgetName):
+        target = self.findWidgetInStatusBar(self.statusbar, widgetName)
+        target.deleteLater()
+
     # ===========================================================================
     # Menu functions
     # ===========================================================================
@@ -411,7 +419,7 @@ class GameCheatsManager(QMainWindow):
             self.settings_window.show()
 
     def import_files(self):
-        file_names, _ = QFileDialog.getOpenFileNames(self, tr("Select trainers you want to import"), "", tr("Executable Files (*.exe)"))
+        file_names, _ = QFileDialog.getOpenFileNames(self, tr("Select trainers you want to import"), "", "Executable Files (*.exe)")
         if file_names:
             for file_name in file_names:
                 dest_path = os.path.join(self.trainerPath, os.path.basename(file_name))

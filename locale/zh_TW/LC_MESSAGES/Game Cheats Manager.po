@@ -61,17 +61,29 @@ msgstr "版本: "
 msgid "Please complete any security checks..."
 msgstr "請完成所有安全檢查..."
 
+msgid "Initializing translator..."
+msgstr "初始化翻譯..."
+
 msgid "Translation request failed with status code: "
 msgstr "翻譯請求失敗，狀態碼為："
+
+msgid "Updating data from FLiNG"
+msgstr "正在更新風靈月影數據庫"
+
+msgid "Update from FLiGN failed"
+msgstr "更新風靈月影數據庫失敗"
+
+msgid "Fetching trainer translations"
+msgstr "正在獲取修改器翻譯"
+
+msgid "Fetch trainer translations failed"
+msgstr "獲取修改器翻譯失敗"
 
 msgid "Checking for internet connection..."
 msgstr "正在檢查網際網路連接..."
 
 msgid "No internet connection, search failed."
 msgstr "沒有互聯網連接，搜索失敗。"
-
-msgid "Initializing translator..."
-msgstr "初始化翻譯..."
 
 msgid "Searching..."
 msgstr "搜尋中..."
@@ -88,11 +100,11 @@ msgstr "翻譯關鍵字..."
 msgid "No translations found."
 msgstr "未找到翻譯。"
 
-msgid "Connection success!"
-msgstr "連接成功！"
+msgid "Search success!"
+msgstr "搜索成功！"
 
-msgid "Connection failed."
-msgstr "連結失敗。"
+msgid "Search failed, please wait until all data is updated from FLiNG."
+msgstr "蒐索失敗，請等待風靈月影數據庫完成更新。"
 
 msgid "Translating trainer name..."
 msgstr "翻譯修改器名稱..."
@@ -178,9 +190,6 @@ msgstr "建立新路徑時出錯："
 
 msgid "Select trainers you want to import"
 msgstr "選擇要導入的修改器"
-
-msgid "Executable Files (*.exe)"
-msgstr "可執行檔案（*.exe）"
 
 msgid ""
 "WeMod not installed or invalid installation path.\n"
