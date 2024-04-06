@@ -67,6 +67,9 @@ msgstr "Initializing translator..."
 msgid "Translation request failed with status code: "
 msgstr "Translation request failed with status code: "
 
+msgid "Checking for trainer updates"
+msgstr "Checking for trainer updates"
+
 msgid "Updating data from FLiNG"
 msgstr "Updating data from FLiNG"
 
@@ -106,6 +109,9 @@ msgstr "Search success!"
 msgid "Search failed, please wait until all data is updated from FLiNG."
 msgstr "Search failed, please wait until all data is updated from FLiNG."
 
+msgid "Updating "
+msgstr "Updating "
+
 msgid "Translating trainer name..."
 msgstr "Translating trainer name..."
 
@@ -134,14 +140,14 @@ msgstr ""
 "Additional actions required\n"
 "Please check folder for details!"
 
-msgid "Error"
-msgstr "Error"
-
 msgid "Could not find the downloaded trainer file, please try turning your antivirus software off."
 msgstr "Could not find the downloaded trainer file, please try turning your antivirus software off."
 
 msgid "Removing trainer background music..."
 msgstr "Removing trainer background music..."
+
+msgid "Trainer is currently in use, please close any programs using the file and try again."
+msgstr "Trainer is currently in use, please close any programs using the file and try again."
 
 msgid "Download success!"
 msgstr "Download success!"
@@ -172,6 +178,9 @@ msgstr "Delete"
 
 msgid "Change trainer download path"
 msgstr "Change trainer download path"
+
+msgid "Error"
+msgstr "Error"
 
 msgid "Please choose a new path."
 msgstr "Please choose a new path."

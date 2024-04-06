@@ -3,6 +3,7 @@ fuzzywuzzy
 polib
 PyQt6
 PyQt6-WebEngine
+pywin32
 python-Levenshtein
 requests
 tendo

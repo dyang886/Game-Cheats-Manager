@@ -1,4 +1,5 @@
 import os
+from queue import Queue
 import re
 import shutil
 import sys
@@ -34,21 +35,20 @@ class GameCheatsManager(QMainWindow):
         self.downloadSearchEntryPrompt = tr("Search to download")
 
         # Paths and variable management
-        self.trainerPath = os.path.normpath(
+        self.trainerDownloadPath = os.path.normpath(
             os.path.abspath(settings["downloadPath"]))
-        os.makedirs(self.trainerPath, exist_ok=True)
+        os.makedirs(self.trainerDownloadPath, exist_ok=True)
         
         self.dropDownArrow_path = resource_path("assets/dropdown.png").replace("\\", "/")
         
         self.crackFile_path = resource_path("dependency/app.asar")
         self.search_path = resource_path("assets/search.png")
-        resource_path("dependency/ResourceHacker.exe")
-        resource_path("dependency/UnRAR.exe")
-        resource_path("dependency/TrainerBGM.mid")
 
         self.trainers = {}  # Store installed trainers: {trainer name: trainer path}
         self.searchable = True  # able to search online trainers or not
         self.downloadable = False  # able to double click on download list or not
+        self.downloadQueue = Queue()
+        self.currentlyDownloading = False
 
         # Window references
         self.settings_window = None
@@ -175,7 +175,7 @@ class GameCheatsManager(QMainWindow):
 
         self.downloadPathEntry = QLineEdit()
         self.downloadPathEntry.setReadOnly(True)
-        self.downloadPathEntry.setText(self.trainerPath)
+        self.downloadPathEntry.setText(self.trainerDownloadPath)
         changeDownloadPathLayout.addWidget(self.downloadPathEntry)
 
         self.fileDialogButton = QPushButton("...")
@@ -184,11 +184,11 @@ class GameCheatsManager(QMainWindow):
 
         self.show_cheats()
 
-        # Check for trainer update timer
+        # Update database, trainer update
         self.timer = QTimer(self)
         self.timer.timeout.connect(self.on_main_interval)
         self.on_main_interval()
-        self.timer.start(300000)
+        self.timer.start(3600000)
 
     # ===========================================================================
     # Core functions
@@ -250,7 +250,7 @@ class GameCheatsManager(QMainWindow):
     def show_cheats(self):
         self.flingListBox.clear()
         self.trainers = {}
-        for trainer in sorted(os.scandir(self.trainerPath), key=lambda dirent: dirent.name):
+        for trainer in sorted(os.scandir(self.trainerDownloadPath), key=lambda dirent: dirent.name):
             trainerName, trainerExt = os.path.splitext(os.path.basename(trainer.path))
             if trainerExt.lower() == ".exe" and os.path.getsize(trainer.path) != 0:
                 self.flingListBox.addItem(trainerName)
@@ -271,10 +271,13 @@ class GameCheatsManager(QMainWindow):
     def delete_trainer(self):
         index = self.flingListBox.currentRow()
         if index != -1:
-            trainerName = self.flingListBox.item(index).text()
-            os.remove(self.trainers[trainerName])
-            self.flingListBox.takeItem(index)
-            self.show_cheats()
+            try:
+                trainerName = self.flingListBox.item(index).text()
+                os.remove(self.trainers[trainerName])
+                self.flingListBox.takeItem(index)
+                self.show_cheats()
+            except PermissionError as e:
+                pass
     
     def findWidgetInStatusBar(self, statusbar, widgetName):
         for widget in statusbar.children():
@@ -295,7 +298,7 @@ class GameCheatsManager(QMainWindow):
                 return
 
             self.downloadListBox.addItem(tr("Migrating existing trainers..."))
-            self.migration_thread = PathChangeThread(self.trainerPath, folder, self)
+            self.migration_thread = PathChangeThread(self.trainerDownloadPath, folder, self)
             self.migration_thread.finished.connect(self.on_migration_finished)
             self.migration_thread.error.connect(self.on_migration_error)
             self.migration_thread.start()
@@ -306,12 +309,12 @@ class GameCheatsManager(QMainWindow):
             return
 
     def on_migration_finished(self, new_path):
-        self.trainerPath = new_path
-        settings["downloadPath"] = self.trainerPath
+        self.trainerDownloadPath = new_path
+        settings["downloadPath"] = self.trainerDownloadPath
         apply_settings(settings)
         self.show_cheats()
         self.downloadListBox.addItem(tr("Migration complete!"))
-        self.downloadPathEntry.setText(self.trainerPath)
+        self.downloadPathEntry.setText(self.trainerDownloadPath)
         self.enable_all_widgets()
 
     def on_migration_error(self, error_message):
@@ -354,16 +357,7 @@ class GameCheatsManager(QMainWindow):
         self.enable_download_widgets()
 
     def download_trainers(self, index):
-        self.disable_download_widgets()
-        self.downloadListBox.clear()
-        self.downloadable = False
-        self.searchable = False
-
-        download_thread = DownloadTrainersThread(index, self.trainerPath, self.trainers, self)
-        download_thread.message.connect(self.on_message)
-        download_thread.messageBox.connect(self.on_message_box)
-        download_thread.finished.connect(self.on_download_finished)
-        download_thread.start()
+        self.enqueue_download(index, self.trainers, self.trainerDownloadPath, False, None, None)
 
     def on_message_box(self, type, title, text):
         if type == "info":
@@ -376,36 +370,65 @@ class GameCheatsManager(QMainWindow):
         self.searchable = True
         self.enable_download_widgets()
         self.show_cheats()
+        self.currentlyDownloading = False
+        self.start_next_download()
 
     def on_main_interval(self):
-        fetch_main_site_thread = FetchFlingSite(self)
-        fetch_main_site_thread.message.connect(self.on_status_load)
-        fetch_main_site_thread.update.connect(self.on_status_update)
-        fetch_main_site_thread.error.connect(self.on_status_error)
-        fetch_main_site_thread.finished.connect(self.on_interval_finished)
-        fetch_main_site_thread.start()
+        fetch_fling_site_thread = FetchFlingSite(self)
+        fetch_fling_site_thread.message.connect(self.on_status_load)
+        fetch_fling_site_thread.update.connect(self.on_status_update)
+        fetch_fling_site_thread.finished.connect(self.on_interval_finished)
+        fetch_fling_site_thread.start()
 
-        fetch_main_site_thread = FetchTrainerDetails(self)
-        fetch_main_site_thread.message.connect(self.on_status_load)
-        fetch_main_site_thread.messageBox.connect(self.on_message_box)
-        fetch_main_site_thread.finished.connect(self.on_interval_finished)
-        fetch_main_site_thread.start()
+        fetch_trainer_details_thread = FetchTrainerDetails(self)
+        fetch_trainer_details_thread.message.connect(self.on_status_load)
+        fetch_trainer_details_thread.update.connect(self.on_status_update)
+        fetch_trainer_details_thread.finished.connect(self.on_interval_finished)
+        fetch_trainer_details_thread.start()
 
-    def on_status_load(self, message):
-        statusWidget = StatusMessageWidget(message, "load")
+        trainer_update_thread = UpdateTrainers(self.trainers, self)
+        trainer_update_thread.message.connect(self.on_status_load)
+        trainer_update_thread.update.connect(self.on_trainer_update)
+        trainer_update_thread.finished.connect(self.on_interval_finished)
+        trainer_update_thread.start()
+
+    def on_status_load(self, widgetName, message):
+        statusWidget = StatusMessageWidget(widgetName, message)
         self.statusbar.addWidget(statusWidget)
-    
-    def on_status_error(self, message):
-        statusWidget = StatusMessageWidget(message, "error")
-        self.statusbar.addWidget(statusWidget)
 
-    def on_status_update(self, widgetName, newMessage):
+    def on_status_update(self, widgetName, newMessage, state):
         target = self.findWidgetInStatusBar(self.statusbar, widgetName)
-        target.update_message(newMessage)
+        target.update_message(newMessage, state)
 
     def on_interval_finished(self, widgetName):
         target = self.findWidgetInStatusBar(self.statusbar, widgetName)
-        target.deleteLater()
+        if target:
+            target.deleteLater()
+    
+    def on_trainer_update(self, trainerPath, updateUrl):
+        self.enqueue_download(None, None, self.trainerDownloadPath, True, trainerPath, updateUrl)
+    
+    def enqueue_download(self, index, trainers, trainerDownloadPath, update, trainerPath, updateUrl):
+        self.downloadQueue.put((index, trainers, trainerDownloadPath, update, trainerPath, updateUrl))
+        if not self.currentlyDownloading:
+            self.start_next_download()
+
+    def start_next_download(self):
+        if not self.downloadQueue.empty():
+            self.currentlyDownloading = True
+            self.disable_download_widgets()
+            self.downloadListBox.clear()
+            self.downloadable = False
+            self.searchable = False
+
+            index, trainers, trainerDownloadPath, update, trainerPath, updateUrl = self.downloadQueue.get()
+            download_thread = DownloadTrainersThread(index, trainers, trainerDownloadPath, update, trainerPath, updateUrl, self)
+            download_thread.message.connect(self.on_message)
+            download_thread.messageBox.connect(self.on_message_box)
+            download_thread.finished.connect(self.on_download_finished)
+            download_thread.start()
+        else:
+            self.currentlyDownloading = False
 
     # ===========================================================================
     # Menu functions
@@ -422,13 +445,13 @@ class GameCheatsManager(QMainWindow):
         file_names, _ = QFileDialog.getOpenFileNames(self, tr("Select trainers you want to import"), "", "Executable Files (*.exe)")
         if file_names:
             for file_name in file_names:
-                dest_path = os.path.join(self.trainerPath, os.path.basename(file_name))
+                dest_path = os.path.join(self.trainerDownloadPath, os.path.basename(file_name))
                 shutil.move(file_name, dest_path)
                 print("Trainer moved: ", file_name)
             self.show_cheats()
 
     def open_trainer_directory(self):
-        os.startfile(self.trainerPath)
+        os.startfile(self.trainerDownloadPath)
 
     def open_about(self):
         if self.about_window is not None and self.about_window.isVisible():

@@ -67,6 +67,9 @@ msgstr "初始化翻譯..."
 msgid "Translation request failed with status code: "
 msgstr "翻譯請求失敗，狀態碼為："
 
+msgid "Checking for trainer updates"
+msgstr "正在檢查修改器更新"
+
 msgid "Updating data from FLiNG"
 msgstr "正在更新風靈月影數據庫"
 
@@ -106,6 +109,9 @@ msgstr "搜索成功！"
 msgid "Search failed, please wait until all data is updated from FLiNG."
 msgstr "蒐索失敗，請等待風靈月影數據庫完成更新。"
 
+msgid "Updating "
+msgstr "正在更新"
+
 msgid "Translating trainer name..."
 msgstr "翻譯修改器名稱..."
 
@@ -134,14 +140,14 @@ msgstr ""
 "需要執行其他操作\n"
 "詳情請查看資料夾！"
 
-msgid "Error"
-msgstr "錯誤"
-
 msgid "Could not find the downloaded trainer file, please try turning your antivirus software off."
 msgstr "找不到下載的修改器，請嘗試關閉防毒軟體。"
 
 msgid "Removing trainer background music..."
 msgstr "刪除修改器背景音樂..."
+
+msgid "Trainer is currently in use, please close any programs using the file and try again."
+msgstr "修改器目前正在使用中，請關閉使用該檔案的所有程式，然後重試。"
 
 msgid "Download success!"
 msgstr "下載成功！"
@@ -172,6 +178,9 @@ msgstr "刪除"
 
 msgid "Change trainer download path"
 msgstr "更改修改器下載路徑"
+
+msgid "Error"
+msgstr "錯誤"
 
 msgid "Please choose a new path."
 msgstr "請選擇一個新路徑。"

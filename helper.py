@@ -1,4 +1,5 @@
 import concurrent.futures
+import datetime
 import gettext
 import json
 import locale
@@ -10,17 +11,19 @@ import sys
 import tempfile
 import time
 from urllib.parse import urljoin, urlparse
+import uuid
 import zipfile
 
 from bs4 import BeautifulSoup
 from fuzzywuzzy import fuzz, process
 import polib
 from PyQt6.QtCore import Qt, QEventLoop, QThread, QTimer, pyqtSignal, QUrl
-from PyQt6.QtGui import QIcon, QMovie, QPixmap
+from PyQt6.QtGui import QIcon, QPixmap
 from PyQt6.QtWebEngineCore import QWebEngineDownloadRequest
 from PyQt6.QtWebEngineWidgets import QWebEngineView
 from PyQt6.QtWidgets import QDialog, QCheckBox, QVBoxLayout, QHBoxLayout, QPushButton, QComboBox, QLabel, QLineEdit, QMessageBox, QFileDialog, QWidget
 import requests
+ts = None
 
 
 def resource_path(relative_path):
@@ -109,7 +112,13 @@ if not os.path.exists(setting_path):
 
 SETTINGS_FILE = os.path.join(setting_path, "settings.json")
 DATABASE_PATH = os.path.join(setting_path, "db")
+DOWNLOAD_TEMP_DIR = os.path.join(tempfile.gettempdir(), "GameCheatsManagerTemp", "download")
+VERSION_TEMP_DIR = os.path.join(tempfile.gettempdir(), "GameCheatsManagerTemp", "version")
 os.makedirs(DATABASE_PATH, exist_ok=True)
+
+resourceHacker_path = resource_path("dependency/ResourceHacker.exe")
+unrar_path = resource_path("dependency/UnRAR.exe")
+emptyMidi_path = resource_path("dependency/TrainerBGM.mid")
 
 settings = load_settings()
 tr = get_translator()
@@ -290,36 +299,42 @@ class PathChangeThread(QThread):
 
 
 class StatusMessageWidget(QWidget):
-    def __init__(self, message, type):
+    def __init__(self, widgetName, message):
         super().__init__()
-        self.setObjectName(message)
-        layout = QHBoxLayout()
-        layout.setSpacing(3)
-        self.setLayout(layout)
+        self.setObjectName(widgetName)
+
+        self.layout = QHBoxLayout()
+        self.layout.setSpacing(3)
+        self.setLayout(self.layout)
 
         self.messageLabel = QLabel(message)
-        layout.addWidget(self.messageLabel)
+        self.layout.addWidget(self.messageLabel)
 
-        if type == "load":
-            self.loadingLabel = QLabel(".")
-            self.loadingLabel.setFixedWidth(10)
-            layout.addWidget(self.loadingLabel)
+        self.loadingLabel = QLabel(".")
+        self.loadingLabel.setFixedWidth(20)
+        self.layout.addWidget(self.loadingLabel)
 
-            self.timer = QTimer(self)
-            self.timer.timeout.connect(self.update_loading_animation)
-            self.timer.start(500)
-
-        elif type == "error":
-            self.messageLabel.setStyleSheet("QLabel { color: red; }")
+        self.timer = QTimer(self)
+        self.timer.timeout.connect(self.update_loading_animation)
+        self.timer.start(500)
 
     def update_loading_animation(self):
         current_text = self.loadingLabel.text()
         new_text = '.' * ((len(current_text) % 3) + 1)
         self.loadingLabel.setText(new_text)
-    
-    def update_message(self, newMessage):
-        self.setObjectName(newMessage)
+
+    def update_message(self, newMessage, state="load"):
         self.messageLabel.setText(newMessage)
+        if state == "load":
+            if not self.loadingLabel.isVisible():
+                self.loadingLabel.show()
+            if not self.timer.isActive():
+                self.timer.start(500)
+            self.messageLabel.setStyleSheet("")
+        elif state == "error":
+            self.timer.stop()
+            self.loadingLabel.hide()
+            self.messageLabel.setStyleSheet("QLabel { color: red; }")
 
 
 class BrowserDialog(QDialog):
@@ -411,6 +426,7 @@ class DownloadBaseThread(QThread):
     headers = {
         'User-Agent': 'Mozilla/5.0 (Windows NT 10.0; Win64; x64) AppleWebKit/537.36 (KHTML, like Gecko) Chrome/58.0.3029.110 Safari/537.3',
     }
+    translator_initialized = False
     
     def __init__(self, parent=None):
         super().__init__(parent)
@@ -423,6 +439,9 @@ class DownloadBaseThread(QThread):
         self.browser_dialog.download_completed.connect(self.handle_download_completed)
 
     def get_webpage_content(self, url, target_text):
+        if not self.is_internet_connected():
+            return ""
+        
         req = requests.get(url, headers=self.headers)
 
         if req.status_code != 200:
@@ -527,9 +546,12 @@ class DownloadBaseThread(QThread):
     def initialize_translator(self):
         try:
             global ts
-            if "translators" not in sys.modules:
-                self.message.emit(tr("Initializing translator..."), None)
-                import translators as ts
+            if ts is None:
+                if not self.translator_initialized:
+                    self.message.emit(tr("Initializing translator..."), None)
+                    self.translator_initialized = True
+                import translators as trans
+                ts = trans
             ts.translate_text("test")
         except Exception as e:
             print("import translators failed or error occurred while translating: " + str(e))
@@ -662,96 +684,151 @@ class DownloadBaseThread(QThread):
             with open(json_file, 'r', encoding='utf-8') as file:
                 return json.load(file)
         return ""
-    
-    def on_check_update(self):
+
+        
+class UpdateTrainers(DownloadBaseThread):
+    message = pyqtSignal(str, str)
+    update = pyqtSignal(str, str)
+    finished = pyqtSignal(str)
+
+    def __init__(self, trainers, parent=None):
+        super().__init__(parent)
+        self.trainers = trainers
+
+    def run(self):
+        statusWidgetName = "trainerUpdate"
+        self.message.emit(statusWidgetName, tr("Checking for trainer updates"))
+
+        with concurrent.futures.ThreadPoolExecutor(max_workers=5) as executor:
+            futures = [executor.submit(self.process_trainer, trainerPath) for trainerPath in self.trainers.values()]
+
+            for future in concurrent.futures.as_completed(futures):
+                result = future.result()
+                if result:
+                    trainerPath, update_url = result
+                    self.update.emit(trainerPath, update_url)
+        
+        self.finished.emit(statusWidgetName)
+
+    def process_trainer(self, trainerPath):
         # The binary pattern representing "FLiNGTrainerNamedPipe_" followed by some null bytes and the date
         pattern_hex = '46 00 4c 00 69 00 4E 00 47 00 54 00 72 00 61 00 69 00 6E 00 65 00 72 00 4E 00 61 00 6D 00 65 00 64 00 50 00 69 00 70 00 65 00 5F'
-        # Convert the hex pattern to binary
         pattern = bytes.fromhex(''.join(pattern_hex.split()))
+        tagName = self.get_product_name(trainerPath)
 
-        for index, trainerPath in enumerate(self.trainers.values()):
-            trainerBuildDate = ""
-            checkUpdateUrl = "https://flingtrainer.com/tag/"
-
-            with open(trainerPath, 'rb') as file:
-                content = file.read()
-                pattern_index = content.find(pattern)
-
-                if pattern_index == -1:
-                    continue
-
-                # Find the start of the date string after the pattern and skip null bytes (00)
+        with open(trainerPath, 'rb') as file:
+            content = file.read()
+            pattern_index = content.find(pattern)
+            if pattern_index != -1:
                 start_index = pattern_index + len(pattern)
                 while content[start_index] == 0:
                     start_index += 1
 
                 # The date could be "Mar  8 2024" or "Dec 10 2022"
                 date_match = re.search(rb'\b(?:Jan|Feb|Mar|Apr|May|Jun|Jul|Aug|Sep|Oct|Nov|Dec)\s+\d{1,2}\s+\d{4}\b', content[start_index:])
-                
-                if date_match:
-                    trainerBuildDate = date_match.group().decode('utf-8')
-                    # print(trainerBuildDate)
+                if date_match and tagName:
+                    trainerSrcDate = datetime.datetime.strptime(date_match.group().decode('utf-8'), '%b %d %Y')
 
-                    # extract trainer name
+                    page_content = self.get_webpage_content(f"https://flingtrainer.com/tag/{tagName}", "FLiNG Trainer")
+                    tagPage = BeautifulSoup(page_content, 'html.parser')
+
+                    entry_div = tagPage.find('div', class_='entry')
+                    if entry_div:
+                        match = re.search(r'Last Updated:\s+(\d+\.\d+\.\d+)', entry_div.text)
+                        if match:
+                            trainerDstDate = datetime.datetime.strptime(match.group(1), '%Y.%m.%d')
+                            print(f"{tagName}\nTrainer source date: {trainerSrcDate.strftime('%Y-%m-%d')}\nNewest build date: {trainerDstDate.strftime('%Y-%m-%d')}\n")
+                            
+                            if trainerDstDate > trainerSrcDate:
+                                update_url = tagPage.find('a', href=True, rel='bookmark')['href']
+                                return trainerPath, update_url
+        return None
+    
+    def get_product_name(self, trainerPath):
+        os.makedirs(VERSION_TEMP_DIR, exist_ok=True)
+        unique_id = uuid.uuid4().hex
+        temp_version_info = os.path.join(VERSION_TEMP_DIR, f"version_info_{unique_id}.rc")
+
+        # Command to extract version information using Resource Hacker
+        command = [resourceHacker_path, "-open", trainerPath, "-save",
+                   temp_version_info, "-action", "extract", "-mask", "VERSIONINFO,,"]
+        subprocess.run(command, stdout=subprocess.DEVNULL, stderr=subprocess.DEVNULL, creationflags=subprocess.CREATE_NO_WINDOW)
+
+        product_name = None
+        with open(temp_version_info, 'r', encoding='utf-16') as file:
+            file_content = file.read()
+
+        match = re.search(r'VALUE "ProductName", "(.*?)"', file_content)
+        if match:
+            product_name = match.group(1)
+        os.remove(temp_version_info)
+
+        # Parse only the game name
+        tag_name = None
+        match = re.search(r'^(.*?)(\s+v\d+|\s+Early Access)', product_name)
+        if match:
+            tag_name = match.group(1).lower().replace(" ", "-")
+
+        return tag_name
 
 
 class FetchFlingSite(DownloadBaseThread):
-    message = pyqtSignal(str)
-    update = pyqtSignal(str, str)
-    error = pyqtSignal(str)
+    message = pyqtSignal(str, str)
+    update = pyqtSignal(str, str, str)
     finished = pyqtSignal(str)
 
     def __init__(self, parent=None):
         super().__init__(parent)
 
     def run(self):
+        statusWidgetName = "fling"
         update_message1 = tr("Updating data from FLiNG") + " (1/2)"
         update_failed1 = tr("Update from FLiGN failed") + " (1/2)"
         update_message2 = tr("Updating data from FLiNG") + " (2/2)"
         update_failed2 = tr("Update from FLiGN failed") + " (2/2)"
 
-        self.message.emit(update_message1)
+        self.message.emit(statusWidgetName, update_message1)
         url = "https://archive.flingtrainer.com/"
         page_content = self.get_webpage_content(url, "FLiNG Trainers Archive")
         if not page_content:
-            self.error.emit(update_failed1)
+            self.update.emit(statusWidgetName, update_failed1, "error")
             time.sleep(2)
-            self.finished.emit(update_failed1)
         else:
             self.save_html_content(page_content, "fling_archive.html")
 
-        self.update.emit(update_message1, update_message2)
+        self.update.emit(statusWidgetName, update_message2, "load")
         url = "https://flingtrainer.com/all-trainers-a-z/"
         page_content = self.get_webpage_content(url, "All Trainers (A-Z)")
         if not page_content:
-            self.error.emit(update_failed2)
+            self.update.emit(statusWidgetName, update_failed2, "error")
             time.sleep(2)
-            self.finished.emit(update_failed2)
         else:
             self.save_html_content(page_content, "fling_main.html")
 
-        self.finished.emit(update_message2)
+        self.finished.emit(statusWidgetName)
 
 
 class FetchTrainerDetails(DownloadBaseThread):
-    message = pyqtSignal(str)
-    error = pyqtSignal(str)
+    message = pyqtSignal(str, str)
+    update = pyqtSignal(str, str, str)
     finished = pyqtSignal(str)
 
     def __init__(self, parent=None):
         super().__init__(parent)
 
     def run(self):
+        statusWidgetName = "details"
         fetch_message = tr("Fetching trainer translations")
         fetch_error = tr("Fetch trainer translations failed")
 
-        self.message.emit(fetch_message)
-        index_page = "https://dl.fucnm.com/datafile/xgqdetail/index.txt"
-        total_pages_response = requests.get(index_page, headers=self.headers)
-        if total_pages_response.status_code == 200:
-            total_pages = total_pages_response.json().get("page")
-        else:
-            total_pages = ""
+        self.message.emit(statusWidgetName, fetch_message)
+        total_pages = ""
+
+        if self.is_internet_connected():
+            index_page = "https://dl.fucnm.com/datafile/xgqdetail/index.txt"
+            total_pages_response = requests.get(index_page, headers=self.headers)
+            if total_pages_response.status_code == 200:
+                total_pages = total_pages_response.json().get("page", "")
 
         if total_pages:
             with concurrent.futures.ThreadPoolExecutor(max_workers=5) as executor:
@@ -820,6 +897,66 @@ class FetchTrainerDetails(DownloadBaseThread):
                     "en_name": "Far Cry 5",
                     "keyw": "孤岛惊魂5",
                 },
+                {
+                    "en_name": "Digimon Story Cyber Sleuth: Complete Edition",
+                    "keyw": "数码宝贝物语：网路侦探骇客追忆",
+                },
+                {
+                    "en_name": "The Legend of Heroes: Trails into Reverie",
+                    "keyw": "英雄传说：创之轨迹",
+                },
+                {
+                    "en_name": "Final Fantasy (Pixel Remaster)",
+                    "keyw": "最终幻想 像素复刻版",
+                },
+                {
+                    "en_name": "Final Fantasy II (Pixel Remaster)",
+                    "keyw": "最终幻想2 像素复刻版",
+                },
+                {
+                    "en_name": "Final Fantasy III (Pixel Remaster)",
+                    "keyw": "最终幻想3 像素复刻版",
+                },
+                {
+                    "en_name": "Final Fantasy IV (Pixel Remaster)",
+                    "keyw": "最终幻想4 像素复刻版",
+                },
+                {
+                    "en_name": "Final Fantasy V (Pixel Remaster)",
+                    "keyw": "最终幻想5 像素复刻版",
+                },
+                {
+                    "en_name": "Final Fantasy VI (Pixel Remaster)",
+                    "keyw": "最终幻想6 像素复刻版",
+                },
+                {
+                    "en_name": "Final Fantasy IV The After Years",
+                    "keyw": "最终幻想4：月之归还",
+                },
+                {
+                    "en_name": "Halo: The Master Chief Collection (Halo 2: Anniversary)",
+                    "keyw": "光环：士官长合集（光环2：周年版）",
+                },
+                {
+                    "en_name": "Halo: The Master Chief Collection (Halo: CE Anniversary)",
+                    "keyw": "光环：士官长合集（光环：战斗进化周年版）",
+                },
+                {
+                    "en_name": "Halo: The Master Chief Collection (Halo: Reach) Trainer",
+                    "keyw": "光环：士官长合集（光环：致远星）",
+                },
+                {
+                    "en_name": "Dishonored-The Knife of Dunwall",
+                    "keyw": "耻辱 顿沃城之锋",
+                },
+                {
+                    "en_name": "Mark of the Ninja",
+                    "keyw": "忍者印记",
+                },
+                {
+                    "en_name": "Risen 2 Dark Waters",
+                    "keyw": "崛起2：黑暗水域",
+                },
             ]
             all_data.extend(additions)
 
@@ -828,11 +965,10 @@ class FetchTrainerDetails(DownloadBaseThread):
                 json.dump(all_data, file, ensure_ascii=False, indent=4)
 
         else:
-            self.error.emit(fetch_error)
+            self.update.emit(statusWidgetName, fetch_error, "error")
             time.sleep(2)
-            self.finished.emit(fetch_error)
         
-        self.finished.emit(fetch_message)
+        self.finished.emit(statusWidgetName)
     
     def fetch_page(self, page_number):
         trainer_detail_page = f"https://dl.fucnm.com/datafile/xgqdetail/list_{page_number}.txt"
@@ -1013,7 +1149,7 @@ class DownloadDisplayThread(DownloadBaseThread):
             # parse trainer name
             rawTrainerName = link.get_text()
             parsedTrainerName = re.sub(
-                r' v.*|\.\bv.*| \d+\.\d+\.\d+.*| Plus\s\d+.*|Build\s\d+.*|(\d+\.\d+-Update.*)|Update\s\d+.*|\(Update\s.*| Early Access .*|\.Early.Access.*', '', rawTrainerName).replace("_", ": ")
+                r' v[\d.]+.*|\.\bv.*| \d+\.\d+\.\d+.*| Plus\s\d+.*|Build\s\d+.*|(\d+\.\d+-Update.*)|Update\s\d+.*|\(Update\s.*| Early Access .*|\.Early.Access.*', '', rawTrainerName).replace("_", ": ")
             trainerName = parsedTrainerName.strip() + " Trainer"
 
             # search algorithm
@@ -1063,51 +1199,65 @@ class DownloadDisplayThread(DownloadBaseThread):
 
 
 class DownloadTrainersThread(DownloadBaseThread):
-    def __init__(self, index, trainerPath, trainers, parent=None):
+    def __init__(self, index, trainers, trainerDownloadPath, update, trainerPath, updateUrl, parent=None):
         super().__init__(parent)
         self.index = index
-        self.trainerPath = trainerPath
         self.trainers = trainers
-        self.tempDir = os.path.join(tempfile.gettempdir(), "GameCheatsManagerTemp")
-        self.resourceHacker_path = resource_path("dependency/ResourceHacker.exe")
-        self.unrar_path = resource_path("dependency/UnRAR.exe")
-        self.emptyMidi_path = resource_path("dependency/TrainerBGM.mid")
+        self.trainerDownloadPath = trainerDownloadPath
+        self.update = update
+        self.trainerPath = trainerPath
+        self.updateUrl = updateUrl
+        self.download_finish_delay = 0.5
 
     def run(self):
-        if os.path.exists(self.tempDir):
-            shutil.rmtree(self.tempDir)
+        if os.path.exists(DOWNLOAD_TEMP_DIR):
+            shutil.rmtree(DOWNLOAD_TEMP_DIR)
+        
+        if self.update:
+            self.trainerName = os.path.splitext(os.path.basename(self.trainerPath))[0]
+            self.message.emit(tr("Updating ") + self.trainerName + "...", None)
 
-        # Extract final file link
-        trainer_list = list(DownloadBaseThread.trainer_urls.items())
-        filename = trainer_list[self.index][0]
-        mFilename = filename.replace(':', ' -')
-        if "/" in mFilename:
-            mFilename = mFilename.split("/")[1]
-        self.message.emit(tr("Translating trainer name..."), None)
-        trans_mFilename = self.translate_trainer(mFilename)
+        # Trainer name check
+        if not self.update:
+            trainer_list = list(DownloadBaseThread.trainer_urls.items())
+            filename = trainer_list[self.index][0]
+            mFilename = filename.replace(':', ' -')
+            if "/" in mFilename:
+                mFilename = mFilename.split("/")[1]
+            self.message.emit(tr("Translating trainer name..."), None)
+            trans_mFilename = self.translate_trainer(mFilename)
 
-        for trainerPath in self.trainers.keys():
-            if mFilename in trainerPath or trans_mFilename in trainerPath:
-                self.message.emit(tr("Trainer already exists, aborted download."), "failure")
-                self.finished.emit(1)
-                return
+            for trainerPath in self.trainers.keys():
+                if mFilename in trainerPath or trans_mFilename in trainerPath:
+                    self.message.emit(tr("Trainer already exists, aborted download."), "failure")
+                    time.sleep(self.download_finish_delay)
+                    self.finished.emit(1)
+                    return
+        else:
+            mFilename = self.trainerName
+            trans_mFilename = self.trainerName
 
         # Download trainer
         self.message.emit(tr("Downloading..."), None)
         try:
             # Additional trainer file extraction for trainers from main site
-            targetUrl = DownloadBaseThread.trainer_urls[filename]
+            if not self.update:
+                targetUrl = DownloadBaseThread.trainer_urls[filename]
+            else:
+                targetUrl = self.updateUrl
+
             domain = urlparse(targetUrl).netloc
             if domain == "flingtrainer.com":
                 page_content = self.get_webpage_content(targetUrl, "FLiNG Trainer")
                 trainerPage = BeautifulSoup(page_content, 'html.parser')
                 targetUrl = trainerPage.find(target="_self").get("href")
             
-            os.makedirs(self.tempDir, exist_ok=True)
-            trainerTemp = self.request_download(targetUrl, self.tempDir, mFilename)
+            os.makedirs(DOWNLOAD_TEMP_DIR, exist_ok=True)
+            trainerTemp = self.request_download(targetUrl, DOWNLOAD_TEMP_DIR, mFilename)
 
         except Exception as e:
             self.message.emit(tr("An error occurred while downloading trainer: ") + str(e), "failure")
+            time.sleep(self.download_finish_delay)
             self.finished.emit(1)
             return
         
@@ -1120,6 +1270,7 @@ class DownloadTrainersThread(DownloadBaseThread):
             time.sleep(1)
         if not found_trainer:
             self.message.emit(tr("Downloaded file not found."), "failure")
+            time.sleep(self.download_finish_delay)
             self.finished.emit(1)
             return
 
@@ -1128,41 +1279,43 @@ class DownloadTrainersThread(DownloadBaseThread):
         extension = os.path.splitext(trainerTemp)[1]
         try:
             if extension == ".rar":
-                command = [self.unrar_path, "x", "-y", trainerTemp, self.tempDir]
+                command = [unrar_path, "x", "-y", trainerTemp, DOWNLOAD_TEMP_DIR]
                 subprocess.run(command, check=True,
                                creationflags=subprocess.CREATE_NO_WINDOW)
             elif extension == ".zip":
                 with zipfile.ZipFile(trainerTemp, 'r') as zip_ref:
-                    zip_ref.extractall(self.tempDir)
+                    zip_ref.extractall(DOWNLOAD_TEMP_DIR)
 
         except Exception as e:
             self.message.emit(tr("An error occurred while extracting downloaded trainer: ") + str(e), "failure")
+            time.sleep(self.download_finish_delay)
             self.finished.emit(1)
             return
 
         # Locate extracted .exe file
         cnt = 0
         gameRawName = None
-        for filename in os.listdir(self.tempDir):
-            if "Trainer" in filename and filename.endswith(".exe"):
+        for filename in os.listdir(DOWNLOAD_TEMP_DIR):
+            if "trainer" in filename.lower() and filename.endswith(".exe"):
                 gameRawName = filename
-            elif "Trainer" not in filename:
+            elif "trainer" not in filename.lower():
                 cnt += 1
         # Warn user if extra files found
         if cnt > 0:
             self.messageBox.emit("info", tr("Attention"), tr("Additional actions required\nPlease check folder for details!"))
-            os.startfile(self.tempDir)
+            os.startfile(DOWNLOAD_TEMP_DIR)
 
         # Check if gameRawName is None
         if not gameRawName:
-            self.messageBox.emit("error", tr("Error"), tr("Could not find the downloaded trainer file, please try turning your antivirus software off."))
+            self.message.emit(tr("Could not find the downloaded trainer file, please try turning your antivirus software off."), "failure")
+            time.sleep(self.download_finish_delay)
             self.finished.emit(1)
             return
 
-        os.makedirs(self.trainerPath, exist_ok=True)
+        os.makedirs(self.trainerDownloadPath, exist_ok=True)
         trainer_name = trans_mFilename + ".exe"
-        source_file = os.path.join(self.tempDir, gameRawName)
-        destination_file = os.path.join(self.trainerPath, trainer_name)
+        source_file = os.path.join(DOWNLOAD_TEMP_DIR, gameRawName)
+        destination_file = os.path.join(self.trainerDownloadPath, trainer_name)
 
         # remove fling trainer bg music
         self.message.emit(tr("Removing trainer background music..."), None)
@@ -1173,16 +1326,23 @@ class DownloadTrainersThread(DownloadBaseThread):
         try:
             shutil.move(source_file, destination_file)
             os.remove(trainerTemp)
-            rhLog = os.path.join(self.tempDir, "rh.log")
+            rhLog = os.path.join(DOWNLOAD_TEMP_DIR, "rh.log")
             if os.path.exists(rhLog):
                 os.remove(rhLog)
 
+        except PermissionError as e:
+            self.message.emit(tr("Trainer is currently in use, please close any programs using the file and try again."), "failure")
+            time.sleep(self.download_finish_delay)
+            self.finished.emit(1)
+            return
         except Exception as e:
-            self.messageBox.emit("error", tr("Error"), tr("Could not find the downloaded trainer file, please try turning your antivirus software off."))
+            self.message.emit(tr("Could not find the downloaded trainer file, please try turning your antivirus software off."), "failure")
+            time.sleep(self.download_finish_delay)
             self.finished.emit(1)
             return
         
         self.message.emit(tr("Download success!"), "success")
+        time.sleep(self.download_finish_delay)
         self.finished.emit(0)
     
     def modify_fling_settings(self):
@@ -1191,7 +1351,7 @@ class DownloadTrainersThread(DownloadBaseThread):
         flingSettings_path = f"C:/Users/{username}/Documents/FLiNGTrainer"
         bgMusic_path = os.path.join(flingSettings_path, "TrainerBGM.mid")
         if os.path.exists(bgMusic_path):
-            shutil.copyfile(self.emptyMidi_path, bgMusic_path)
+            shutil.copyfile(emptyMidi_path, bgMusic_path)
 
         # change fling settings to disable startup music
         settingFiles = [
@@ -1221,10 +1381,10 @@ class DownloadTrainersThread(DownloadBaseThread):
         resource_type = resource_type_list.pop(0)
 
         # Define paths and files
-        tempLog = os.path.join(self.tempDir, "rh.log")
+        tempLog = os.path.join(DOWNLOAD_TEMP_DIR, "rh.log")
 
         # Remove background music from executable
-        command = [self.resourceHacker_path, "-open", source_exe, "-save", source_exe,
+        command = [resourceHacker_path, "-open", source_exe, "-save", source_exe,
                    "-action", "delete", "-mask", f"{resource_type},,", "-log", tempLog]
         subprocess.run(command, creationflags=subprocess.CREATE_NO_WINDOW)
 
@@ -1241,8 +1401,8 @@ class DownloadTrainersThread(DownloadBaseThread):
             resource_id = match.group(2)
             locale_id = match.group(3)
             resource = ",".join([resource_type, resource_id, locale_id])
-            command = [self.resourceHacker_path, "-open", source_exe, "-save", source_exe,
-                       "-action", "addoverwrite", "-res", self.emptyMidi_path, "-mask", resource]
+            command = [resourceHacker_path, "-open", source_exe, "-save", source_exe,
+                       "-action", "addoverwrite", "-res", emptyMidi_path, "-mask", resource]
             subprocess.run(command, creationflags=subprocess.CREATE_NO_WINDOW)
         else:
             # Try the next resource type if any remain
