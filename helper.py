@@ -841,6 +841,9 @@ class FetchTrainerDetails(DownloadBaseThread):
                 total_pages = total_pages_response.json().get("page", "")
 
         if total_pages:
+            completed_pages = 0
+            self.update.emit(statusWidgetName, f"{fetch_message} ({completed_pages}/{total_pages})", "load")
+
             with concurrent.futures.ThreadPoolExecutor(max_workers=5) as executor:
                 futures = [executor.submit(self.fetch_page, page) for page in range(1, total_pages + 1)]
                 all_data = []
@@ -848,6 +851,8 @@ class FetchTrainerDetails(DownloadBaseThread):
                     result = future.result()
                     if result:
                         all_data.extend(result)
+                    completed_pages += 1
+                    self.update.emit(statusWidgetName, f"{fetch_message} ({completed_pages}/{total_pages})", "load")
             
             # Special cases/additions
             additions = [
@@ -966,6 +971,30 @@ class FetchTrainerDetails(DownloadBaseThread):
                 {
                     "en_name": "Risen 2 Dark Waters",
                     "keyw": "崛起2：黑暗水域",
+                },
+                {
+                    "en_name": "Orcs Must Die 2",
+                    "keyw": "兽人必须死2",
+                },
+                {
+                    "en_name": "Spellforce 2: Faith in Destiny",
+                    "keyw": "咒语力量2：命运信仰",
+                },
+                {
+                    "en_name": "Guilty Gear Xrd Revelator",
+                    "keyw": "罪恶装备：启示者",
+                },
+                {
+                    "en_name": "Ninja Gaiden: Master Collection (Ninja Gaiden Sigma)",
+                    "keyw": "忍者龙剑传：大师合集（忍者龙剑传：西格玛）",
+                },
+                {
+                    "en_name": "Ninja Gaiden: Master Collection (Ninja Gaiden Sigma 2)",
+                    "keyw": "忍者龙剑传：大师合集（忍者龙剑传：西格玛2）",
+                },
+                {
+                    "en_name": "Ninja Gaiden: Master Collection (Ninja Gaiden 3: Razor’s Edge)",
+                    "keyw": "忍者龙剑传：大师合集（忍者龙剑传3：刀锋边缘）",
                 },
             ]
             all_data.extend(additions)

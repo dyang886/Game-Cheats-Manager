@@ -193,6 +193,10 @@ class GameCheatsManager(QMainWindow):
     # ===========================================================================
     # Core functions
     # ===========================================================================
+    def closeEvent(self, event):
+        super().closeEvent(event)
+        os._exit(1)
+
     def init_settings(self):
         if settings["theme"] == "black":
             style = style_sheet.black
@@ -298,29 +302,16 @@ class GameCheatsManager(QMainWindow):
                 return
 
             self.downloadListBox.addItem(tr("Migrating existing trainers..."))
-            self.migration_thread = PathChangeThread(self.trainerDownloadPath, folder, self)
-            self.migration_thread.finished.connect(self.on_migration_finished)
-            self.migration_thread.error.connect(self.on_migration_error)
-            self.migration_thread.start()
+            migration_thread = PathChangeThread(self.trainerDownloadPath, folder, self)
+            migration_thread.finished.connect(self.on_migration_finished)
+            migration_thread.error.connect(self.on_migration_error)
+            migration_thread.start()
         
         else:
             self.downloadListBox.addItem(tr("No path selected."))
             self.enable_all_widgets()
             return
-
-    def on_migration_finished(self, new_path):
-        self.trainerDownloadPath = new_path
-        settings["downloadPath"] = self.trainerDownloadPath
-        apply_settings(settings)
-        self.show_cheats()
-        self.downloadListBox.addItem(tr("Migration complete!"))
-        self.downloadPathEntry.setText(self.trainerDownloadPath)
-        self.enable_all_widgets()
-
-    def on_migration_error(self, error_message):
-        QMessageBox.critical(self, tr("Error"), tr("Error creating the new path: ") + error_message)
-        self.enable_all_widgets()
-
+    
     def download_display(self, keyword):
         self.disable_download_widgets()
         self.downloadListBox.clear()
@@ -331,48 +322,7 @@ class GameCheatsManager(QMainWindow):
         display_thread.message.connect(self.on_message)
         display_thread.finished.connect(self.on_display_finished)
         display_thread.start()
-
-    def on_message(self, message, type=None):
-        item = QListWidgetItem(message)
-
-        if type == "clear":
-            self.downloadListBox.clear()
-        elif type == "success":
-            item.setForeground(QColor('green'))
-            self.downloadListBox.addItem(item)
-        elif type == "failure":
-            item.setForeground(QColor('red'))
-            self.downloadListBox.addItem(item)
-        else:
-            self.downloadListBox.addItem(item)
-
-    def on_display_finished(self, status):
-        # 0: success; 1: failure
-        if status:
-            self.downloadable = False
-        else:
-            self.downloadable = True
-            
-        self.searchable = True
-        self.enable_download_widgets()
-
-    def download_trainers(self, index):
-        self.enqueue_download(index, self.trainers, self.trainerDownloadPath, False, None, None)
-
-    def on_message_box(self, type, title, text):
-        if type == "info":
-            QMessageBox.information(self, title, text)
-        elif type == "error":
-            QMessageBox.critical(self, title, text)
     
-    def on_download_finished(self, status):
-        self.downloadable = False
-        self.searchable = True
-        self.enable_download_widgets()
-        self.show_cheats()
-        self.currentlyDownloading = False
-        self.start_next_download()
-
     def on_main_interval(self):
         fetch_fling_site_thread = FetchFlingSite(self)
         fetch_fling_site_thread.message.connect(self.on_status_load)
@@ -392,18 +342,8 @@ class GameCheatsManager(QMainWindow):
         trainer_update_thread.finished.connect(self.on_interval_finished)
         trainer_update_thread.start()
 
-    def on_status_load(self, widgetName, message):
-        statusWidget = StatusMessageWidget(widgetName, message)
-        self.statusbar.addWidget(statusWidget)
-
-    def on_status_update(self, widgetName, newMessage, state):
-        target = self.findWidgetInStatusBar(self.statusbar, widgetName)
-        target.update_message(newMessage, state)
-
-    def on_interval_finished(self, widgetName):
-        target = self.findWidgetInStatusBar(self.statusbar, widgetName)
-        if target:
-            target.deleteLater()
+    def download_trainers(self, index):
+        self.enqueue_download(index, self.trainers, self.trainerDownloadPath, False, None, None)
     
     def on_trainer_update(self, trainerPath, updateUrl):
         self.enqueue_download(None, None, self.trainerDownloadPath, True, trainerPath, updateUrl)
@@ -429,6 +369,70 @@ class GameCheatsManager(QMainWindow):
             download_thread.start()
         else:
             self.currentlyDownloading = False
+
+    def on_message(self, message, type=None):
+        item = QListWidgetItem(message)
+
+        if type == "clear":
+            self.downloadListBox.clear()
+        elif type == "success":
+            item.setForeground(QColor('green'))
+            self.downloadListBox.addItem(item)
+        elif type == "failure":
+            item.setForeground(QColor('red'))
+            self.downloadListBox.addItem(item)
+        else:
+            self.downloadListBox.addItem(item)
+    
+    def on_message_box(self, type, title, text):
+        if type == "info":
+            QMessageBox.information(self, title, text)
+        elif type == "error":
+            QMessageBox.critical(self, title, text)
+    
+    def on_migration_error(self, error_message):
+        QMessageBox.critical(self, tr("Error"), tr("Error creating the new path: ") + error_message)
+        self.enable_all_widgets()
+    
+    def on_migration_finished(self, new_path):
+        self.trainerDownloadPath = new_path
+        settings["downloadPath"] = self.trainerDownloadPath
+        apply_settings(settings)
+        self.show_cheats()
+        self.downloadListBox.addItem(tr("Migration complete!"))
+        self.downloadPathEntry.setText(self.trainerDownloadPath)
+        self.enable_all_widgets()
+
+    def on_display_finished(self, status):
+        # 0: success; 1: failure
+        if status:
+            self.downloadable = False
+        else:
+            self.downloadable = True
+            
+        self.searchable = True
+        self.enable_download_widgets()
+    
+    def on_download_finished(self, status):
+        self.downloadable = False
+        self.searchable = True
+        self.enable_download_widgets()
+        self.show_cheats()
+        self.currentlyDownloading = False
+        self.start_next_download()
+
+    def on_status_load(self, widgetName, message):
+        statusWidget = StatusMessageWidget(widgetName, message)
+        self.statusbar.addWidget(statusWidget)
+
+    def on_status_update(self, widgetName, newMessage, state):
+        target = self.findWidgetInStatusBar(self.statusbar, widgetName)
+        target.update_message(newMessage, state)
+
+    def on_interval_finished(self, widgetName):
+        target = self.findWidgetInStatusBar(self.statusbar, widgetName)
+        if target:
+            target.deleteLater()
 
     # ===========================================================================
     # Menu functions
