@@ -732,16 +732,26 @@ class UpdateTrainers(DownloadBaseThread):
                     page_content = self.get_webpage_content(f"https://flingtrainer.com/tag/{tagName}", "FLiNG Trainer")
                     tagPage = BeautifulSoup(page_content, 'html.parser')
 
-                    entry_div = tagPage.find('div', class_='entry')
-                    if entry_div:
-                        match = re.search(r'Last Updated:\s+(\d+\.\d+\.\d+)', entry_div.text)
-                        if match:
-                            trainerDstDate = datetime.datetime.strptime(match.group(1), '%Y.%m.%d')
-                            print(f"{tagName}\nTrainer source date: {trainerSrcDate.strftime('%Y-%m-%d')}\nNewest build date: {trainerDstDate.strftime('%Y-%m-%d')}\n")
+                    trainerNamesMap = {}  # trainerName: gameContentEntryOnWeb
+                    for game in tagPage.find_all('div', class_='post-content'):
+                        trainerName = self.sanitize(game.find('a', rel='bookmark').text)
+                        trainerNamesMap[trainerName] = game
+
+                    if trainerNamesMap:
+                        best_match, score = process.extractOne(self.sanitize(tagName + "-trainer"), trainerNamesMap.keys())
+                        if score >= 85:
+                            targetGameOgj = trainerNamesMap[best_match]
+                            version_entry = targetGameOgj.find('div', class_='entry')
                             
-                            if trainerDstDate > trainerSrcDate:
-                                update_url = tagPage.find('a', href=True, rel='bookmark')['href']
-                                return trainerPath, update_url
+                            if version_entry:
+                                match = re.search(r'Last Updated:\s+(\d+\.\d+\.\d+)', version_entry.text)
+                                if match:
+                                    trainerDstDate = datetime.datetime.strptime(match.group(1), '%Y.%m.%d')
+                                    print(f"{tagName}\nTrainer source date: {trainerSrcDate.strftime('%Y-%m-%d')}\nNewest build date: {trainerDstDate.strftime('%Y-%m-%d')}\n")
+                                    
+                                    if trainerDstDate > trainerSrcDate:
+                                        update_url = targetGameOgj.find('a', href=True, rel='bookmark')['href']
+                                        return trainerPath, update_url
         return None
     
     def get_product_name(self, trainerPath):
@@ -767,7 +777,7 @@ class UpdateTrainers(DownloadBaseThread):
         tag_name = None
         match = re.search(r'^(.*?)(\s+v\d+|\s+Early Access)', product_name)
         if match:
-            tag_name = match.group(1).lower().replace(" ", "-")
+            tag_name = match.group(1).lower().replace("(", "").replace(")", "").replace(" ", "-")
 
         return tag_name
 
@@ -1300,9 +1310,10 @@ class DownloadTrainersThread(DownloadBaseThread):
                 gameRawName = filename
             elif "trainer" not in filename.lower():
                 cnt += 1
+
         # Warn user if extra files found
-        if cnt > 0:
-            self.messageBox.emit("info", tr("Attention"), tr("Additional actions required\nPlease check folder for details!"))
+        if cnt > 0 and not self.update:
+            self.messageBox.emit("info", tr("Attention"), tr("Please check folder for anti-cheat requirements!"))
             os.startfile(DOWNLOAD_TEMP_DIR)
 
         # Check if gameRawName is None
