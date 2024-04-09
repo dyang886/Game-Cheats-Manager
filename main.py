@@ -40,6 +40,10 @@ class GameCheatsManager(QMainWindow):
         os.makedirs(self.trainerDownloadPath, exist_ok=True)
         
         self.dropDownArrow_path = resource_path("assets/dropdown.png").replace("\\", "/")
+        self.upArrow_path = resource_path("assets/up.png").replace("\\", "/")
+        self.downArrow_path = resource_path("assets/down.png").replace("\\", "/")
+        self.leftArrow_path = resource_path("assets/left.png").replace("\\", "/")
+        self.rightArrow_path = resource_path("assets/right.png").replace("\\", "/")
         
         self.crackFile_path = resource_path("dependency/app.asar")
         self.search_path = resource_path("assets/search.png")
@@ -205,6 +209,10 @@ class GameCheatsManager(QMainWindow):
 
         style = style.format(
             drop_down_arrow=self.dropDownArrow_path,
+            scroll_bar_top=self.upArrow_path,
+            scroll_bar_bottom=self.downArrow_path,
+            scroll_bar_left=self.leftArrow_path,
+            scroll_bar_right=self.rightArrow_path,
         )
         self.setStyleSheet(style)
 

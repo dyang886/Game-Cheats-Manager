@@ -144,4 +144,94 @@ black = """
         background-color: #2a2a2a;
         color: #ffffff;
     }}
+
+    QScrollBar:vertical {{
+        background-color: #2f2f2f;
+        width: 15px;
+        margin: 15px 0 15px 0;
+    }}
+
+    QScrollBar::handle:vertical {{
+        background-color: #636363;
+        min-height: 20px;
+        border-radius: 3px;
+        margin: 0 4px 0 4px;
+    }}
+
+    QScrollBar::handle:vertical:hover {{
+        background-color: #6f6f6f;
+    }}
+
+    QScrollBar::handle:vertical:pressed {{
+        background-color: #5c5c5c;
+    }}
+
+    QScrollBar::sub-line:vertical {{
+        image: url({scroll_bar_top});
+        background-color: #2f2f2f;
+        height: 15px;
+        border-top-left-radius: 7px;
+        border-top-right-radius: 7px;
+        subcontrol-position: top;
+        subcontrol-origin: margin;
+    }}
+
+    QScrollBar::add-line:vertical {{
+        image: url({scroll_bar_bottom});
+        background-color: #2f2f2f;
+        height: 15px;
+        border-bottom-left-radius: 7px;
+        border-bottom-right-radius: 7px;
+        subcontrol-position: bottom;
+        subcontrol-origin: margin;
+    }}
+
+    QScrollBar::add-page:vertical, QScrollBar::sub-page:vertical {{
+        background: none;
+    }}
+
+    QScrollBar:horizontal {{
+        background-color: #2f2f2f;
+        height: 15px;
+        margin: 0 15px 0 15px;
+    }}
+
+    QScrollBar::handle:horizontal {{
+        background-color: #636363;
+        min-width: 20px;
+        border-radius: 3px;
+        margin: 4px 0 4px 0;
+    }}
+
+    QScrollBar::handle:horizontal:hover {{
+        background-color: #6f6f6f;
+    }}
+
+    QScrollBar::handle:horizontal:pressed {{
+        background-color: #5c5c5c;
+    }}
+
+    QScrollBar::sub-line:horizontal {{
+        image: url({scroll_bar_left});
+        background-color: #2f2f2f;
+        width: 15px;
+        border-top-left-radius: 7px;
+        border-bottom-left-radius: 7px;
+        subcontrol-position: left;
+        subcontrol-origin: margin;
+    }}
+
+    QScrollBar::add-line:horizontal {{
+        image: url({scroll_bar_right});
+        background-color: #2f2f2f;
+        width: 15px;
+        border-top-right-radius: 7px;
+        border-bottom-right-radius: 7px;
+        subcontrol-position: right;
+        subcontrol-origin: margin;
+    }}
+
+    QScrollBar::add-page:horizontal, QScrollBar::sub-page:horizontal {{
+        background: none;
+    }}
 """

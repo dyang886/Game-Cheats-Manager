@@ -243,4 +243,24 @@ additions = [
         "en_name": "Alan Wake",
         "keyw": "心灵杀手",
     },
+    {
+        "en_name": "Fable III",
+        "keyw": "神鬼寓言3",
+    },
+    {
+        "en_name": "Port Royale 3",
+        "keyw": "海商王3",
+    },
+    {
+        "en_name": "Viking: Battle for Asgard",
+        "keyw": "维京：神域之战",
+    },
+    {
+        "en_name": "Battlefield Hardline",
+        "keyw": "战地：硬仗",
+    },
+    {
+        "en_name": "Battlefield 4",
+        "keyw": "战地4",
+    },
 ]

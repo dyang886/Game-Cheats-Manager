@@ -742,16 +742,15 @@ class UpdateTrainers(DownloadBaseThread):
             return None
 
         product_name = None
+        tag_name = None
         match = re.search(r'VALUE "ProductName", "(.*?)"', file_content)
+        os.remove(temp_version_info)
         if match:
             product_name = match.group(1)
-        os.remove(temp_version_info)
-
-        # Parse only the game name
-        tag_name = None
-        match = re.search(r'^(.*?)(\s+v\d+|\s+Early Access)', product_name)
-        if match:
-            tag_name = match.group(1).lower().replace("(", "").replace(")", "").replace(" ", "-")
+            # Parse only the game name
+            match = re.search(r'^(.*?)(\s+v\d+|\s+Early Access)', product_name)
+            if match:
+                tag_name = match.group(1).lower().replace("(", "").replace(")", "").replace(" ", "-")
 
         return tag_name
 
@@ -1209,7 +1208,10 @@ class DownloadTrainersThread(DownloadBaseThread):
             with open(settingFile, 'w', encoding='utf-8') as file:
                 for line in lines:
                     if line.strip().startswith('OnLoadMusic'):
-                        file.write('OnLoadMusic=False\n')
+                        if os.path.basename(settingFile) == "FLiNGTSettings.ini":
+                            file.write('OnLoadMusic = False\n')
+                        elif os.path.basename(settingFile) == "TrainerSettings.ini":
+                            file.write('OnLoadMusic=False\n')
                     else:
                         file.write(line)
 
