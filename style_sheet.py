@@ -57,6 +57,10 @@ black = """
         color: white;
     }}
 
+    QCheckBox {{
+        color: white;
+    }}
+
     QPushButton {{
         padding: 9px;
         border-radius: 3px;

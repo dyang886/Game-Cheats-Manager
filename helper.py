@@ -16,6 +16,7 @@ import zipfile
 
 from bs4 import BeautifulSoup
 from fuzzywuzzy import fuzz, process
+import pinyin
 import polib
 from PyQt6.QtCore import Qt, QEventLoop, QThread, QTimer, pyqtSignal, QUrl
 from PyQt6.QtGui import QIcon, QPixmap
@@ -24,6 +25,8 @@ from PyQt6.QtWebEngineWidgets import QWebEngineView
 from PyQt6.QtWidgets import QDialog, QCheckBox, QVBoxLayout, QHBoxLayout, QPushButton, QComboBox, QLabel, QLineEdit, QMessageBox, QFileDialog, QWidget
 import requests
 ts = None
+
+import db_additions
 
 
 def resource_path(relative_path):
@@ -68,17 +71,19 @@ def load_settings():
         "language": app_locale,
         "theme": "black",
         "enSearchResults": False,
+        "autoUpdate": True,
         "WeModPath": os.path.join(os.environ["LOCALAPPDATA"], "WeMod")
     }
 
     try:
         with open(SETTINGS_FILE, "r") as f:
             settings = json.load(f)
-    except FileNotFoundError:
+    except Exception as e:
+        print("Error loading settings json" + str(e))
         settings = default_settings
-    else:
-        for key, value in default_settings.items():
-            settings.setdefault(key, value)
+
+    for key, value in default_settings.items():
+        settings.setdefault(key, value)
 
     with open(SETTINGS_FILE, "w") as f:
         json.dump(settings, f)
@@ -103,6 +108,19 @@ def get_translator():
         "Game Cheats Manager", resource_path("locale/"), languages=[lang])
     lang.install()
     return lang.gettext
+
+
+def is_chinese(text):
+    for char in text:
+        if '\u4e00' <= char <= '\u9fff':
+            return True
+    return False
+
+
+def sort_trainers_key(name):
+    if is_chinese(name):
+        return pinyin.get(name, format="strip", delimiter=" ")
+    return name
 
 
 setting_path = os.path.join(
@@ -172,14 +190,14 @@ class SettingsDialog(QDialog):
         languageLayout.addWidget(self.languageCombo)
 
         # Always show english
-        alwaysEnLayout = QHBoxLayout()
-        alwaysEnLayout.setSpacing(10)
-        settingsWidgetsLayout.addLayout(alwaysEnLayout)
-        alwaysEnlabel = QLabel(tr("Always show search results in English:"))
-        alwaysEnLayout.addWidget(alwaysEnlabel)
-        self.alwaysEncheckbox = QCheckBox()
-        self.alwaysEncheckbox.setChecked(settings["enSearchResults"])
-        alwaysEnLayout.addWidget(self.alwaysEncheckbox)
+        self.alwaysEnCheckbox = QCheckBox(tr("Always show search results in English"))
+        self.alwaysEnCheckbox.setChecked(settings["enSearchResults"])
+        settingsWidgetsLayout.addWidget(self.alwaysEnCheckbox)
+
+        # Auto trainer updates
+        self.autoUpdateCheckbox = QCheckBox(tr("Update trainers automatically"))
+        self.autoUpdateCheckbox.setChecked(settings["autoUpdate"])
+        settingsWidgetsLayout.addWidget(self.autoUpdateCheckbox)
 
         # Wemod path
         wemodLayout = QVBoxLayout()
@@ -219,7 +237,8 @@ class SettingsDialog(QDialog):
     def apply_settings_page(self):
         settings["theme"] = theme_options[self.themeCombo.currentText()]
         settings["language"] = language_options[self.languageCombo.currentText()]
-        settings["enSearchResults"] = self.alwaysEncheckbox.isChecked()
+        settings["enSearchResults"] = self.alwaysEnCheckbox.isChecked()
+        settings["autoUpdate"] = self.autoUpdateCheckbox.isChecked()
         settings["WeModPath"] = self.wemodLineEdit.text()
         apply_settings(settings)
         QMessageBox.information(self, tr("Attention"), tr(
@@ -237,14 +256,15 @@ class AboutDialog(QDialog):
         self.setLayout(aboutLayout)
 
         appLayout = QHBoxLayout()
-        appLayout.setSpacing(0)
+        appLayout.setSpacing(20)
         aboutLayout.addLayout(appLayout)
 
         # App logo
-        logoPixmap = QPixmap(resource_path("assets/logo.png")).scaled(120, 120, Qt.AspectRatioMode.KeepAspectRatio)
+        logoPixmap = QPixmap(resource_path("assets/logo.png"))
+        scaledLogoPixmap = logoPixmap.scaled(120, 120, Qt.AspectRatioMode.KeepAspectRatio, Qt.TransformationMode.SmoothTransformation)
         logoLabel = QLabel()
         logoLabel.setAlignment(Qt.AlignmentFlag.AlignCenter)
-        logoLabel.setPixmap(logoPixmap)
+        logoLabel.setPixmap(scaledLogoPixmap)
         appLayout.addWidget(logoLabel)
 
         # App name and version
@@ -426,7 +446,7 @@ class DownloadBaseThread(QThread):
     headers = {
         'User-Agent': 'Mozilla/5.0 (Windows NT 10.0; Win64; x64) AppleWebKit/537.36 (KHTML, like Gecko) Chrome/58.0.3029.110 Safari/537.3',
     }
-    translator_initialized = False
+    translator_initializing = False
     
     def __init__(self, parent=None):
         super().__init__(parent)
@@ -497,12 +517,6 @@ class DownloadBaseThread(QThread):
             except requests.RequestException:
                 continue
         return False
-
-    def is_chinese(self, keyword):
-        for char in keyword:
-            if '\u4e00' <= char <= '\u9fff':
-                return True
-        return False
     
     def arabic_to_roman(self, num):
         if num == 0:
@@ -546,24 +560,31 @@ class DownloadBaseThread(QThread):
     def initialize_translator(self):
         try:
             global ts
-            if ts is None:
-                if not self.translator_initialized:
-                    self.message.emit(tr("Initializing translator..."), None)
-                    self.translator_initialized = True
+            if ts is None and not self.translator_initializing:
+                self.translator_initializing = True
+                self.message.emit(tr("Initializing translator..."), None)
                 import translators as trans
                 ts = trans
-            ts.translate_text("test")
+                ts.translate_text("test")
+            elif ts is None:
+                # In process of initialization, wait until completed
+                for _ in range(10):
+                    if ts is not None:
+                        break
+                    time.sleep(1)
         except Exception as e:
             print("import translators failed or error occurred while translating: " + str(e))
 
     def translate_trainer(self, trainerName):
+        """
+        For displaying trainer name only.
+        """
+
         # =======================================================
         # Special cases
         if trainerName == "Bright.Memory.Episode.1 Trainer":
             trainerName = "Bright Memory: Episode 1 Trainer"
 
-        if "/" in trainerName:
-            trainerName = trainerName.split("/")[0]
         trans_trainerName = trainerName
 
         if (settings["language"] == "zh_CN" or settings["language"] == "zh_TW") and not settings["enSearchResults"]:
@@ -573,43 +594,15 @@ class DownloadBaseThread(QThread):
                 # Using 3dm api to match en_names
                 best_match = self.find_best_trainer_match(original_trainerName)
                 if best_match:
-                    if "/" in best_match:
-                        best_match = best_match.split("/")[0]
                     trans_trainerName = f"《{best_match}》修改器"
             
                 else:
-                    found_translation = False
-                    # Using Xiao Hei He search to get list of chinese names
-                    xhhSearchUrl = f"https://api.xiaoheihe.cn/bbs/app/api/general/search/v1?search_type=game&q={original_trainerName}"
-                    reqs = requests.get(xhhSearchUrl, headers=self.headers)
-                    xhhData = reqs.json()
-
-                    if reqs.status_code != 200:
-                        self.message.emit(tr("Translation request failed with status code: ") + str(reqs.status_code), "failure")
-
-                    steam_appids = [item['info']['steam_appid']
-                                    for item in xhhData['result']['items']
-                                    if 'steam_appid' in item['info']]
-
-                    if steam_appids:
-                        with concurrent.futures.ThreadPoolExecutor() as executor:
-                            future_to_appid = {executor.submit(
-                                self.xhh_zhName, appid, original_trainerName): appid for appid in steam_appids[:3]}
-
-                            for future in concurrent.futures.as_completed(future_to_appid):
-                                result = future.result()
-                                if result != None:
-                                    trans_trainerName = result
-                                    found_translation = True
-                                    break
-
                     # Use direct translation if couldn't find a match
-                    if not found_translation:
-                        self.initialize_translator()
-                        print(
-                            "No matches found, using direct translation for: " + original_trainerName)
-                        trans_trainerName = ts.translate_text(
-                            original_trainerName, from_language='en', to_language='zh')
+                    self.initialize_translator()
+                    print(
+                        "No matches found, using direct translation for: " + original_trainerName)
+                    trans_trainerName = ts.translate_text(
+                        original_trainerName, from_language='en', to_language='zh')
 
                     # strip any game names that have their english names
                     pattern = r'[A-Za-z0-9\s：&]+（([^\）]*)\）|\（[A-Za-z\s：&]+\）$'
@@ -627,44 +620,11 @@ class DownloadBaseThread(QThread):
                     trans_trainerName = trans_trainerName.replace(
                         "《", "").replace("》", "")
                     trans_trainerName = f"《{trans_trainerName}》修改器"
+
             except Exception as e:
                 print(f"An error occurred while translating trainer name: {str(e)}")
 
         return trans_trainerName
-    
-    def xhh_enName(self, appid):
-        xhhGameDetailUrl = f"https://api.xiaoheihe.cn/game/get_game_detail/?h_src=game_rec_a&appid={appid}"
-        reqs = requests.get(xhhGameDetailUrl, headers=self.headers)
-        xhhData = reqs.json()
-
-        if reqs.status_code != 200:
-            self.message.emit(tr("Translation request failed with status code: ") + str(reqs.status_code), "failure")
-
-        if 'name_en' in xhhData['result']:
-            return xhhData['result']['name_en']
-        else:
-            return None
-
-    def xhh_zhName(self, appid, trainerName):
-        xhhGameDetailUrl = f"https://api.xiaoheihe.cn/game/get_game_detail/?h_src=game_rec_a&appid={appid}"
-        reqs = requests.get(xhhGameDetailUrl, headers=self.headers)
-        xhhData = reqs.json()
-
-        if reqs.status_code != 200:
-            self.message.emit(tr("Translation request failed with status code: ") + str(reqs.status_code), "failure")
-
-        if 'name_en' in xhhData['result']:
-            enName = xhhData['result']['name_en']
-            sanitized_enName = self.sanitize(enName)
-            sanitized_trainerName = self.sanitize(trainerName)
-            match = sanitized_enName == sanitized_trainerName
-            # print("Match:", sanitized_trainerName, "&", sanitized_enName, "=>", match)
-
-            zhName = xhhData['result']['name']
-            if match and self.is_chinese(zhName):
-                return zhName
-            else:
-                return None
     
     def save_html_content(self, content, file_name):
         html_file = os.path.join(DATABASE_PATH, file_name)
@@ -688,7 +648,8 @@ class DownloadBaseThread(QThread):
         
 class UpdateTrainers(DownloadBaseThread):
     message = pyqtSignal(str, str)
-    update = pyqtSignal(str, str)
+    update = pyqtSignal(str, str, str)
+    updateTrainer = pyqtSignal(str, str)
     finished = pyqtSignal(str)
 
     def __init__(self, trainers, parent=None):
@@ -699,14 +660,18 @@ class UpdateTrainers(DownloadBaseThread):
         statusWidgetName = "trainerUpdate"
         self.message.emit(statusWidgetName, tr("Checking for trainer updates"))
 
-        with concurrent.futures.ThreadPoolExecutor(max_workers=5) as executor:
-            futures = [executor.submit(self.process_trainer, trainerPath) for trainerPath in self.trainers.values()]
+        if self.is_internet_connected():
+            with concurrent.futures.ThreadPoolExecutor(max_workers=5) as executor:
+                futures = [executor.submit(self.process_trainer, trainerPath) for trainerPath in self.trainers.values()]
 
-            for future in concurrent.futures.as_completed(futures):
-                result = future.result()
-                if result:
-                    trainerPath, update_url = result
-                    self.update.emit(trainerPath, update_url)
+                for future in concurrent.futures.as_completed(futures):
+                    result = future.result()
+                    if result:
+                        trainerPath, update_url = result
+                        self.updateTrainer.emit(trainerPath, update_url)
+        else:
+            self.update.emit(statusWidgetName, tr("Check trainer updates failed"), "error")
+            time.sleep(2)
         
         self.finished.emit(statusWidgetName)
 
@@ -716,42 +681,43 @@ class UpdateTrainers(DownloadBaseThread):
         pattern = bytes.fromhex(''.join(pattern_hex.split()))
         tagName = self.get_product_name(trainerPath)
 
-        with open(trainerPath, 'rb') as file:
-            content = file.read()
-            pattern_index = content.find(pattern)
-            if pattern_index != -1:
-                start_index = pattern_index + len(pattern)
-                while content[start_index] == 0:
-                    start_index += 1
+        if os.path.exists(trainerPath):
+            with open(trainerPath, 'rb') as file:
+                content = file.read()
+                pattern_index = content.find(pattern)
+                if pattern_index != -1:
+                    start_index = pattern_index + len(pattern)
+                    while content[start_index] == 0:
+                        start_index += 1
 
-                # The date could be "Mar  8 2024" or "Dec 10 2022"
-                date_match = re.search(rb'\b(?:Jan|Feb|Mar|Apr|May|Jun|Jul|Aug|Sep|Oct|Nov|Dec)\s+\d{1,2}\s+\d{4}\b', content[start_index:])
-                if date_match and tagName:
-                    trainerSrcDate = datetime.datetime.strptime(date_match.group().decode('utf-8'), '%b %d %Y')
+                    # The date could be "Mar  8 2024" or "Dec 10 2022"
+                    date_match = re.search(rb'\b(?:Jan|Feb|Mar|Apr|May|Jun|Jul|Aug|Sep|Oct|Nov|Dec)\s+\d{1,2}\s+\d{4}\b', content[start_index:])
+                    if date_match and tagName:
+                        trainerSrcDate = datetime.datetime.strptime(date_match.group().decode('utf-8'), '%b %d %Y')
 
-                    page_content = self.get_webpage_content(f"https://flingtrainer.com/tag/{tagName}", "FLiNG Trainer")
-                    tagPage = BeautifulSoup(page_content, 'html.parser')
+                        page_content = self.get_webpage_content(f"https://flingtrainer.com/tag/{tagName}", "FLiNG Trainer")
+                        tagPage = BeautifulSoup(page_content, 'html.parser')
 
-                    trainerNamesMap = {}  # trainerName: gameContentEntryOnWeb
-                    for game in tagPage.find_all('div', class_='post-content'):
-                        trainerName = self.sanitize(game.find('a', rel='bookmark').text)
-                        trainerNamesMap[trainerName] = game
+                        trainerNamesMap = {}  # trainerName: gameContentEntryOnWeb
+                        for game in tagPage.find_all('div', class_='post-content'):
+                            trainerName = self.sanitize(game.find('a', rel='bookmark').text)
+                            trainerNamesMap[trainerName] = game
 
-                    if trainerNamesMap:
-                        best_match, score = process.extractOne(self.sanitize(tagName + "-trainer"), trainerNamesMap.keys())
-                        if score >= 85:
-                            targetGameOgj = trainerNamesMap[best_match]
-                            version_entry = targetGameOgj.find('div', class_='entry')
-                            
-                            if version_entry:
-                                match = re.search(r'Last Updated:\s+(\d+\.\d+\.\d+)', version_entry.text)
-                                if match:
-                                    trainerDstDate = datetime.datetime.strptime(match.group(1), '%Y.%m.%d')
-                                    print(f"{tagName}\nTrainer source date: {trainerSrcDate.strftime('%Y-%m-%d')}\nNewest build date: {trainerDstDate.strftime('%Y-%m-%d')}\n")
-                                    
-                                    if trainerDstDate > trainerSrcDate:
-                                        update_url = targetGameOgj.find('a', href=True, rel='bookmark')['href']
-                                        return trainerPath, update_url
+                        if trainerNamesMap:
+                            best_match, score = process.extractOne(self.sanitize(tagName + "-trainer"), trainerNamesMap.keys())
+                            if score >= 85:
+                                targetGameOgj = trainerNamesMap[best_match]
+                                version_entry = targetGameOgj.find('div', class_='entry')
+                                
+                                if version_entry:
+                                    match = re.search(r'Last Updated:\s+(\d+\.\d+\.\d+)', version_entry.text)
+                                    if match:
+                                        trainerDstDate = datetime.datetime.strptime(match.group(1), '%Y.%m.%d')
+                                        print(f"{tagName}\nTrainer source date: {trainerSrcDate.strftime('%Y-%m-%d')}\nNewest build date: {trainerDstDate.strftime('%Y-%m-%d')}\n")
+                                        
+                                        if trainerDstDate > trainerSrcDate:
+                                            update_url = targetGameOgj.find('a', href=True, rel='bookmark')['href']
+                                            return trainerPath, update_url
         return None
     
     def get_product_name(self, trainerPath):
@@ -764,10 +730,18 @@ class UpdateTrainers(DownloadBaseThread):
                    temp_version_info, "-action", "extract", "-mask", "VERSIONINFO,,"]
         subprocess.run(command, stdout=subprocess.DEVNULL, stderr=subprocess.DEVNULL, creationflags=subprocess.CREATE_NO_WINDOW)
 
-        product_name = None
-        with open(temp_version_info, 'r', encoding='utf-16') as file:
-            file_content = file.read()
+        file_content = None
+        for _ in range(10):
+            if os.path.exists(temp_version_info):
+                with open(temp_version_info, 'r', encoding='utf-16') as file:
+                    file_content = file.read()
+                    break
+            time.sleep(0.2)
+        if not file_content:
+            print("\nCould not find extracted .rc file for version info")
+            return None
 
+        product_name = None
         match = re.search(r'VALUE "ProductName", "(.*?)"', file_content)
         if match:
             product_name = match.group(1)
@@ -854,150 +828,7 @@ class FetchTrainerDetails(DownloadBaseThread):
                     completed_pages += 1
                     self.update.emit(statusWidgetName, f"{fetch_message} ({completed_pages}/{total_pages})", "load")
             
-            # Special cases/additions
-            additions = [
-                {
-                    "en_name": "Assassins Creed Libertation Remastered",
-                    "keyw": "刺客信条：解放-重制版",
-                },
-                {
-                    "en_name": "All Zombies Must Die!",
-                    "keyw": "僵尸必须死",
-                },
-                {
-                    "en_name": "Tale of Immortal",
-                    "keyw": "鬼谷八荒",
-                },
-                {
-                    "en_name": "Bright Memory: Episode 1",
-                    "keyw": "光明记忆：第一章",
-                },
-                {
-                    "en_name": "Monster Hunter World: Iceborne",
-                    "keyw": "怪物猎人：世界-冰原",
-                },
-                {
-                    "en_name": "Resident Evil 2",
-                    "keyw": "生化危机2：重制版",
-                },
-                {
-                    "en_name": "Resident Evil Operation Raccoon City",
-                    "keyw": "生化危机：浣熊市行动",
-                },
-                {
-                    "en_name": "Resident Evil: Biohazard HD Remaster",
-                    "keyw": "生化危机HD重制版",
-                },
-                {
-                    "en_name": "XCOM 2",
-                    "keyw": "幽浮2",
-                },
-                {
-                    "en_name": "Vampire’s Fall - Origins",
-                    "keyw": "吸血鬼之殇：起源",
-                },
-                {
-                    "en_name": "Dark Souls: Prepare To Die Edition",
-                    "keyw": "黑暗之魂：受死版",
-                },
-                {
-                    "en_name": "WARP",
-                    "keyw": "弯曲",
-                },
-                {
-                    "en_name": "Far Cry 3",
-                    "keyw": "孤岛惊魂3",
-                },
-                {
-                    "en_name": "Far Cry 5",
-                    "keyw": "孤岛惊魂5",
-                },
-                {
-                    "en_name": "Digimon Story Cyber Sleuth: Complete Edition",
-                    "keyw": "数码宝贝物语：网路侦探骇客追忆",
-                },
-                {
-                    "en_name": "The Legend of Heroes: Trails into Reverie",
-                    "keyw": "英雄传说：创之轨迹",
-                },
-                {
-                    "en_name": "Final Fantasy (Pixel Remaster)",
-                    "keyw": "最终幻想 像素复刻版",
-                },
-                {
-                    "en_name": "Final Fantasy II (Pixel Remaster)",
-                    "keyw": "最终幻想2 像素复刻版",
-                },
-                {
-                    "en_name": "Final Fantasy III (Pixel Remaster)",
-                    "keyw": "最终幻想3 像素复刻版",
-                },
-                {
-                    "en_name": "Final Fantasy IV (Pixel Remaster)",
-                    "keyw": "最终幻想4 像素复刻版",
-                },
-                {
-                    "en_name": "Final Fantasy V (Pixel Remaster)",
-                    "keyw": "最终幻想5 像素复刻版",
-                },
-                {
-                    "en_name": "Final Fantasy VI (Pixel Remaster)",
-                    "keyw": "最终幻想6 像素复刻版",
-                },
-                {
-                    "en_name": "Final Fantasy IV The After Years",
-                    "keyw": "最终幻想4：月之归还",
-                },
-                {
-                    "en_name": "Halo: The Master Chief Collection (Halo 2: Anniversary)",
-                    "keyw": "光环：士官长合集（光环2：周年版）",
-                },
-                {
-                    "en_name": "Halo: The Master Chief Collection (Halo: CE Anniversary)",
-                    "keyw": "光环：士官长合集（光环：战斗进化周年版）",
-                },
-                {
-                    "en_name": "Halo: The Master Chief Collection (Halo: Reach) Trainer",
-                    "keyw": "光环：士官长合集（光环：致远星）",
-                },
-                {
-                    "en_name": "Dishonored-The Knife of Dunwall",
-                    "keyw": "耻辱 顿沃城之锋",
-                },
-                {
-                    "en_name": "Mark of the Ninja",
-                    "keyw": "忍者印记",
-                },
-                {
-                    "en_name": "Risen 2 Dark Waters",
-                    "keyw": "崛起2：黑暗水域",
-                },
-                {
-                    "en_name": "Orcs Must Die 2",
-                    "keyw": "兽人必须死2",
-                },
-                {
-                    "en_name": "Spellforce 2: Faith in Destiny",
-                    "keyw": "咒语力量2：命运信仰",
-                },
-                {
-                    "en_name": "Guilty Gear Xrd Revelator",
-                    "keyw": "罪恶装备：启示者",
-                },
-                {
-                    "en_name": "Ninja Gaiden: Master Collection (Ninja Gaiden Sigma)",
-                    "keyw": "忍者龙剑传：大师合集（忍者龙剑传：西格玛）",
-                },
-                {
-                    "en_name": "Ninja Gaiden: Master Collection (Ninja Gaiden Sigma 2)",
-                    "keyw": "忍者龙剑传：大师合集（忍者龙剑传：西格玛2）",
-                },
-                {
-                    "en_name": "Ninja Gaiden: Master Collection (Ninja Gaiden 3: Razor’s Edge)",
-                    "keyw": "忍者龙剑传：大师合集（忍者龙剑传3：刀锋边缘）",
-                },
-            ]
-            all_data.extend(additions)
+            all_data.extend(db_additions.additions)
 
             filepath = os.path.join(DATABASE_PATH, "xgqdetail.json")
             with open(filepath, 'w', encoding='utf-8') as file:
@@ -1072,43 +903,41 @@ class DownloadDisplayThread(DownloadBaseThread):
         # Convert the dictionary to use original names as keys
         DownloadBaseThread.trainer_urls = {original: url for _, (original, url) in new_trainer_urls.items()}
 
-        # Sort the dict alphabetically
-        DownloadBaseThread.trainer_urls = dict(sorted(DownloadBaseThread.trainer_urls.items()))
+        if len(DownloadBaseThread.trainer_urls) == 0:
+            self.message.emit(tr("No results found."), "failure")
+            self.finished.emit(1)
+            return
 
-        # Display search results
+        # Translate search results
         self.message.emit(tr("Translating search results..."), None)
         trainer_names = list(DownloadBaseThread.trainer_urls.keys())
 
-        # Using a dictionary to store future and its corresponding original trainer name
-        max_threads = 5
-        with concurrent.futures.ThreadPoolExecutor(max_workers=max_threads) as executor:
-            future_to_trainerName = {executor.submit(
-                self.translate_trainer, trainerName): trainerName for trainerName in trainer_names}
+        with concurrent.futures.ThreadPoolExecutor(max_workers=5) as executor:
+            future_to_trainerName = {executor.submit(self.translate_trainer, trainerName): trainerName for trainerName in trainer_names}
 
-        translated_names = {}
+        translated_names = {}  # {original_en_name: translated_name}
         for future in concurrent.futures.as_completed(future_to_trainerName):
             original_trainerName = future_to_trainerName[future]
             translated_trainerName = future.result()
             translated_names[original_trainerName] = translated_trainerName
 
-        # Clear prior texts
+        # Sort based on translated names considering pinyin
+        sorted_pairs = sorted(translated_names.items(), key=lambda item: sort_trainers_key(item[1]))
+
+        # Reconstruct `DownloadBaseThread.trainer_urls` to match the sorted order of translated names
+        DownloadBaseThread.trainer_urls = {original: DownloadBaseThread.trainer_urls[original] for original, _ in sorted_pairs}
+        print("\nTrainer results in original name: ", DownloadBaseThread.trainer_urls.keys())
+
+        # Display sorted results
         self.message.emit("", "clear")
-
-        # Display results in the original order
-        print("\nTrainer results in original name: ", trainer_names)
-        for count, trainerName in enumerate(trainer_names, start=1):
-            self.message.emit(f"{str(count)}. {translated_names[trainerName]}", None)
-
-        if len(DownloadBaseThread.trainer_urls) == 0:
-            self.message.emit(tr("No results found."), "failure")
-            self.finished.emit(1)
-            return
+        for count, (original_name, translated_name) in enumerate(sorted_pairs, start=1):
+            self.message.emit(f"{count}. {translated_name}", None)
         
         self.finished.emit(0)
 
     def translate_keyword(self, keyword):
         translations = []
-        if self.is_chinese(keyword):
+        if is_chinese(keyword):
             self.message.emit(tr("Translating keywords..."), None)
 
             # Using 3dm api to match cn_names
@@ -1136,34 +965,6 @@ class DownloadDisplayThread(DownloadBaseThread):
                     except Exception as e:
                         print(f"Translation failed with {service}: {str(e)}")
 
-                # Using XiaoHeiHe search to get list of english names
-                xhhSearchUrl = f"https://api.xiaoheihe.cn/bbs/app/api/general/search/v1?search_type=game&q={keyword}"
-                reqs = requests.get(xhhSearchUrl, headers=self.headers)
-                xhhData = reqs.json()
-                steam_appids = []
-
-                # XiaoHeiHe search
-                if reqs.status_code != 200:
-                    self.message.emit(tr("Translation request failed with status code: ") + str(reqs.status_code), "failure")
-                    print("Xiao Hei He request failed")
-                elif 'result' in xhhData and 'items' in xhhData['result']:
-                    steam_appids = [item['info']['steam_appid']
-                                    for item in xhhData['result']['items']
-                                    if 'steam_appid' in item['info']]
-                else:
-                    print("No items found for Xiao Hei He request or incorrect JSON format")
-
-                # Get every english game name from steam app id
-                if steam_appids:
-                    with concurrent.futures.ThreadPoolExecutor() as executor:
-                        future_to_appid = {executor.submit(
-                            self.xhh_enName, appid): appid for appid in steam_appids[:10]}
-
-                        for future in concurrent.futures.as_completed(future_to_appid):
-                            name_en = future.result()
-                            if name_en:
-                                translations.append(name_en)
-
                 if not translations:
                     self.message.emit(tr("No translations found."), "failure")
 
@@ -1181,7 +982,7 @@ class DownloadDisplayThread(DownloadBaseThread):
         if archiveHTML.find():
             self.message.emit(tr("Search success!") + " 1/2", "success")
         else:
-            self.message.emit(tr("Search failed, please wait until all data is updated from FLiNG.") + " 1/2", "failure")
+            self.message.emit(tr("Search failed, please wait until all data is updated from FLiNG."), "failure")
             return False
 
         for link in archiveHTML.find_all(target="_self"):
@@ -1207,7 +1008,7 @@ class DownloadDisplayThread(DownloadBaseThread):
         if mainSiteHTML.find():
             self.message.emit(tr("Search success!") + " 2/2", "success")
         else:
-            self.message.emit(tr("Search failed, please wait until all data is updated from FLiNG.") + " 2/2", "failure")
+            self.message.emit(tr("Search failed, please wait until all data is updated from FLiNG."), "failure")
             return False
         time.sleep(0.5)
 
@@ -1247,6 +1048,7 @@ class DownloadTrainersThread(DownloadBaseThread):
         self.trainerPath = trainerPath
         self.updateUrl = updateUrl
         self.download_finish_delay = 0.5
+        self.update_error_delay = 3
 
     def run(self):
         if os.path.exists(DOWNLOAD_TEMP_DIR):
@@ -1260,21 +1062,19 @@ class DownloadTrainersThread(DownloadBaseThread):
         if not self.update:
             trainer_list = list(DownloadBaseThread.trainer_urls.items())
             filename = trainer_list[self.index][0]
-            mFilename = filename.replace(':', ' -')
-            if "/" in mFilename:
-                mFilename = mFilename.split("/")[1]
+            trainerName_download = filename.replace(':', ' -').replace("/", "_").replace("?", "")
             self.message.emit(tr("Translating trainer name..."), None)
-            trans_mFilename = self.translate_trainer(mFilename)
+            trainerName_final = self.translate_trainer(trainerName_download).replace(':', ' -').replace("/", "_").replace("?", "")
 
             for trainerPath in self.trainers.keys():
-                if mFilename in trainerPath or trans_mFilename in trainerPath:
+                if trainerName_download in trainerPath or trainerName_final in trainerPath:
                     self.message.emit(tr("Trainer already exists, aborted download."), "failure")
                     time.sleep(self.download_finish_delay)
                     self.finished.emit(1)
                     return
         else:
-            mFilename = self.trainerName
-            trans_mFilename = self.trainerName
+            trainerName_download = self.trainerName
+            trainerName_final = self.trainerName
 
         # Download trainer
         self.message.emit(tr("Downloading..."), None)
@@ -1292,7 +1092,7 @@ class DownloadTrainersThread(DownloadBaseThread):
                 targetUrl = trainerPage.find(target="_self").get("href")
             
             os.makedirs(DOWNLOAD_TEMP_DIR, exist_ok=True)
-            trainerTemp = self.request_download(targetUrl, DOWNLOAD_TEMP_DIR, mFilename)
+            trainerTemp = self.request_download(targetUrl, DOWNLOAD_TEMP_DIR, trainerName_download)
 
         except Exception as e:
             self.message.emit(tr("An error occurred while downloading trainer: ") + str(e), "failure")
@@ -1353,7 +1153,7 @@ class DownloadTrainersThread(DownloadBaseThread):
             return
 
         os.makedirs(self.trainerDownloadPath, exist_ok=True)
-        trainer_name = trans_mFilename + ".exe"
+        trainer_name = (trainerName_final + ".exe")
         source_file = os.path.join(DOWNLOAD_TEMP_DIR, gameRawName)
         destination_file = os.path.join(self.trainerDownloadPath, trainer_name)
 
@@ -1372,7 +1172,7 @@ class DownloadTrainersThread(DownloadBaseThread):
 
         except PermissionError as e:
             self.message.emit(tr("Trainer is currently in use, please close any programs using the file and try again."), "failure")
-            time.sleep(self.download_finish_delay)
+            time.sleep(self.update_error_delay)
             self.finished.emit(1)
             return
         except Exception as e:

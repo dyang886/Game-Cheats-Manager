@@ -28,7 +28,7 @@ class GameCheatsManager(QMainWindow):
         self.setFixedSize(self.size())
 
         # Version, user prompts, and links
-        self.appVersion = "2.0.0-beta.4"
+        self.appVersion = "2.0.0"
         self.githubLink = "https://github.com/dyang886/Game-Cheats-Manager"
         self.updateLink = "https://api.github.com/repos/dyang886/Game-Cheats-Manager/releases/latest"
         self.trainerSearchEntryPrompt = tr("Search for installed")
@@ -242,7 +242,7 @@ class GameCheatsManager(QMainWindow):
 
     def update_list(self):
         search_text = self.trainerSearchEntry.text().lower()
-        if search_text == self.trainerSearchEntryPrompt.lower() or search_text == "":
+        if search_text == "":
             self.show_cheats()
             return
 
@@ -254,11 +254,17 @@ class GameCheatsManager(QMainWindow):
     def show_cheats(self):
         self.flingListBox.clear()
         self.trainers = {}
-        for trainer in sorted(os.scandir(self.trainerDownloadPath), key=lambda dirent: dirent.name):
-            trainerName, trainerExt = os.path.splitext(os.path.basename(trainer.path))
-            if trainerExt.lower() == ".exe" and os.path.getsize(trainer.path) != 0:
+        entries = sorted(
+            os.scandir(self.trainerDownloadPath),
+            key=lambda dirent: sort_trainers_key(dirent.name)
+        )
+
+        for trainer in entries:
+            trainerPath = os.path.normpath(trainer.path)
+            trainerName, trainerExt = os.path.splitext(os.path.basename(trainerPath))
+            if trainerExt.lower() == ".exe" and os.path.getsize(trainerPath) != 0:
                 self.flingListBox.addItem(trainerName)
-                self.trainers[trainerName] = trainer.path
+                self.trainers[trainerName] = trainerPath
 
     def launch_trainer(self):
         try:
@@ -281,7 +287,7 @@ class GameCheatsManager(QMainWindow):
                 self.flingListBox.takeItem(index)
                 self.show_cheats()
             except PermissionError as e:
-                pass
+                QMessageBox.critical(self, tr("Error"), tr("Trainer is currently in use, please close any programs using the file and try again."))
     
     def findWidgetInStatusBar(self, statusbar, widgetName):
         for widget in statusbar.children():
@@ -336,11 +342,13 @@ class GameCheatsManager(QMainWindow):
         fetch_trainer_details_thread.finished.connect(self.on_interval_finished)
         fetch_trainer_details_thread.start()
 
-        trainer_update_thread = UpdateTrainers(self.trainers, self)
-        trainer_update_thread.message.connect(self.on_status_load)
-        trainer_update_thread.update.connect(self.on_trainer_update)
-        trainer_update_thread.finished.connect(self.on_interval_finished)
-        trainer_update_thread.start()
+        if settings["autoUpdate"]:
+            trainer_update_thread = UpdateTrainers(self.trainers, self)
+            trainer_update_thread.message.connect(self.on_status_load)
+            trainer_update_thread.update.connect(self.on_status_update)
+            trainer_update_thread.updateTrainer.connect(self.on_trainer_update)
+            trainer_update_thread.finished.connect(self.on_interval_finished)
+            trainer_update_thread.start()
 
     def download_trainers(self, index):
         self.enqueue_download(index, self.trainers, self.trainerDownloadPath, False, None, None)

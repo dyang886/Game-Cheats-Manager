@@ -34,8 +34,11 @@ msgstr "主题："
 msgid "Language:"
 msgstr "语言："
 
-msgid "Always show search results in English:"
-msgstr "始终以英文显示搜索结果："
+msgid "Always show search results in English"
+msgstr "始终以英文显示搜索结果"
+
+msgid "Update trainers automatically"
+msgstr "自动更新修改器"
 
 msgid "WeMod path:"
 msgstr "WeMod 路径："
@@ -64,11 +67,11 @@ msgstr "请完成所有安全检查..."
 msgid "Initializing translator..."
 msgstr "初始化翻译..."
 
-msgid "Translation request failed with status code: "
-msgstr "翻译请求失败，状态代码为："
-
 msgid "Checking for trainer updates"
 msgstr "正在检查修改器更新"
+
+msgid "Check trainer updates failed"
+msgstr "检查修改器更新失败"
 
 msgid "Updating data from FLiNG"
 msgstr "正在更新风灵月影数据库"
@@ -91,11 +94,11 @@ msgstr "未连接到互联网，搜索失败。"
 msgid "Searching..."
 msgstr "搜索中..."
 
-msgid "Translating search results..."
-msgstr "翻译搜索结果中..."
-
 msgid "No results found."
 msgstr "未找到结果。"
+
+msgid "Translating search results..."
+msgstr "翻译搜索结果中..."
 
 msgid "Translating keywords..."
 msgstr "翻译关键词中..."
@@ -172,11 +175,11 @@ msgstr "启动"
 msgid "Delete"
 msgstr "删除"
 
-msgid "Change trainer download path"
-msgstr "更改修改器下载路径"
-
 msgid "Error"
 msgstr "错误"
+
+msgid "Change trainer download path"
+msgstr "更改修改器下载路径"
 
 msgid "Please choose a new path."
 msgstr "请选择一个新路径。"
@@ -187,11 +190,11 @@ msgstr "正在迁移现有修改器..."
 msgid "No path selected."
 msgstr "未选择路径。"
 
-msgid "Migration complete!"
-msgstr "迁移完成！"
-
 msgid "Error creating the new path: "
 msgstr "创建新路径时出错："
+
+msgid "Migration complete!"
+msgstr "迁移完成！"
 
 msgid "Select trainers you want to import"
 msgstr "选择要导入的修改器"

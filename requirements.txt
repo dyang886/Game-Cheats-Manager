@@ -1,9 +1,10 @@
 beautifulsoup4
 fuzzywuzzy
+pinyin
 polib
 PyQt6
 PyQt6-WebEngine
-pywin32
 python-Levenshtein
 requests
 tendo
+translators
