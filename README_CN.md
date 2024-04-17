@@ -1,6 +1,6 @@
 # Game Cheats Manager
 
-[English](./README.md) | 简体中文
+[English](./README.md) | 简体中文 | [正體中文](./README_TW.md)
 
 Game Cheats Manager 为玩家提供了一个高效管理游戏修改器的一站式解决方案。它允许用户在一个便捷的位置浏览、下载和管理所有修改器。每个修改器，通常是一个独立的可执行文件，都可以通过应用程序直接启动或删除，从而简化您的游戏体验。
 
