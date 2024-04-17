@@ -37,11 +37,17 @@ msgstr "Language:"
 msgid "Always show search results in English"
 msgstr "Always show search results in English"
 
+msgid "Update trainer databases automatically"
+msgstr "Update trainer databases automatically"
+
 msgid "Update trainers automatically"
 msgstr "Update trainers automatically"
 
 msgid "WeMod path:"
 msgstr "WeMod path:"
+
+msgid "Launch app on startup"
+msgstr "Launch app on startup"
 
 msgid "Apply"
 msgstr "Apply"
@@ -64,6 +70,9 @@ msgstr "Version: "
 msgid "Please complete any security checks..."
 msgstr "Please complete any security checks..."
 
+msgid "No internet connection, translation failed."
+msgstr "No internet connection, translation failed."
+
 msgid "Initializing translator..."
 msgstr "Initializing translator..."
 
@@ -85,12 +94,6 @@ msgstr "Fetching trainer translations"
 msgid "Fetch trainer translations failed"
 msgstr "Fetch trainer translations failed"
 
-msgid "Checking for internet connection..."
-msgstr "Checking for internet connection..."
-
-msgid "No internet connection, search failed."
-msgstr "No internet connection, search failed."
-
 msgid "Searching..."
 msgstr "Searching..."
 
@@ -111,6 +114,12 @@ msgstr "Search success!"
 
 msgid "Search failed, please wait until all data is updated from FLiNG."
 msgstr "Search failed, please wait until all data is updated from FLiNG."
+
+msgid "Checking for internet connection..."
+msgstr "Checking for internet connection..."
+
+msgid "No internet connection, download failed."
+msgstr "No internet connection, download failed."
 
 msgid "Updating "
 msgstr "Updating "
@@ -168,6 +177,12 @@ msgstr "Open Trainer Download Path"
 
 msgid "Unlock WeMod Pro"
 msgstr "Unlock WeMod Pro"
+
+msgid "Update Trainer Database"
+msgstr "Update Trainer Database"
+
+msgid "Update Trainers"
+msgstr "Update Trainers"
 
 msgid "Launch"
 msgstr "Launch"

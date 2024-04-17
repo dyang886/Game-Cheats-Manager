@@ -37,11 +37,17 @@ msgstr "語言："
 msgid "Always show search results in English"
 msgstr "始終以英文顯示搜尋結果"
 
+msgid "Update trainer databases automatically"
+msgstr "自動更新修改器資料庫"
+
 msgid "Update trainers automatically"
 msgstr "自動更新修改器"
 
 msgid "WeMod path:"
 msgstr "WeMod 路徑："
+
+msgid "Launch app on startup"
+msgstr "開機自啟"
 
 msgid "Apply"
 msgstr "應用"
@@ -64,6 +70,9 @@ msgstr "版本: "
 msgid "Please complete any security checks..."
 msgstr "請完成所有安全檢查..."
 
+msgid "No internet connection, translation failed."
+msgstr "沒有互聯網連接，翻譯失敗。"
+
 msgid "Initializing translator..."
 msgstr "初始化翻譯..."
 
@@ -85,12 +94,6 @@ msgstr "正在獲取修改器翻譯"
 msgid "Fetch trainer translations failed"
 msgstr "獲取修改器翻譯失敗"
 
-msgid "Checking for internet connection..."
-msgstr "正在檢查網際網路連接..."
-
-msgid "No internet connection, search failed."
-msgstr "沒有互聯網連接，搜索失敗。"
-
 msgid "Searching..."
 msgstr "搜尋中..."
 
@@ -111,6 +114,12 @@ msgstr "搜索成功！"
 
 msgid "Search failed, please wait until all data is updated from FLiNG."
 msgstr "蒐索失敗，請等待風靈月影數據庫完成更新。"
+
+msgid "Checking for internet connection..."
+msgstr "正在檢查網際網路連接..."
+
+msgid "No internet connection, download failed."
+msgstr "沒有互聯網連接，下載失敗。"
 
 msgid "Updating "
 msgstr "正在更新"
@@ -168,6 +177,12 @@ msgstr "打開修改器下載路徑"
 
 msgid "Unlock WeMod Pro"
 msgstr "解鎖 WeMod Pro"
+
+msgid "Update Trainer Database"
+msgstr "更新修改器資料庫"
+
+msgid "Update Trainers"
+msgstr "更新修改器"
 
 msgid "Launch"
 msgstr "啟動"

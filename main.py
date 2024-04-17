@@ -6,7 +6,7 @@ import sys
 
 from PyQt6.QtCore import Qt, QTimer
 from PyQt6.QtGui import QAction, QColor, QFont, QFontDatabase, QIcon, QPixmap
-from PyQt6.QtWidgets import QApplication, QFileDialog, QGridLayout, QHBoxLayout, QLabel, QLineEdit, QListWidgetItem, QMainWindow, QMessageBox, QPushButton, QStatusBar, QSizePolicy, QVBoxLayout, QWidget, QListWidget
+from PyQt6.QtWidgets import QApplication, QFileDialog, QGridLayout, QHBoxLayout, QLabel, QLineEdit, QListWidgetItem, QMainWindow, QMessageBox, QPushButton, QStatusBar, QVBoxLayout, QWidget, QListWidget
 from tendo import singleton
 
 from helper import *
@@ -25,7 +25,7 @@ class GameCheatsManager(QMainWindow):
             sys.exit(1)
         self.setWindowTitle("Game Cheats Manager")
         self.setWindowIcon(QIcon(resource_path("assets/logo.ico")))
-        self.setFixedSize(self.size())
+        self.setMinimumSize(670, 500)
 
         # Version, user prompts, and links
         self.appVersion = "2.0.0"
@@ -53,6 +53,9 @@ class GameCheatsManager(QMainWindow):
         self.downloadable = False  # able to double click on download list or not
         self.downloadQueue = Queue()
         self.currentlyDownloading = False
+        self.currentlyUpdatingTrainers = False
+        self.currentlyUpdatingFling = False
+        self.currentlyUpdatingTrans = False
 
         # Window references
         self.settings_window = None
@@ -90,15 +93,26 @@ class GameCheatsManager(QMainWindow):
         openDirectoryAction.triggered.connect(self.open_trainer_directory)
         optionMenu.addAction(openDirectoryAction)
 
-        wemodAction = QAction(tr("Unlock WeMod Pro"), self)
-        wemodAction.setFont(menuFont)
-        wemodAction.triggered.connect(self.wemod_pro)
-        optionMenu.addAction(wemodAction)
-
         aboutAction = QAction(tr("About"), self)
         aboutAction.setFont(menuFont)
         aboutAction.triggered.connect(self.open_about)
         optionMenu.addAction(aboutAction)
+
+        # Below are standalone menu actions
+        wemodAction = QAction(tr("Unlock WeMod Pro"), self)
+        wemodAction.setFont(menuFont)
+        wemodAction.triggered.connect(self.wemod_pro)
+        menu.addAction(wemodAction)
+
+        updateDatabaseAction = QAction(tr("Update Trainer Database"), self)
+        updateDatabaseAction.setFont(menuFont)
+        updateDatabaseAction.triggered.connect(self.fetch_database)
+        menu.addAction(updateDatabaseAction)
+
+        updateTrainersAction = QAction(tr("Update Trainers"), self)
+        updateTrainersAction.setFont(menuFont)
+        updateTrainersAction.triggered.connect(self.update_trainers)
+        menu.addAction(updateTrainersAction)
 
         # Status bar setup
         self.statusbar = QStatusBar()
@@ -337,26 +351,38 @@ class GameCheatsManager(QMainWindow):
         display_thread.finished.connect(self.on_display_finished)
         display_thread.start()
     
-    def on_main_interval(self):
-        fetch_fling_site_thread = FetchFlingSite(self)
-        fetch_fling_site_thread.message.connect(self.on_status_load)
-        fetch_fling_site_thread.update.connect(self.on_status_update)
-        fetch_fling_site_thread.finished.connect(self.on_interval_finished)
-        fetch_fling_site_thread.start()
+    def fetch_database(self):
+        if not self.currentlyUpdatingFling:
+            self.currentlyUpdatingFling = True
+            fetch_fling_site_thread = FetchFlingSite(self)
+            fetch_fling_site_thread.message.connect(self.on_status_load)
+            fetch_fling_site_thread.update.connect(self.on_status_update)
+            fetch_fling_site_thread.finished.connect(self.on_interval_finished)
+            fetch_fling_site_thread.start()
 
-        fetch_trainer_details_thread = FetchTrainerDetails(self)
-        fetch_trainer_details_thread.message.connect(self.on_status_load)
-        fetch_trainer_details_thread.update.connect(self.on_status_update)
-        fetch_trainer_details_thread.finished.connect(self.on_interval_finished)
-        fetch_trainer_details_thread.start()
-
-        if settings["autoUpdate"]:
+        if not self.currentlyUpdatingTrans:
+            self.currentlyUpdatingTrans = True
+            fetch_trainer_details_thread = FetchTrainerDetails(self)
+            fetch_trainer_details_thread.message.connect(self.on_status_load)
+            fetch_trainer_details_thread.update.connect(self.on_status_update)
+            fetch_trainer_details_thread.finished.connect(self.on_interval_finished)
+            fetch_trainer_details_thread.start()
+    
+    def update_trainers(self):
+        if not self.currentlyUpdatingTrainers:
+            self.currentlyUpdatingTrainers = True
             trainer_update_thread = UpdateTrainers(self.trainers, self)
             trainer_update_thread.message.connect(self.on_status_load)
             trainer_update_thread.update.connect(self.on_status_update)
             trainer_update_thread.updateTrainer.connect(self.on_trainer_update)
             trainer_update_thread.finished.connect(self.on_interval_finished)
             trainer_update_thread.start()
+    
+    def on_main_interval(self):
+        if settings["autoUpdateDatabase"]:
+            self.fetch_database()
+        if settings["autoUpdate"]:
+            self.update_trainers()
 
     def download_trainers(self, index):
         self.enqueue_download(index, self.trainers, self.trainerDownloadPath, False, None, None)
@@ -449,6 +475,13 @@ class GameCheatsManager(QMainWindow):
         target = self.findWidgetInStatusBar(self.statusbar, widgetName)
         if target:
             target.deleteLater()
+
+        if widgetName == "fling":
+            self.currentlyUpdatingFling = False
+        elif widgetName == "details":
+            self.currentlyUpdatingTrans = False
+        elif widgetName == "trainerUpdate":
+            self.currentlyUpdatingTrainers = False
 
     # ===========================================================================
     # Menu functions

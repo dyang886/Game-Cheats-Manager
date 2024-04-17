@@ -263,4 +263,160 @@ additions = [
         "en_name": "Battlefield 4",
         "keyw": "战地4",
     },
+    {
+        "en_name": "BioShock Remastered",
+        "keyw": "生化奇兵1：重制版",
+    },
+    {
+        "en_name": "NOBUNAGA’S AMBITION: Awakening",
+        "keyw": "信长之野望：新生-威力加强版",
+    },
+    {
+        "en_name": "Nobunagas Ambition Taishi with Power Up Kit",
+        "keyw": "信长之野望：大志-威力加强版",
+    },
+    {
+        "en_name": "Nobunagas Ambition Taishi",
+        "keyw": "信长之野望：大志",
+    },
+    {
+        "en_name": "Rayman Origins",
+        "keyw": "雷曼：起源",
+    },
+    {
+        "en_name": "Jagged Alliance: Crossfire",
+        "keyw": "铁血联盟：交叉火力",
+    },
+    {
+        "en_name": "Atelier Lydie and Suelle The Alchemists and the Mysterious Paintings",
+        "keyw": "莉蒂与苏尔的工作室",
+    },
+    {
+        "en_name": "Shining Resonance Refrain",
+        "keyw": "光明之响Refrain",
+    },
+    {
+        "en_name": "Street Fighter X Tekken",
+        "keyw": "街头霸王X铁拳",
+    },
+    {
+        "en_name": "Catherine Classic",
+        "keyw": "凯瑟琳：经典版",
+    },
+    {
+        "en_name": "Inversion",
+        "keyw": "重力反转",
+    },
+    {
+        "en_name": "Little Witch Academia Chamber of Time",
+        "keyw": "小魔女学园",
+    },
+    {
+        "en_name": "Ridge Racer Unbounded",
+        "keyw": "山脊赛车：无限",
+    },
+    {
+        "en_name": "The Amazing Spider-Man",
+        "keyw": "神奇蜘蛛侠",
+    },
+    {
+        "en_name": "Toy Soldiers",
+        "keyw": "玩具士兵",
+    },
+    {
+        "en_name": "Transformers: Fall of Cybertron",
+        "keyw": "变形金刚：赛博坦陨落",
+    },
+    {
+        "en_name": "Dragon Quest XI Echoes of an Elusive Age",
+        "keyw": "勇者斗恶龙11",
+    },
+    {
+        "en_name": "Ho Tu Lo Shu The Books of Dragon",
+        "keyw": "河洛群侠传",
+    },
+    {
+        "en_name": "Darksiders II",
+        "keyw": "暗黑血统2",
+    },
+    {
+        "en_name": "Fairy Fencer F Advent Dark Force",
+        "keyw": "妖精剑士F：邪神降临",
+    },
+    {
+        "en_name": "Pro Evolution Soccer 2018",
+        "keyw": "实况足球2018",
+    },
+    {
+        "en_name": "Pro Evolution Soccer 2016",
+        "keyw": "实况足球2016",
+    },
+    {
+        "en_name": "eFootball PES 2020",
+        "keyw": "实况足球2020",
+    },
+    {
+        "en_name": "AKIBAS TRIP Undead And Undressed",
+        "keyw": "秋叶原之旅2",
+    },
+    {
+        "en_name": "Lords of Football",
+        "keyw": "足球之王",
+    },
+    {
+        "en_name": "Ace Combat: Assault Horizon",
+        "keyw": "皇牌空战7：突击地平线",
+    },
+    {
+        "en_name": "Endless Space",
+        "keyw": "无尽空间",
+    },
+    {
+        "en_name": "Deadlight Directors Cut",
+        "keyw": "死光：导演剪辑版",
+    },
+    {
+        "en_name": "State of Decay 2: Juggernaut Edition",
+        "keyw": "腐烂国度2：主宰版",
+    },
+    {
+        "en_name": "Doom 3 BFG Edition",
+        "keyw": "毁灭战士3：BFG",
+    },
+    {
+        "en_name": "Spec Ops: The Line",
+        "keyw": "特殊行动：一线生机",
+    },
+    {
+        "en_name": "Prototype 2",
+        "keyw": "虐杀原形2",
+    },
+    {
+        "en_name": "Rainblood: Mirage",
+        "keyw": "雨血前传：蜃楼",
+    },
+    {
+        "en_name": "Hyperdimension Neptunia ReBirth3",
+        "keyw": "超次元游戏海王星：重生3",
+    },
+    {
+        "en_name": "Dead Island Riptide Definitive Edition",
+        "keyw": "死亡岛：激潮 终极版",
+    },
+    {
+        "en_name": "Soulstone Survivors",
+        "keyw": "灵魂石幸存者",
+    },
+    {
+        "en_name": "HITMAN",
+        "keyw": "杀手",
+    },
+    {
+        "en_name": "Terminator: Dark Fate – Defiance",
+        "keyw": "终结者：黑暗命运-反抗",
+    },
+    {
+        "en_name": "Binary Domain",
+        "keyw": "二进制领域",
+    },
 ]

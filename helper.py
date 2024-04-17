@@ -12,6 +12,7 @@ import tempfile
 import time
 from urllib.parse import urljoin, urlparse
 import uuid
+import winreg as reg
 import zipfile
 
 from bs4 import BeautifulSoup
@@ -71,8 +72,10 @@ def load_settings():
         "language": app_locale,
         "theme": "black",
         "enSearchResults": False,
+        "autoUpdateDatabase": True,
         "autoUpdate": True,
-        "WeModPath": os.path.join(os.environ["LOCALAPPDATA"], "WeMod")
+        "WeModPath": os.path.join(os.environ["LOCALAPPDATA"], "WeMod"),
+        "autoStart": False,
     }
 
     try:
@@ -194,6 +197,11 @@ class SettingsDialog(QDialog):
         self.alwaysEnCheckbox.setChecked(settings["enSearchResults"])
         settingsWidgetsLayout.addWidget(self.alwaysEnCheckbox)
 
+        # Auto update trainer databases
+        self.autoUpdateDatabaseCheckbox = QCheckBox(tr("Update trainer databases automatically"))
+        self.autoUpdateDatabaseCheckbox.setChecked(settings["autoUpdateDatabase"])
+        settingsWidgetsLayout.addWidget(self.autoUpdateDatabaseCheckbox)
+
         # Auto trainer updates
         self.autoUpdateCheckbox = QCheckBox(tr("Update trainers automatically"))
         self.autoUpdateCheckbox.setChecked(settings["autoUpdate"])
@@ -213,6 +221,11 @@ class SettingsDialog(QDialog):
         wemodPathButton = QPushButton("...")
         wemodPathButton.clicked.connect(self.selectWeModPath)
         wemodPathLayout.addWidget(wemodPathButton)
+
+        # Launch app on startup
+        self.autoStartCheckbox = QCheckBox(tr("Launch app on startup"))
+        self.autoStartCheckbox.setChecked(settings["autoStart"])
+        settingsWidgetsLayout.addWidget(self.autoStartCheckbox)
 
         # Apply button
         applyButtonLayout = QHBoxLayout()
@@ -234,13 +247,37 @@ class SettingsDialog(QDialog):
         if directory:
             self.wemodLineEdit.setText(os.path.normpath(directory))
     
+    def add_or_remove_startup(self, app_name, path_to_exe, add=True):
+        key = reg.HKEY_CURRENT_USER
+        key_path = "Software\\Microsoft\\Windows\\CurrentVersion\\Run"
+        try:
+            registry_key = reg.OpenKey(key, key_path, 0, reg.KEY_WRITE)
+            if add:
+                reg.SetValueEx(registry_key, app_name, 0, reg.REG_SZ, path_to_exe)
+            else:
+                reg.DeleteValue(registry_key, app_name)
+            reg.CloseKey(registry_key)
+        except WindowsError as e:
+            print(f"Registry modification failed: {str(e)}")
+    
     def apply_settings_page(self):
         settings["theme"] = theme_options[self.themeCombo.currentText()]
         settings["language"] = language_options[self.languageCombo.currentText()]
         settings["enSearchResults"] = self.alwaysEnCheckbox.isChecked()
+        settings["autoUpdateDatabase"] = self.autoUpdateDatabaseCheckbox.isChecked()
         settings["autoUpdate"] = self.autoUpdateCheckbox.isChecked()
         settings["WeModPath"] = self.wemodLineEdit.text()
+        settings["autoStart"] = self.autoStartCheckbox.isChecked()
         apply_settings(settings)
+
+        if getattr(sys, 'frozen', False):
+            app_name = "Game Cheats Manager"
+            app_path = sys.executable
+            if self.autoStartCheckbox.isChecked():
+                self.add_or_remove_startup(app_name, app_path, True)
+            else:
+                self.add_or_remove_startup(app_name, app_path, False)
+
         QMessageBox.information(self, tr("Attention"), tr(
             "Please restart the application to apply theme and language settings."))
 
@@ -447,6 +484,7 @@ class DownloadBaseThread(QThread):
         'User-Agent': 'Mozilla/5.0 (Windows NT 10.0; Win64; x64) AppleWebKit/537.36 (KHTML, like Gecko) Chrome/58.0.3029.110 Safari/537.3',
     }
     translator_initializing = False
+    translator_warnings_displayed = False  # make sure warning doesn't display more than once
     
     def __init__(self, parent=None):
         super().__init__(parent)
@@ -558,6 +596,13 @@ class DownloadBaseThread(QThread):
         return None
     
     def initialize_translator(self):
+        if not self.is_internet_connected():
+            if not self.translator_warnings_displayed:
+                self.message.emit(tr("No internet connection, translation failed."), "failure")
+                self.translator_warnings_displayed = True
+                time.sleep(1)
+            return False
+        
         try:
             global ts
             if ts is None and not self.translator_initializing:
@@ -572,8 +617,11 @@ class DownloadBaseThread(QThread):
                     if ts is not None:
                         break
                     time.sleep(1)
+            return True
+        
         except Exception as e:
             print("import translators failed or error occurred while translating: " + str(e))
+            return False
 
     def translate_trainer(self, trainerName):
         """
@@ -596,9 +644,8 @@ class DownloadBaseThread(QThread):
                 if best_match:
                     trans_trainerName = f"《{best_match}》修改器"
             
-                else:
+                elif self.initialize_translator():
                     # Use direct translation if couldn't find a match
-                    self.initialize_translator()
                     print(
                         "No matches found, using direct translation for: " + original_trainerName)
                     trans_trainerName = ts.translate_text(
@@ -855,13 +902,7 @@ class DownloadDisplayThread(DownloadBaseThread):
         self.keyword = keyword
 
     def run(self):
-        # Check for internet connection before search
-        self.message.emit(tr("Checking for internet connection..."), None)
-        if not self.is_internet_connected():
-            self.message.emit(tr("No internet connection, search failed."), "failure")
-            self.finished.emit(1)
-            return
-        
+        self.translator_warnings_displayed = False
         DownloadBaseThread.trainer_urls = {}
         keywordList = self.translate_keyword(self.keyword)
 
@@ -882,6 +923,7 @@ class DownloadDisplayThread(DownloadBaseThread):
             ignored_trainers = [
                 "Dying Light The Following Enhanced Edition Trainer",
                 "World War Z Trainer",
+                "Street Fighter V Trainer",
             ]
             if original_name in ignored_trainers:
                 continue
@@ -925,7 +967,7 @@ class DownloadDisplayThread(DownloadBaseThread):
 
         # Reconstruct `DownloadBaseThread.trainer_urls` to match the sorted order of translated names
         DownloadBaseThread.trainer_urls = {original: DownloadBaseThread.trainer_urls[original] for original, _ in sorted_pairs}
-        print("\nTrainer results in original name: ", DownloadBaseThread.trainer_urls.keys())
+        print("\nTrainer results in original name: ", [f"{index}. {trainerName}" for index, trainerName in enumerate(DownloadBaseThread.trainer_urls.keys(), start=1)])
 
         # Display sorted results
         self.message.emit("", "clear")
@@ -946,9 +988,8 @@ class DownloadDisplayThread(DownloadBaseThread):
                     if keyword in trainer.get("keyw", ""):
                         translations.append(trainer.get("en_name", ""))
 
-            else:
+            elif self.initialize_translator():
                 # Direct translation
-                self.initialize_translator()
                 services = ["bing"]
                 for service in services:
                     try:
@@ -1050,6 +1091,13 @@ class DownloadTrainersThread(DownloadBaseThread):
         self.update_error_delay = 3
 
     def run(self):
+        self.message.emit(tr("Checking for internet connection..."), None)
+        if not self.is_internet_connected():
+            self.message.emit(tr("No internet connection, download failed."), "failure")
+            time.sleep(self.download_finish_delay)
+            self.finished.emit(1)
+            return
+
         if os.path.exists(DOWNLOAD_TEMP_DIR):
             shutil.rmtree(DOWNLOAD_TEMP_DIR)
         
