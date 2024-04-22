@@ -419,4 +419,32 @@ additions = [
         "en_name": "Binary Domain",
         "keyw": "二进制领域",
     },
+    {
+        "en_name": "Shoot Many Robots",
+        "keyw": "机器人暴动",
+    },
+    {
+        "en_name": "Blades of Time",
+        "keyw": "时光之刃",
+    },
+    {
+        "en_name": "Avatar: The Game",
+        "keyw": "阿凡达",
+    },
+    {
+        "en_name": "Max Payne 3",
+        "keyw": "马克思佩恩3",
+    },
+    {
+        "en_name": "I am Alive",
+        "keyw": "我还活着",
+    },
+    {
+        "en_name": "YuTian",
+        "keyw": "御天降魔传",
+    },
+    {
+        "en_name": "Pacific Drive",
+        "keyw": "超自然车旅",
+    },
 ]

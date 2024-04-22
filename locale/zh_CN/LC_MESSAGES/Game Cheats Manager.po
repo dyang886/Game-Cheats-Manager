@@ -25,6 +25,24 @@ msgstr "黑色"
 msgid "white"
 msgstr "白色"
 
+msgid "Warning"
+msgstr "警告"
+
+msgid ""
+"This software is open source and provided free of charge.\n"
+"If you have paid for this software, please report the seller immediately.\n"
+"Below are official links."
+msgstr ""
+"本软件为开源软件且完全免费。\n"
+"如果您是通过购买方式获得本软件，请立即举报卖家。\n"
+"以下为官方链接。"
+
+msgid "Bilibili author homepage:"
+msgstr "B站作者主页:"
+
+msgid "Don't show again"
+msgstr "不再显示"
+
 msgid "Settings"
 msgstr "设置"
 

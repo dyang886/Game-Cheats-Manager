@@ -25,6 +25,24 @@ msgstr "黑色"
 msgid "white"
 msgstr "白色"
 
+msgid "Warning"
+msgstr "警告"
+
+msgid ""
+"This software is open source and provided free of charge.\n"
+"If you have paid for this software, please report the seller immediately.\n"
+"Below are official links."
+msgstr ""
+"本軟件爲開源軟件且完全免費。\n"
+"如果您是通過購買方式獲得本軟件，請立即舉報賣家。\n"
+"以下爲官方鏈接。"
+
+msgid "Bilibili author homepage:"
+msgstr "B站作者主頁:"
+
+msgid "Don't show again"
+msgstr "不再顯示"
+
 msgid "Settings"
 msgstr "設定"
 
@@ -93,12 +111,6 @@ msgstr "正在獲取修改器翻譯"
 
 msgid "Fetch trainer translations failed"
 msgstr "獲取修改器翻譯失敗"
-
-msgid "Checking for internet connection..."
-msgstr "正在檢查網際網路連接..."
-
-msgid "No internet connection, search failed."
-msgstr "沒有網際網路連接，搜尋失敗。"
 
 msgid "Searching..."
 msgstr "搜尋中..."

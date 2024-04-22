@@ -76,6 +76,7 @@ def load_settings():
         "autoUpdate": True,
         "WeModPath": os.path.join(os.environ["LOCALAPPDATA"], "WeMod"),
         "autoStart": False,
+        "showWarning": True,
     }
 
     try:
@@ -156,6 +157,68 @@ theme_options = {
 }
 
 
+class PopUp(QDialog):
+    def __init__(self, parent=None):
+        super().__init__(parent)
+        self.setWindowTitle(tr("Warning"))
+        self.setWindowIcon(QIcon(resource_path("assets/logo.ico")))
+        popUpLayout = QVBoxLayout()
+        popUpLayout.setSpacing(30)
+        popUpLayout.setContentsMargins(20, 30, 20, 20)
+        self.setLayout(popUpLayout)
+
+        warningLayout = QHBoxLayout()
+        popUpLayout.addLayout(warningLayout)
+
+        WarningPixmap = QPixmap(resource_path("assets/warning.png"))
+        scaledWarningPixmap = WarningPixmap.scaled(120, 120, Qt.AspectRatioMode.KeepAspectRatio, Qt.TransformationMode.SmoothTransformation)
+        warningSign = QLabel()
+        warningSign.setPixmap(scaledWarningPixmap)
+        warningLayout.addWidget(warningSign)
+
+        warningFont = self.font()
+        warningFont.setPointSize(12)
+        warningText = QLabel(tr("This software is open source and provided free of charge.\nIf you have paid for this software, please report the seller immediately.\nBelow are official links."))
+        warningText.setFont(warningFont)
+        warningText.setStyleSheet("color: red;")
+        warningLayout.addWidget(warningText)
+
+        linksLayout = QVBoxLayout()
+        linksLayout.setSpacing(10)
+        popUpLayout.addLayout(linksLayout)
+
+        githubUrl = self.parent().githubLink
+        githubText = f'GitHub: <a href="{githubUrl}" style="text-decoration: none; color: #284fff;">{githubUrl}</a>'
+        githubLabel = QLabel(githubText)
+        githubLabel.setAlignment(Qt.AlignmentFlag.AlignCenter)
+        githubLabel.setTextFormat(Qt.TextFormat.RichText)
+        githubLabel.setOpenExternalLinks(True)
+        linksLayout.addWidget(githubLabel)
+
+        bilibiliUrl = self.parent().bilibiliLink
+        text = tr("Bilibili author homepage:")
+        bilibiliText = f'{text} <a href="{bilibiliUrl}" style="text-decoration: none; color: #284fff;">{bilibiliUrl}</a>'
+        bilibiliLabel = QLabel(bilibiliText)
+        bilibiliLabel.setAlignment(Qt.AlignmentFlag.AlignCenter)
+        bilibiliLabel.setTextFormat(Qt.TextFormat.RichText)
+        bilibiliLabel.setOpenExternalLinks(True)
+        linksLayout.addWidget(bilibiliLabel)
+
+        dontShowLayout = QHBoxLayout()
+        dontShowLayout.setAlignment(Qt.AlignmentFlag.AlignRight)
+        self.dontShowCheckbox = QCheckBox(tr("Don't show again"))
+        dontShowLayout.addWidget(self.dontShowCheckbox)
+        popUpLayout.addLayout(dontShowLayout)
+
+        self.setFixedSize(self.sizeHint())
+
+    def closeEvent(self, event):
+        if self.dontShowCheckbox.isChecked():
+            settings["showWarning"] = False
+            apply_settings(settings)
+        super().closeEvent(event)
+
+
 class SettingsDialog(QDialog):
     def __init__(self, parent=None):
         super().__init__(parent)
@@ -164,7 +227,7 @@ class SettingsDialog(QDialog):
         settingsLayout = QVBoxLayout()
         settingsLayout.setSpacing(15)
         self.setLayout(settingsLayout)
-        self.setMinimumWidth(370)
+        self.setMinimumWidth(400)
 
         settingsWidgetsLayout = QVBoxLayout()
         settingsWidgetsLayout.setContentsMargins(50, 30, 50, 20)
@@ -289,7 +352,7 @@ class AboutDialog(QDialog):
         self.setWindowIcon(QIcon(resource_path("assets/logo.ico")))
         aboutLayout = QVBoxLayout()
         aboutLayout.setSpacing(30)
-        aboutLayout.setContentsMargins(40, 20, 40, 40)
+        aboutLayout.setContentsMargins(40, 20, 40, 30)
         self.setLayout(aboutLayout)
 
         appLayout = QHBoxLayout()
@@ -308,7 +371,9 @@ class AboutDialog(QDialog):
         appNameFont = self.font()
         appNameFont.setPointSize(18)
         appInfoLayout = QVBoxLayout()
+        appInfoLayout.setAlignment(Qt.AlignmentFlag.AlignVCenter)
         appLayout.addLayout(appInfoLayout)
+
         appNameLabel = QLabel("Game Cheats Manager")
         appNameLabel.setFont(appNameFont)
         appNameLabel.setAlignment(Qt.AlignmentFlag.AlignCenter)
@@ -318,13 +383,28 @@ class AboutDialog(QDialog):
         appInfoLayout.addWidget(appVersionLabel)
 
         # Links
+        linksLayout = QVBoxLayout()
+        linksLayout.setSpacing(10)
+        aboutLayout.addLayout(linksLayout)
+
         githubUrl = self.parent().githubLink
         githubText = f'GitHub: <a href="{githubUrl}" style="text-decoration: none; color: #284fff;">{githubUrl}</a>'
         githubLabel = QLabel(githubText)
         githubLabel.setAlignment(Qt.AlignmentFlag.AlignCenter)
         githubLabel.setTextFormat(Qt.TextFormat.RichText)
         githubLabel.setOpenExternalLinks(True)
-        aboutLayout.addWidget(githubLabel)
+        linksLayout.addWidget(githubLabel)
+
+        bilibiliUrl = self.parent().bilibiliLink
+        text = tr("Bilibili author homepage:")
+        bilibiliText = f'{text} <a href="{bilibiliUrl}" style="text-decoration: none; color: #284fff;">{bilibiliUrl}</a>'
+        bilibiliLabel = QLabel(bilibiliText)
+        bilibiliLabel.setAlignment(Qt.AlignmentFlag.AlignCenter)
+        bilibiliLabel.setTextFormat(Qt.TextFormat.RichText)
+        bilibiliLabel.setOpenExternalLinks(True)
+        linksLayout.addWidget(bilibiliLabel)
+
+        self.setFixedSize(self.sizeHint())
 
 
 class PathChangeThread(QThread):
@@ -858,7 +938,9 @@ class FetchTrainerDetails(DownloadBaseThread):
             index_page = "https://dl.fucnm.com/datafile/xgqdetail/index.txt"
             total_pages_response = requests.get(index_page, headers=self.headers)
             if total_pages_response.status_code == 200:
-                total_pages = total_pages_response.json().get("page", "")
+                response = total_pages_response.json()
+                total_pages = response.get("page", "")
+                print(f"Total trainer translations count: {response.get("total", "null")}")
 
         if total_pages:
             completed_pages = 0

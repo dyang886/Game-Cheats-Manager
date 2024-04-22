@@ -23,6 +23,9 @@ class GameCheatsManager(QMainWindow):
             self.single_instance_checker = singleton.SingleInstance()
         except singleton.SingleInstanceException:
             sys.exit(1)
+        except Exception as e:
+            print(str(e))
+
         self.setWindowTitle("Game Cheats Manager")
         self.setWindowIcon(QIcon(resource_path("assets/logo.ico")))
         self.setMinimumSize(670, 500)
@@ -31,12 +34,12 @@ class GameCheatsManager(QMainWindow):
         self.appVersion = "2.0.0"
         self.githubLink = "https://github.com/dyang886/Game-Cheats-Manager"
         self.updateLink = "https://api.github.com/repos/dyang886/Game-Cheats-Manager/releases/latest"
+        self.bilibiliLink = "https://space.bilibili.com/256673766"
         self.trainerSearchEntryPrompt = tr("Search for installed")
         self.downloadSearchEntryPrompt = tr("Search to download")
 
         # Paths and variable management
-        self.trainerDownloadPath = os.path.normpath(
-            os.path.abspath(settings["downloadPath"]))
+        self.trainerDownloadPath = os.path.normpath(settings["downloadPath"])
         os.makedirs(self.trainerDownloadPath, exist_ok=True)
         
         self.dropDownArrow_path = resource_path("assets/dropdown.png").replace("\\", "/")
@@ -201,6 +204,11 @@ class GameCheatsManager(QMainWindow):
         self.fileDialogButton.clicked.connect(self.change_path)
 
         self.show_cheats()
+
+        # Show warning pop up
+        if settings["showWarning"]:
+            popUp = PopUp(self)
+            popUp.show()
 
         # Update database, trainer update
         self.timer = QTimer(self)
