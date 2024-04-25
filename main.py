@@ -49,6 +49,7 @@ class GameCheatsManager(QMainWindow):
         self.rightArrow_path = resource_path("assets/right.png").replace("\\", "/")
         
         self.crackFile_path = resource_path("dependency/app.asar")
+        self.elevator_path = resource_path("dependency/elevator.exe")
         self.search_path = resource_path("assets/search.png")
 
         self.trainers = {}  # Store installed trainers: {trainer name: trainer path}
@@ -95,6 +96,11 @@ class GameCheatsManager(QMainWindow):
         openDirectoryAction.setFont(menuFont)
         openDirectoryAction.triggered.connect(self.open_trainer_directory)
         optionMenu.addAction(openDirectoryAction)
+
+        whiteListAction = QAction(tr("Add Paths to Whitelist"), self)
+        whiteListAction.setFont(menuFont)
+        whiteListAction.triggered.connect(self.add_whitelist)
+        optionMenu.addAction(whiteListAction)
 
         aboutAction = QAction(tr("About"), self)
         aboutAction.setFont(menuFont)
@@ -513,6 +519,25 @@ class GameCheatsManager(QMainWindow):
 
     def open_trainer_directory(self):
         os.startfile(self.trainerDownloadPath)
+    
+    def add_whitelist(self):
+        user_response = QMessageBox.question(
+            self,
+            tr("Administrator Access Required"),
+            tr("To proceed with adding the trainer download paths to the Windows Defender whitelist, administrator rights are needed. A User Account Control (UAC) prompt will appear for permission.") +
+               "\n\n" + tr("Would you like to continue?"),
+            QMessageBox.StandardButton.Yes | QMessageBox.StandardButton.No
+        )
+
+        if user_response == QMessageBox.StandardButton.Yes:
+            paths = [DOWNLOAD_TEMP_DIR, settings["downloadPath"]]
+
+            try:
+                subprocess.run([self.elevator_path] + paths, check=True, shell=True)
+                QMessageBox.information(self, tr("Success"), tr("Successfully added paths to Windows Defender whitelist."))
+
+            except subprocess.CalledProcessError:
+                QMessageBox.critical(self, tr("Failure"), tr("Failed to add paths to Windows Defender whitelist."))
 
     def open_about(self):
         if self.about_window is not None and self.about_window.isVisible():

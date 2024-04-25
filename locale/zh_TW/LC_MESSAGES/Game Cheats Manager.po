@@ -30,11 +30,11 @@ msgstr "警告"
 
 msgid ""
 "This software is open source and provided free of charge.\n"
-"If you have paid for this software, please report the seller immediately.\n"
+"If you have paid for this software unofficially, please report the seller immediately.\n"
 "Below are official links."
 msgstr ""
 "本軟件爲開源軟件且完全免費。\n"
-"如果您是通過購買方式獲得本軟件，請立即舉報賣家。\n"
+"如果您是通過非官方購買方式獲得本軟件，請立即舉報賣家。\n"
 "以下爲官方鏈接。"
 
 msgid "Bilibili author homepage:"
@@ -193,6 +193,9 @@ msgstr "匯入修改器"
 msgid "Open Trainer Download Path"
 msgstr "打開修改器下載路徑"
 
+msgid "Add Paths to Whitelist"
+msgstr "添加路徑至白名單"
+
 msgid "Unlock WeMod Pro"
 msgstr "解鎖 WeMod Pro"
 
@@ -232,6 +235,27 @@ msgstr "遷移完成！"
 msgid "Select trainers you want to import"
 msgstr "選擇要匯入的修改器"
 
+msgid "Administrator Access Required"
+msgstr "需要管理員訪問許可權"
+
+msgid "To proceed with adding the trainer download paths to the Windows Defender whitelist, administrator rights are needed. A User Account Control (UAC) prompt will appear for permission."
+msgstr "若要將修改器下載路徑添加到 Windows Defender 白名單中，需要管理員權限。請留意將彈出的用戶帳戶控製（UAC）提示。"
+
+msgid "Would you like to continue?"
+msgstr "是否要繼續？"
+
+msgid "Success"
+msgstr "成功"
+
+msgid "Successfully added paths to Windows Defender whitelist."
+msgstr "已成功將路徑添加到 Windows Defender 白名單。"
+
+msgid "Failure"
+msgstr "失敗"
+
+msgid "Failed to add paths to Windows Defender whitelist."
+msgstr "無法將路徑添加到 Windows Defender 白名單。"
+
 msgid ""
 "WeMod not installed or invalid installation path.\n"
 "Please choose a correct WeMod installation path in settings."
@@ -241,9 +265,6 @@ msgstr ""
 
 msgid "WeMod is currently running, please close the application first."
 msgstr "WeMod 目前正在運行中，請先關閉應用程式。"
-
-msgid "Success"
-msgstr "成功"
 
 msgid ""
 "You have now activated WeMod Pro!\n"

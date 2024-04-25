@@ -30,11 +30,11 @@ msgstr "Warning"
 
 msgid ""
 "This software is open source and provided free of charge.\n"
-"If you have paid for this software, please report the seller immediately.\n"
+"If you have paid for this software unofficially, please report the seller immediately.\n"
 "Below are official links."
 msgstr ""
 "This software is open source and provided free of charge.\n"
-"If you have paid for this software, please report the seller immediately.\n"
+"If you have paid for this software unofficially, please report the seller immediately.\n"
 "Below are official links."
 
 msgid "Bilibili author homepage:"
@@ -193,6 +193,9 @@ msgstr "Import Trainers"
 msgid "Open Trainer Download Path"
 msgstr "Open Trainer Download Path"
 
+msgid "Add Paths to Whitelist"
+msgstr "Add Paths to Whitelist"
+
 msgid "Unlock WeMod Pro"
 msgstr "Unlock WeMod Pro"
 
@@ -232,6 +235,27 @@ msgstr "Migration complete!"
 msgid "Select trainers you want to import"
 msgstr "Select trainers you want to import"
 
+msgid "Administrator Access Required"
+msgstr "Administrator Access Required"
+
+msgid "To proceed with adding the trainer download paths to the Windows Defender whitelist, administrator rights are needed. A User Account Control (UAC) prompt will appear for permission."
+msgstr "To proceed with adding the trainer download paths to the Windows Defender whitelist, administrator rights are needed. A User Account Control (UAC) prompt will appear for permission."
+
+msgid "Would you like to continue?"
+msgstr "Would you like to continue?"
+
+msgid "Success"
+msgstr "Success"
+
+msgid "Successfully added paths to Windows Defender whitelist."
+msgstr "Successfully added paths to Windows Defender whitelist."
+
+msgid "Failure"
+msgstr "Failure"
+
+msgid "Failed to add paths to Windows Defender whitelist."
+msgstr "Failed to add paths to Windows Defender whitelist."
+
 msgid ""
 "WeMod not installed or invalid installation path.\n"
 "Please choose a correct WeMod installation path in settings."
@@ -241,9 +265,6 @@ msgstr ""
 
 msgid "WeMod is currently running, please close the application first."
 msgstr "WeMod is currently running, please close the application first."
-
-msgid "Success"
-msgstr "Success"
 
 msgid ""
 "You have now activated WeMod Pro!\n"

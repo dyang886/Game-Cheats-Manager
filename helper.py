@@ -177,8 +177,8 @@ class PopUp(QDialog):
         warningLayout.addWidget(warningSign)
 
         warningFont = self.font()
-        warningFont.setPointSize(12)
-        warningText = QLabel(tr("This software is open source and provided free of charge.\nIf you have paid for this software, please report the seller immediately.\nBelow are official links."))
+        warningFont.setPointSize(11)
+        warningText = QLabel(tr("This software is open source and provided free of charge.\nIf you have paid for this software unofficially, please report the seller immediately.\nBelow are official links."))
         warningText.setFont(warningFont)
         warningText.setStyleSheet("color: red;")
         warningLayout.addWidget(warningText)
@@ -820,6 +820,7 @@ class UpdateTrainers(DownloadBaseThread):
                     # The date could be "Mar  8 2024" or "Dec 10 2022"
                     date_match = re.search(rb'\b(?:Jan|Feb|Mar|Apr|May|Jun|Jul|Aug|Sep|Oct|Nov|Dec)\s+\d{1,2}\s+\d{4}\b', content[start_index:])
                     if date_match and tagName:
+                        locale.setlocale(locale.LC_TIME, 'English_United States')
                         trainerSrcDate = datetime.datetime.strptime(date_match.group().decode('utf-8'), '%b %d %Y')
 
                         page_content = self.get_webpage_content(f"https://flingtrainer.com/tag/{tagName}", "FLiNG Trainer")
@@ -978,6 +979,7 @@ class FetchTrainerDetails(DownloadBaseThread):
             return None
 
 
+# https://down.fucnm.com/Story.of.Seasons.A.Wonderful.Life.v1.0.Plus.24.Trainer-FLiNG.zip
 class DownloadDisplayThread(DownloadBaseThread):
     def __init__(self, keyword, parent=None):
         super().__init__(parent)
