@@ -272,3 +272,15 @@ msgid ""
 msgstr ""
 "您已激活 WeMod Pro！\n"
 "当前 WeMod 版本：v"
+
+msgid "Trainer Delete"
+msgstr "删除修改器"
+
+msgid "Are you sure you want to delete "
+msgstr "确定要删除"
+
+msgid "Confirm"
+msgstr "确认"
+
+msgid "Cancel"
+msgstr "取消"

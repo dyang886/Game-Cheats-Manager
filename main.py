@@ -317,13 +317,26 @@ class GameCheatsManager(QMainWindow):
     def delete_trainer(self):
         index = self.flingListBox.currentRow()
         if index != -1:
-            try:
-                trainerName = self.flingListBox.item(index).text()
-                os.remove(self.trainers[trainerName])
-                self.flingListBox.takeItem(index)
-                self.show_cheats()
-            except PermissionError as e:
-                QMessageBox.critical(self, tr("Error"), tr("Trainer is currently in use, please close any programs using the file and try again."))
+            trainerName = self.flingListBox.item(index).text()
+        
+            # 弹出确认提示框
+            msg_box = QMessageBox(QMessageBox.Icon.Question, tr('Trainer Delete'), tr('Are you sure you want to delete ')+f"'{trainerName}'?",
+                      QMessageBox.StandardButton.Yes | QMessageBox.StandardButton.No, self)
+            
+            yes_button = msg_box.button(QMessageBox.StandardButton.Yes)
+            yes_button.setText(tr("Confirm"))
+            no_button = msg_box.button(QMessageBox.StandardButton.No)
+            no_button.setText(tr("Cancel"))
+
+            reply = msg_box.exec()
+
+            if reply == QMessageBox.StandardButton.Yes:
+                try:
+                    os.remove(self.trainers[trainerName])
+                    self.flingListBox.takeItem(index)
+                    self.show_cheats()
+                except PermissionError as e:
+                    QMessageBox.critical(self, tr("Error"), tr("Trainer is currently in use, please close any programs using the file and try again."))
     
     def findWidgetInStatusBar(self, statusbar, widgetName):
         for widget in statusbar.children():
@@ -513,8 +526,8 @@ class GameCheatsManager(QMainWindow):
         if file_names:
             for file_name in file_names:
                 dest_path = os.path.join(self.trainerDownloadPath, os.path.basename(file_name))
-                shutil.move(file_name, dest_path)
-                print("Trainer moved: ", file_name)
+                shutil.copy(file_name, dest_path)  # 请使用copy而不是move，原本目录里的文件应该得到保留！！！
+                print("Trainer copied: ", file_name)
             self.show_cheats()
 
     def open_trainer_directory(self):
