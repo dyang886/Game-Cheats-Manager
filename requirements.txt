@@ -1,4 +1,5 @@
 beautifulsoup4
+cn2an
 fuzzywuzzy
 pinyin
 polib

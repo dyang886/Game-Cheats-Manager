@@ -25,6 +25,12 @@ msgstr "Black"
 msgid "white"
 msgstr "white"
 
+msgid "China"
+msgstr "China"
+
+msgid "International"
+msgstr "International"
+
 msgid "Warning"
 msgstr "Warning"
 
@@ -51,6 +57,9 @@ msgstr "Theme:"
 
 msgid "Language:"
 msgstr "Language:"
+
+msgid "Download Server:"
+msgstr "Download Server:"
 
 msgid "Always show search results in English"
 msgstr "Always show search results in English"
@@ -132,6 +141,9 @@ msgstr "Search success!"
 
 msgid "Search failed, please wait until all data is updated from FLiNG."
 msgstr "Search failed, please wait until all data is updated from FLiNG."
+
+msgid "Failed to get trainer url: "
+msgstr "Failed to get trainer url: "
 
 msgid "Checking for internet connection..."
 msgstr "Checking for internet connection..."

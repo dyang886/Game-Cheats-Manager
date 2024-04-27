@@ -25,6 +25,12 @@ msgstr "黑色"
 msgid "white"
 msgstr "白色"
 
+msgid "China"
+msgstr "中国"
+
+msgid "International"
+msgstr "国际"
+
 msgid "Warning"
 msgstr "警告"
 
@@ -51,6 +57,9 @@ msgstr "主题："
 
 msgid "Language:"
 msgstr "语言："
+
+msgid "Download Server:"
+msgstr "下载服务器："
 
 msgid "Always show search results in English"
 msgstr "始终以英文显示搜索结果"
@@ -132,6 +141,9 @@ msgstr "搜索成功！"
 
 msgid "Search failed, please wait until all data is updated from FLiNG."
 msgstr "搜索失败，请等待风灵月影数据库完成更新。"
+
+msgid "Failed to get trainer url: "
+msgstr "无法获取修改器网址："
 
 msgid "Checking for internet connection..."
 msgstr "检查互联网连接中..."
