@@ -970,7 +970,7 @@ class FetchTrainerDetails(DownloadBaseThread):
             if total_pages_response.status_code == 200:
                 response = total_pages_response.json()
                 total_pages = response.get("page", "")
-                print(f"Total trainer translations count: {response.get("total", "null")}")
+                print(f"Total trainer translations count: {response.get('total', 'null')}")
 
         if total_pages:
             completed_pages = 0
