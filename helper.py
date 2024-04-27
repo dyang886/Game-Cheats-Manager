@@ -1206,9 +1206,10 @@ class DownloadDisplayThread(DownloadBaseThread):
                     full_url = ""
                     anti_url = ""
                     if settings["language"] == "en_US":
-                        trainerDisplayName = f"{entry["en_name"]} Trainer"
+                        trainerDisplayName = f"{entry['en_name']} Trainer"
                     elif settings["language"] == "zh_CN" or settings["language"] == "zh_TW":
-                        trainerDisplayName = f"《{re.sub(r"\s(v[\d\.v\-]+.*|Early ?Access.*)", "", entry["title"])}》修改器"
+                        pattern = r'\s(v[\d\.v\-]+.*|Early ?Access.*)'
+                        trainerDisplayName = f"《{re.sub(pattern, '', entry['title'])}》修改器"
 
                     try:
                         # Construct download url, example: https://down.fucnm.com/Story.of.Seasons.A.Wonderful.Life.v1.0.Plus.24.Trainer-FLiNG.zip
@@ -1230,7 +1231,7 @@ class DownloadDisplayThread(DownloadBaseThread):
                             anti_url = entry["anti_url"]
                     except Exception as e:
                         self.message.emit(tr("Failed to get trainer url: ") + trainerDisplayName, "failure")
-                        print(f"Constructing download url for {entry["keyw"]} failed: {str(e)}")
+                        print(f"Constructing download url for {entry['keyw']} failed: {str(e)}")
                     
                     if trainerDisplayName and full_url:
                         DownloadBaseThread.trainer_urls[trainerDisplayName] = [full_url, anti_url]
