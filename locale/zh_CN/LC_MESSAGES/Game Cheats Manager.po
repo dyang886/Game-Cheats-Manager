@@ -223,6 +223,18 @@ msgstr "启动"
 msgid "Delete"
 msgstr "删除"
 
+msgid "Delete trainer"
+msgstr "删除修改器"
+
+msgid "Are you sure you want to delete "
+msgstr "确定要删除"
+
+msgid "Confirm"
+msgstr "确认"
+
+msgid "Cancel"
+msgstr "取消"
+
 msgid "Error"
 msgstr "错误"
 
@@ -247,6 +259,27 @@ msgstr "迁移完成！"
 msgid "Select trainers you want to import"
 msgstr "选择要导入的修改器"
 
+msgid "Failure"
+msgstr "失败"
+
+msgid "Failed to import trainer: "
+msgstr "导入修改器失败："
+
+msgid "Delete original trainers"
+msgstr "删除原始修改器"
+
+msgid "Do you want to delete the original trainer files?"
+msgstr "是否要删除原始修改器文件？"
+
+msgid "Yes"
+msgstr "是"
+
+msgid "No"
+msgstr "否"
+
+msgid "Failed to delete original trainer: "
+msgstr "无法删除原始修改器："
+
 msgid "Administrator Access Required"
 msgstr "需要管理员访问权限"
 
@@ -261,9 +294,6 @@ msgstr "成功"
 
 msgid "Successfully added paths to Windows Defender whitelist."
 msgstr "已成功将路径添加到 Windows Defender 白名单。"
-
-msgid "Failure"
-msgstr "失败"
 
 msgid "Failed to add paths to Windows Defender whitelist."
 msgstr "无法将路径添加到 Windows Defender 白名单。"
@@ -284,15 +314,3 @@ msgid ""
 msgstr ""
 "您已激活 WeMod Pro！\n"
 "当前 WeMod 版本：v"
-
-msgid "Trainer Delete"
-msgstr "删除修改器"
-
-msgid "Are you sure you want to delete "
-msgstr "确定要删除"
-
-msgid "Confirm"
-msgstr "确认"
-
-msgid "Cancel"
-msgstr "取消"

@@ -7,6 +7,7 @@ import locale
 import os
 import re
 import shutil
+import stat
 import subprocess
 import sys
 import tempfile
@@ -142,10 +143,10 @@ if not os.path.exists(setting_path):
 
 SETTINGS_FILE = os.path.join(setting_path, "settings.json")
 DATABASE_PATH = os.path.join(setting_path, "db")
+os.makedirs(DATABASE_PATH, exist_ok=True)
 ensure_trainer_details_exist()
 DOWNLOAD_TEMP_DIR = os.path.join(tempfile.gettempdir(), "GameCheatsManagerTemp", "download")
 VERSION_TEMP_DIR = os.path.join(tempfile.gettempdir(), "GameCheatsManagerTemp", "version")
-os.makedirs(DATABASE_PATH, exist_ok=True)
 
 resourceHacker_path = resource_path("dependency/ResourceHacker.exe")
 unrar_path = resource_path("dependency/UnRAR.exe")
@@ -970,7 +971,7 @@ class FetchTrainerDetails(DownloadBaseThread):
             if total_pages_response.status_code == 200:
                 response = total_pages_response.json()
                 total_pages = response.get("page", "")
-                print(f"Total trainer translations count: {response.get('total', 'null')}")
+                print(f"Total trainer translations fetched: {response.get('total', 'null')}\n")
 
         if total_pages:
             completed_pages = 0
@@ -1469,6 +1470,8 @@ class DownloadTrainersThread(DownloadBaseThread):
         self.remove_bgMusic(source_file, ["MID", "MIDI"])
 
         try:
+            if os.path.exists(destination_file):
+                os.chmod(destination_file, stat.S_IWRITE)
             shutil.move(source_file, destination_file)
             os.remove(trainerTemp)
             if antiUrl:

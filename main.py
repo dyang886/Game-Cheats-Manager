@@ -3,6 +3,7 @@ from queue import Queue
 import re
 import shutil
 import sys
+import stat
 
 from PyQt6.QtCore import Qt, QTimer
 from PyQt6.QtGui import QAction, QColor, QFont, QFontDatabase, QIcon, QPixmap
@@ -318,21 +319,26 @@ class GameCheatsManager(QMainWindow):
         index = self.flingListBox.currentRow()
         if index != -1:
             trainerName = self.flingListBox.item(index).text()
+            trainerPath = self.trainers[trainerName]
         
-            # 弹出确认提示框
-            msg_box = QMessageBox(QMessageBox.Icon.Question, tr('Trainer Delete'), tr('Are you sure you want to delete ')+f"'{trainerName}'?",
-                      QMessageBox.StandardButton.Yes | QMessageBox.StandardButton.No, self)
+            msg_box = QMessageBox(
+                QMessageBox.Icon.Question,
+                tr('Delete trainer'),
+                tr('Are you sure you want to delete ') + f"{trainerName}?",
+                QMessageBox.StandardButton.Yes | QMessageBox.StandardButton.No,
+                self
+            )
             
             yes_button = msg_box.button(QMessageBox.StandardButton.Yes)
             yes_button.setText(tr("Confirm"))
             no_button = msg_box.button(QMessageBox.StandardButton.No)
             no_button.setText(tr("Cancel"))
-
             reply = msg_box.exec()
 
             if reply == QMessageBox.StandardButton.Yes:
                 try:
-                    os.remove(self.trainers[trainerName])
+                    os.chmod(trainerPath, stat.S_IWRITE)
+                    os.remove(trainerPath)
                     self.flingListBox.takeItem(index)
                     self.show_cheats()
                 except PermissionError as e:
@@ -525,24 +531,57 @@ class GameCheatsManager(QMainWindow):
         file_names, _ = QFileDialog.getOpenFileNames(self, tr("Select trainers you want to import"), "", "Executable Files (*.exe)")
         if file_names:
             for file_name in file_names:
-                dest_path = os.path.join(self.trainerDownloadPath, os.path.basename(file_name))
-                shutil.copy(file_name, dest_path)  # 请使用copy而不是move，原本目录里的文件应该得到保留！！！
-                print("Trainer copied: ", file_name)
-            self.show_cheats()
+                try:
+                    dst = os.path.join(self.trainerDownloadPath, os.path.basename(file_name))
+                    if os.path.exists(dst):
+                        os.chmod(dst, stat.S_IWRITE)
+                    shutil.copy(file_name, dst)
+                    print("Trainer copied: ", file_name)
+                except Exception as e:
+                        QMessageBox.critical(self, tr("Failure"), tr("Failed to import trainer: ") + f"{file_name}\n{str(e)}")
+                self.show_cheats()
+
+            msg_box = QMessageBox(
+                QMessageBox.Icon.Question,
+                tr("Delete original trainers"),
+                tr("Do you want to delete the original trainer files?"),
+                QMessageBox.StandardButton.Yes | QMessageBox.StandardButton.No,
+                self
+            )
+            
+            yes_button = msg_box.button(QMessageBox.StandardButton.Yes)
+            yes_button.setText(tr("Yes"))
+            no_button = msg_box.button(QMessageBox.StandardButton.No)
+            no_button.setText(tr("No"))
+            reply = msg_box.exec()
+
+            if reply == QMessageBox.StandardButton.Yes:
+                for file_name in file_names:
+                    try:
+                        os.remove(file_name)
+                    except Exception as e:
+                        QMessageBox.critical(self, tr("Failure"), tr("Failed to delete original trainer: ") + f"{file_name}\n{str(e)}")
 
     def open_trainer_directory(self):
         os.startfile(self.trainerDownloadPath)
     
     def add_whitelist(self):
-        user_response = QMessageBox.question(
-            self,
+        msg_box = QMessageBox(
+            QMessageBox.Icon.Question,
             tr("Administrator Access Required"),
             tr("To proceed with adding the trainer download paths to the Windows Defender whitelist, administrator rights are needed. A User Account Control (UAC) prompt will appear for permission.") +
                "\n\n" + tr("Would you like to continue?"),
-            QMessageBox.StandardButton.Yes | QMessageBox.StandardButton.No
+            QMessageBox.StandardButton.Yes | QMessageBox.StandardButton.No,
+            self
         )
+        
+        yes_button = msg_box.button(QMessageBox.StandardButton.Yes)
+        yes_button.setText(tr("Yes"))
+        no_button = msg_box.button(QMessageBox.StandardButton.No)
+        no_button.setText(tr("No"))
+        reply = msg_box.exec()
 
-        if user_response == QMessageBox.StandardButton.Yes:
+        if reply == QMessageBox.StandardButton.Yes:
             paths = [DOWNLOAD_TEMP_DIR, settings["downloadPath"]]
 
             try:

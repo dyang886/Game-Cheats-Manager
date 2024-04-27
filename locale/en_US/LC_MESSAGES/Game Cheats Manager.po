@@ -223,6 +223,18 @@ msgstr "Launch"
 msgid "Delete"
 msgstr "Delete"
 
+msgid "Delete trainer"
+msgstr "Delete trainer"
+
+msgid "Are you sure you want to delete "
+msgstr "Are you sure you want to delete "
+
+msgid "Confirm"
+msgstr "Confirm"
+
+msgid "Cancel"
+msgstr "Cancel"
+
 msgid "Error"
 msgstr "Error"
 
@@ -247,6 +259,27 @@ msgstr "Migration complete!"
 msgid "Select trainers you want to import"
 msgstr "Select trainers you want to import"
 
+msgid "Failure"
+msgstr "Failure"
+
+msgid "Failed to import trainer: "
+msgstr "Failed to import trainer: "
+
+msgid "Delete original trainers"
+msgstr "Delete original trainers"
+
+msgid "Do you want to delete the original trainer files?"
+msgstr "Do you want to delete the original trainer files?"
+
+msgid "Yes"
+msgstr "Yes"
+
+msgid "No"
+msgstr "No"
+
+msgid "Failed to delete original trainer: "
+msgstr "Failed to delete original trainer: "
+
 msgid "Administrator Access Required"
 msgstr "Administrator Access Required"
 
@@ -261,9 +294,6 @@ msgstr "Success"
 
 msgid "Successfully added paths to Windows Defender whitelist."
 msgstr "Successfully added paths to Windows Defender whitelist."
-
-msgid "Failure"
-msgstr "Failure"
 
 msgid "Failed to add paths to Windows Defender whitelist."
 msgstr "Failed to add paths to Windows Defender whitelist."

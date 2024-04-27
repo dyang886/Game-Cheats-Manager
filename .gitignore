@@ -1,0 +1,11 @@
+__pycache__
+.vscode
+.DS_Store
+*.mo
+build
+dist
+compile.bat
+Game Cheats Manager.spec
+utility.py
+ResourceHacker.ini
+elevator.manifest

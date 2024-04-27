@@ -223,6 +223,18 @@ msgstr "啟動"
 msgid "Delete"
 msgstr "刪除"
 
+msgid "Delete trainer"
+msgstr "刪除修改器"
+
+msgid "Are you sure you want to delete "
+msgstr "確定要刪除"
+
+msgid "Confirm"
+msgstr "確認"
+
+msgid "Cancel"
+msgstr "取消"
+
 msgid "Error"
 msgstr "錯誤"
 
@@ -247,6 +259,27 @@ msgstr "遷移完成！"
 msgid "Select trainers you want to import"
 msgstr "選擇要匯入的修改器"
 
+msgid "Failure"
+msgstr "失敗"
+
+msgid "Failed to import trainer: "
+msgstr "匯入修改器失敗："
+
+msgid "Delete original trainers"
+msgstr "刪除原始修改器"
+
+msgid "Do you want to delete the original trainer files?"
+msgstr "是否要刪除原始修改器檔？"
+
+msgid "Yes"
+msgstr "是"
+
+msgid "No"
+msgstr "否"
+
+msgid "Failed to delete original trainer: "
+msgstr "無法刪除原始修改器："
+
 msgid "Administrator Access Required"
 msgstr "需要管理員訪問許可權"
 
@@ -261,9 +294,6 @@ msgstr "成功"
 
 msgid "Successfully added paths to Windows Defender whitelist."
 msgstr "已成功將路徑添加到 Windows Defender 白名單。"
-
-msgid "Failure"
-msgstr "失敗"
 
 msgid "Failed to add paths to Windows Defender whitelist."
 msgstr "無法將路徑添加到 Windows Defender 白名單。"
