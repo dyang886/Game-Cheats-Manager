@@ -31,15 +31,15 @@ class GameCheatsManager(QMainWindow):
         self.setWindowIcon(QIcon(resource_path("assets/logo.ico")))
         self.setMinimumSize(670, 500)
 
-        # Version, user prompts, and links
+        # Version and links
         self.appVersion = "2.0.0"
         self.githubLink = "https://github.com/dyang886/Game-Cheats-Manager"
         self.updateLink = "https://api.github.com/repos/dyang886/Game-Cheats-Manager/releases/latest"
         self.bilibiliLink = "https://space.bilibili.com/256673766"
-        self.trainerSearchEntryPrompt = tr("Search for installed")
-        self.downloadSearchEntryPrompt = tr("Search to download")
 
         # Paths and variable management
+        self.trainerSearchEntryPrompt = tr("Search for installed")
+        self.downloadSearchEntryPrompt = tr("Search to download")
         self.trainerDownloadPath = os.path.normpath(settings["downloadPath"])
         os.makedirs(self.trainerDownloadPath, exist_ok=True)
         
@@ -153,7 +153,7 @@ class GameCheatsManager(QMainWindow):
 
         # Display installed trainers
         self.flingListBox = QListWidget()
-        self.flingListBox.itemDoubleClicked.connect(self.launch_trainer)
+        self.flingListBox.itemActivated.connect(self.launch_trainer)
         trainersLayout.addWidget(self.flingListBox)
 
         # Launch and delete buttons
@@ -193,7 +193,7 @@ class GameCheatsManager(QMainWindow):
 
         # Display trainer search results
         self.downloadListBox = QListWidget()
-        self.downloadListBox.itemDoubleClicked.connect(self.on_download_double_click)
+        self.downloadListBox.itemActivated.connect(self.on_download_start)
         downloadsLayout.addWidget(self.downloadListBox)
 
         # Change trainer download path
@@ -250,7 +250,7 @@ class GameCheatsManager(QMainWindow):
         if keyword and self.searchable:
             self.download_display(keyword)
 
-    def on_download_double_click(self, item):
+    def on_download_start(self, item):
         index = self.downloadListBox.row(item)
         if index >= 0 and self.downloadable:
             self.download_trainers(index)
@@ -359,6 +359,7 @@ class GameCheatsManager(QMainWindow):
             changedPath = os.path.normpath(os.path.join(folder, "GCM Trainers/"))
             if self.downloadPathEntry.text() == changedPath:
                 QMessageBox.critical(self, tr("Error"), tr("Please choose a new path."))
+                self.on_message(tr("Failed to change trainer download path."), "failure")
                 self.enable_all_widgets()
                 return
 
@@ -458,7 +459,7 @@ class GameCheatsManager(QMainWindow):
             self.downloadListBox.addItem(item)
         else:
             self.downloadListBox.addItem(item)
-    
+            
     def on_message_box(self, type, title, text):
         if type == "info":
             QMessageBox.information(self, title, text)
@@ -466,7 +467,9 @@ class GameCheatsManager(QMainWindow):
             QMessageBox.critical(self, title, text)
     
     def on_migration_error(self, error_message):
-        QMessageBox.critical(self, tr("Error"), tr("Error creating the new path: ") + error_message)
+        QMessageBox.critical(self, tr("Error"), tr("Error migrating trainers: ") + error_message)
+        self.on_message(tr("Failed to change trainer download path."), "failure")
+        self.show_cheats()
         self.enable_all_widgets()
     
     def on_migration_finished(self, new_path):
@@ -474,7 +477,7 @@ class GameCheatsManager(QMainWindow):
         settings["downloadPath"] = self.trainerDownloadPath
         apply_settings(settings)
         self.show_cheats()
-        self.downloadListBox.addItem(tr("Migration complete!"))
+        self.on_message(tr("Migration complete!"), "success")
         self.downloadPathEntry.setText(self.trainerDownloadPath)
         self.enable_all_widgets()
 

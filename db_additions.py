@@ -105,7 +105,7 @@ additions = [
     },
     {
         "en_name": "Dishonored-The Knife of Dunwall",
-        "keyw": "耻辱 顿沃城之锋",
+        "keyw": "耻辱：顿沃城之锋",
     },
     {
         "en_name": "Mark of the Ninja",
@@ -446,5 +446,49 @@ additions = [
     {
         "en_name": "Pacific Drive",
         "keyw": "超自然车旅",
+    },
+    {
+        "en_name": "Devil May Cry 1 HD",
+        "keyw": "鬼泣1：HD",
+    },
+    {
+        "en_name": "Devil May Cry 2 HD",
+        "keyw": "鬼泣2：HD",
+    },
+    {
+        "en_name": "Devil May Cry 3 HD",
+        "keyw": "鬼泣3：HD",
+    },
+    {
+        "en_name": "DmC: Devil May Cry",
+        "keyw": "DmC：鬼泣",
+    },
+    {
+        "en_name": "Shenmue 1 HD",
+        "keyw": "莎木1 HD",
+    },
+    {
+        "en_name": "Shenmue 2 HD",
+        "keyw": "莎木2 HD",
+    },
+    {
+        "en_name": "Magicka",
+        "keyw": "魔能",
+    },
+    {
+        "en_name": "NBA 2K13",
+        "keyw": "NBA 2K13",
+    },
+    {
+        "en_name": "Haydee 2",
+        "keyw": "Haydee 2",
+    },
+    {
+        "en_name": "Wooden Sen'SeY",
+        "keyw": "木遁大师",
+    },
+    {
+        "en_name": "Ys Memories of Celceta Steam",
+        "keyw": "伊苏：塞尔塞塔的树海Steam版",
     },
 ]

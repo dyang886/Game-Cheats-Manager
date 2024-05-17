@@ -25,21 +25,23 @@ msgstr "Black"
 msgid "white"
 msgstr "white"
 
-msgid "China"
-msgstr "China"
-
 msgid "International"
 msgstr "International"
+
+msgid "China"
+msgstr "China"
 
 msgid "Warning"
 msgstr "Warning"
 
 msgid ""
 "This software is open source and provided free of charge.\n"
+"Resale is strictly prohibited, and developers reserve the right to pursue legal responsibility against the violators.\n"
 "If you have paid for this software unofficially, please report the seller immediately.\n"
 "Below are official links."
 msgstr ""
 "This software is open source and provided free of charge.\n"
+"Resale is strictly prohibited, and developers reserve the right to pursue legal responsibility against the violators.\n"
 "If you have paid for this software unofficially, please report the seller immediately.\n"
 "Below are official links."
 
@@ -94,8 +96,11 @@ msgstr "About"
 msgid "Version: "
 msgstr "Version: "
 
-msgid "Please complete any security checks..."
-msgstr "Please complete any security checks..."
+msgid "Please complete any security checks"
+msgstr "Please complete any security checks"
+
+msgid "Unable to access webpage"
+msgstr "Unable to access webpage"
 
 msgid "No internet connection, translation failed."
 msgstr "No internet connection, translation failed."
@@ -244,14 +249,17 @@ msgstr "Change trainer download path"
 msgid "Please choose a new path."
 msgstr "Please choose a new path."
 
+msgid "Failed to change trainer download path."
+msgstr "Failed to change trainer download path."
+
 msgid "Migrating existing trainers..."
 msgstr "Migrating existing trainers..."
 
 msgid "No path selected."
 msgstr "No path selected."
 
-msgid "Error creating the new path: "
-msgstr "Error creating the new path: "
+msgid "Error migrating trainers: "
+msgstr "Error migrating trainers: "
 
 msgid "Migration complete!"
 msgstr "Migration complete!"

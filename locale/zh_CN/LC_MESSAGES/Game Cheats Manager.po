@@ -25,21 +25,23 @@ msgstr "黑色"
 msgid "white"
 msgstr "白色"
 
-msgid "China"
-msgstr "中国"
-
 msgid "International"
 msgstr "国际"
+
+msgid "China"
+msgstr "中国"
 
 msgid "Warning"
 msgstr "警告"
 
 msgid ""
 "This software is open source and provided free of charge.\n"
+"Resale is strictly prohibited, and developers reserve the right to pursue legal responsibility against the violators.\n"
 "If you have paid for this software unofficially, please report the seller immediately.\n"
 "Below are official links."
 msgstr ""
 "本软件为开源软件且完全免费。\n"
+"严禁倒卖，软件开发者保留追究违反者法律责任的权利。\n"
 "如果您是通过非官方购买方式获得本软件，请立即举报卖家。\n"
 "以下为官方链接。"
 
@@ -94,8 +96,11 @@ msgstr "关于"
 msgid "Version: "
 msgstr "版本："
 
-msgid "Please complete any security checks..."
-msgstr "请完成所有安全检查..."
+msgid "Please complete any security checks"
+msgstr "请完成所有安全检查"
+
+msgid "Unable to access webpage"
+msgstr "无法访问网页"
 
 msgid "No internet connection, translation failed."
 msgstr "没有互联网连接，翻译失败。"
@@ -227,7 +232,7 @@ msgid "Delete trainer"
 msgstr "删除修改器"
 
 msgid "Are you sure you want to delete "
-msgstr "确定要删除"
+msgstr "确定要删除 "
 
 msgid "Confirm"
 msgstr "确认"
@@ -244,14 +249,17 @@ msgstr "更改修改器下载路径"
 msgid "Please choose a new path."
 msgstr "请选择一个新路径。"
 
+msgid "Failed to change trainer download path."
+msgstr "更改修改器下载路径失败。"
+
 msgid "Migrating existing trainers..."
 msgstr "正在迁移现有修改器..."
 
 msgid "No path selected."
 msgstr "未选择路径。"
 
-msgid "Error creating the new path: "
-msgstr "创建新路径时出错："
+msgid "Error migrating trainers: "
+msgstr "迁移修改器时出错："
 
 msgid "Migration complete!"
 msgstr "迁移完成！"

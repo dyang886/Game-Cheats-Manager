@@ -133,13 +133,12 @@ def sort_trainers_key(name):
 def ensure_trainer_details_exist():
     dst = os.path.join(DATABASE_PATH, "xgqdetail.json")
     if not os.path.exists(dst):
-        shutil.copyfile(resource_path("assets/xgqdetail.json"), dst)
+        shutil.copyfile(resource_path("dependency/xgqdetail.json"), dst)
 
 
 setting_path = os.path.join(
     os.environ["APPDATA"], "GCM Settings/")
-if not os.path.exists(setting_path):
-    os.makedirs(setting_path)
+os.makedirs(setting_path, exist_ok=True)
 
 SETTINGS_FILE = os.path.join(setting_path, "settings.json")
 DATABASE_PATH = os.path.join(setting_path, "db")
@@ -167,8 +166,8 @@ theme_options = {
 }
 
 server_options = {
-    tr("China"): "china",
-    tr("International"): "intl"
+    tr("International"): "intl",
+    tr("China"): "china"
 }
 
 
@@ -193,7 +192,7 @@ class PopUp(QDialog):
 
         warningFont = self.font()
         warningFont.setPointSize(11)
-        warningText = QLabel(tr("This software is open source and provided free of charge.\nIf you have paid for this software unofficially, please report the seller immediately.\nBelow are official links."))
+        warningText = QLabel(tr("This software is open source and provided free of charge.\nResale is strictly prohibited, and developers reserve the right to pursue legal responsibility against the violators.\nIf you have paid for this software unofficially, please report the seller immediately.\nBelow are official links."))
         warningText.setFont(warningFont)
         warningText.setStyleSheet("color: red;")
         warningLayout.addWidget(warningText)
@@ -452,8 +451,9 @@ class PathChangeThread(QThread):
             for filename in os.listdir(self.source_path):
                 src_file = os.path.join(self.source_path, filename)
                 dst_file = os.path.join(dst, filename)
+                os.chmod(src_file, stat.S_IWRITE)
                 if os.path.exists(dst_file):
-                    os.remove(dst_file)
+                    os.chmod(dst, stat.S_IWRITE)
                 shutil.move(src_file, dst_file)
             shutil.rmtree(self.source_path)
 
@@ -512,7 +512,7 @@ class BrowserDialog(QDialog):
         layout.addWidget(self.browser)
         self.setLayout(layout)
         self.resize(800, 600)
-        self.setWindowTitle(tr("Please complete any security checks..."))
+        self.setWindowTitle(tr("Please complete any security checks") + "/" + tr("Unable to access webpage"))
         self.setWindowIcon(QIcon(resource_path("assets/logo.ico")))
 
         self.check_timer = QTimer(self)
@@ -656,7 +656,7 @@ class DownloadBaseThread(QThread):
 
         for url in urls:
             try:
-                response = requests.get(url, timeout=timeout)
+                response = requests.head(url, timeout=timeout)
                 response.raise_for_status()
                 return True
             except requests.RequestException:
@@ -685,6 +685,9 @@ class DownloadBaseThread(QThread):
     def sanitize(self, text):
         text = re.sub(r'\d+', lambda x: self.arabic_to_roman(int(x.group())), text)
         return re.sub(r"[\-\s\"'‘’“”:：.。,，()（）<>《》;；!！?？@#$%^&™®_+*=~`|]", "", text).lower()
+    
+    def symbol_replacement(self, text):
+        return text.replace(': ', ' - ').replace(':', '-').replace("/", "_").replace("?", "")
     
     def find_best_trainer_match(self, targetEnName, threshold=85):
         trainer_details = self.load_json_content("xgqdetail.json")
@@ -1044,8 +1047,7 @@ class DownloadDisplayThread(DownloadBaseThread):
                     continue
 
                 # Normalize the name
-                norm_name = original_name.replace(":", "").replace(".", "").replace(
-                    "'", "").replace("’", "").replace(" ", "").lower()
+                norm_name = self.sanitize(original_name)
                 domain = urlparse(url).netloc
 
                 # Add or update the entry based on domain preference
@@ -1206,7 +1208,7 @@ class DownloadDisplayThread(DownloadBaseThread):
                 if "id" in entry and (keyword in entry["keyw"] or (len(keyword) >= 2 and keyword.lower() in entry["en_name"].lower())):
                     full_url = ""
                     anti_url = ""
-                    if settings["language"] == "en_US":
+                    if settings["language"] == "en_US" or settings["enSearchResults"]:
                         trainerDisplayName = f"{entry['en_name']} Trainer"
                     elif settings["language"] == "zh_CN" or settings["language"] == "zh_TW":
                         pattern = r'\s(v[\d\.v\-]+.*|Early ?Access.*)'
@@ -1287,9 +1289,9 @@ class DownloadTrainersThread(DownloadBaseThread):
             if not self.update:
                 trainer_list = list(DownloadBaseThread.trainer_urls.items())
                 filename = trainer_list[self.index][0]
-                trainerName_download = filename.replace(':', ' -').replace("/", "_").replace("?", "")
+                trainerName_download = self.symbol_replacement(filename)
                 self.message.emit(tr("Translating trainer name..."), None)
-                trainerName_final = self.translate_trainer(trainerName_download).replace(':', ' -').replace("/", "_").replace("?", "")
+                trainerName_final = self.symbol_replacement(self.translate_trainer(trainerName_download))
 
                 for trainerPath in self.trainers.keys():
                     if trainerName_download in trainerPath or trainerName_final in trainerPath:
@@ -1384,7 +1386,7 @@ class DownloadTrainersThread(DownloadBaseThread):
         
         elif settings["downloadServer"] == "china":
             trainer_list = list(DownloadBaseThread.trainer_urls.items())
-            trainerName = trainer_list[self.index][0].replace(':', ' -').replace("/", "_").replace("?", "")
+            trainerName = self.symbol_replacement(trainer_list[self.index][0])
             downloadUrl = trainer_list[self.index][1][0]
             antiUrl = trainer_list[self.index][1][1]
             if os.path.splitext(urlparse(antiUrl).path)[1] == ".rar":

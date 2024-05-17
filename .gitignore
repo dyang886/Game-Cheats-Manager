@@ -4,7 +4,7 @@ __pycache__
 *.mo
 build
 dist
-compile.bat
+*.bat
 Game Cheats Manager.spec
 utility.py
 ResourceHacker.ini
