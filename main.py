@@ -214,8 +214,8 @@ class GameCheatsManager(QMainWindow):
 
         # Show warning pop up
         if settings["showWarning"]:
-            popUp = PopUp(self)
-            popUp.show()
+            dialog = CopyRightWarning(self)
+            dialog.show()
 
         # Update database, trainer update
         self.timer = QTimer(self)
@@ -613,40 +613,66 @@ class GameCheatsManager(QMainWindow):
             if os.path.isdir(os.path.join(wemodPath, item)):
                 match = re.match(r'app-(\d+\.\d+\.\d+)', item)
                 if match:
-                    version_info = tuple(
-                        map(int, match.group(1).split('.')))  # (8, 13, 3)
-                    # ((8, 13, 3), 'app-8.13.3')
-                    version_folders.append((version_info, item))
+                    version_info = tuple(map(int, match.group(1).split('.')))  # (8, 19, 0)
+                    version_folders.append((version_info, item))  # ((8, 19, 0), 'app-8.19.0')
 
         if not version_folders:
             QMessageBox.critical(self, tr("Error"), tr("WeMod not installed or invalid installation path.\nPlease choose a correct WeMod installation path in settings."))
             return
+        
+        version_folders.sort(reverse=True)
+        newest_version_folder = version_folders[0]
+        if newest_version_folder[0] >= (9, 0, 0):
+            version_eight_folders = [vf for vf in version_folders if vf[0][0] == 8]
+            version_eight_folders.sort(reverse=True)
 
-        # Sort based on version numbers (major, minor, patch)
-        version_folders.sort(reverse=True)  # Newest first
+            # Found supported version (v8.x.x), choose the newest one
+            if version_eight_folders:
+                unsupported_version_number = newest_version_folder[1].strip('-app')
+                newest_version_folder = version_eight_folders[0]
+                version_number = newest_version_folder[1].strip('-app')
+                msg_box = QMessageBox(
+                    QMessageBox.Icon.Question,
+                    tr("Unsupported WeMod Version"),
+                    tr("WeMod version higher than 9.0.0 is not supported.") + "\n" +
+                    tr("Current WeMod version: v") + unsupported_version_number + "\n\n" +
+                    tr("Detected newest supported WeMod version {version}, would you like to use this version?").format(version=version_number),
+                    QMessageBox.StandardButton.Yes | QMessageBox.StandardButton.No,
+                    self
+                )
+                
+                yes_button = msg_box.button(QMessageBox.StandardButton.Yes)
+                yes_button.setText(tr("Yes"))
+                no_button = msg_box.button(QMessageBox.StandardButton.No)
+                no_button.setText(tr("No"))
+                reply = msg_box.exec()
 
-        # Skip the deletion if there's only one folder found
-        if not len(version_folders) <= 1:
-            # Skip the first one as it's the newest
-            for version_info, folder_name in version_folders[1:]:
+                if reply == QMessageBox.StandardButton.No:
+                    return
+            
+            # Has only unsupported version (> v9.0.0)
+            else:
+                dialog = WeModVersionWarning(newest_version_folder[1].strip('-app'))
+                dialog.exec()
+                return
+
+        # Delete other version folders
+        for version_info, folder_name in version_folders:
+            if version_info != newest_version_folder[0]:
                 folder_path = os.path.join(wemodPath, folder_name)
                 try:
                     shutil.rmtree(folder_path)
+                    print(f"Deleted unused version folder: {folder_path}")
                 except Exception as e:
-                    print(str(e))
-                print(f"Deleted old version folder: {folder_path}")
-
-        newest_version_folder = version_folders[0][1]
-
-        newest_version_path = os.path.join(
-            wemodPath, newest_version_folder)
-        print("Newest Version Folder: " + newest_version_path)
+                    QMessageBox.critical(self, tr("Error"), tr("WeMod is currently running, please close the application first."))
+                    return
 
         # Apply patch
-        file_to_replace = os.path.join(
-            newest_version_path, "resources/app.asar")
+        file_to_replace = os.path.join(wemodPath, newest_version_folder[1], "resources/app.asar")
+        file_to_remove = os.path.join(wemodPath, "Update.exe")
         try:
             os.remove(file_to_replace)
+            os.remove(file_to_remove)
         except FileNotFoundError:
             pass
         except Exception:
@@ -654,7 +680,7 @@ class GameCheatsManager(QMainWindow):
             return
         shutil.copyfile(self.crackFile_path, file_to_replace)
 
-        QMessageBox.information(self, tr("Success"), tr("You have now activated WeMod Pro!\nCurrent WeMod version: v") + newest_version_folder.strip('-app'))
+        QMessageBox.information(self, tr("Success"), tr("You have now activated WeMod Pro!\n") + tr("Current WeMod version: v") + newest_version_folder[1].strip('-app'))
 
 
 if __name__ == "__main__":

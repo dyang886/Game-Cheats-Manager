@@ -11,7 +11,7 @@ msgstr ""
 "Content-Type: text/plain; charset=UTF-8\n"
 "Content-Transfer-Encoding: 8bit\n"
 "Plural-Forms: nplurals=1; plural=0;\n"
-"X-Generator: Poedit 3.4.2\n"
+"X-Generator: Poedit 3.4.4\n"
 
 msgid "Couldn't find {missing_resource}. Please try reinstalling the application."
 msgstr "找不到 {missing_resource}。請嘗試重新安裝應用程式。"
@@ -50,6 +50,18 @@ msgstr "B站作者主頁:"
 
 msgid "Don't show again"
 msgstr "不再顯示"
+
+msgid "Unsupported WeMod Version"
+msgstr "不支援的 WeMod 版本"
+
+msgid "WeMod version higher than 9.0.0 is not supported."
+msgstr "不支援高於 9.0.0 的 WeMod 版本。"
+
+msgid "Current WeMod version: v"
+msgstr "當前 WeMod 版本：v"
+
+msgid "Use the link below to download the latest supported version:"
+msgstr "使用以下連結下載最新的受支援版本："
 
 msgid "Settings"
 msgstr "設定"
@@ -214,7 +226,7 @@ msgid "Add Paths to Whitelist"
 msgstr "添加路徑至白名單"
 
 msgid "Unlock WeMod Pro"
-msgstr "解鎖 WeMod Pro"
+msgstr "解鎖 WeMod 專業版"
 
 msgid "Update Trainer Database"
 msgstr "更新修改器資料庫"
@@ -313,12 +325,11 @@ msgstr ""
 "WeMod 未安裝或安裝路徑無效。\n"
 "請在設定中選擇正確的 WeMod 安裝路徑。"
 
+msgid "Detected newest supported WeMod version {version}, would you like to use this version?"
+msgstr "檢測到最新支援的 WeMod 版本 {version}，您想使用這個版本嗎？"
+
 msgid "WeMod is currently running, please close the application first."
 msgstr "WeMod 目前正在運行中，請先關閉應用程式。"
 
-msgid ""
-"You have now activated WeMod Pro!\n"
-"Current WeMod version: v"
-msgstr ""
-"您已啟用 WeMod Pro！\n"
-"當前 WeMod 版本：v"
+msgid "You have now activated WeMod Pro!\n"
+msgstr "您已啟用 WeMod 專業版！\n"

@@ -51,6 +51,18 @@ msgstr "Bilibili author homepage:"
 msgid "Don't show again"
 msgstr "Don't show again"
 
+msgid "Unsupported WeMod Version"
+msgstr "Unsupported WeMod Version"
+
+msgid "WeMod version higher than 9.0.0 is not supported."
+msgstr "WeMod version higher than 9.0.0 is not supported."
+
+msgid "Current WeMod version: v"
+msgstr "Current WeMod version: v"
+
+msgid "Use the link below to download the latest supported version:"
+msgstr "Use the link below to download the latest supported version:"
+
 msgid "Settings"
 msgstr "Settings"
 
@@ -313,12 +325,11 @@ msgstr ""
 "WeMod not installed or invalid installation path.\n"
 "Please choose a correct WeMod installation path in settings."
 
+msgid "Detected newest supported WeMod version {version}, would you like to use this version?"
+msgstr "Detected newest supported WeMod version {version}, would you like to use this version?"
+
 msgid "WeMod is currently running, please close the application first."
 msgstr "WeMod is currently running, please close the application first."
 
-msgid ""
-"You have now activated WeMod Pro!\n"
-"Current WeMod version: v"
-msgstr ""
-"You have now activated WeMod Pro!\n"
-"Current WeMod version: v"
+msgid "You have now activated WeMod Pro!\n"
+msgstr "You have now activated WeMod Pro!\n"

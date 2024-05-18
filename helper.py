@@ -171,18 +171,18 @@ server_options = {
 }
 
 
-class PopUp(QDialog):
+class CopyRightWarning(QDialog):
     def __init__(self, parent=None):
         super().__init__(parent)
         self.setWindowTitle(tr("Warning"))
         self.setWindowIcon(QIcon(resource_path("assets/logo.ico")))
-        popUpLayout = QVBoxLayout()
-        popUpLayout.setSpacing(30)
-        popUpLayout.setContentsMargins(20, 30, 20, 20)
-        self.setLayout(popUpLayout)
+        layout = QVBoxLayout()
+        layout.setSpacing(30)
+        layout.setContentsMargins(20, 30, 20, 20)
+        self.setLayout(layout)
 
         warningLayout = QHBoxLayout()
-        popUpLayout.addLayout(warningLayout)
+        layout.addLayout(warningLayout)
 
         WarningPixmap = QPixmap(resource_path("assets/warning.png"))
         scaledWarningPixmap = WarningPixmap.scaled(120, 120, Qt.AspectRatioMode.KeepAspectRatio, Qt.TransformationMode.SmoothTransformation)
@@ -199,7 +199,7 @@ class PopUp(QDialog):
 
         linksLayout = QVBoxLayout()
         linksLayout.setSpacing(10)
-        popUpLayout.addLayout(linksLayout)
+        layout.addLayout(linksLayout)
 
         githubUrl = self.parent().githubLink
         githubText = f'GitHub: <a href="{githubUrl}" style="text-decoration: none; color: #284fff;">{githubUrl}</a>'
@@ -222,7 +222,7 @@ class PopUp(QDialog):
         dontShowLayout.setAlignment(Qt.AlignmentFlag.AlignRight)
         self.dontShowCheckbox = QCheckBox(tr("Don't show again"))
         dontShowLayout.addWidget(self.dontShowCheckbox)
-        popUpLayout.addLayout(dontShowLayout)
+        layout.addLayout(dontShowLayout)
 
         self.setFixedSize(self.sizeHint())
 
@@ -231,6 +231,27 @@ class PopUp(QDialog):
             settings["showWarning"] = False
             apply_settings(settings)
         super().closeEvent(event)
+
+
+class WeModVersionWarning(QDialog):
+    def __init__(self, version_folder, parent=None):
+        super().__init__(parent)
+        self.setWindowTitle(tr("Unsupported WeMod Version"))
+        self.setWindowIcon(QIcon(resource_path("assets/logo.ico")))
+        layout = QVBoxLayout()
+        self.setLayout(layout)
+        layout.setContentsMargins(20, 20, 20, 20)
+        self.setLayout(layout)
+        
+        label = QLabel(
+            tr("WeMod version higher than 9.0.0 is not supported.") + "<br>" +
+            tr("Current WeMod version: v") + f"{version_folder}<br>" +
+            tr("Use the link below to download the latest supported version:") + "<br>" +
+            "<a href='https://storage-cdn.wemod.com/app/releases/stable/WeMod-8.20.0.exe'>https://storage-cdn.wemod.com/app/releases/stable/WeMod-8.20.0.exe</a>"
+        )
+        label.setOpenExternalLinks(True)
+        label.setTextFormat(Qt.TextFormat.RichText)
+        layout.addWidget(label)
 
 
 class SettingsDialog(QDialog):
@@ -295,6 +316,11 @@ class SettingsDialog(QDialog):
         self.autoUpdateCheckbox.setChecked(settings["autoUpdate"])
         settingsWidgetsLayout.addWidget(self.autoUpdateCheckbox)
 
+        # Launch app on startup
+        self.autoStartCheckbox = QCheckBox(tr("Launch app on startup"))
+        self.autoStartCheckbox.setChecked(settings["autoStart"])
+        settingsWidgetsLayout.addWidget(self.autoStartCheckbox)
+
         # Wemod path
         wemodLayout = QVBoxLayout()
         wemodLayout.setSpacing(2)
@@ -309,11 +335,6 @@ class SettingsDialog(QDialog):
         wemodPathButton = QPushButton("...")
         wemodPathButton.clicked.connect(self.selectWeModPath)
         wemodPathLayout.addWidget(wemodPathButton)
-
-        # Launch app on startup
-        self.autoStartCheckbox = QCheckBox(tr("Launch app on startup"))
-        self.autoStartCheckbox.setChecked(settings["autoStart"])
-        settingsWidgetsLayout.addWidget(self.autoStartCheckbox)
 
         # Apply button
         applyButtonLayout = QHBoxLayout()
@@ -606,8 +627,12 @@ class DownloadBaseThread(QThread):
     def get_webpage_content(self, url, target_text):
         if not self.is_internet_connected():
             return ""
-        
-        req = requests.get(url, headers=self.headers)
+
+        try:
+            req = requests.get(url, headers=self.headers)
+        except Exception as e:
+            print(f"Error requesting {url}: {str(e)}")
+            return ""
 
         if req.status_code != 200:
             self.loop = QEventLoop()
@@ -624,7 +649,11 @@ class DownloadBaseThread(QThread):
             self.loop.quit()
 
     def request_download(self, url, download_path, file_name):
-        req = requests.get(url, headers=self.headers)
+        try:
+            req = requests.get(url, headers=self.headers)
+        except Exception as e:
+            print(f"Error requesting {url}: {str(e)}")
+            return ""
         
         if req.status_code != 200:
             self.loop = QEventLoop()
@@ -970,11 +999,14 @@ class FetchTrainerDetails(DownloadBaseThread):
 
         if self.is_internet_connected():
             index_page = "https://dl.fucnm.com/datafile/xgqdetail/index.txt"
-            total_pages_response = requests.get(index_page, headers=self.headers)
-            if total_pages_response.status_code == 200:
-                response = total_pages_response.json()
-                total_pages = response.get("page", "")
-                print(f"Total trainer translations fetched: {response.get('total', 'null')}\n")
+            try:
+                total_pages_response = requests.get(index_page, headers=self.headers)
+                if total_pages_response.status_code == 200:
+                    response = total_pages_response.json()
+                    total_pages = response.get("page", "")
+                    print(f"Total trainer translations fetched: {response.get('total', 'null')}\n")
+            except Exception as e:
+                print(f"Error requesting {index_page}: {str(e)}")
 
         if total_pages:
             completed_pages = 0
@@ -1004,12 +1036,16 @@ class FetchTrainerDetails(DownloadBaseThread):
     
     def fetch_page(self, page_number):
         trainer_detail_page = f"https://dl.fucnm.com/datafile/xgqdetail/list_{page_number}.txt"
-        page_response = requests.get(trainer_detail_page, headers=self.headers)
-        if page_response.status_code == 200:
-            return page_response.json()
-        else:
-            print(f"Failed to fetch trainer detail page {page_number}")
+        try:
+            page_response = requests.get(trainer_detail_page, headers=self.headers)
+            if page_response.status_code == 200:
+                return page_response.json()
+        except Exception as e:
+            print(f"Error requesting {trainer_detail_page}: {str(e)}")
             return None
+
+        print(f"Failed to fetch trainer detail page {page_number}")
+        return None
 
 
 class DownloadDisplayThread(DownloadBaseThread):
@@ -1401,33 +1437,41 @@ class DownloadTrainersThread(DownloadBaseThread):
             
             # Download trainer
             self.message.emit(tr("Downloading..."), None)
-            req = requests.get(downloadUrl, headers=self.headers)
-            if req.status_code != 200:
-                self.message.emit(tr("An error occurred while downloading trainer: ") + f"Status code {req.status_code}: {req.reason}", "failure")
-                time.sleep(self.download_finish_delay)
-                self.finished.emit(1)
-                return
-            else:
-                os.makedirs(DOWNLOAD_TEMP_DIR, exist_ok=True)
-                trainerTemp = os.path.join(DOWNLOAD_TEMP_DIR, trainerName + ".zip")
-                with open(trainerTemp, "wb") as f:
-                    f.write(req.content)
-
-            # Download anti-cheat files
-            anti_folder = os.path.join(DOWNLOAD_TEMP_DIR, "anti")
-            if antiUrl:
-                req = requests.get(antiUrl, headers=self.headers)
+            try:
+                req = requests.get(downloadUrl, headers=self.headers)
                 if req.status_code != 200:
                     self.message.emit(tr("An error occurred while downloading trainer: ") + f"Status code {req.status_code}: {req.reason}", "failure")
                     time.sleep(self.download_finish_delay)
                     self.finished.emit(1)
                     return
-                else:
-                    os.makedirs(anti_folder, exist_ok=True)
-                    antiFileName = os.path.basename(urlparse(antiUrl).path)
-                    antiTemp = os.path.join(anti_folder, antiFileName)
-                    with open(antiTemp, "wb") as f:
-                        f.write(req.content)
+            except Exception as e:
+                print(f"Error requesting {downloadUrl}: {str(e)}")
+                return
+            
+            os.makedirs(DOWNLOAD_TEMP_DIR, exist_ok=True)
+            trainerTemp = os.path.join(DOWNLOAD_TEMP_DIR, trainerName + ".zip")
+            with open(trainerTemp, "wb") as f:
+                f.write(req.content)
+
+            # Download anti-cheat files
+            anti_folder = os.path.join(DOWNLOAD_TEMP_DIR, "anti")
+            if antiUrl:
+                try:
+                    req = requests.get(antiUrl, headers=self.headers)
+                    if req.status_code != 200:
+                        self.message.emit(tr("An error occurred while downloading trainer: ") + f"Status code {req.status_code}: {req.reason}", "failure")
+                        time.sleep(self.download_finish_delay)
+                        self.finished.emit(1)
+                        return
+                except Exception as e:
+                    print(f"Error requesting {antiUrl}: {str(e)}")
+                    return
+
+                os.makedirs(anti_folder, exist_ok=True)
+                antiFileName = os.path.basename(urlparse(antiUrl).path)
+                antiTemp = os.path.join(anti_folder, antiFileName)
+                with open(antiTemp, "wb") as f:
+                    f.write(req.content)
             
             # Decompress downloaded zip
             self.message.emit(tr("Decompressing..."), None)
