@@ -29,7 +29,7 @@ class GameCheatsManager(QMainWindow):
 
         self.setWindowTitle("Game Cheats Manager")
         self.setWindowIcon(QIcon(resource_path("assets/logo.ico")))
-        self.setMinimumSize(670, 500)
+        self.setMinimumSize(680, 520)
 
         # Version and links
         self.appVersion = "2.0.0"
@@ -43,7 +43,10 @@ class GameCheatsManager(QMainWindow):
         self.trainerDownloadPath = os.path.normpath(settings["downloadPath"])
         os.makedirs(self.trainerDownloadPath, exist_ok=True)
         
-        self.dropDownArrow_path = resource_path("assets/dropdown.png").replace("\\", "/")
+        if settings["theme"] == "black":
+            self.dropDownArrow_path = resource_path("assets/dropdown-white.png").replace("\\", "/")
+        elif settings["theme"] == "white":
+            self.dropDownArrow_path = resource_path("assets/dropdown-black.png").replace("\\", "/")
         self.upArrow_path = resource_path("assets/up.png").replace("\\", "/")
         self.downArrow_path = resource_path("assets/down.png").replace("\\", "/")
         self.leftArrow_path = resource_path("assets/left.png").replace("\\", "/")
@@ -452,10 +455,12 @@ class GameCheatsManager(QMainWindow):
         if type == "clear":
             self.downloadListBox.clear()
         elif type == "success":
-            item.setForeground(QColor('green'))
+            # item.setForeground(QColor('green'))
+            item.setBackground(QColor(0, 255, 0, 20))
             self.downloadListBox.addItem(item)
         elif type == "failure":
-            item.setForeground(QColor('red'))
+            # item.setForeground(QColor('red'))
+            item.setBackground(QColor(255, 0, 0, 20))
             self.downloadListBox.addItem(item)
         else:
             self.downloadListBox.addItem(item)
