@@ -1,6 +1,6 @@
 white = """
     QMainWindow {{
-        background-color: #ffffff;
+        background-color: #f3f3f3;
     }}
 
     QStatusBar::item {{
@@ -8,31 +8,32 @@ white = """
     }}
 
     QMenuBar {{
-        background-color: #f0f0f0;
+        background-color: #fbfbfd;
     }}
 
     QMenuBar::item {{
-        background-color: #f0f0f0;
+        background-color: #fbfbfd;
         color: #000000;
         padding: 5px;
     }}
 
     QMenuBar::item:selected {{
-        background-color: #cccccc;
+        background-color: #e2e2e2;
     }}
 
     QMenu {{
-        background-color: #ffffff;
+        background-color: #f3f3f3;
         border: 2px solid #000000;
+        border-radius: 5px;
     }}
 
     QMenu::item {{
-        background-color: #ffffff;
+        background-color: #f3f3f3;
         color: #000000;
     }}
 
     QMenu::item:selected {{
-        background-color: #cccccc;
+        background-color: #e2e2e2;
     }}
 
     QStatusBar {{
@@ -43,26 +44,34 @@ white = """
         color: black;
     }}
 
+    QCheckBox::indicator:unchecked {{
+        background-color: #fbfbfd;
+        border: 1px solid #5e5e5e;
+        border-radius: 5px;
+    }}
+
     QPushButton {{
-        padding: 9px;
+        padding: 7px;
         border-radius: 3px;
-        background-color: #e6e6e6;
+        border: 1px solid #e5e5e5;
+        background-color: #fbfbfd;
         color: #000000;
         outline: none;
     }}
 
     QPushButton:hover {{
-        background-color: #f2f2f2;
+        background-color: #f6f6f6;
     }}
 
     QPushButton:pressed {{
-        background-color: #d9d9d9;
+        background-color: #eaeaea;
     }}
 
     QComboBox {{
         padding: 7px;
         border-radius: 3px;
-        background-color: #e6e6e6;
+        border: 1px solid #e5e5e5;
+        background-color: #fbfbfd;
         color: #000000;
     }}
 
@@ -77,41 +86,23 @@ white = """
     }}
 
     QComboBox QAbstractItemView {{
-        background-color: #e6e6e6;
+        background-color: #fbfbfd;
         color: #000000;
+        border: 1px solid #e5e5e5;
     }}
 
     QDialog {{
-        background-color: #ffffff;
+        background-color: #f3f3f3;
     }}
 
     QLabel {{
         color: #000000;
     }}
 
-    QTabWidget::pane {{
-        border-top: 2px solid #f0f0f0;
-    }}
-
-    QTabBar::tab {{
-        background-color: #e6e6e6;
-        color: #000000;
-        padding: 10px;
-        border-radius: 3px;
-    }}
-
-    QTabBar::tab:hover {{
-        background-color: #f2f2f2;
-    }}
-
-    QTabBar::tab:selected {{
-        background-color: #d9d9d9;
-    }}
-
     QLineEdit {{
-        background-color: #e6e6e6;
+        background-color: #fbfbfd;
         color: #000000;
-        border: 1px solid #aaaaaa;
+        border: 1px solid #e5e5e5;
         border-radius: 3px;
         padding: 6px;
     }}
@@ -123,7 +114,7 @@ white = """
     QListWidget {{
         border: 1px solid #8c8c8c;
         border-radius: 3px;
-        background-color: #e6e6e6;
+        background-color: #fbfbfd;
         color: #000000;
     }}
 
@@ -244,6 +235,7 @@ black = """
     QMenu {{
         background-color: #1c1c1c;
         border: 2px solid #ffffff;
+        border-radius: 5px;
     }}
 
     QMenu::item {{
@@ -263,9 +255,16 @@ black = """
         color: white;
     }}
 
+    QCheckBox::indicator:unchecked {{
+        background-color: #2a2a2a;
+        border: 1px solid #5e5e5e;
+        border-radius: 5px;
+    }}
+
     QPushButton {{
-        padding: 9px;
+        padding: 7px;
         border-radius: 3px;
+        border: 1px solid #555555;
         background-color: #2a2a2a;
         color: #FFFFFF;
         outline: none;
@@ -282,6 +281,7 @@ black = """
     QComboBox {{
         padding: 7px;
         border-radius: 3px;
+        border: 1px solid #555555;
         background-color: #2a2a2a;
         color: #FFFFFF;
     }}
@@ -299,6 +299,7 @@ black = """
     QComboBox QAbstractItemView {{
         background-color: #2a2a2a;
         color: #FFFFFF;
+        border: 1px solid #555555;
     }}
 
     QDialog {{
@@ -307,25 +308,6 @@ black = """
 
     QLabel {{
         color: #FFFFFF;
-    }}
-
-    QTabWidget::pane {{
-        border-top: 2px solid #2e2e2e;
-    }}
-
-    QTabBar::tab {{
-        background-color: #2a2a2a;
-        color: #FFFFFF;
-        padding: 10px;
-        border-radius: 3px;
-    }}
-
-    QTabBar::tab:hover {{
-        background-color: #2f2f2f;
-    }}
-
-    QTabBar::tab:selected {{
-        background-color: #232323;
     }}
 
     QLineEdit {{

@@ -412,6 +412,12 @@ class AboutDialog(QDialog):
         logoLabel = QLabel()
         logoLabel.setAlignment(Qt.AlignmentFlag.AlignCenter)
         logoLabel.setPixmap(scaledLogoPixmap)
+        if settings["theme"] == "white":
+            logoLabel.setStyleSheet("""
+                border: 2px solid black;
+                border-radius: 20px;
+                padding: -2px;
+            """)
         appLayout.addWidget(logoLabel)
 
         # App name and version
@@ -1010,6 +1016,7 @@ class FetchTrainerDetails(DownloadBaseThread):
 
         if total_pages:
             completed_pages = 0
+            error = False
             self.update.emit(statusWidgetName, f"{fetch_message} ({completed_pages}/{total_pages})", "load")
 
             with concurrent.futures.ThreadPoolExecutor(max_workers=5) as executor:
@@ -1019,8 +1026,16 @@ class FetchTrainerDetails(DownloadBaseThread):
                     result = future.result()
                     if result:
                         all_data.extend(result)
+                    else:
+                        error = True
                     completed_pages += 1
                     self.update.emit(statusWidgetName, f"{fetch_message} ({completed_pages}/{total_pages})", "load")
+
+            if error:
+                self.update.emit(statusWidgetName, fetch_error, "error")
+                time.sleep(2)
+                self.finished.emit(statusWidgetName)
+                return
             
             all_data.extend(db_additions.additions)
 
