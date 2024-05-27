@@ -387,9 +387,10 @@ class SettingsDialog(QDialog):
                 self.add_or_remove_startup(app_name, app_path, True)
             else:
                 self.add_or_remove_startup(app_name, app_path, False)
-
-        QMessageBox.information(self, tr("Attention"), tr(
-            "Please restart the application to apply theme and language settings."))
+                
+        os.execl(sys.executable, sys.executable, *sys.argv)
+        # QMessageBox.information(self, tr("Attention"), tr(
+        #     "Please restart the application to apply theme and language settings."))
 
 
 class AboutDialog(QDialog):
