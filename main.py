@@ -1,16 +1,16 @@
 import os
 from queue import Queue
-import re
 import shutil
-import sys
 import stat
+import sys
 
 from PyQt6.QtCore import Qt, QTimer
 from PyQt6.QtGui import QAction, QColor, QFont, QFontDatabase, QIcon, QPixmap
-from PyQt6.QtWidgets import QApplication, QFileDialog, QGridLayout, QHBoxLayout, QLabel, QLineEdit, QListWidgetItem, QMainWindow, QMessageBox, QPushButton, QStatusBar, QVBoxLayout, QWidget, QListWidget
+from PyQt6.QtWidgets import QApplication, QFileDialog, QGridLayout, QHBoxLayout, QLabel, QLineEdit, QListWidget, QListWidgetItem, QMainWindow, QMessageBox, QPushButton, QStatusBar, QVBoxLayout, QWidget
 from tendo import singleton
 
 from helper import *
+from wemod import *
 import style_sheet
 
 
@@ -32,7 +32,7 @@ class GameCheatsManager(QMainWindow):
         self.setMinimumSize(680, 520)
 
         # Version and links
-        self.appVersion = "2.0.0"
+        self.appVersion = "2.1.0"
         self.githubLink = "https://github.com/dyang886/Game-Cheats-Manager"
         self.updateLink = "https://api.github.com/repos/dyang886/Game-Cheats-Manager/releases/latest"
         self.bilibiliLink = "https://space.bilibili.com/256673766"
@@ -52,7 +52,6 @@ class GameCheatsManager(QMainWindow):
         self.leftArrow_path = resource_path("assets/left.png").replace("\\", "/")
         self.rightArrow_path = resource_path("assets/right.png").replace("\\", "/")
         
-        self.crackFile_path = resource_path("dependency/app.asar")
         self.elevator_path = resource_path("dependency/elevator.exe")
         self.search_path = resource_path("assets/search.png")
 
@@ -68,6 +67,7 @@ class GameCheatsManager(QMainWindow):
         # Window references
         self.settings_window = None
         self.about_window = None
+        self.wemod_window = None
 
         # Main widget group
         centralWidget = QWidget(self)
@@ -79,51 +79,39 @@ class GameCheatsManager(QMainWindow):
         self.init_settings()
 
         # Menu setup
-        menuFont = self.font()
-        menuFont.setPointSize(9)
         menu = self.menuBar()
-        menu.setFont(menuFont)
-
         optionMenu = menu.addMenu(tr("Options"))
 
         settingsAction = QAction(tr("Settings"), self)
-        settingsAction.setFont(menuFont)
         settingsAction.triggered.connect(self.open_settings)
         optionMenu.addAction(settingsAction)
 
         importAction = QAction(tr("Import Trainers"), self)
-        importAction.setFont(menuFont)
         importAction.triggered.connect(self.import_files)
         optionMenu.addAction(importAction)
 
         openDirectoryAction = QAction(tr("Open Trainer Download Path"), self)
-        openDirectoryAction.setFont(menuFont)
         openDirectoryAction.triggered.connect(self.open_trainer_directory)
         optionMenu.addAction(openDirectoryAction)
 
         whiteListAction = QAction(tr("Add Paths to Whitelist"), self)
-        whiteListAction.setFont(menuFont)
         whiteListAction.triggered.connect(self.add_whitelist)
         optionMenu.addAction(whiteListAction)
 
         aboutAction = QAction(tr("About"), self)
-        aboutAction.setFont(menuFont)
         aboutAction.triggered.connect(self.open_about)
         optionMenu.addAction(aboutAction)
 
         # Below are standalone menu actions
-        wemodAction = QAction(tr("Unlock WeMod Pro"), self)
-        wemodAction.setFont(menuFont)
+        wemodAction = QAction(tr("WeMod Customization"), self)
         wemodAction.triggered.connect(self.wemod_pro)
         menu.addAction(wemodAction)
 
         updateDatabaseAction = QAction(tr("Update Trainer Database"), self)
-        updateDatabaseAction.setFont(menuFont)
         updateDatabaseAction.triggered.connect(self.fetch_database)
         menu.addAction(updateDatabaseAction)
 
         updateTrainersAction = QAction(tr("Update Trainers"), self)
-        updateTrainersAction.setFont(menuFont)
         updateTrainersAction.triggered.connect(self.update_trainers)
         menu.addAction(updateTrainersAction)
 
@@ -231,7 +219,7 @@ class GameCheatsManager(QMainWindow):
     # ===========================================================================
     def closeEvent(self, event):
         super().closeEvent(event)
-        os._exit(1)
+        os._exit(0)
 
     def init_settings(self):
         if settings["theme"] == "black":
@@ -608,84 +596,12 @@ class GameCheatsManager(QMainWindow):
             self.about_window.show()
 
     def wemod_pro(self):
-        wemodPath = os.path.normpath(settings["WeModPath"])
-        if not os.path.exists(wemodPath):
-            QMessageBox.critical(self, tr("Error"), tr("WeMod not installed or invalid installation path.\nPlease choose a correct WeMod installation path in settings."))
-            return
-
-        version_folders = []
-        for item in os.listdir(wemodPath):
-            if os.path.isdir(os.path.join(wemodPath, item)):
-                match = re.match(r'app-(\d+\.\d+\.\d+)', item)
-                if match:
-                    version_info = tuple(map(int, match.group(1).split('.')))  # (8, 19, 0)
-                    version_folders.append((version_info, item))  # ((8, 19, 0), 'app-8.19.0')
-
-        if not version_folders:
-            QMessageBox.critical(self, tr("Error"), tr("WeMod not installed or invalid installation path.\nPlease choose a correct WeMod installation path in settings."))
-            return
-        
-        version_folders.sort(reverse=True)
-        newest_version_folder = version_folders[0]
-        if newest_version_folder[0] >= (9, 0, 0):
-            version_eight_folders = [vf for vf in version_folders if vf[0][0] == 8]
-            version_eight_folders.sort(reverse=True)
-
-            # Found supported version (v8.x.x), choose the newest one
-            if version_eight_folders:
-                unsupported_version_number = newest_version_folder[1].strip('-app')
-                newest_version_folder = version_eight_folders[0]
-                version_number = newest_version_folder[1].strip('-app')
-                msg_box = QMessageBox(
-                    QMessageBox.Icon.Question,
-                    tr("Unsupported WeMod Version"),
-                    tr("WeMod version higher than 9.0.0 is not supported.") + "\n" +
-                    tr("Current WeMod version: v") + unsupported_version_number + "\n\n" +
-                    tr("Detected newest supported WeMod version {version}, would you like to use this version?").format(version=version_number),
-                    QMessageBox.StandardButton.Yes | QMessageBox.StandardButton.No,
-                    self
-                )
-                
-                yes_button = msg_box.button(QMessageBox.StandardButton.Yes)
-                yes_button.setText(tr("Yes"))
-                no_button = msg_box.button(QMessageBox.StandardButton.No)
-                no_button.setText(tr("No"))
-                reply = msg_box.exec()
-
-                if reply == QMessageBox.StandardButton.No:
-                    return
-            
-            # Has only unsupported version (> v9.0.0)
-            else:
-                dialog = WeModVersionWarning(newest_version_folder[1].strip('-app'))
-                dialog.exec()
-                return
-
-        # Delete other version folders
-        for version_info, folder_name in version_folders:
-            if version_info != newest_version_folder[0]:
-                folder_path = os.path.join(wemodPath, folder_name)
-                try:
-                    shutil.rmtree(folder_path)
-                    print(f"Deleted unused version folder: {folder_path}")
-                except Exception as e:
-                    QMessageBox.critical(self, tr("Error"), tr("WeMod is currently running, please close the application first."))
-                    return
-
-        # Apply patch
-        file_to_replace = os.path.join(wemodPath, newest_version_folder[1], "resources/app.asar")
-        file_to_remove = os.path.join(wemodPath, "Update.exe")
-        try:
-            os.remove(file_to_replace)
-            os.remove(file_to_remove)
-        except FileNotFoundError:
-            pass
-        except Exception:
-            QMessageBox.critical(self, tr("Error"), tr("WeMod is currently running, please close the application first."))
-            return
-        shutil.copyfile(self.crackFile_path, file_to_replace)
-
-        QMessageBox.information(self, tr("Success"), tr("You have now activated WeMod Pro!\n") + tr("Current WeMod version: v") + newest_version_folder[1].strip('-app'))
+        if self.wemod_window is not None and self.wemod_window.isVisible():
+            self.wemod_window.raise_()
+            self.wemod_window.activateWindow()
+        else:
+            self.wemod_window = WeModDialog(self)
+            self.wemod_window.show()
 
 
 if __name__ == "__main__":

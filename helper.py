@@ -1,7 +1,5 @@
-import cn2an
 import concurrent.futures
 import datetime
-import gettext
 import json
 import locale
 import os
@@ -10,165 +8,24 @@ import shutil
 import stat
 import subprocess
 import sys
-import tempfile
 import time
 from urllib.parse import urljoin, urlparse
 import uuid
 import winreg as reg
-import zipfile
 
 from bs4 import BeautifulSoup
+import cn2an
 from fuzzywuzzy import fuzz, process
-import pinyin
-import polib
-from PyQt6.QtCore import Qt, QEventLoop, QThread, QTimer, pyqtSignal, QUrl
+from PyQt6.QtCore import QEventLoop, Qt, QThread, QTimer, QUrl, pyqtSignal
 from PyQt6.QtGui import QIcon, QPixmap
 from PyQt6.QtWebEngineCore import QWebEngineDownloadRequest
 from PyQt6.QtWebEngineWidgets import QWebEngineView
-from PyQt6.QtWidgets import QDialog, QCheckBox, QVBoxLayout, QHBoxLayout, QPushButton, QComboBox, QLabel, QLineEdit, QMessageBox, QFileDialog, QWidget
+from PyQt6.QtWidgets import QCheckBox, QComboBox, QDialog, QHBoxLayout, QLabel, QMessageBox, QPushButton, QVBoxLayout, QWidget
 import requests
 ts = None
 
+from config import *
 import db_additions
-
-
-def resource_path(relative_path):
-    if hasattr(sys, "_MEIPASS"):
-        full_path = os.path.join(sys._MEIPASS, relative_path)
-    else:
-        full_path = os.path.join(os.path.abspath("."), relative_path)
-
-    if not os.path.exists(full_path):
-        resource_name = os.path.basename(relative_path)
-        formatted_message = tr("Couldn't find {missing_resource}. Please try reinstalling the application.").format(
-            missing_resource=resource_name)
-        QMessageBox.critical(
-            None, tr("Missing resource file"), formatted_message)
-        sys.exit(1)
-
-    return full_path
-
-
-def apply_settings(settings):
-    with open(SETTINGS_FILE, "w") as f:
-        json.dump(settings, f, indent=4)
-
-
-def load_settings():
-    locale.setlocale(locale.LC_ALL, '')
-    system_locale = locale.getlocale()[0]
-    locale_mapping = {
-        "English_United States": "en_US",
-        "Chinese (Simplified)_China": "zh_CN",
-        "Chinese (Simplified)_Hong Kong SAR": "zh_CN",
-        "Chinese (Simplified)_Macao SAR": "zh_CN",
-        "Chinese (Simplified)_Singapore": "zh_CN",
-        "Chinese (Traditional)_Hong Kong SAR": "zh_TW",
-        "Chinese (Traditional)_Macao SAR": "zh_TW",
-        "Chinese (Traditional)_Taiwan": "zh_TW"
-    }
-    app_locale = locale_mapping.get(system_locale, 'en_US')
-
-    default_settings = {
-        "downloadPath": os.path.join(os.environ["APPDATA"], "GCM Trainers"),
-        "language": app_locale,
-        "theme": "black",
-        "enSearchResults": False,
-        "autoUpdateDatabase": True,
-        "autoUpdate": True,
-        "WeModPath": os.path.join(os.environ["LOCALAPPDATA"], "WeMod"),
-        "autoStart": False,
-        "showWarning": True,
-        "downloadServer": "intl",
-    }
-
-    try:
-        with open(SETTINGS_FILE, "r") as f:
-            settings = json.load(f)
-    except Exception as e:
-        print("Error loading settings json" + str(e))
-        settings = default_settings
-
-    for key, value in default_settings.items():
-        settings.setdefault(key, value)
-
-    with open(SETTINGS_FILE, "w") as f:
-        json.dump(settings, f, indent=4)
-
-    return settings
-
-
-def get_translator():
-    if not hasattr(sys, 'frozen'):
-        for root, dirs, files in os.walk(resource_path("locale/")):
-            for file in files:
-                if file.endswith(".po"):
-                    po = polib.pofile(os.path.join(root, file))
-                    po.save_as_mofile(os.path.join(
-                        root, os.path.splitext(file)[0] + ".mo"))
-
-    lang = settings["language"]
-    gettext.bindtextdomain("Game Cheats Manager",
-                           resource_path("locale/"))
-    gettext.textdomain("Game Cheats Manager")
-    lang = gettext.translation(
-        "Game Cheats Manager", resource_path("locale/"), languages=[lang])
-    lang.install()
-    return lang.gettext
-
-
-def is_chinese(text):
-    for char in text:
-        if '\u4e00' <= char <= '\u9fff':
-            return True
-    return False
-
-
-def sort_trainers_key(name):
-    if is_chinese(name):
-        return pinyin.get(name, format="strip", delimiter=" ")
-    return name
-
-
-def ensure_trainer_details_exist():
-    dst = os.path.join(DATABASE_PATH, "xgqdetail.json")
-    if not os.path.exists(dst):
-        shutil.copyfile(resource_path("dependency/xgqdetail.json"), dst)
-
-
-setting_path = os.path.join(
-    os.environ["APPDATA"], "GCM Settings/")
-os.makedirs(setting_path, exist_ok=True)
-
-SETTINGS_FILE = os.path.join(setting_path, "settings.json")
-DATABASE_PATH = os.path.join(setting_path, "db")
-os.makedirs(DATABASE_PATH, exist_ok=True)
-ensure_trainer_details_exist()
-DOWNLOAD_TEMP_DIR = os.path.join(tempfile.gettempdir(), "GameCheatsManagerTemp", "download")
-VERSION_TEMP_DIR = os.path.join(tempfile.gettempdir(), "GameCheatsManagerTemp", "version")
-
-resourceHacker_path = resource_path("dependency/ResourceHacker.exe")
-unrar_path = resource_path("dependency/UnRAR.exe")
-emptyMidi_path = resource_path("dependency/TrainerBGM.mid")
-
-settings = load_settings()
-tr = get_translator()
-
-language_options = {
-    "English (US)": "en_US",
-    "简体中文": "zh_CN",
-    "繁體中文": "zh_TW"
-}
-
-theme_options = {
-    tr("Black"): "black",
-    tr("white"): "white"
-}
-
-server_options = {
-    tr("International"): "intl",
-    tr("China"): "china"
-}
 
 
 class CopyRightWarning(QDialog):
@@ -233,27 +90,6 @@ class CopyRightWarning(QDialog):
         super().closeEvent(event)
 
 
-class WeModVersionWarning(QDialog):
-    def __init__(self, version_folder, parent=None):
-        super().__init__(parent)
-        self.setWindowTitle(tr("Unsupported WeMod Version"))
-        self.setWindowIcon(QIcon(resource_path("assets/logo.ico")))
-        layout = QVBoxLayout()
-        self.setLayout(layout)
-        layout.setContentsMargins(20, 20, 20, 20)
-        self.setLayout(layout)
-        
-        label = QLabel(
-            tr("WeMod version higher than 9.0.0 is not supported.") + "<br>" +
-            tr("Current WeMod version: v") + f"{version_folder}<br>" +
-            tr("Use the link below to download the latest supported version:") + "<br>" +
-            "<a href='https://storage-cdn.wemod.com/app/releases/stable/WeMod-8.20.0.exe'>https://storage-cdn.wemod.com/app/releases/stable/WeMod-8.20.0.exe</a>"
-        )
-        label.setOpenExternalLinks(True)
-        label.setTextFormat(Qt.TextFormat.RichText)
-        layout.addWidget(label)
-
-
 class SettingsDialog(QDialog):
     def __init__(self, parent=None):
         super().__init__(parent)
@@ -306,6 +142,11 @@ class SettingsDialog(QDialog):
         self.alwaysEnCheckbox.setChecked(settings["enSearchResults"])
         settingsWidgetsLayout.addWidget(self.alwaysEnCheckbox)
 
+        # Remove trainer background music when downloading
+        self.removeBgMusicCheckbox = QCheckBox(tr("Remove trainer background music"))
+        self.removeBgMusicCheckbox.setChecked(settings["removeBgMusic"])
+        settingsWidgetsLayout.addWidget(self.removeBgMusicCheckbox)
+
         # Auto update trainer databases
         self.autoUpdateDatabaseCheckbox = QCheckBox(tr("Update trainer databases automatically"))
         self.autoUpdateDatabaseCheckbox.setChecked(settings["autoUpdateDatabase"])
@@ -321,21 +162,6 @@ class SettingsDialog(QDialog):
         self.autoStartCheckbox.setChecked(settings["autoStart"])
         settingsWidgetsLayout.addWidget(self.autoStartCheckbox)
 
-        # Wemod path
-        wemodLayout = QVBoxLayout()
-        wemodLayout.setSpacing(2)
-        settingsWidgetsLayout.addLayout(wemodLayout)
-        wemodLayout.addWidget(QLabel(tr("WeMod path:")))
-        wemodPathLayout = QHBoxLayout()
-        wemodPathLayout.setSpacing(5)
-        wemodLayout.addLayout(wemodPathLayout)
-        self.wemodLineEdit = QLineEdit()
-        self.wemodLineEdit.setText(settings["WeModPath"])
-        wemodPathLayout.addWidget(self.wemodLineEdit)
-        wemodPathButton = QPushButton("...")
-        wemodPathButton.clicked.connect(self.selectWeModPath)
-        wemodPathLayout.addWidget(wemodPathButton)
-
         # Apply button
         applyButtonLayout = QHBoxLayout()
         applyButtonLayout.setContentsMargins(0, 0, 10, 10)
@@ -348,13 +174,6 @@ class SettingsDialog(QDialog):
     
     def find_settings_key(self, value, dict):
         return next(key for key, val in dict.items() if val == value)
-
-    def selectWeModPath(self):
-        initialPath = self.wemodLineEdit.text() or os.path.expanduser("~")
-        directory = QFileDialog.getExistingDirectory(
-            self, tr("Select WeMod Installation Path"), initialPath)
-        if directory:
-            self.wemodLineEdit.setText(os.path.normpath(directory))
     
     def add_or_remove_startup(self, app_name, path_to_exe, add=True):
         key = reg.HKEY_CURRENT_USER
@@ -370,12 +189,15 @@ class SettingsDialog(QDialog):
             print(f"Registry modification failed: {str(e)}")
     
     def apply_settings_page(self):
+        original_theme = settings["theme"]
+        original_language = settings["language"]
+
         settings["theme"] = theme_options[self.themeCombo.currentText()]
         settings["language"] = language_options[self.languageCombo.currentText()]
         settings["enSearchResults"] = self.alwaysEnCheckbox.isChecked()
+        settings["removeBgMusic"] = self.removeBgMusicCheckbox.isChecked()
         settings["autoUpdateDatabase"] = self.autoUpdateDatabaseCheckbox.isChecked()
         settings["autoUpdate"] = self.autoUpdateCheckbox.isChecked()
-        settings["WeModPath"] = self.wemodLineEdit.text()
         settings["autoStart"] = self.autoStartCheckbox.isChecked()
         settings["downloadServer"] = server_options[self.serverCombo.currentText()]
         apply_settings(settings)
@@ -388,8 +210,26 @@ class SettingsDialog(QDialog):
             else:
                 self.add_or_remove_startup(app_name, app_path, False)
 
-        QMessageBox.information(self, tr("Attention"), tr(
-            "Please restart the application to apply theme and language settings."))
+        if original_theme != settings["theme"] or original_language != settings["language"]:
+            msg_box = QMessageBox(
+                QMessageBox.Icon.Question,
+                tr("Attention"),
+                tr("Do you want to restart the application now to apply theme or language settings?"),
+                QMessageBox.StandardButton.Yes | QMessageBox.StandardButton.No,
+                self
+            )
+            
+            yes_button = msg_box.button(QMessageBox.StandardButton.Yes)
+            yes_button.setText(tr("Yes"))
+            no_button = msg_box.button(QMessageBox.StandardButton.No)
+            no_button.setText(tr("No"))
+            reply = msg_box.exec()
+
+            if reply == QMessageBox.StandardButton.Yes:
+                os.execl(sys.executable, sys.executable, *map(lambda arg: f'"{arg}"', sys.argv))
+        
+        else:
+            QMessageBox.information(self, tr("Success"), tr("Settings saved."))
 
 
 class AboutDialog(QDialog):
@@ -791,15 +631,12 @@ class DownloadBaseThread(QThread):
             
                 elif self.initialize_translator():
                     # Use direct translation if couldn't find a match
-                    print(
-                        "No matches found, using direct translation for: " + original_trainerName)
-                    trans_trainerName = ts.translate_text(
-                        original_trainerName, from_language='en', to_language='zh')
+                    print("No matches found, using direct translation for: " + original_trainerName)
+                    trans_trainerName = ts.translate_text(original_trainerName, from_language='en', to_language='zh')
 
                     # strip any game names that have their english names
                     pattern = r'[A-Za-z0-9\s：&]+（([^\）]*)\）|\（[A-Za-z\s：&]+\）$'
-                    trans_trainerName = re.sub(pattern, lambda m: m.group(
-                        1) if m.group(1) else '', trans_trainerName)
+                    trans_trainerName = re.sub(pattern, lambda m: m.group(1) if m.group(1) else '', trans_trainerName)
 
                     # do not alter if game name ends with roman numerics
                     def is_roman_numeral(s):
@@ -809,8 +646,7 @@ class DownloadBaseThread(QThread):
                         pattern = r'[A-Za-z\s：&]+$'
                         trans_trainerName = re.sub(pattern, '', trans_trainerName)
 
-                    trans_trainerName = trans_trainerName.replace(
-                        "《", "").replace("》", "")
+                    trans_trainerName = trans_trainerName.replace("《", "").replace("》", "")
                     trans_trainerName = f"《{trans_trainerName}》修改器"
 
             except Exception as e:
@@ -1393,15 +1229,9 @@ class DownloadTrainersThread(DownloadBaseThread):
 
             # Extract compressed file and rename
             self.message.emit(tr("Decompressing..."), None)
-            extension = os.path.splitext(trainerTemp)[1]
             try:
-                if extension == ".rar":
-                    command = [unrar_path, "x", "-y", trainerTemp, DOWNLOAD_TEMP_DIR]
-                    subprocess.run(command, check=True,
-                                creationflags=subprocess.CREATE_NO_WINDOW)
-                elif extension == ".zip":
-                    with zipfile.ZipFile(trainerTemp, 'r') as zip_ref:
-                        zip_ref.extractall(DOWNLOAD_TEMP_DIR)
+                command = [unzip_path, "x", "-y", trainerTemp, f"-o{DOWNLOAD_TEMP_DIR}"]
+                subprocess.run(command, check=True, creationflags=subprocess.CREATE_NO_WINDOW)
 
             except Exception as e:
                 self.message.emit(tr("An error occurred while extracting downloaded trainer: ") + str(e), "failure")
@@ -1411,14 +1241,14 @@ class DownloadTrainersThread(DownloadBaseThread):
 
             # Locate extracted .exe file
             cnt = 0
-            exeRawName = None
+            exeRawName = []
             for filename in os.listdir(DOWNLOAD_TEMP_DIR):
                 if "trainer" in filename.lower() and filename.endswith(".exe"):
-                    exeRawName = filename
+                    exeRawName.append(filename)
                 elif "trainer" not in filename.lower():
                     cnt += 1
 
-            # Warn user if extra files found
+            # Warn user if anti-cheat files found
             if cnt > 0 and not self.update:
                 self.messageBox.emit("info", tr("Attention"), tr("Please check folder for anti-cheat requirements!"))
                 os.startfile(DOWNLOAD_TEMP_DIR)
@@ -1430,11 +1260,40 @@ class DownloadTrainersThread(DownloadBaseThread):
                 self.finished.emit(1)
                 return
 
+            # Construct destination trainer name dict (may have multiple versions of a same game)
             os.makedirs(self.trainerDownloadPath, exist_ok=True)
-            trainer_name = trainerName_final + ".exe"
-            source_file = os.path.join(DOWNLOAD_TEMP_DIR, exeRawName)
-            destination_file = os.path.join(self.trainerDownloadPath, trainer_name)
-        
+            src_dst = {}  # {source file: destination file, ...}
+            if len(exeRawName) > 1:
+                if self.update:
+                    match = re.search(r'^(.*?)(\s+v\d+|\s+Early Access)', exeRawName[0])
+                    trainerName = match.group(1) + " Trainer"
+                    trainerName_final = self.symbol_replacement(self.translate_trainer(trainerName))
+
+                for source_exe in exeRawName:
+                    trainer_details = ""
+                    if domain == "flingtrainer.com":
+                        pattern = r'trainer(.*)'
+                        match = re.search(pattern, source_exe, re.IGNORECASE)
+                        if match:
+                            trainer_details = match.group(1)
+                    else:
+                        pattern = r"\sUpdate.*"
+                        match = re.search(pattern, source_exe)
+                        if match:
+                            trainer_details = match.group().replace(" Trainer", "")
+
+                    trainer_name = f"{trainerName_final}{trainer_details}"
+                
+                    source_file = os.path.join(DOWNLOAD_TEMP_DIR, source_exe)
+                    destination_file = os.path.join(self.trainerDownloadPath, trainer_name)
+                    src_dst[source_file] = destination_file
+
+            else:
+                trainer_name = f"{trainerName_final}.exe"
+                source_file = os.path.join(DOWNLOAD_TEMP_DIR, exeRawName[0])
+                destination_file = os.path.join(self.trainerDownloadPath, trainer_name)
+                src_dst[source_file] = destination_file
+
         elif settings["downloadServer"] == "china":
             trainer_list = list(DownloadBaseThread.trainer_urls.items())
             trainerName = self.symbol_replacement(trainer_list[self.index][0])
@@ -1491,11 +1350,11 @@ class DownloadTrainersThread(DownloadBaseThread):
             # Decompress downloaded zip
             self.message.emit(tr("Decompressing..."), None)
             try:
-                with zipfile.ZipFile(trainerTemp, 'r') as zip_ref:
-                    zip_ref.extractall(DOWNLOAD_TEMP_DIR)
+                command = [unzip_path, "x", "-y", trainerTemp, f"-o{DOWNLOAD_TEMP_DIR}"]
+                subprocess.run(command, check=True, creationflags=subprocess.CREATE_NO_WINDOW)
                 if antiUrl:
-                    with zipfile.ZipFile(antiTemp, 'r') as zip_ref:
-                        zip_ref.extractall(anti_folder)
+                    command = [unzip_path, "x", "-y", antiTemp, f"-o{anti_folder}"]
+                    subprocess.run(command, check=True, creationflags=subprocess.CREATE_NO_WINDOW)
 
             except Exception as e:
                 self.message.emit(tr("An error occurred while extracting downloaded trainer: ") + str(e), "failure")
@@ -1510,7 +1369,7 @@ class DownloadTrainersThread(DownloadBaseThread):
                 if filename.endswith(".exe"):
                     exeRawName = filename
 
-            # Warn user if extra files found
+            # Warn user if anti-cheat files found
             if antiUrl:
                 self.messageBox.emit("info", tr("Attention"), tr("Please check folder for anti-cheat requirements!"))
                 os.startfile(anti_folder)
@@ -1522,18 +1381,33 @@ class DownloadTrainersThread(DownloadBaseThread):
                 return
 
             os.makedirs(self.trainerDownloadPath, exist_ok=True)
+            src_dst = {}
             source_file = os.path.join(DOWNLOAD_TEMP_DIR, exeRawName)
             destination_file = os.path.join(self.trainerDownloadPath, trainerName + ".exe")
+            src_dst[source_file] = destination_file
 
         # remove fling trainer bg music
-        self.message.emit(tr("Removing trainer background music..."), None)
-        self.modify_fling_settings()
-        self.remove_bgMusic(source_file, ["MID", "MIDI"])
+        if settings["removeBgMusic"]:
+            self.message.emit(tr("Removing trainer background music..."), None)
+            self.modify_fling_settings(True)
+            for source_file in src_dst.keys():
+                self.remove_bgMusic(source_file, ["MID", "MIDI"])
+        else:
+            self.modify_fling_settings(False)
 
         try:
-            if os.path.exists(destination_file):
-                os.chmod(destination_file, stat.S_IWRITE)
-            shutil.move(source_file, destination_file)
+            # Delete original trainer file (could not preserve original file name due to multiple versions when updating)
+            if len(exeRawName) > 1 and self.update:
+                original_trainer_name = f"{self.trainerName}.exe"
+                original_trainer_file = os.path.join(self.trainerDownloadPath, original_trainer_name)
+                os.chmod(original_trainer_file, stat.S_IWRITE)
+                os.remove(original_trainer_file)
+
+            for src, dst in src_dst.items():
+                if os.path.exists(dst):
+                    os.chmod(dst, stat.S_IWRITE)
+                shutil.move(src, dst)
+
             os.remove(trainerTemp)
             if antiUrl:
                 os.remove(antiTemp)
@@ -1556,13 +1430,16 @@ class DownloadTrainersThread(DownloadBaseThread):
         time.sleep(self.download_finish_delay)
         self.finished.emit(0)
     
-    def modify_fling_settings(self):
+    def modify_fling_settings(self, removeBgMusic):
         # replace bg music in Documents folder
         username = os.getlogin()
         flingSettings_path = f"C:/Users/{username}/Documents/FLiNGTrainer"
         bgMusic_path = os.path.join(flingSettings_path, "TrainerBGM.mid")
         if os.path.exists(bgMusic_path):
-            shutil.copyfile(emptyMidi_path, bgMusic_path)
+            if settings["removeBgMusic"]:
+                shutil.copyfile(emptyMidi_path, bgMusic_path)
+            else:
+                os.remove(bgMusic_path)
 
         # change fling settings to disable startup music
         settingFiles = [
@@ -1581,9 +1458,15 @@ class DownloadTrainersThread(DownloadBaseThread):
                 for line in lines:
                     if line.strip().startswith('OnLoadMusic'):
                         if os.path.basename(settingFile) == "FLiNGTSettings.ini":
-                            file.write('OnLoadMusic = False\n')
+                            if removeBgMusic:
+                                file.write('OnLoadMusic = False\n')
+                            else:
+                                file.write('OnLoadMusic = True\n')
                         elif os.path.basename(settingFile) == "TrainerSettings.ini":
-                            file.write('OnLoadMusic=False\n')
+                            if removeBgMusic:
+                                file.write('OnLoadMusic=False\n')
+                            else:
+                                file.write('OnLoadMusic=True\n')
                     else:
                         file.write(line)
 

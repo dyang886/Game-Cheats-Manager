@@ -491,4 +491,16 @@ additions = [
         "en_name": "Ys Memories of Celceta Steam",
         "keyw": "伊苏：塞尔塞塔的树海Steam版",
     },
+    {
+        "en_name": "Hades",
+        "keyw": "哈迪斯",
+    },
+    {
+        "en_name": "Hades II",
+        "keyw": "哈迪斯2",
+    },
+    {
+        "en_name": "Nine Sols",
+        "keyw": "九日",
+    },
 ]

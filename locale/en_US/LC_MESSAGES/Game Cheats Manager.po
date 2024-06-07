@@ -51,18 +51,6 @@ msgstr "Bilibili author homepage:"
 msgid "Don't show again"
 msgstr "Don't show again"
 
-msgid "Unsupported WeMod Version"
-msgstr "Unsupported WeMod Version"
-
-msgid "WeMod version higher than 9.0.0 is not supported."
-msgstr "WeMod version higher than 9.0.0 is not supported."
-
-msgid "Current WeMod version: v"
-msgstr "Current WeMod version: v"
-
-msgid "Use the link below to download the latest supported version:"
-msgstr "Use the link below to download the latest supported version:"
-
 msgid "Settings"
 msgstr "Settings"
 
@@ -78,14 +66,14 @@ msgstr "Download Server:"
 msgid "Always show search results in English"
 msgstr "Always show search results in English"
 
+msgid "Remove trainer background music"
+msgstr "Remove trainer background music"
+
 msgid "Update trainer databases automatically"
 msgstr "Update trainer databases automatically"
 
 msgid "Update trainers automatically"
 msgstr "Update trainers automatically"
-
-msgid "WeMod path:"
-msgstr "WeMod path:"
 
 msgid "Launch app on startup"
 msgstr "Launch app on startup"
@@ -93,14 +81,23 @@ msgstr "Launch app on startup"
 msgid "Apply"
 msgstr "Apply"
 
-msgid "Select WeMod Installation Path"
-msgstr "Select WeMod Installation Path"
-
 msgid "Attention"
 msgstr "Attention"
 
-msgid "Please restart the application to apply theme and language settings."
-msgstr "Please restart the application to apply theme and language settings."
+msgid "Do you want to restart the application now to apply theme or language settings?"
+msgstr "Do you want to restart the application now to apply theme or language settings?"
+
+msgid "Yes"
+msgstr "Yes"
+
+msgid "No"
+msgstr "No"
+
+msgid "Success"
+msgstr "Success"
+
+msgid "Settings saved."
+msgstr "Settings saved."
 
 msgid "About"
 msgstr "About"
@@ -225,8 +222,8 @@ msgstr "Open Trainer Download Path"
 msgid "Add Paths to Whitelist"
 msgstr "Add Paths to Whitelist"
 
-msgid "Unlock WeMod Pro"
-msgstr "Unlock WeMod Pro"
+msgid "WeMod Customization"
+msgstr "WeMod Customization"
 
 msgid "Update Trainer Database"
 msgstr "Update Trainer Database"
@@ -291,12 +288,6 @@ msgstr "Delete original trainers"
 msgid "Do you want to delete the original trainer files?"
 msgstr "Do you want to delete the original trainer files?"
 
-msgid "Yes"
-msgstr "Yes"
-
-msgid "No"
-msgstr "No"
-
 msgid "Failed to delete original trainer: "
 msgstr "Failed to delete original trainer: "
 
@@ -309,27 +300,76 @@ msgstr "To proceed with adding the trainer download paths to the Windows Defende
 msgid "Would you like to continue?"
 msgstr "Would you like to continue?"
 
-msgid "Success"
-msgstr "Success"
-
 msgid "Successfully added paths to Windows Defender whitelist."
 msgstr "Successfully added paths to Windows Defender whitelist."
 
 msgid "Failed to add paths to Windows Defender whitelist."
 msgstr "Failed to add paths to Windows Defender whitelist."
 
+msgid "WeMod installation path:"
+msgstr "WeMod installation path:"
+
+msgid "Installed WeMod Versions:"
+msgstr "Installed WeMod Versions:"
+
+msgid "Activate WeMod Pro"
+msgstr "Activate WeMod Pro"
+
+msgid "Disable WeMod Auto Update"
+msgstr "Disable WeMod Auto Update"
+
+msgid "Delete All Other WeMod Versions"
+msgstr "Delete All Other WeMod Versions"
+
+msgid "Select WeMod Installation Path"
+msgstr "Select WeMod Installation Path"
+
+msgid "WeMod not installed"
+msgstr "WeMod not installed"
+
 msgid ""
-"WeMod not installed or invalid installation path.\n"
-"Please choose a correct WeMod installation path in settings."
+"WeMod is currently running,\n"
+"please close the application first."
 msgstr ""
-"WeMod not installed or invalid installation path.\n"
-"Please choose a correct WeMod installation path in settings."
+"WeMod is currently running,\n"
+"please close the application first."
 
-msgid "Detected newest supported WeMod version {version}, would you like to use this version?"
-msgstr "Detected newest supported WeMod version {version}, would you like to use this version?"
+msgid "Failed to extract file:"
+msgstr "Failed to extract file:"
 
-msgid "WeMod is currently running, please close the application first."
-msgstr "WeMod is currently running, please close the application first."
+msgid "Unsupported WeMod version."
+msgstr "Unsupported WeMod version."
 
-msgid "You have now activated WeMod Pro!\n"
-msgstr "You have now activated WeMod Pro!\n"
+msgid "Failed to patch file:"
+msgstr "Failed to patch file:"
+
+msgid "WeMod Pro activated."
+msgstr "WeMod Pro activated."
+
+msgid "Failed to activate WeMod Pro."
+msgstr "Failed to activate WeMod Pro."
+
+msgid "WeMod Pro disabled."
+msgstr "WeMod Pro disabled."
+
+msgid "WeMod auto update disabled."
+msgstr "WeMod auto update disabled."
+
+msgid "WeMod auto update enabled."
+msgstr "WeMod auto update enabled."
+
+msgid ""
+"Failed to enable WeMod auto update,\n"
+"please try reinstalling WeMod."
+msgstr ""
+"Failed to enable WeMod auto update,\n"
+"please try reinstalling WeMod."
+
+msgid "Failed to process WeMod update file:"
+msgstr "Failed to process WeMod update file:"
+
+msgid "Deleted WeMod version: "
+msgstr "Deleted WeMod version: "
+
+msgid "Failed to delete WeMod version: "
+msgstr "Failed to delete WeMod version: "

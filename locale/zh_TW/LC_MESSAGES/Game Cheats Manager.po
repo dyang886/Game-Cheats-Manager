@@ -51,18 +51,6 @@ msgstr "B站作者首頁:"
 msgid "Don't show again"
 msgstr "不再顯示"
 
-msgid "Unsupported WeMod Version"
-msgstr "不支援的 WeMod 版本"
-
-msgid "WeMod version higher than 9.0.0 is not supported."
-msgstr "不支援高於 9.0.0 的 WeMod 版本。"
-
-msgid "Current WeMod version: v"
-msgstr "當前 WeMod 版本：v"
-
-msgid "Use the link below to download the latest supported version:"
-msgstr "使用以下連結下載最新的受支援版本："
-
 msgid "Settings"
 msgstr "設定"
 
@@ -78,14 +66,14 @@ msgstr "下載伺服器："
 msgid "Always show search results in English"
 msgstr "始終以英文顯示搜尋結果"
 
+msgid "Remove trainer background music"
+msgstr "刪除修改器背景音樂"
+
 msgid "Update trainer databases automatically"
 msgstr "自動更新修改器資料庫"
 
 msgid "Update trainers automatically"
 msgstr "自動更新修改器"
-
-msgid "WeMod path:"
-msgstr "WeMod 路徑："
 
 msgid "Launch app on startup"
 msgstr "開機自啟"
@@ -93,14 +81,23 @@ msgstr "開機自啟"
 msgid "Apply"
 msgstr "應用"
 
-msgid "Select WeMod Installation Path"
-msgstr "選擇 WeMod 安裝路徑"
-
 msgid "Attention"
 msgstr "警告"
 
-msgid "Please restart the application to apply theme and language settings."
-msgstr "請重新啟動應用程式以應用外觀和語言設定。"
+msgid "Do you want to restart the application now to apply theme or language settings?"
+msgstr "是否立即重啟程序以應用主題或語言設置？"
+
+msgid "Yes"
+msgstr "是"
+
+msgid "No"
+msgstr "否"
+
+msgid "Success"
+msgstr "成功"
+
+msgid "Settings saved."
+msgstr "設定已儲存。"
 
 msgid "About"
 msgstr "關於"
@@ -225,8 +222,8 @@ msgstr "打開修改器下載路徑"
 msgid "Add Paths to Whitelist"
 msgstr "添加路徑至白名單"
 
-msgid "Unlock WeMod Pro"
-msgstr "解鎖 WeMod 專業版"
+msgid "WeMod Customization"
+msgstr "自定義 WeMod"
 
 msgid "Update Trainer Database"
 msgstr "更新修改器資料庫"
@@ -291,12 +288,6 @@ msgstr "刪除原始修改器"
 msgid "Do you want to delete the original trainer files?"
 msgstr "是否要刪除原始修改器檔？"
 
-msgid "Yes"
-msgstr "是"
-
-msgid "No"
-msgstr "否"
-
 msgid "Failed to delete original trainer: "
 msgstr "無法刪除原始修改器："
 
@@ -309,27 +300,76 @@ msgstr "若要將修改器下載路徑添加到 Windows Defender 白名單中，
 msgid "Would you like to continue?"
 msgstr "是否要繼續？"
 
-msgid "Success"
-msgstr "成功"
-
 msgid "Successfully added paths to Windows Defender whitelist."
 msgstr "已成功將路徑添加到 Windows Defender 白名單。"
 
 msgid "Failed to add paths to Windows Defender whitelist."
 msgstr "無法將路徑添加到 Windows Defender 白名單。"
 
+msgid "WeMod installation path:"
+msgstr "WeMod 安裝路徑："
+
+msgid "Installed WeMod Versions:"
+msgstr "已安裝的 WeMod 版本："
+
+msgid "Activate WeMod Pro"
+msgstr "激活 WeMod 專業版"
+
+msgid "Disable WeMod Auto Update"
+msgstr "禁用 WeMod 自動更新"
+
+msgid "Delete All Other WeMod Versions"
+msgstr "刪除所有其他 WeMod 版本"
+
+msgid "Select WeMod Installation Path"
+msgstr "選擇 WeMod 安裝路徑"
+
+msgid "WeMod not installed"
+msgstr "未安裝 WeMod"
+
 msgid ""
-"WeMod not installed or invalid installation path.\n"
-"Please choose a correct WeMod installation path in settings."
+"WeMod is currently running,\n"
+"please close the application first."
 msgstr ""
-"WeMod 未安裝或安裝路徑無效。\n"
-"請在設定中選擇正確的 WeMod 安裝路徑。"
+"WeMod 正在運行中，\n"
+"請先關閉該應用程序。"
 
-msgid "Detected newest supported WeMod version {version}, would you like to use this version?"
-msgstr "檢測到最新支援的 WeMod 版本 {version}，您想使用這個版本嗎？"
+msgid "Failed to extract file:"
+msgstr "提取文件失敗："
 
-msgid "WeMod is currently running, please close the application first."
-msgstr "WeMod 目前正在運行中，請先關閉應用程式。"
+msgid "Unsupported WeMod version."
+msgstr "不支持的 WeMod 版本。"
 
-msgid "You have now activated WeMod Pro!\n"
-msgstr "您已啟用 WeMod 專業版！\n"
+msgid "Failed to patch file:"
+msgstr "修補文件失敗："
+
+msgid "WeMod Pro activated."
+msgstr "WeMod 專業版已激活。"
+
+msgid "Failed to activate WeMod Pro."
+msgstr "WeMod 專業版激活失敗。"
+
+msgid "WeMod Pro disabled."
+msgstr "WeMod 專業版已禁用。"
+
+msgid "WeMod auto update disabled."
+msgstr "WeMod 自動更新已禁用。"
+
+msgid "WeMod auto update enabled."
+msgstr "WeMod 自動更新已啟用。"
+
+msgid ""
+"Failed to enable WeMod auto update,\n"
+"please try reinstalling WeMod."
+msgstr ""
+"無法啟用 WeMod 自動更新，\n"
+"請嚐試重新安裝 WeMod。"
+
+msgid "Failed to process WeMod update file:"
+msgstr "無法處理 WeMod 更新文件："
+
+msgid "Deleted WeMod version: "
+msgstr "已刪除 WeMod 版本："
+
+msgid "Failed to delete WeMod version: "
+msgstr "刪除 WeMod 版本失敗："
