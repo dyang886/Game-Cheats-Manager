@@ -17,7 +17,7 @@ Game Cheats Manager is a one-stop solution for gamers to manage their trainers e
    5. **About**: View app version and GitHub repository link.
 ##### FAQ
 1.**Trainer Multiversion**：The compressed package downloaded from the official website may include multiple versions of the modifiers. All versions must be preserved. (This issue is known to exist in the Dead Cells modifiers.)
-2.**File MD5**：下载后，已使用 Resource Hacker 从所有旧的修正器 MIDI 音频文件中移除了背景音乐。
+2.**File MD5**：After downloading, background music has been removed from all old modifier MIDI audio files using Resource Hacker.
 
 ## Installation
 
