@@ -6,12 +6,12 @@ import sys
 
 from PyQt6.QtCore import Qt, QTimer
 from PyQt6.QtGui import QAction, QColor, QFont, QFontDatabase, QIcon, QPixmap
-from PyQt6.QtWidgets import QApplication, QFileDialog, QGridLayout, QHBoxLayout, QLabel, QLineEdit, QListWidget, QListWidgetItem, QMainWindow, QMessageBox, QPushButton, QStatusBar, QVBoxLayout, QWidget
+from PyQt6.QtWidgets import QApplication, QFileDialog, QGridLayout, QHBoxLayout, QLabel, QLineEdit, QListWidget, QListWidgetItem, QMainWindow, QMessageBox, QStatusBar, QVBoxLayout, QWidget
 from tendo import singleton
 
 from helper import *
-from wemod import *
 import style_sheet
+from wemod import *
 
 
 class GameCheatsManager(QMainWindow):
@@ -37,23 +37,10 @@ class GameCheatsManager(QMainWindow):
         self.updateLink = "https://api.github.com/repos/dyang886/Game-Cheats-Manager/releases/latest"
         self.bilibiliLink = "https://space.bilibili.com/256673766"
 
-        # Paths and variable management
+        # Variable management
         self.trainerSearchEntryPrompt = tr("Search for installed")
         self.downloadSearchEntryPrompt = tr("Search to download")
         self.trainerDownloadPath = os.path.normpath(settings["downloadPath"])
-        os.makedirs(self.trainerDownloadPath, exist_ok=True)
-        
-        if settings["theme"] == "black":
-            self.dropDownArrow_path = resource_path("assets/dropdown-white.png").replace("\\", "/")
-        elif settings["theme"] == "white":
-            self.dropDownArrow_path = resource_path("assets/dropdown-black.png").replace("\\", "/")
-        self.upArrow_path = resource_path("assets/up.png").replace("\\", "/")
-        self.downArrow_path = resource_path("assets/down.png").replace("\\", "/")
-        self.leftArrow_path = resource_path("assets/left.png").replace("\\", "/")
-        self.rightArrow_path = resource_path("assets/right.png").replace("\\", "/")
-        
-        self.elevator_path = resource_path("dependency/elevator.exe")
-        self.search_path = resource_path("assets/search.png")
 
         self.trainers = {}  # Store installed trainers: {trainer name: trainer path}
         self.searchable = True  # able to search online trainers or not
@@ -132,7 +119,7 @@ class GameCheatsManager(QMainWindow):
         trainerSearchLayout.setContentsMargins(20, 0, 20, 0)
         trainersLayout.addLayout(trainerSearchLayout)
 
-        searchPixmap = QPixmap(self.search_path).scaled(25, 25, Qt.AspectRatioMode.KeepAspectRatio)
+        searchPixmap = QPixmap(search_path).scaled(25, 25, Qt.AspectRatioMode.KeepAspectRatio)
         searchLabel = QLabel()
         searchLabel.setPixmap(searchPixmap)
         trainerSearchLayout.addWidget(searchLabel)
@@ -152,11 +139,11 @@ class GameCheatsManager(QMainWindow):
         bottomLayout.setSpacing(6)
         trainersLayout.addLayout(bottomLayout)
 
-        self.launchButton = QPushButton(tr("Launch"))
+        self.launchButton = CustomButton(tr("Launch"))
         bottomLayout.addWidget(self.launchButton)
         self.launchButton.clicked.connect(self.launch_trainer)
 
-        self.deleteButton = QPushButton(tr("Delete"))
+        self.deleteButton = CustomButton(tr("Delete"))
         bottomLayout.addWidget(self.deleteButton)
         self.deleteButton.clicked.connect(self.delete_trainer)
 
@@ -174,7 +161,7 @@ class GameCheatsManager(QMainWindow):
         downloadsLayout.addLayout(downloadSearchLayout)
 
         searchLabel = QLabel()
-        searchLabel.setPixmap(QPixmap(self.search_path).scaled(25, 25, Qt.AspectRatioMode.KeepAspectRatio))
+        searchLabel.setPixmap(QPixmap(search_path).scaled(25, 25, Qt.AspectRatioMode.KeepAspectRatio))
         downloadSearchLayout.addWidget(searchLabel)
 
         self.downloadSearchEntry = QLineEdit()
@@ -197,7 +184,7 @@ class GameCheatsManager(QMainWindow):
         self.downloadPathEntry.setText(self.trainerDownloadPath)
         changeDownloadPathLayout.addWidget(self.downloadPathEntry)
 
-        self.fileDialogButton = QPushButton("...")
+        self.fileDialogButton = CustomButton("...")
         changeDownloadPathLayout.addWidget(self.fileDialogButton)
         self.fileDialogButton.clicked.connect(self.change_path)
 
@@ -228,11 +215,11 @@ class GameCheatsManager(QMainWindow):
             style = style_sheet.white
 
         style = style.format(
-            drop_down_arrow=self.dropDownArrow_path,
-            scroll_bar_top=self.upArrow_path,
-            scroll_bar_bottom=self.downArrow_path,
-            scroll_bar_left=self.leftArrow_path,
-            scroll_bar_right=self.rightArrow_path,
+            drop_down_arrow=dropDownArrow_path,
+            scroll_bar_top=upArrow_path,
+            scroll_bar_bottom=downArrow_path,
+            scroll_bar_left=leftArrow_path,
+            scroll_bar_right=rightArrow_path,
         )
         self.setStyleSheet(style)
 
@@ -347,7 +334,7 @@ class GameCheatsManager(QMainWindow):
         folder = QFileDialog.getExistingDirectory(self, tr("Change trainer download path"))
 
         if folder:
-            changedPath = os.path.normpath(os.path.join(folder, "GCM Trainers/"))
+            changedPath = os.path.normpath(os.path.join(folder, "GCM Trainers"))
             if self.downloadPathEntry.text() == changedPath:
                 QMessageBox.critical(self, tr("Error"), tr("Please choose a new path."))
                 self.on_message(tr("Failed to change trainer download path."), "failure")
@@ -355,7 +342,7 @@ class GameCheatsManager(QMainWindow):
                 return
 
             self.downloadListBox.addItem(tr("Migrating existing trainers..."))
-            migration_thread = PathChangeThread(self.trainerDownloadPath, folder, self)
+            migration_thread = PathChangeThread(self.trainerDownloadPath, changedPath, self)
             migration_thread.finished.connect(self.on_migration_finished)
             migration_thread.error.connect(self.on_migration_error)
             migration_thread.start()
@@ -581,7 +568,7 @@ class GameCheatsManager(QMainWindow):
             paths = [DOWNLOAD_TEMP_DIR, settings["downloadPath"]]
 
             try:
-                subprocess.run([self.elevator_path] + paths, check=True, shell=True)
+                subprocess.run([elevator_path] + paths, check=True, shell=True)
                 QMessageBox.information(self, tr("Success"), tr("Successfully added paths to Windows Defender whitelist."))
 
             except subprocess.CalledProcessError:

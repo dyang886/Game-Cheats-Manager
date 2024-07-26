@@ -216,16 +216,8 @@ additions = [
         "keyw": "在地下城寻求邂逅是否搞错了什么：无限战斗",
     },
     {
-        "en_name": "WARRIORS OROCHI 3 Ultimate Definitive Edition",
-        "keyw": "无双大蛇3：终极版",
-    },
-    {
-        "en_name": "Warriors Orochi 4",
-        "keyw": "无双大蛇4",
-    },
-    {
         "en_name": "Warriors Orochi 4: Ultimate",
-        "keyw": "无双大蛇4：终极版",
+        "keyw": "无双大蛇3：终极版",
     },
     {
         "en_name": "Shin Sangokumusou 6",
@@ -498,9 +490,5 @@ additions = [
     {
         "en_name": "Hades II",
         "keyw": "哈迪斯2",
-    },
-    {
-        "en_name": "Nine Sols",
-        "keyw": "九日",
     },
 ]

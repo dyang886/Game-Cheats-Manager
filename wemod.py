@@ -6,9 +6,10 @@ import subprocess
 
 from PyQt6.QtCore import QThread, pyqtSignal
 from PyQt6.QtGui import QColor, QIcon
-from PyQt6.QtWidgets import QCheckBox, QComboBox, QDialog, QFileDialog, QHBoxLayout, QLabel, QLineEdit, QListWidget, QListWidgetItem, QPushButton, QVBoxLayout
+from PyQt6.QtWidgets import QCheckBox, QComboBox, QDialog, QFileDialog, QHBoxLayout, QLabel, QLineEdit, QListWidget, QListWidgetItem, QVBoxLayout
 
 from config import *
+from helper import CustomButton
 
 
 class WeModDialog(QDialog):
@@ -21,9 +22,13 @@ class WeModDialog(QDialog):
         self.setLayout(weModLayout)
         self.setMinimumWidth(900)
 
+        weModDownloadLink = QLabel(tr("Download WeMod: ") + '<a href="https://www.wemod.com" style="text-decoration: none;">https://www.wemod.com</a>')
+        weModDownloadLink.setOpenExternalLinks(True)
+        weModLayout.addWidget(weModDownloadLink)
+
         mainLayout = QHBoxLayout()
         mainLayout.setSpacing(30)
-        mainLayout.setContentsMargins(30, 30, 30, 20)
+        mainLayout.setContentsMargins(30, 20, 30, 20)
         weModLayout.addLayout(mainLayout)
 
         column1Layout = QVBoxLayout()
@@ -54,7 +59,7 @@ class WeModDialog(QDialog):
         installLayout.addLayout(installPathLayout)
         self.installLineEdit = QLineEdit()
         installPathLayout.addWidget(self.installLineEdit)
-        installPathButton = QPushButton("...")
+        installPathButton = CustomButton("...")
         installPathButton.clicked.connect(self.selectWeModPath)
         installPathLayout.addWidget(installPathButton)
 
@@ -85,7 +90,7 @@ class WeModDialog(QDialog):
         applyButtonLayout.setContentsMargins(0, 0, 10, 10)
         applyButtonLayout.addStretch(1)
         weModLayout.addLayout(applyButtonLayout)
-        self.applyButton = QPushButton(tr("Apply"))
+        self.applyButton = CustomButton(tr("Apply"))
         self.applyButton.setFixedWidth(100)
         self.applyButton.clicked.connect(self.applyWeModCustomization)
         self.applyButton.setDisabled(True)
@@ -96,7 +101,7 @@ class WeModDialog(QDialog):
     
     def selectWeModPath(self):
         initialPath = self.installLineEdit.text() or os.path.expanduser("~")
-        directory = QFileDialog.getExistingDirectory(self, tr("Select WeMod Installation Path"), initialPath)
+        directory = QFileDialog.getExistingDirectory(self, tr("Select WeMod installation path"), initialPath)
         if directory:
             self.installLineEdit.setText(os.path.normpath(directory))
     
@@ -117,7 +122,7 @@ class WeModDialog(QDialog):
             if os.path.isdir(os.path.join(weModPath, item)):
                 match = re.match(r'app-(\d+\.\d+\.\d+)', item)
                 if match:
-                    version_info = match.group(1)  # 9.3.0
+                    version_info = match.group(1)  # for instance: 9.3.0
                     self.weModVersions.append(version_info)
 
         if not self.weModVersions:
@@ -264,11 +269,6 @@ class ApplyCustomization(QThread):
                 self.message.emit(tr("Failed to activate WeMod Pro."), "failure")
 
         else:
-            if os.path.exists(weModExe_bak):
-                if os.path.exists(weModExe):
-                    os.remove(weModExe)
-                os.rename(weModExe_bak, weModExe)
-
             if os.path.exists(asar_bak):
                 if os.path.exists(asar):
                     os.remove(asar)

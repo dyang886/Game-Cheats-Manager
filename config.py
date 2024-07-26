@@ -8,7 +8,6 @@ import tempfile
 
 import pinyin
 import polib
-from PyQt6.QtWidgets import QMessageBox
 ts = None
 
 
@@ -20,11 +19,8 @@ def resource_path(relative_path):
 
     if not os.path.exists(full_path):
         resource_name = os.path.basename(relative_path)
-        formatted_message = tr("Couldn't find {missing_resource}. Please try reinstalling the application.").format(
-            missing_resource=resource_name)
-        QMessageBox.critical(
-            None, tr("Missing resource file"), formatted_message)
-        sys.exit(1)
+        formatted_message = tr("Couldn't find {missing_resource}. Please try reinstalling the application.").format(missing_resource=resource_name)
+        raise FileNotFoundError(formatted_message)
 
     return full_path
 
@@ -85,15 +81,12 @@ def get_translator():
             for file in files:
                 if file.endswith(".po"):
                     po = polib.pofile(os.path.join(root, file))
-                    po.save_as_mofile(os.path.join(
-                        root, os.path.splitext(file)[0] + ".mo"))
+                    po.save_as_mofile(os.path.join(root, os.path.splitext(file)[0] + ".mo"))
 
     lang = settings["language"]
-    gettext.bindtextdomain("Game Cheats Manager",
-                           resource_path("locale/"))
+    gettext.bindtextdomain("Game Cheats Manager",resource_path("locale/"))
     gettext.textdomain("Game Cheats Manager")
-    lang = gettext.translation(
-        "Game Cheats Manager", resource_path("locale/"), languages=[lang])
+    lang = gettext.translation("Game Cheats Manager", resource_path("locale/"), languages=[lang])
     lang.install()
     return lang.gettext
 
@@ -117,8 +110,16 @@ def ensure_trainer_details_exist():
         shutil.copyfile(resource_path("dependency/xgqdetail.json"), dst)
 
 
-setting_path = os.path.join(
-    os.environ["APPDATA"], "GCM Settings/")
+def ensure_trainer_download_path_is_valid():
+    try:
+        os.makedirs(settings["downloadPath"], exist_ok=True)
+    except Exception:
+        settings["downloadPath"] = os.path.join(os.environ["APPDATA"], "GCM Trainers")
+        apply_settings(settings)
+        os.makedirs(settings["downloadPath"], exist_ok=True)
+
+
+setting_path = os.path.join(os.environ["APPDATA"], "GCM Settings")
 os.makedirs(setting_path, exist_ok=True)
 
 SETTINGS_FILE = os.path.join(setting_path, "settings.json")
@@ -132,10 +133,22 @@ settings = load_settings()
 tr = get_translator()
 
 ensure_trainer_details_exist()
+ensure_trainer_download_path_is_valid()
+
+if settings["theme"] == "black":
+    dropDownArrow_path = resource_path("assets/dropdown-white.png").replace("\\", "/")
+elif settings["theme"] == "white":
+    dropDownArrow_path = resource_path("assets/dropdown-black.png").replace("\\", "/")
+upArrow_path = resource_path("assets/up.png").replace("\\", "/")
+downArrow_path = resource_path("assets/down.png").replace("\\", "/")
+leftArrow_path = resource_path("assets/left.png").replace("\\", "/")
+rightArrow_path = resource_path("assets/right.png").replace("\\", "/")
 resourceHacker_path = resource_path("dependency/ResourceHacker.exe")
 unzip_path = resource_path("dependency/7z/7z.exe")
 binmay_path = resource_path("dependency/binmay.exe")
 emptyMidi_path = resource_path("dependency/TrainerBGM.mid")
+elevator_path = resource_path("dependency/elevator.exe")
+search_path = resource_path("assets/search.png")
 
 language_options = {
     "English (US)": "en_US",
@@ -150,5 +163,5 @@ theme_options = {
 
 server_options = {
     tr("International"): "intl",
-    tr("China"): "china"
+    tr("China") + tr(" (Some trainers cannot be downloaded)"): "china"
 }

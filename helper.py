@@ -20,7 +20,7 @@ from PyQt6.QtCore import QEventLoop, Qt, QThread, QTimer, QUrl, pyqtSignal
 from PyQt6.QtGui import QIcon, QPixmap
 from PyQt6.QtWebEngineCore import QWebEngineDownloadRequest
 from PyQt6.QtWebEngineWidgets import QWebEngineView
-from PyQt6.QtWidgets import QCheckBox, QComboBox, QDialog, QHBoxLayout, QLabel, QMessageBox, QPushButton, QVBoxLayout, QWidget
+from PyQt6.QtWidgets import QApplication, QCheckBox, QComboBox, QDialog, QHBoxLayout, QLabel, QMessageBox, QPushButton, QVBoxLayout, QWidget
 import requests
 ts = None
 
@@ -59,7 +59,7 @@ class CopyRightWarning(QDialog):
         layout.addLayout(linksLayout)
 
         githubUrl = self.parent().githubLink
-        githubText = f'GitHub: <a href="{githubUrl}" style="text-decoration: none; color: #284fff;">{githubUrl}</a>'
+        githubText = f'GitHub: <a href="{githubUrl}" style="text-decoration: none;">{githubUrl}</a>'
         githubLabel = QLabel(githubText)
         githubLabel.setAlignment(Qt.AlignmentFlag.AlignCenter)
         githubLabel.setTextFormat(Qt.TextFormat.RichText)
@@ -68,7 +68,7 @@ class CopyRightWarning(QDialog):
 
         bilibiliUrl = self.parent().bilibiliLink
         text = tr("Bilibili author homepage:")
-        bilibiliText = f'{text} <a href="{bilibiliUrl}" style="text-decoration: none; color: #284fff;">{bilibiliUrl}</a>'
+        bilibiliText = f'{text} <a href="{bilibiliUrl}" style="text-decoration: none;">{bilibiliUrl}</a>'
         bilibiliLabel = QLabel(bilibiliText)
         bilibiliLabel.setAlignment(Qt.AlignmentFlag.AlignCenter)
         bilibiliLabel.setTextFormat(Qt.TextFormat.RichText)
@@ -167,7 +167,7 @@ class SettingsDialog(QDialog):
         applyButtonLayout.setContentsMargins(0, 0, 10, 10)
         applyButtonLayout.addStretch(1)
         settingsLayout.addLayout(applyButtonLayout)
-        self.applyButton = QPushButton(tr("Apply"))
+        self.applyButton = CustomButton(tr("Apply"))
         self.applyButton.setFixedWidth(100)
         self.applyButton.clicked.connect(self.apply_settings_page)
         applyButtonLayout.addWidget(self.applyButton)
@@ -281,7 +281,7 @@ class AboutDialog(QDialog):
         aboutLayout.addLayout(linksLayout)
 
         githubUrl = self.parent().githubLink
-        githubText = f'GitHub: <a href="{githubUrl}" style="text-decoration: none; color: #284fff;">{githubUrl}</a>'
+        githubText = f'GitHub: <a href="{githubUrl}" style="text-decoration: none;">{githubUrl}</a>'
         githubLabel = QLabel(githubText)
         githubLabel.setAlignment(Qt.AlignmentFlag.AlignCenter)
         githubLabel.setTextFormat(Qt.TextFormat.RichText)
@@ -290,7 +290,7 @@ class AboutDialog(QDialog):
 
         bilibiliUrl = self.parent().bilibiliLink
         text = tr("Bilibili author homepage:")
-        bilibiliText = f'{text} <a href="{bilibiliUrl}" style="text-decoration: none; color: #284fff;">{bilibiliUrl}</a>'
+        bilibiliText = f'{text} <a href="{bilibiliUrl}" style="text-decoration: none;">{bilibiliUrl}</a>'
         bilibiliLabel = QLabel(bilibiliText)
         bilibiliLabel.setAlignment(Qt.AlignmentFlag.AlignCenter)
         bilibiliLabel.setTextFormat(Qt.TextFormat.RichText)
@@ -304,29 +304,50 @@ class PathChangeThread(QThread):
     finished = pyqtSignal(str)
     error = pyqtSignal(str)
 
-    def __init__(self, source_path, destination_folder, parent=None):
+    def __init__(self, source_path, destination_path, parent=None):
         super().__init__(parent)
         self.source_path = source_path
-        self.destination_folder = destination_folder
+        self.destination_path = destination_path
 
     def run(self):
         try:
-            dst = os.path.normpath(os.path.join(self.destination_folder, "GCM Trainers/"))
-            if not os.path.exists(dst):
-                os.makedirs(dst)
+            if not os.path.exists(self.destination_path):
+                os.makedirs(self.destination_path)
 
             for filename in os.listdir(self.source_path):
                 src_file = os.path.join(self.source_path, filename)
-                dst_file = os.path.join(dst, filename)
+                dst_file = os.path.join(self.destination_path, filename)
                 os.chmod(src_file, stat.S_IWRITE)
                 if os.path.exists(dst_file):
-                    os.chmod(dst, stat.S_IWRITE)
+                    os.chmod(self.destination_path, stat.S_IWRITE)
                 shutil.move(src_file, dst_file)
             shutil.rmtree(self.source_path)
 
-            self.finished.emit(dst)
+            self.finished.emit(self.destination_path)
         except Exception as e:
             self.error.emit(str(e))
+
+
+class CustomButton(QPushButton):
+    def __init__(self, text, parent=None):
+        super(CustomButton, self).__init__(text, parent)
+        self.setCursor(Qt.CursorShape.PointingHandCursor)
+
+    def setEnabled(self, enabled):
+        super().setEnabled(enabled)
+        if enabled:
+            self.setCursor(Qt.CursorShape.PointingHandCursor)
+        else:
+            self.setCursor(Qt.CursorShape.ForbiddenCursor)
+
+    def enterEvent(self, event):
+        if not self.isEnabled():
+            QApplication.setOverrideCursor(Qt.CursorShape.ForbiddenCursor)
+        super().enterEvent(event)
+
+    def leaveEvent(self, event):
+        QApplication.restoreOverrideCursor()
+        super().leaveEvent(event)
 
 
 class StatusMessageWidget(QWidget):
@@ -736,20 +757,28 @@ class UpdateTrainers(DownloadBaseThread):
                             trainerNamesMap[trainerName] = game
 
                         if trainerNamesMap:
-                            best_match, score = process.extractOne(self.sanitize(tagName + "-trainer"), trainerNamesMap.keys())
-                            if score >= 85:
-                                targetGameOgj = trainerNamesMap[best_match]
-                                version_entry = targetGameOgj.find('div', class_='entry')
+                            if len(trainerNamesMap) == 1:
+                                targetGameObj = next(iter(trainerNamesMap.values()))
+                                version_entry = targetGameObj.find('div', class_='entry')
+                            else:
+                                best_match, score = process.extractOne(self.sanitize(tagName + "-trainer"), trainerNamesMap.keys())
+                                if score >= 85:
+                                    targetGameObj = trainerNamesMap[best_match]
+                                    version_entry = targetGameObj.find('div', class_='entry')
                                 
-                                if version_entry:
-                                    match = re.search(r'Last Updated:\s+(\d+\.\d+\.\d+)', version_entry.text)
-                                    if match:
-                                        trainerDstDate = datetime.datetime.strptime(match.group(1), '%Y.%m.%d')
-                                        print(f"{tagName}\nTrainer source date: {trainerSrcDate.strftime('%Y-%m-%d')}\nNewest build date: {trainerDstDate.strftime('%Y-%m-%d')}\n")
-                                        
-                                        if trainerDstDate > trainerSrcDate:
-                                            update_url = targetGameOgj.find('a', href=True, rel='bookmark')['href']
-                                            return trainerPath, update_url
+                            if version_entry:
+                                match = re.search(r'Last Updated:\s+(\d+\.\d+\.\d+)', version_entry.text)
+                                if match:
+                                    trainerDstDate = datetime.datetime.strptime(match.group(1), '%Y.%m.%d')
+                                    print(f"{tagName}\nTrainer source date: {trainerSrcDate.strftime('%Y-%m-%d')}\nNewest build date: {trainerDstDate.strftime('%Y-%m-%d')}\n")
+                                    
+                                    if trainerDstDate > trainerSrcDate:
+                                        # Special cases
+                                        if tagName == "dynasty-warriors-8-xtreme-legends-complete-edition" and (trainerDstDate - trainerSrcDate < datetime.timedelta(days=2)):
+                                            return None
+
+                                        update_url = targetGameObj.find('a', href=True, rel='bookmark')['href']
+                                        return trainerPath, update_url
         return None
     
     def get_product_name(self, trainerPath):
@@ -1203,7 +1232,11 @@ class DownloadTrainersThread(DownloadBaseThread):
                 if domain == "flingtrainer.com":
                     page_content = self.get_webpage_content(targetUrl, "FLiNG Trainer")
                     trainerPage = BeautifulSoup(page_content, 'html.parser')
-                    targetUrl = trainerPage.find(target="_self").get("href")
+                    targetObj = trainerPage.find(target="_self")
+                    if targetObj:
+                        targetUrl = targetObj.get("href")
+                    else:
+                        raise Exception(tr("Internet request failed."))
                 
                 os.makedirs(DOWNLOAD_TEMP_DIR, exist_ok=True)
                 trainerTemp = self.request_download(targetUrl, DOWNLOAD_TEMP_DIR, trainerName_download)
@@ -1277,7 +1310,7 @@ class DownloadTrainersThread(DownloadBaseThread):
                         if match:
                             trainer_details = match.group(1)
                     else:
-                        pattern = r"\sUpdate.*"
+                        pattern = r"\s+Update.*|\s+v\d+.*"
                         match = re.search(pattern, source_exe)
                         if match:
                             trainer_details = match.group().replace(" Trainer", "")

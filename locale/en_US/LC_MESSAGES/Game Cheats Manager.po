@@ -16,9 +16,6 @@ msgstr ""
 msgid "Couldn't find {missing_resource}. Please try reinstalling the application."
 msgstr "Couldn't find {missing_resource}. Please try reinstalling the application."
 
-msgid "Missing resource file"
-msgstr "Missing resource file"
-
 msgid "Black"
 msgstr "Black"
 
@@ -80,6 +77,9 @@ msgstr "Launch app on startup"
 
 msgid "Apply"
 msgstr "Apply"
+
+msgid " (Some trainers cannot be downloaded)"
+msgstr " (Some trainers cannot be downloaded)"
 
 msgid "Attention"
 msgstr "Attention"
@@ -176,6 +176,9 @@ msgstr "Trainer already exists, aborted download."
 
 msgid "Downloading..."
 msgstr "Downloading..."
+
+msgid "Internet request failed."
+msgstr "Internet request failed."
 
 msgid "An error occurred while downloading trainer: "
 msgstr "An error occurred while downloading trainer: "
@@ -306,6 +309,9 @@ msgstr "Successfully added paths to Windows Defender whitelist."
 msgid "Failed to add paths to Windows Defender whitelist."
 msgstr "Failed to add paths to Windows Defender whitelist."
 
+msgid "Download WeMod: "
+msgstr "Download WeMod: "
+
 msgid "WeMod installation path:"
 msgstr "WeMod installation path:"
 
@@ -321,8 +327,8 @@ msgstr "Disable WeMod Auto Update"
 msgid "Delete All Other WeMod Versions"
 msgstr "Delete All Other WeMod Versions"
 
-msgid "Select WeMod Installation Path"
-msgstr "Select WeMod Installation Path"
+msgid "Select WeMod installation path"
+msgstr "Select WeMod installation path"
 
 msgid "WeMod not installed"
 msgstr "WeMod not installed"

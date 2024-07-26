@@ -16,9 +16,6 @@ msgstr ""
 msgid "Couldn't find {missing_resource}. Please try reinstalling the application."
 msgstr "找不到 {missing_resource}。請嘗試重新安裝應用程式。"
 
-msgid "Missing resource file"
-msgstr "缺少資源檔"
-
 msgid "Black"
 msgstr "黑色"
 
@@ -80,6 +77,9 @@ msgstr "開機自啟"
 
 msgid "Apply"
 msgstr "應用"
+
+msgid " (Some trainers cannot be downloaded)"
+msgstr "部分修改器無法下載"
 
 msgid "Attention"
 msgstr "警告"
@@ -176,6 +176,9 @@ msgstr "修改器已存在，已中止下載。"
 
 msgid "Downloading..."
 msgstr "下載中..."
+
+msgid "Internet request failed."
+msgstr "網絡請求失敗。"
 
 msgid "An error occurred while downloading trainer: "
 msgstr "下載修改器時出錯："
@@ -306,6 +309,9 @@ msgstr "已成功將路徑添加到 Windows Defender 白名單。"
 msgid "Failed to add paths to Windows Defender whitelist."
 msgstr "無法將路徑添加到 Windows Defender 白名單。"
 
+msgid "Download WeMod: "
+msgstr "下載 WeMod："
+
 msgid "WeMod installation path:"
 msgstr "WeMod 安裝路徑："
 
@@ -321,7 +327,7 @@ msgstr "禁用 WeMod 自動更新"
 msgid "Delete All Other WeMod Versions"
 msgstr "刪除所有其他 WeMod 版本"
 
-msgid "Select WeMod Installation Path"
+msgid "Select WeMod installation path"
 msgstr "選擇 WeMod 安裝路徑"
 
 msgid "WeMod not installed"
