@@ -2,10 +2,11 @@
 
 English | [简体中文](./README_CN.md) | [繁體中文](./README_TW.md)
 
-<img src="assets\logo.png" alt="Game Cheats Manager logo" style="zoom:50%;" />
+![GitHub Downloads (all assets, all releases)](https://img.shields.io/github/downloads/dyang886/Game-Cheats-Manager/total) ![GitHub Release](https://img.shields.io/github/v/release/dyang886/Game-Cheats-Manager?link=https%3A%2F%2Fgithub.com%2Fdyang886%2FGame-Cheats-Manager%2Freleases%2Flatest) ![GitHub License](https://img.shields.io/github/license/dyang886/Game-Cheats-Manager) ![GitHub Repo stars](https://img.shields.io/github/stars/dyang886/Game-Cheats-Manager?link=https%3A%2F%2Fgithub.com%2Fdyang886%2FGame-Cheats-Manager%2Fstargazers)
 
-![GitHub Downloads (all assets, all releases)](https://img.shields.io/github/downloads/dyang886/Game-Cheats-Manager/total)![GitHub Release](https://img.shields.io/github/v/release/dyang886/Game-Cheats-Manager?link=https%3A%2F%2Fgithub.com%2Fdyang886%2FGame-Cheats-Manager%2Freleases%2Flatest)![GitHub License](https://img.shields.io/github/license/dyang886/Game-Cheats-Manager)![GitHub Repo stars](https://img.shields.io/github/stars/dyang886/Game-Cheats-Manager?link=https%3A%2F%2Fgithub.com%2Fdyang886%2FGame-Cheats-Manager%2Fstargazers)
-
+<div align="center">
+    <img src="assets/logo.png" alt="Game Cheats Manager logo" width="250" />
+</div>
 Game Cheats Manager is a one-stop solution for gamers to manage their trainers efficiently. It allows users to browse, download, and manage all their trainers from one convenient location. Each trainer, typically a standalone executable, can be launched or deleted directly through the app, simplifying your gaming experience by keeping everything organized and accessible.
 
 ## Usage
@@ -39,7 +40,7 @@ For issues, feature requests, or contributions, please visit the [GitHub reposit
 
 Below are funding options:
 
-|                            WeChat                            |                            Alipay                            |                             QQ                             |
-| :----------------------------------------------------------: | :----------------------------------------------------------: | :--------------------------------------------------------: |
-| <img src="assets\wechat.png" alt="WeChat Pay" style="zoom:50%;" /> | <img src="assets\alipay.png" alt="Alipay" style="zoom:50%;" /> | <img src="assets\qq.png" alt="QQ Pay" style="zoom:50%;" /> |
+|                            WeChat                            |                          Alipay                          |                          QQ                          |
+| :----------------------------------------------------------: | :------------------------------------------------------: | :--------------------------------------------------: |
+| <img src="assets\wechat.png" alt="WeChat Pay" width="200" /> | <img src="assets\alipay.png" alt="Alipay" width="200" /> | <img src="assets\qq.png" alt="QQ Pay" width="200" /> |
 

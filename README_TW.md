@@ -2,9 +2,11 @@
 
 [English](./README.md) | [简体中文](./README_CN.md) | 繁體中文
 
-<img src="D:\Resources\Software\Game Cheats Manager\assets\logo.png" alt="Game Cheats Manager logo" style="zoom:50%;" />
+![GitHub Downloads (all assets, all releases)](https://img.shields.io/github/downloads/dyang886/Game-Cheats-Manager/total) ![GitHub Release](https://img.shields.io/github/v/release/dyang886/Game-Cheats-Manager?link=https%3A%2F%2Fgithub.com%2Fdyang886%2FGame-Cheats-Manager%2Freleases%2Flatest) ![GitHub License](https://img.shields.io/github/license/dyang886/Game-Cheats-Manager) ![GitHub Repo stars](https://img.shields.io/github/stars/dyang886/Game-Cheats-Manager?link=https%3A%2F%2Fgithub.com%2Fdyang886%2FGame-Cheats-Manager%2Fstargazers)
 
-![GitHub Downloads (all assets, all releases)](https://img.shields.io/github/downloads/dyang886/Game-Cheats-Manager/total)![GitHub Release](https://img.shields.io/github/v/release/dyang886/Game-Cheats-Manager?link=https%3A%2F%2Fgithub.com%2Fdyang886%2FGame-Cheats-Manager%2Freleases%2Flatest)![GitHub License](https://img.shields.io/github/license/dyang886/Game-Cheats-Manager)![GitHub Repo stars](https://img.shields.io/github/stars/dyang886/Game-Cheats-Manager?link=https%3A%2F%2Fgithub.com%2Fdyang886%2FGame-Cheats-Manager%2Fstargazers)
+<div align="center">
+    <img src="assets/logo.png" alt="Game Cheats Manager logo" width="250" />
+</div>
 
 Game Cheats Manager 為玩家提供了一個高效管理遊戲修改器的一站式解決方案。它允許使用者在一個便捷的位置瀏覽、下載和管理所有修改器。每個修改器，通常是一個獨立的可執行檔案，都可以透過應用程式直接啟動或刪除，從而簡化您的遊戲體驗。
 
@@ -39,7 +41,7 @@ Game Cheats Manager 是一個獨立工具，與任何外部修改器提供商均
 
 以下是捐助方式:
 
-|                             微信                             |                            支付寶                            |                             QQ                             |
-| :----------------------------------------------------------: | :----------------------------------------------------------: | :--------------------------------------------------------: |
-| <img src="assets\wechat.png" alt="WeChat Pay" style="zoom:50%;" /> | <img src="assets\alipay.png" alt="Alipay" style="zoom:50%;" /> | <img src="assets\qq.png" alt="QQ Pay" style="zoom:50%;" /> |
+|                             微信                             |                          支付寶                          |                          QQ                          |
+| :----------------------------------------------------------: | :------------------------------------------------------: | :--------------------------------------------------: |
+| <img src="assets\wechat.png" alt="WeChat Pay" width="200" /> | <img src="assets\alipay.png" alt="Alipay" width="200" /> | <img src="assets\qq.png" alt="QQ Pay" width="200" /> |
 
