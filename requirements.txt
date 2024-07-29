@@ -4,6 +4,7 @@ fuzzywuzzy
 pinyin
 polib
 psutil
+pyinstaller
 PyQt6
 PyQt6-WebEngine
 python-Levenshtein

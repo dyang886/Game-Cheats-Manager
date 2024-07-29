@@ -106,9 +106,9 @@ class WeModDialog(QDialog):
             self.installLineEdit.setText(os.path.normpath(directory))
     
     def setWeModPath(self):
-        settings["WeModPath"] = self.installLineEdit.text()
+        settings["WeModPath"] = self.installLineEdit.text().strip()
         apply_settings(settings)
-        self.findWeModVersions(self.installLineEdit.text())
+        self.findWeModVersions(settings["WeModPath"])
     
     def findWeModVersions(self, weModPath):
         self.weModVersions = []
