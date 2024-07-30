@@ -58,6 +58,7 @@ class WeModDialog(QDialog):
         installPathLayout.setSpacing(5)
         installLayout.addLayout(installPathLayout)
         self.installLineEdit = QLineEdit()
+        self.installLineEdit.setReadOnly(True)
         installPathLayout.addWidget(self.installLineEdit)
         installPathButton = CustomButton("...")
         installPathButton.clicked.connect(self.selectWeModPath)
@@ -96,19 +97,17 @@ class WeModDialog(QDialog):
         self.applyButton.setDisabled(True)
         applyButtonLayout.addWidget(self.applyButton)
 
-        self.installLineEdit.textChanged.connect(self.setWeModPath)
         self.installLineEdit.setText(settings["WeModPath"])
+        self.findWeModVersions(settings["WeModPath"])
     
     def selectWeModPath(self):
         initialPath = self.installLineEdit.text() or os.path.expanduser("~")
         directory = QFileDialog.getExistingDirectory(self, tr("Select WeMod installation path"), initialPath)
         if directory:
-            self.installLineEdit.setText(os.path.normpath(directory))
-    
-    def setWeModPath(self):
-        settings["WeModPath"] = self.installLineEdit.text().strip()
-        apply_settings(settings)
-        self.findWeModVersions(settings["WeModPath"])
+            settings["WeModPath"] = os.path.normpath(directory)
+            self.installLineEdit.setText(settings["WeModPath"])
+            apply_settings(settings)
+            self.findWeModVersions(settings["WeModPath"])
     
     def findWeModVersions(self, weModPath):
         self.weModVersions = []
@@ -154,7 +153,7 @@ class WeModDialog(QDialog):
     
     def on_finished(self):
         self.applyButton.setEnabled(True)
-        self.setWeModPath()
+        self.findWeModVersions(settings["WeModPath"])
     
     def applyWeModCustomization(self):
         weModInstallPath = self.installLineEdit.text()
