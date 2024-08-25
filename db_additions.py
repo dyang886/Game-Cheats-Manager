@@ -491,4 +491,12 @@ additions = [
         "en_name": "Hades II",
         "keyw": "哈迪斯2",
     },
+    {
+        "en_name": "Grounded",
+        "keyw": "禁闭求生",
+    },
+    {
+        "en_name": "The Legend of Heroes: Trails through Daybreak",
+        "keyw": "英雄传说：黎之轨迹",
+    },
 ]

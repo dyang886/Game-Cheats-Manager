@@ -8,6 +8,7 @@ import shutil
 import stat
 import subprocess
 import sys
+import threading
 import time
 from urllib.parse import urljoin, urlparse
 import uuid
@@ -271,9 +272,28 @@ class AboutDialog(QDialog):
         appNameLabel.setFont(appNameFont)
         appNameLabel.setAlignment(Qt.AlignmentFlag.AlignCenter)
         appInfoLayout.addWidget(appNameLabel)
-        appVersionLabel = QLabel(tr("Version: ") + self.parent().appVersion)
-        appVersionLabel.setAlignment(Qt.AlignmentFlag.AlignCenter)
-        appInfoLayout.addWidget(appVersionLabel)
+
+        versionLayout = QVBoxLayout()
+        versionLayout.setSpacing(2)
+        appInfoLayout.addLayout(versionLayout)
+
+        currentVersionTextLabel = QLabel(tr("Current version: "))
+        self.currentVersionNumberLabel = QLabel(self.parent().appVersion)
+        currentVersionLayout = QHBoxLayout()
+        currentVersionLayout.setSpacing(3)
+        currentVersionLayout.setAlignment(Qt.AlignmentFlag.AlignCenter)
+        currentVersionLayout.addWidget(currentVersionTextLabel)
+        currentVersionLayout.addWidget(self.currentVersionNumberLabel)
+        versionLayout.addLayout(currentVersionLayout)
+
+        newestVersionTextLabel = QLabel(tr("Newest version: "))
+        self.newestVersionNumberLabel = QLabel(tr("Loading..."))
+        newestVersionLayout = QHBoxLayout()
+        newestVersionLayout.setSpacing(3)
+        newestVersionLayout.setAlignment(Qt.AlignmentFlag.AlignCenter)
+        newestVersionLayout.addWidget(newestVersionTextLabel)
+        newestVersionLayout.addWidget(self.newestVersionNumberLabel)
+        versionLayout.addLayout(newestVersionLayout)
 
         # Links
         linksLayout = QVBoxLayout()
@@ -298,6 +318,53 @@ class AboutDialog(QDialog):
         linksLayout.addWidget(bilibiliLabel)
 
         self.setFixedSize(self.sizeHint())
+        self.start_version_fetch()
+    
+    def start_version_fetch(self):
+        self.worker = VersionFetchWorker(self.parent().updateLink)
+        self.worker.versionFetched.connect(self.update_version_labels)
+        self.worker.fetchFailed.connect(self.handle_version_load_failure)
+        self.worker.start()
+
+    def update_version_labels(self, latest_version):
+        current_version = self.parent().appVersion
+
+        if latest_version == current_version or current_version > latest_version:
+            # Versions are the same or current version is newer
+            self.currentVersionNumberLabel.setStyleSheet("color: white;")
+            self.newestVersionNumberLabel.setStyleSheet("color: white;")
+        else:
+            # Newer version available
+            self.currentVersionNumberLabel.setStyleSheet("color: red;")
+            self.newestVersionNumberLabel.setStyleSheet("color: green;")
+
+        self.newestVersionNumberLabel.setText(latest_version)
+        self.worker.quit()
+
+    def handle_version_load_failure(self):
+        self.newestVersionNumberLabel.setText(tr("Failed to load"))
+        self.newestVersionNumberLabel.setStyleSheet("color: red;")
+        self.worker.quit()
+
+
+class VersionFetchWorker(QThread):
+    versionFetched = pyqtSignal(str)
+    fetchFailed = pyqtSignal()
+
+    def __init__(self, update_link, parent=None):
+        super().__init__(parent)
+        self.update_link = update_link
+
+    def run(self):
+        try:
+            response = requests.get(self.update_link)
+            response.raise_for_status()
+            data = response.json()
+            latest_version = data.get("tag_name", "").lstrip("v")
+            self.versionFetched.emit(latest_version)
+        except Exception as e:
+            print(f"Error fetching latest version: {e}")
+            self.fetchFailed.emit()
 
 
 class PathChangeThread(QThread):
@@ -701,6 +768,8 @@ class UpdateTrainers(DownloadBaseThread):
     updateTrainer = pyqtSignal(str, str)
     finished = pyqtSignal(str)
 
+    browser_condition = threading.Condition()
+
     def __init__(self, trainers, parent=None):
         super().__init__(parent)
         self.trainers = trainers
@@ -748,7 +817,7 @@ class UpdateTrainers(DownloadBaseThread):
                         locale.setlocale(locale.LC_TIME, 'English_United States')
                         trainerSrcDate = datetime.datetime.strptime(date_match.group().decode('utf-8'), '%b %d %Y')
 
-                        page_content = self.get_webpage_content(f"https://flingtrainer.com/tag/{tagName}", "FLiNG Trainer")
+                        page_content = self.get_webpage_content_with_lock(f"https://flingtrainer.com/tag/{tagName}", "FLiNG Trainer")
                         tagPage = BeautifulSoup(page_content, 'html.parser')
 
                         trainerNamesMap = {}  # trainerName: gameContentEntryOnWeb
@@ -773,13 +842,25 @@ class UpdateTrainers(DownloadBaseThread):
                                     print(f"{tagName}\nTrainer source date: {trainerSrcDate.strftime('%Y-%m-%d')}\nNewest build date: {trainerDstDate.strftime('%Y-%m-%d')}\n")
                                     
                                     if trainerDstDate > trainerSrcDate:
-                                        # Special cases
-                                        if tagName == "dynasty-warriors-8-xtreme-legends-complete-edition" and (trainerDstDate - trainerSrcDate < datetime.timedelta(days=2)):
+                                        # Special cases where trainers keep updating
+                                        inconsistent_update_dates = ["dynasty-warriors-8-xtreme-legends-complete-edition", "dredge"]
+                                        if tagName in inconsistent_update_dates and (trainerDstDate - trainerSrcDate < datetime.timedelta(days=2)):
                                             return None
 
                                         update_url = targetGameObj.find('a', href=True, rel='bookmark')['href']
                                         return trainerPath, update_url
         return None
+    
+    def get_webpage_content_with_lock(self, url, target_text):
+        with self.browser_condition:
+            self.browser_condition.wait_for(lambda: True)
+
+            # Trigger the browser dialog and wait for its completion
+            content = self.get_webpage_content(url, target_text)
+
+            self.browser_condition.notify_all()
+
+        return content
     
     def get_product_name(self, trainerPath):
         os.makedirs(VERSION_TEMP_DIR, exist_ok=True)
@@ -1344,15 +1425,25 @@ class DownloadTrainersThread(DownloadBaseThread):
             
             # Download trainer
             self.message.emit(tr("Downloading..."), None)
+            base_url, filename = downloadUrl.rsplit('/', 1)
+            modified_url = f"{base_url}/3DMGAME-{filename}"
+            urls_to_try = [downloadUrl, modified_url]
+
+            download_successful = False
             try:
-                req = requests.get(downloadUrl, headers=self.headers)
-                if req.status_code != 200:
-                    self.message.emit(tr("An error occurred while downloading trainer: ") + f"Status code {req.status_code}: {req.reason}", "failure")
-                    time.sleep(self.download_finish_delay)
-                    self.finished.emit(1)
-                    return
+                for url in urls_to_try:
+                    req = requests.get(url, headers=self.headers)
+                    if req.status_code == 200:
+                        download_successful = True
+                        break
             except Exception as e:
-                print(f"Error requesting {downloadUrl}: {str(e)}")
+                print(f"Error requesting {urls_to_try}: {str(e)}")
+                return
+
+            if not download_successful:
+                self.message.emit(tr("An error occurred while downloading trainer: ") + f"Status code {req.status_code}: {req.reason}", "failure")
+                time.sleep(self.download_finish_delay)
+                self.finished.emit(1)
                 return
             
             os.makedirs(DOWNLOAD_TEMP_DIR, exist_ok=True)

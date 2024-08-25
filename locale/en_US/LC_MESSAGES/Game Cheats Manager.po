@@ -11,7 +11,7 @@ msgstr ""
 "Content-Type: text/plain; charset=UTF-8\n"
 "Content-Transfer-Encoding: 8bit\n"
 "Plural-Forms: nplurals=1; plural=0;\n"
-"X-Generator: Poedit 3.4.2\n"
+"X-Generator: Poedit 3.4.4\n"
 
 msgid "Couldn't find {missing_resource}. Please try reinstalling the application."
 msgstr "Couldn't find {missing_resource}. Please try reinstalling the application."
@@ -27,6 +27,9 @@ msgstr "International"
 
 msgid "China"
 msgstr "China"
+
+msgid " (Some trainers cannot be downloaded)"
+msgstr " (Some trainers cannot be downloaded)"
 
 msgid "Warning"
 msgstr "Warning"
@@ -78,9 +81,6 @@ msgstr "Launch app on startup"
 msgid "Apply"
 msgstr "Apply"
 
-msgid " (Some trainers cannot be downloaded)"
-msgstr " (Some trainers cannot be downloaded)"
-
 msgid "Attention"
 msgstr "Attention"
 
@@ -102,8 +102,17 @@ msgstr "Settings saved."
 msgid "About"
 msgstr "About"
 
-msgid "Version: "
-msgstr "Version: "
+msgid "Current version: "
+msgstr "Current version: "
+
+msgid "Newest version: "
+msgstr "Newest version: "
+
+msgid "Loading..."
+msgstr "Loading..."
+
+msgid "Failed to load"
+msgstr "Failed to load"
 
 msgid "Please complete any security checks"
 msgstr "Please complete any security checks"

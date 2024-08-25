@@ -22,6 +22,7 @@ class WeModDialog(QDialog):
         self.setLayout(weModLayout)
         self.setMinimumWidth(900)
 
+        # Latest WeMod download: https://api.wemod.com/client/download
         weModDownloadLink = QLabel(tr("Download WeMod: ") + '<a href="https://www.wemod.com" style="text-decoration: none;">https://www.wemod.com</a>')
         weModDownloadLink.setOpenExternalLinks(True)
         weModLayout.addWidget(weModDownloadLink)

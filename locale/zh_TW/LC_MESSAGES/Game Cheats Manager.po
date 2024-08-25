@@ -28,6 +28,9 @@ msgstr "國際"
 msgid "China"
 msgstr "中國"
 
+msgid " (Some trainers cannot be downloaded)"
+msgstr "部分修改器無法下載"
+
 msgid "Warning"
 msgstr "警告"
 
@@ -78,9 +81,6 @@ msgstr "開機自啟"
 msgid "Apply"
 msgstr "應用"
 
-msgid " (Some trainers cannot be downloaded)"
-msgstr "部分修改器無法下載"
-
 msgid "Attention"
 msgstr "警告"
 
@@ -102,8 +102,17 @@ msgstr "設定已儲存。"
 msgid "About"
 msgstr "關於"
 
-msgid "Version: "
-msgstr "版本: "
+msgid "Current version: "
+msgstr "當前版本："
+
+msgid "Newest version: "
+msgstr "最新版本："
+
+msgid "Loading..."
+msgstr "加載中..."
+
+msgid "Failed to load"
+msgstr "加載失敗"
 
 msgid "Please complete any security checks"
 msgstr "請完成所有安全檢查"

@@ -11,4 +11,4 @@ issuehunt: # Replace with a single IssueHunt username
 lfx_crowdfunding: # Replace with a single LFX Crowdfunding project-name e.g., cloud-foundry
 polar: # Replace with a single Polar username
 buy_me_a_coffee: dyang886 # Replace with a single Buy Me a Coffee username
-custom: [https://ifdian.net/a/dyang886] # Replace with up to 4 custom sponsorship URLs e.g., ['link1', 'link2']
+custom: [https://afdian.com/a/dyang886] # Replace with up to 4 custom sponsorship URLs e.g., ['link1', 'link2']
