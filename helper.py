@@ -329,12 +329,7 @@ class AboutDialog(QDialog):
     def update_version_labels(self, latest_version):
         current_version = self.parent().appVersion
 
-        if latest_version == current_version or current_version > latest_version:
-            # Versions are the same or current version is newer
-            self.currentVersionNumberLabel.setStyleSheet("color: white;")
-            self.newestVersionNumberLabel.setStyleSheet("color: white;")
-        else:
-            # Newer version available
+        if latest_version > current_version:
             self.currentVersionNumberLabel.setStyleSheet("color: red;")
             self.newestVersionNumberLabel.setStyleSheet("color: green;")
 
