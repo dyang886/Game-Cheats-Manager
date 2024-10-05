@@ -100,7 +100,7 @@ additions = [
         "keyw": "光环：士官长合集（光环：战斗进化周年版）",
     },
     {
-        "en_name": "Halo: The Master Chief Collection (Halo: Reach) Trainer",
+        "en_name": "Halo: The Master Chief Collection (Halo: Reach)",
         "keyw": "光环：士官长合集（光环：致远星）",
     },
     {
