@@ -6,6 +6,7 @@ import os
 import re
 import shutil
 import stat
+import string
 import subprocess
 import sys
 import threading
@@ -23,6 +24,7 @@ from PyQt6.QtWebEngineCore import QWebEngineDownloadRequest
 from PyQt6.QtWebEngineWidgets import QWebEngineView
 from PyQt6.QtWidgets import QApplication, QCheckBox, QComboBox, QDialog, QHBoxLayout, QLabel, QMessageBox, QPushButton, QVBoxLayout, QWidget
 import requests
+import zhon
 ts = None
 
 from config import *
@@ -648,7 +650,8 @@ class DownloadBaseThread(QThread):
     
     def sanitize(self, text):
         text = re.sub(r'\d+', lambda x: self.arabic_to_roman(int(x.group())), text)
-        return re.sub(r"[\-\s\"'‘’“”:：.。,，()（）<>《》;；!！?？@#$%^&™®_+*=~`|]", "", text).lower()
+        all_punctuation = string.punctuation + zhon.hanzi.punctuation
+        return ''.join(char for char in text if char not in all_punctuation and not char.isspace()).lower()
     
     def symbol_replacement(self, text):
         return text.replace(': ', ' - ').replace(':', '-').replace("/", "_").replace("?", "")
@@ -1119,7 +1122,7 @@ class DownloadDisplayThread(DownloadBaseThread):
             trainer_details = self.load_json_content("xgqdetail.json")
             if trainer_details:
                 for trainer in trainer_details:
-                    if keyword in trainer.get("keyw", ""):
+                    if self.sanitize(keyword) in self.sanitize(trainer.get("keyw", "")):
                         translations.append(trainer.get("en_name", ""))
 
             elif self.initialize_translator():

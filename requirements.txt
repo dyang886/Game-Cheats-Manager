@@ -11,3 +11,4 @@ python-Levenshtein
 requests
 tendo
 translators
+zhon
