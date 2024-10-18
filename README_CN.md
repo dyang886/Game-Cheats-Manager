@@ -43,5 +43,5 @@ Game Cheats Manager 是一个独立工具，与任何外部修改器提供商均
 
 |                             微信                             |                          支付宝                          |                          QQ                          |
 | :----------------------------------------------------------: | :------------------------------------------------------: | :--------------------------------------------------: |
-| <img src="assets\wechat.png" alt="WeChat Pay" width="200" /> | <img src="assets\alipay.png" alt="Alipay" width="200" /> | <img src="assets\qq.png" alt="QQ Pay" width="200" /> |
+| <img src="assets/wechat.png" alt="WeChat Pay" width="200" /> | <img src="assets/alipay.png" alt="Alipay" width="200" /> | <img src="assets/qq.png" alt="QQ Pay" width="200" /> |
 

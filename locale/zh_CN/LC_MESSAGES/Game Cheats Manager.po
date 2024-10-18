@@ -75,7 +75,10 @@ msgstr "自动更新修改器数据库"
 msgid "Update trainers automatically"
 msgstr "自动更新修改器"
 
-msgid "Launch app on startup"
+msgid "Check for software update at startup"
+msgstr "软件启动时检查更新"
+
+msgid "Launch app on system startup"
 msgstr "开机自启"
 
 msgid "Apply"
@@ -248,6 +251,21 @@ msgstr "启动"
 
 msgid "Delete"
 msgstr "删除"
+
+msgid "Update Available"
+msgstr "可用更新"
+
+msgid "New version found: {old_version} ➜ {new_version}"
+msgstr "发现新版本：{old_version} ➜ {new_version}"
+
+msgid "Please navigate to `Options` ➜ `About` to download the latest version."
+msgstr "请移至 `选项` ➜ `关于` 下载最新版本。"
+
+msgid "Update Check Failed"
+msgstr "检查更新失败"
+
+msgid "Failed to check for software update. You can navigate to `Options` ➜ `About` to check for updates manually."
+msgstr "无法检查软件更新，请移至 `选项` ➜ `关于` 以手动检查更新。"
 
 msgid "Delete trainer"
 msgstr "删除修改器"

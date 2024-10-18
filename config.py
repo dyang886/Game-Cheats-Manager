@@ -52,6 +52,7 @@ def load_settings():
         "enSearchResults": False,
         "autoUpdateDatabase": True,
         "autoUpdate": True,
+        "appUpdate": True,
         "WeModPath": os.path.join(os.environ["LOCALAPPDATA"], "WeMod"),
         "autoStart": False,
         "showWarning": True,
@@ -147,7 +148,7 @@ resourceHacker_path = resource_path("dependency/ResourceHacker.exe")
 unzip_path = resource_path("dependency/7z/7z.exe")
 binmay_path = resource_path("dependency/binmay.exe")
 emptyMidi_path = resource_path("dependency/TrainerBGM.mid")
-elevator_path = resource_path("dependency/elevator.exe")
+elevator_path = resource_path("dependency/Elevate.exe")
 search_path = resource_path("assets/search.png")
 
 language_options = {

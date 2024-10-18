@@ -158,8 +158,13 @@ class SettingsDialog(QDialog):
         self.autoUpdateCheckbox.setChecked(settings["autoUpdate"])
         settingsWidgetsLayout.addWidget(self.autoUpdateCheckbox)
 
+        # Check software update at startup
+        self.appUpdateCheckbox = QCheckBox(tr("Check for software update at startup"))
+        self.appUpdateCheckbox.setChecked(settings["appUpdate"])
+        settingsWidgetsLayout.addWidget(self.appUpdateCheckbox)
+
         # Launch app on startup
-        self.autoStartCheckbox = QCheckBox(tr("Launch app on startup"))
+        self.autoStartCheckbox = QCheckBox(tr("Launch app on system startup"))
         self.autoStartCheckbox.setChecked(settings["autoStart"])
         settingsWidgetsLayout.addWidget(self.autoStartCheckbox)
 
@@ -199,6 +204,7 @@ class SettingsDialog(QDialog):
         settings["removeBgMusic"] = self.removeBgMusicCheckbox.isChecked()
         settings["autoUpdateDatabase"] = self.autoUpdateDatabaseCheckbox.isChecked()
         settings["autoUpdate"] = self.autoUpdateCheckbox.isChecked()
+        settings["appUpdate"] = self.appUpdateCheckbox.isChecked()
         settings["autoStart"] = self.autoStartCheckbox.isChecked()
         settings["downloadServer"] = server_options[self.serverCombo.currentText()]
         apply_settings(settings)

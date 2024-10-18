@@ -42,5 +42,5 @@ Below are funding options:
 
 |                            WeChat                            |                          Alipay                          |                          QQ                          |
 | :----------------------------------------------------------: | :------------------------------------------------------: | :--------------------------------------------------: |
-| <img src="assets\wechat.png" alt="WeChat Pay" width="200" /> | <img src="assets\alipay.png" alt="Alipay" width="200" /> | <img src="assets\qq.png" alt="QQ Pay" width="200" /> |
+| <img src="assets/wechat.png" alt="WeChat Pay" width="200" /> | <img src="assets/alipay.png" alt="Alipay" width="200" /> | <img src="assets/qq.png" alt="QQ Pay" width="200" /> |
 

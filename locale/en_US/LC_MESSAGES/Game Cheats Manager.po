@@ -75,8 +75,11 @@ msgstr "Update trainer databases automatically"
 msgid "Update trainers automatically"
 msgstr "Update trainers automatically"
 
-msgid "Launch app on startup"
-msgstr "Launch app on startup"
+msgid "Check for software update at startup"
+msgstr "Check for software update at startup"
+
+msgid "Launch app on system startup"
+msgstr "Launch app on system startup"
 
 msgid "Apply"
 msgstr "Apply"
@@ -248,6 +251,21 @@ msgstr "Launch"
 
 msgid "Delete"
 msgstr "Delete"
+
+msgid "Update Available"
+msgstr "Update Available"
+
+msgid "New version found: {old_version} ➜ {new_version}"
+msgstr "New version found: {old_version} ➜ {new_version}"
+
+msgid "Please navigate to `Options` ➜ `About` to download the latest version."
+msgstr "Please navigate to `Options` ➜ `About` to download the latest version."
+
+msgid "Update Check Failed"
+msgstr "Update Check Failed"
+
+msgid "Failed to check for software update. You can navigate to `Options` ➜ `About` to check for updates manually."
+msgstr "Failed to check for software update. You can navigate to `Options` ➜ `About` to check for updates manually."
 
 msgid "Delete trainer"
 msgstr "Delete trainer"

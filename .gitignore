@@ -5,8 +5,8 @@ __pycache__
 *.mo
 build
 dist
-*.bat
+compile.ps1
 Game Cheats Manager.spec
 utility.py
 ResourceHacker.ini
-elevator.manifest
+elevate.manifest

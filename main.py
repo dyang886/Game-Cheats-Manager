@@ -6,7 +6,7 @@ import sys
 
 from PyQt6.QtCore import Qt, QTimer
 from PyQt6.QtGui import QAction, QColor, QFont, QFontDatabase, QIcon, QPixmap
-from PyQt6.QtWidgets import QApplication, QFileDialog, QGridLayout, QHBoxLayout, QLabel, QLineEdit, QListWidget, QListWidgetItem, QMainWindow, QMessageBox, QStatusBar, QVBoxLayout, QWidget
+from PyQt6.QtWidgets import QApplication, QFileDialog, QGridLayout, QHBoxLayout, QLabel, QLineEdit, QListWidget, QListWidgetItem, QMainWindow, QMessageBox, QStatusBar, QVBoxLayout, QWidget, QSystemTrayIcon
 from tendo import singleton
 
 from helper import *
@@ -32,7 +32,7 @@ class GameCheatsManager(QMainWindow):
         self.setMinimumSize(680, 520)
 
         # Version and links
-        self.appVersion = "2.1.2"
+        self.appVersion = "2.1.3"
         self.githubLink = "https://github.com/dyang886/Game-Cheats-Manager"
         self.updateLink = "https://api.github.com/repos/dyang886/Game-Cheats-Manager/releases/latest"
         self.bilibiliLink = "https://space.bilibili.com/256673766"
@@ -194,6 +194,13 @@ class GameCheatsManager(QMainWindow):
         if settings["showWarning"]:
             dialog = CopyRightWarning(self)
             dialog.show()
+ 
+        # Check for software update
+        if settings['appUpdate']:
+            self.versionFetcher = VersionFetchWorker(self.updateLink)
+            self.versionFetcher.versionFetched.connect(lambda latest_version: self.send_notification(True, latest_version))
+            self.versionFetcher.fetchFailed.connect(lambda: self.send_notification(False))
+            self.versionFetcher.start()
 
         # Update database, trainer update
         self.timer = QTimer(self)
@@ -207,6 +214,28 @@ class GameCheatsManager(QMainWindow):
     def closeEvent(self, event):
         super().closeEvent(event)
         os._exit(0)
+    
+    def send_notification(self, success, latest_version=0):
+        tray_icon = QSystemTrayIcon(QIcon(resource_path("assets/logo.ico")), self)
+        tray_icon.show()
+
+        if success and latest_version > self.appVersion:
+            tray_icon.showMessage(
+                tr('Update Available'),
+                tr('New version found: {old_version} ➜ {new_version}').format(
+                    old_version=self.appVersion,
+                    new_version=latest_version
+                ) + '\n' + tr('Please navigate to `Options` ➜ `About` to download the latest version.'),
+                QSystemTrayIcon.MessageIcon.Information
+            )
+        elif not success:
+            tray_icon.showMessage(
+                tr('Update Check Failed'),
+                tr('Failed to check for software update. You can navigate to `Options` ➜ `About` to check for updates manually.'),
+                QSystemTrayIcon.MessageIcon.Warning
+            )
+
+        self.versionFetcher.quit()
 
     def init_settings(self):
         if settings["theme"] == "black":

@@ -220,10 +220,10 @@ class ApplyCustomization(QThread):
                 patch_success = False
         
             patterns = {
-                r'(getUserAccount\()(.*)(}async getUserAccountFlags)': r'\1\2.then(function(response){response.subscription = {period:"yearly",state:"active"};response.flags = 78;return response;})\3',
-                r'(getUserAccountFlags\()(.*)(\)\).flags)': r'\1\2\3.then(function(response){if (response.mask==4){response.flags = 4};return response;})',
-                r'(changeAccountEmail\()(.*)(email:.?,currentPassword:.?}\))': r'\1\2\3.then(function(response){response.subscription = {period:"yearly",state:"active"};response.flags = 78;return response;})',
-                r'(getPromotion\()(.*)(}}},)': r'\1\2.then(function(response){response.components.appBanner = null;response.flags = 0;return response;})\3'
+                r'(getUserAccount\()(.*)(}async getUserAccountFlags)': r'\1\2.then(function(response) {response.subscription={period:"yearly",state:"active"}; response.flags=78; return response;})\3',
+                r'(getUserAccountFlags\()(.*)(\)\).flags)': r'\1\2\3.then(function(response) {if (response.mask==4) {response.flags=4}; return response;})',
+                r'(changeAccountEmail\()(.*)(email:.?,currentPassword:.?}\))': r'\1\2\3.then(function(response) {response.subscription={period:"yearly", state:"active"}; response.flags=78; return response;})',
+                r'(getPromotion\()(.*)(collectMetrics:!0}\))': r'\1\2\3.then(function(response) {response.components.appBanner=null; response.flags=0; return response;})'
             }
 
             # Mapping of patterns to files where they were found: {pattern key: file path}
