@@ -1,6 +1,6 @@
 # Game Cheats Manager
 
-[English](./README.md) | [简体中文](./README_CN.md) | 繁體中文
+[English](./README.md) | [簡體中文](./README_CN.md) | 繁體中文
 
 ![GitHub Downloads (all assets, all releases)](https://img.shields.io/github/downloads/dyang886/Game-Cheats-Manager/total) ![GitHub Repo stars](https://img.shields.io/github/stars/dyang886/Game-Cheats-Manager?style=flat&color=ffc000) ![GitHub Release](https://img.shields.io/github/v/release/dyang886/Game-Cheats-Manager?link=https%3A%2F%2Fgithub.com%2Fdyang886%2FGame-Cheats-Manager%2Freleases%2Flatest) ![GitHub License](https://img.shields.io/github/license/dyang886/Game-Cheats-Manager) <a href="https://hellogithub.com/repository/3ca6e8e23401477282ba72d2d8932311" target="_blank"><img src="https://abroad.hellogithub.com/v1/widgets/recommend.svg?rid=3ca6e8e23401477282ba72d2d8932311&claim_uid=UrZOap0AkvuRw7D&theme=small" alt="Featured｜HelloGitHub" /></a> <a href="https://discord.gg/d627qVyHEF" target="_blank"><img alt="Static Badge" src="https://img.shields.io/badge/Join_Discord-f0f0f0?logo=discord"></a> <a href="https://pd.qq.com/s/h06qbdey6" target="_blank"><img alt="Static Badge" src="https://img.shields.io/badge/Join_QQ-f0f0f0?logo=tencentqq"></a>
 
@@ -12,9 +12,9 @@ Game Cheats Manager 為玩家提供了一個高效管理遊戲修改器的一站
 
 ## 使用
 
-1. **瀏覽修改器**: 在左側使用搜索欄或瀏覽列表查詢下載的修改器。
-2. **下載修改器**: 在右側使用關鍵詞搜索，並雙擊所需的匹配項以直接下載。修改器下載路徑顯示於右側欄底部，您可以點擊右側的 `...` 來更改它。
-3. **管理修改器**: 使用應用程式中相應的按鈕啟動/雙擊或刪除修改器。軟件啟動時還會自動更新已下載的修改器。
+1. **瀏覽修改器**: 在左側使用搜尋欄或瀏覽列表查詢下載的修改器。
+2. **下載修改器**: 在右側使用關鍵字搜尋，並雙擊所需的匹配項以直接下載。修改器下載路徑顯示於右側欄底部，您可以點擊右側的 `...` 來更改它。
+3. **管理修改器**: 使用應用程式中相應的按鈕啟動/雙擊或刪除修改器。軟體啟動時還會自動更新已下載的修改器。
 4. **選項**: `選項` 選單欄包含以下功能：
    1. **設定**: 調整諸如主題和語言等設定。
    2. **匯入修改器**: 從檔案選擇視窗選擇您想要匯入的修改器。
