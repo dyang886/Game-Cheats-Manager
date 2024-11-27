@@ -12,6 +12,7 @@ msgstr ""
 "Content-Transfer-Encoding: 8bit\n"
 "Plural-Forms: nplurals=1; plural=0;\n"
 "X-Generator: Poedit 3.4.4\n"
+"X-ZhConverter: 繁化姬 dict-f968eaf5-r1052 @ 2024/11/04 22:37:42 | https://zhconvert.org\n"
 
 msgid "Couldn't find {missing_resource}. Please try reinstalling the application."
 msgstr "找不到 {missing_resource}。請嘗試重新安裝應用程式。"
@@ -88,7 +89,7 @@ msgid "Attention"
 msgstr "警告"
 
 msgid "Do you want to restart the application now to apply theme or language settings?"
-msgstr "是否立即重啟程序以應用主題或語言設置？"
+msgstr "是否立即重啟程式以應用主題或語言設定？"
 
 msgid "Yes"
 msgstr "是"
@@ -106,22 +107,22 @@ msgid "About"
 msgstr "關於"
 
 msgid "Current version: "
-msgstr "當前版本："
+msgstr "目前版本："
 
 msgid "Newest version: "
 msgstr "最新版本："
 
 msgid "Loading..."
-msgstr "加載中..."
+msgstr "載入中..."
 
 msgid "Failed to load"
-msgstr "加載失敗"
+msgstr "載入失敗"
 
 msgid "Please complete any security checks"
 msgstr "請完成所有安全檢查"
 
 msgid "Unable to access webpage"
-msgstr "無法訪問網頁"
+msgstr "無法瀏覽網頁"
 
 msgid "No internet connection, translation failed."
 msgstr "沒有網路連接，翻譯失敗。"
@@ -190,7 +191,7 @@ msgid "Downloading..."
 msgstr "下載中..."
 
 msgid "Internet request failed."
-msgstr "網絡請求失敗。"
+msgstr "網路請求失敗。"
 
 msgid "An error occurred while downloading trainer: "
 msgstr "下載修改器時出錯："
@@ -238,7 +239,7 @@ msgid "Add Paths to Whitelist"
 msgstr "添加路徑至白名單"
 
 msgid "WeMod Customization"
-msgstr "自定義 WeMod"
+msgstr "自訂 WeMod"
 
 msgid "Update Trainer Database"
 msgstr "更新修改器資料庫"
@@ -325,7 +326,7 @@ msgid "Administrator Access Required"
 msgstr "需要管理員訪問許可權"
 
 msgid "To proceed with adding the trainer download paths to the Windows Defender whitelist, administrator rights are needed. A User Account Control (UAC) prompt will appear for permission."
-msgstr "若要將修改器下載路徑添加到 Windows Defender 白名單中，需要管理員權限。請留意將彈出的用戶帳戶控制（UAC）提示。"
+msgstr "若要將修改器下載路徑添加到 Windows Defender 白名單中，需要管理員權限。請留意將彈出的使用者帳戶控制（UAC）提示。"
 
 msgid "Would you like to continue?"
 msgstr "是否要繼續？"
@@ -346,7 +347,7 @@ msgid "Installed WeMod Versions:"
 msgstr "已安裝的 WeMod 版本："
 
 msgid "Activate WeMod Pro"
-msgstr "激活 WeMod 專業版"
+msgstr "啟用 WeMod 專業版"
 
 msgid "Disable WeMod Auto Update"
 msgstr "禁用 WeMod 自動更新"
@@ -364,23 +365,23 @@ msgid ""
 "WeMod is currently running,\n"
 "please close the application first."
 msgstr ""
-"WeMod 正在運行中，\n"
-"請先關閉該應用程序。"
+"WeMod 正在執行中，\n"
+"請先關閉該應用程式。"
 
 msgid "Failed to extract file:"
 msgstr "提取文件失敗："
 
 msgid "Unsupported WeMod version."
-msgstr "不支持的 WeMod 版本。"
+msgstr "不支援的 WeMod 版本。"
 
 msgid "Failed to patch file:"
 msgstr "修補文件失敗："
 
 msgid "WeMod Pro activated."
-msgstr "WeMod 專業版已激活。"
+msgstr "WeMod 專業版已啟用。"
 
 msgid "Failed to activate WeMod Pro."
-msgstr "WeMod 專業版激活失敗。"
+msgstr "WeMod 專業版啟用失敗。"
 
 msgid "WeMod Pro disabled."
 msgstr "WeMod 專業版已禁用。"
@@ -396,7 +397,7 @@ msgid ""
 "please try reinstalling WeMod."
 msgstr ""
 "無法啟用 WeMod 自動更新，\n"
-"請嚐試重新安裝 WeMod。"
+"請嘗試重新安裝 WeMod。"
 
 msgid "Failed to process WeMod update file:"
 msgstr "無法處理 WeMod 更新文件："
