@@ -9,9 +9,14 @@ from PyQt6.QtGui import QAction, QColor, QFont, QFontDatabase, QIcon, QPixmap
 from PyQt6.QtWidgets import QApplication, QFileDialog, QGridLayout, QHBoxLayout, QLabel, QLineEdit, QListWidget, QListWidgetItem, QMainWindow, QMessageBox, QStatusBar, QVBoxLayout, QWidget, QSystemTrayIcon
 from tendo import singleton
 
-from helper import *
 import style_sheet
-from wemod import *
+from widgets.custom_dialogs import *
+from widgets.custom_widgets import *
+from widgets.wemod import *
+from threads.download_display_thread import *
+from threads.download_trainers_thread import *
+from threads.other_threads import *
+from threads.update_trainers_thread import *
 
 
 class GameCheatsManager(QMainWindow):
@@ -130,7 +135,7 @@ class GameCheatsManager(QMainWindow):
         self.trainerSearchEntry.textChanged.connect(self.update_list)
 
         # Display installed trainers
-        self.flingListBox = QListWidget()
+        self.flingListBox = MultilingualListWidget()
         self.flingListBox.itemActivated.connect(self.launch_trainer)
         trainersLayout.addWidget(self.flingListBox)
 
@@ -170,7 +175,7 @@ class GameCheatsManager(QMainWindow):
         downloadSearchLayout.addWidget(self.downloadSearchEntry)
 
         # Display trainer search results
-        self.downloadListBox = QListWidget()
+        self.downloadListBox = MultilingualListWidget()
         self.downloadListBox.itemActivated.connect(self.on_download_start)
         downloadsLayout.addWidget(self.downloadListBox)
 
@@ -623,17 +628,12 @@ class GameCheatsManager(QMainWindow):
 if __name__ == "__main__":
     app = QApplication(sys.argv)
 
-    # Language setting
-    font_config = {
-        "en_US": resource_path("assets/NotoSans-Regular.ttf"),
-        "zh_CN": resource_path("assets/NotoSansSC-Regular.ttf"),
-        "zh_TW": resource_path("assets/NotoSansTC-Regular.ttf")
-    }
-    fontId = QFontDatabase.addApplicationFont(
-        font_config[settings["language"]])
-    fontFamilies = QFontDatabase.applicationFontFamilies(fontId)
-    customFont = QFont(fontFamilies[0], 10)
-    app.setFont(customFont)
+    # Load the selected font
+    primary_font_path = font_config[settings["language"]]
+    primary_font_id = QFontDatabase.addApplicationFont(primary_font_path)
+    primary_font_families = QFontDatabase.applicationFontFamilies(primary_font_id)
+    custom_font = QFont(primary_font_families[0], 10)
+    app.setFont(custom_font)
 
     mainWin = GameCheatsManager()
     mainWin.show()

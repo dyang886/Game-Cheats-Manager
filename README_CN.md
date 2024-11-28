@@ -5,7 +5,7 @@
 ![GitHub Downloads (all assets, all releases)](https://img.shields.io/github/downloads/dyang886/Game-Cheats-Manager/total) ![GitHub Repo stars](https://img.shields.io/github/stars/dyang886/Game-Cheats-Manager?style=flat&color=ffc000) ![GitHub Release](https://img.shields.io/github/v/release/dyang886/Game-Cheats-Manager?link=https%3A%2F%2Fgithub.com%2Fdyang886%2FGame-Cheats-Manager%2Freleases%2Flatest) ![GitHub License](https://img.shields.io/github/license/dyang886/Game-Cheats-Manager) <a href="https://hellogithub.com/repository/3ca6e8e23401477282ba72d2d8932311" target="_blank"><img src="https://abroad.hellogithub.com/v1/widgets/recommend.svg?rid=3ca6e8e23401477282ba72d2d8932311&claim_uid=UrZOap0AkvuRw7D&theme=small" alt="Featured｜HelloGitHub" /></a> <a href="https://discord.gg/d627qVyHEF" target="_blank"><img alt="Static Badge" src="https://img.shields.io/badge/Join_Discord-f0f0f0?logo=discord"></a> <a href="https://pd.qq.com/s/h06qbdey6" target="_blank"><img alt="Static Badge" src="https://img.shields.io/badge/Join_QQ-f0f0f0?logo=tencentqq"></a>
 
 <div align="center">
-    <img src="assets/logo.png" alt="Game Cheats Manager logo" width="250" />
+    <img src="src/assets/logo.png" alt="Game Cheats Manager logo" width="250" />
 </div>
 
 Game Cheats Manager 为玩家提供了一个高效管理游戏修改器的一站式解决方案。它允许用户在一个便捷的位置浏览、下载和管理所有修改器。每个修改器，通常是一个独立的可执行文件，都可以通过应用程序直接启动或删除，从而简化您的游戏体验。
@@ -43,5 +43,5 @@ Game Cheats Manager 是一个独立工具，与任何外部修改器提供商均
 
 |                             微信                             |                          支付宝                          |                          QQ                          |
 | :----------------------------------------------------------: | :------------------------------------------------------: | :--------------------------------------------------: |
-| <img src="assets/wechat.png" alt="WeChat Pay" width="200" /> | <img src="assets/alipay.png" alt="Alipay" width="200" /> | <img src="assets/qq.png" alt="QQ Pay" width="200" /> |
+| <img src="src/assets/wechat.png" alt="WeChat Pay" width="200" /> | <img src="src/assets/alipay.png" alt="Alipay" width="200" /> | <img src="src/assets/qq.png" alt="QQ Pay" width="200" /> |
 

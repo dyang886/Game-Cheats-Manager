@@ -8,14 +8,14 @@ import tempfile
 
 import pinyin
 import polib
-ts = None
 
 
+# All resources in development mode are relative to `src` folder
 def resource_path(relative_path):
     if hasattr(sys, "_MEIPASS"):
         full_path = os.path.join(sys._MEIPASS, relative_path)
     else:
-        full_path = os.path.join(os.path.abspath("."), relative_path)
+        full_path = os.path.join(os.path.dirname(__file__), '..', relative_path)
 
     if not os.path.exists(full_path):
         resource_name = os.path.basename(relative_path)
@@ -85,7 +85,7 @@ def get_translator():
                     po.save_as_mofile(os.path.join(root, os.path.splitext(file)[0] + ".mo"))
 
     lang = settings["language"]
-    gettext.bindtextdomain("Game Cheats Manager",resource_path("locale/"))
+    gettext.bindtextdomain("Game Cheats Manager", resource_path("locale/"))
     gettext.textdomain("Game Cheats Manager")
     lang = gettext.translation("Game Cheats Manager", resource_path("locale/"), languages=[lang])
     lang.install()
@@ -165,4 +165,10 @@ theme_options = {
 server_options = {
     tr("International"): "intl",
     tr("China") + tr(" (Some trainers cannot be downloaded)"): "china"
+}
+
+font_config = {
+    "en_US": resource_path("assets/NotoSans-Regular.ttf"),
+    "zh_CN": resource_path("assets/NotoSansSC-Regular.ttf"),
+    "zh_TW": resource_path("assets/NotoSansTC-Regular.ttf")
 }

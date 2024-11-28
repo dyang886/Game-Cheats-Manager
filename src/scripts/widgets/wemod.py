@@ -9,7 +9,7 @@ from PyQt6.QtGui import QColor, QIcon
 from PyQt6.QtWidgets import QCheckBox, QComboBox, QDialog, QFileDialog, QHBoxLayout, QLabel, QLineEdit, QListWidget, QListWidgetItem, QVBoxLayout
 
 from config import *
-from helper import CustomButton
+from widgets.custom_widgets import CustomButton
 
 
 class WeModDialog(QDialog):
