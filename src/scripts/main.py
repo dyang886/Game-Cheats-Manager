@@ -6,13 +6,13 @@ import sys
 
 from PyQt6.QtCore import Qt, QTimer
 from PyQt6.QtGui import QAction, QColor, QFont, QFontDatabase, QIcon, QPixmap
-from PyQt6.QtWidgets import QApplication, QFileDialog, QGridLayout, QHBoxLayout, QLabel, QLineEdit, QListWidget, QListWidgetItem, QMainWindow, QMessageBox, QStatusBar, QVBoxLayout, QWidget, QSystemTrayIcon
+from PyQt6.QtWidgets import QApplication, QFileDialog, QGridLayout, QHBoxLayout, QLabel, QLineEdit, QListWidgetItem, QMainWindow, QMessageBox, QStatusBar, QVBoxLayout, QWidget, QSystemTrayIcon
 from tendo import singleton
 
 import style_sheet
 from widgets.custom_dialogs import *
 from widgets.custom_widgets import *
-from widgets.wemod import *
+from widgets.trainer_management import *
 from threads.download_display_thread import *
 from threads.download_trainers_thread import *
 from threads.other_threads import *
@@ -59,7 +59,7 @@ class GameCheatsManager(QMainWindow):
         # Window references
         self.settings_window = None
         self.about_window = None
-        self.wemod_window = None
+        self.trainer_manage_window = None
 
         # Main widget group
         centralWidget = QWidget(self)
@@ -95,8 +95,8 @@ class GameCheatsManager(QMainWindow):
         optionMenu.addAction(aboutAction)
 
         # Below are standalone menu actions
-        wemodAction = QAction(tr("WeMod Customization"), self)
-        wemodAction.triggered.connect(self.wemod_pro)
+        wemodAction = QAction(tr("Trainer Management"), self)
+        wemodAction.triggered.connect(self.open_trainer_management)
         menu.addAction(wemodAction)
 
         updateDatabaseAction = QAction(tr("Update Trainer Database"), self)
@@ -602,7 +602,7 @@ class GameCheatsManager(QMainWindow):
             paths = [DOWNLOAD_TEMP_DIR, settings["downloadPath"]]
 
             try:
-                subprocess.run([elevator_path] + paths, check=True, shell=True)
+                subprocess.run([elevator_path, 'whitelist'] + paths, check=True, shell=True)
                 QMessageBox.information(self, tr("Success"), tr("Successfully added paths to Windows Defender whitelist."))
 
             except subprocess.CalledProcessError:
@@ -616,13 +616,13 @@ class GameCheatsManager(QMainWindow):
             self.about_window = AboutDialog(self)
             self.about_window.show()
 
-    def wemod_pro(self):
-        if self.wemod_window is not None and self.wemod_window.isVisible():
-            self.wemod_window.raise_()
-            self.wemod_window.activateWindow()
+    def open_trainer_management(self):
+        if self.trainer_manage_window is not None and self.trainer_manage_window.isVisible():
+            self.trainer_manage_window.raise_()
+            self.trainer_manage_window.activateWindow()
         else:
-            self.wemod_window = WeModDialog(self)
-            self.wemod_window.show()
+            self.trainer_manage_window = TrainerManagementDialog(self)
+            self.trainer_manage_window.show()
 
 
 if __name__ == "__main__":
@@ -633,6 +633,7 @@ if __name__ == "__main__":
     primary_font_id = QFontDatabase.addApplicationFont(primary_font_path)
     primary_font_families = QFontDatabase.applicationFontFamilies(primary_font_id)
     custom_font = QFont(primary_font_families[0], 10)
+    custom_font.setHintingPreference(QFont.HintingPreference.PreferNoHinting)
     app.setFont(custom_font)
 
     mainWin = GameCheatsManager()

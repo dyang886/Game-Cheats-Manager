@@ -418,4 +418,23 @@ black = """
     QScrollBar::add-page:horizontal, QScrollBar::sub-page:horizontal {{
         background: none;
     }}
+
+    QTabWidget::pane {{
+        border-top: 2px solid #2e2e2e;
+    }}
+
+    QTabBar::tab {{
+        background-color: #2a2a2a;
+        color: #FFFFFF;
+        padding: 10px;
+        border-radius: 3px;
+    }}
+
+    QTabBar::tab:hover {{
+        background-color: #2f2f2f;
+    }}
+
+    QTabBar::tab:selected {{
+        background-color: #232323;
+    }}
 """

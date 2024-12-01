@@ -55,8 +55,8 @@ msgstr "Add Paths to Whitelist"
 msgid "About"
 msgstr "About"
 
-msgid "WeMod Customization"
-msgstr "WeMod Customization"
+msgid "Trainer Management"
+msgstr "Trainer Management"
 
 msgid "Update Trainer Database"
 msgstr "Update Trainer Database"
@@ -256,6 +256,53 @@ msgstr "Fetching trainer translations"
 msgid "Fetch trainer translations failed"
 msgstr "Fetch trainer translations failed"
 
+msgid ""
+"WeMod is currently running,\n"
+"please close the application first"
+msgstr ""
+"WeMod is currently running,\n"
+"please close the application first"
+
+msgid "Failed to extract file:"
+msgstr "Failed to extract file:"
+
+msgid "Unsupported WeMod version"
+msgstr "Unsupported WeMod version"
+
+msgid "Failed to patch file:"
+msgstr "Failed to patch file:"
+
+msgid "WeMod Pro activated"
+msgstr "WeMod Pro activated"
+
+msgid "Failed to activate WeMod Pro"
+msgstr "Failed to activate WeMod Pro"
+
+msgid "WeMod Pro disabled"
+msgstr "WeMod Pro disabled"
+
+msgid "WeMod auto update disabled"
+msgstr "WeMod auto update disabled"
+
+msgid "WeMod auto update enabled"
+msgstr "WeMod auto update enabled"
+
+msgid ""
+"Failed to enable WeMod auto update,\n"
+"please try reinstalling WeMod"
+msgstr ""
+"Failed to enable WeMod auto update,\n"
+"please try reinstalling WeMod"
+
+msgid "Failed to process WeMod update file:"
+msgstr "Failed to process WeMod update file:"
+
+msgid "Deleted WeMod version: "
+msgstr "Deleted WeMod version: "
+
+msgid "Failed to delete WeMod version: "
+msgstr "Failed to delete WeMod version: "
+
 msgid "Checking for trainer updates"
 msgstr "Checking for trainer updates"
 
@@ -294,20 +341,8 @@ msgstr "Theme:"
 msgid "Language:"
 msgstr "Language:"
 
-msgid "Download Server:"
-msgstr "Download Server:"
-
 msgid "Always show search results in English"
 msgstr "Always show search results in English"
-
-msgid "Remove trainer background music"
-msgstr "Remove trainer background music"
-
-msgid "Update trainer databases automatically"
-msgstr "Update trainer databases automatically"
-
-msgid "Update trainers automatically"
-msgstr "Update trainers automatically"
 
 msgid "Check for software update at startup"
 msgstr "Check for software update at startup"
@@ -336,11 +371,35 @@ msgstr "Loading..."
 msgid "Failed to load"
 msgstr "Failed to load"
 
-msgid "Download WeMod: "
-msgstr "Download WeMod: "
+msgid "FLiNG"
+msgstr "FLiNG"
+
+msgid "XiaoXing"
+msgstr "XiaoXing"
+
+msgid "Official Website: "
+msgstr "Official Website: "
+
+msgid "Download Server:"
+msgstr "Download Server:"
+
+msgid "Remove trainer background music"
+msgstr "Remove trainer background music"
+
+msgid "Update trainer databases automatically"
+msgstr "Update trainer databases automatically"
+
+msgid "Update trainers automatically"
+msgstr "Update trainers automatically"
+
+msgid "Enable search for Xiao Xing trainers"
+msgstr "Enable search for Xiao Xing trainers"
 
 msgid "WeMod installation path:"
 msgstr "WeMod installation path:"
+
+msgid "Reset to default"
+msgstr "Reset to default"
 
 msgid "Installed WeMod Versions:"
 msgstr "Installed WeMod Versions:"
@@ -354,55 +413,32 @@ msgstr "Disable WeMod Auto Update"
 msgid "Delete All Other WeMod Versions"
 msgstr "Delete All Other WeMod Versions"
 
+msgid "Cheat Engine installation path:"
+msgstr "Cheat Engine installation path:"
+
+msgid "Add Simplified Chinese"
+msgstr "Add Simplified Chinese"
+
 msgid "Select WeMod installation path"
 msgstr "Select WeMod installation path"
+
+msgid "Select Cheat Engine installation path"
+msgstr "Select Cheat Engine installation path"
+
+msgid "Cheat Engine is installed"
+msgstr "Cheat Engine is installed"
+
+msgid "Cheat Engine not installed"
+msgstr "Cheat Engine not installed"
 
 msgid "WeMod not installed"
 msgstr "WeMod not installed"
 
-msgid ""
-"WeMod is currently running,\n"
-"please close the application first."
-msgstr ""
-"WeMod is currently running,\n"
-"please close the application first."
+msgid "To proceed with adding translation files, administrator rights are needed. A User Account Control (UAC) prompt will appear for permission."
+msgstr "To proceed with adding translation files, administrator rights are needed. A User Account Control (UAC) prompt will appear for permission."
 
-msgid "Failed to extract file:"
-msgstr "Failed to extract file:"
+msgid "Successfully added translation files"
+msgstr "Successfully added translation files"
 
-msgid "Unsupported WeMod version."
-msgstr "Unsupported WeMod version."
-
-msgid "Failed to patch file:"
-msgstr "Failed to patch file:"
-
-msgid "WeMod Pro activated."
-msgstr "WeMod Pro activated."
-
-msgid "Failed to activate WeMod Pro."
-msgstr "Failed to activate WeMod Pro."
-
-msgid "WeMod Pro disabled."
-msgstr "WeMod Pro disabled."
-
-msgid "WeMod auto update disabled."
-msgstr "WeMod auto update disabled."
-
-msgid "WeMod auto update enabled."
-msgstr "WeMod auto update enabled."
-
-msgid ""
-"Failed to enable WeMod auto update,\n"
-"please try reinstalling WeMod."
-msgstr ""
-"Failed to enable WeMod auto update,\n"
-"please try reinstalling WeMod."
-
-msgid "Failed to process WeMod update file:"
-msgstr "Failed to process WeMod update file:"
-
-msgid "Deleted WeMod version: "
-msgstr "Deleted WeMod version: "
-
-msgid "Failed to delete WeMod version: "
-msgstr "Failed to delete WeMod version: "
+msgid "Failed to add translation files"
+msgstr "Failed to add translation files"

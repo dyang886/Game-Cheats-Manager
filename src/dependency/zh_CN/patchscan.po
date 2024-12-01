@@ -1,0 +1,67 @@
+﻿#: patchscan-nave
+msgid "Not a valid executable"
+msgstr "不是有效的可执行文件"
+
+#: patchscan-navwe
+msgid "Not a valid windows executable"
+msgstr "不是有效的windows可执行文件"
+
+#: patchscan-ttomicns
+msgid "This type of module is currently not supported"
+msgstr "当前不支持此类型的模块"
+
+#: patchscan-ce
+msgid "Compare error. "
+msgstr "比较错误"
+
+#: patchscan-ml
+msgid "Module List"
+msgstr "模块列表"
+
+#: patchscan-stmtsfp
+msgid "Select the modules to scan for patches. Hold shift/ctrl to select multiple modules"
+msgstr "选择要扫描修补程序的模块。按住shift/ctrl键可选择多个模块"
+
+#: patchscan-ok
+msgid "  OK  "
+msgstr "好的"
+
+#: patchscan-cancel
+msgid "Cancel"
+msgstr "取消"
+
+#: patchscan-scanning
+msgid "Scanning: %s"
+msgstr "正在扫描: %s"
+
+#: patchscan-ei
+msgid "Error in "
+msgstr "错误"
+
+#: patchscan-pl
+msgid "Patch list"
+msgstr "修补程序列表"
+
+#: patchscan-address
+msgid "Address"
+msgstr "地址"
+
+#: patchscan-original
+msgid "Original"
+msgstr "原件"
+
+#: patchscan-patched
+msgid "Patched"
+msgstr "修补"
+
+#: patchscan-rwo
+msgid "Restore with original"
+msgstr "用原稿还原"
+
+#: patchscan-rp
+msgid "Reapply patch"
+msgstr "重新应用修补程序"
+
+#: patchscan-sfp
+msgid "Scan for patches"
+msgstr "扫描修补程序"

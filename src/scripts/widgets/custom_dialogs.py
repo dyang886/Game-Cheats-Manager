@@ -4,7 +4,7 @@ import winreg as reg
 
 from PyQt6.QtCore import Qt
 from PyQt6.QtGui import QIcon, QPixmap
-from PyQt6.QtWidgets import QCheckBox, QComboBox, QDialog, QHBoxLayout, QLabel, QMessageBox, QVBoxLayout
+from PyQt6.QtWidgets import QCheckBox, QComboBox, QDialog, QHBoxLayout, QLabel, QMessageBox, QSizePolicy, QVBoxLayout
 
 from config import *
 from widgets.custom_widgets import CustomButton
@@ -25,8 +25,7 @@ class CopyRightWarning(QDialog):
         layout.addLayout(warningLayout)
 
         WarningPixmap = QPixmap(resource_path("assets/warning.png"))
-        scaledWarningPixmap = WarningPixmap.scaled(
-            120, 120, Qt.AspectRatioMode.KeepAspectRatio, Qt.TransformationMode.SmoothTransformation)
+        scaledWarningPixmap = WarningPixmap.scaled(120, 120, Qt.AspectRatioMode.KeepAspectRatio, Qt.TransformationMode.SmoothTransformation)
         warningSign = QLabel()
         warningSign.setPixmap(scaledWarningPixmap)
         warningLayout.addWidget(warningSign)
@@ -43,8 +42,7 @@ class CopyRightWarning(QDialog):
         layout.addLayout(linksLayout)
 
         githubUrl = self.parent().githubLink
-        githubText = f'GitHub: <a href="{
-            githubUrl}" style="text-decoration: none;">{githubUrl}</a>'
+        githubText = f'GitHub: <a href="{githubUrl}" style="text-decoration: none;">{githubUrl}</a>'
         githubLabel = QLabel(githubText)
         githubLabel.setAlignment(Qt.AlignmentFlag.AlignCenter)
         githubLabel.setTextFormat(Qt.TextFormat.RichText)
@@ -53,8 +51,7 @@ class CopyRightWarning(QDialog):
 
         bilibiliUrl = self.parent().bilibiliLink
         text = tr("Bilibili author homepage:")
-        bilibiliText = f'{text} <a href="{
-            bilibiliUrl}" style="text-decoration: none;">{bilibiliUrl}</a>'
+        bilibiliText = f'{text} <a href="{bilibiliUrl}" style="text-decoration: none;">{bilibiliUrl}</a>'
         bilibiliLabel = QLabel(bilibiliText)
         bilibiliLabel.setAlignment(Qt.AlignmentFlag.AlignCenter)
         bilibiliLabel.setTextFormat(Qt.TextFormat.RichText)
@@ -94,63 +91,33 @@ class SettingsDialog(QDialog):
         themeLayout = QVBoxLayout()
         themeLayout.setSpacing(2)
         settingsWidgetsLayout.addLayout(themeLayout)
-        themeLayout.addWidget(QLabel(tr("Theme:")))
+        themeLabel = QLabel(tr("Theme:"))
+        themeLabel.setSizePolicy(QSizePolicy.Policy.Fixed, QSizePolicy.Policy.Fixed)
+        themeLayout.addWidget(themeLabel)
         self.themeCombo = QComboBox()
         self.themeCombo.addItems(theme_options.keys())
-        self.themeCombo.setCurrentText(
-            self.find_settings_key(settings["theme"], theme_options))
+        self.themeCombo.setCurrentText(self.find_settings_key(settings["theme"], theme_options))
         themeLayout.addWidget(self.themeCombo)
 
         # Language selection
         languageLayout = QVBoxLayout()
         languageLayout.setSpacing(2)
         settingsWidgetsLayout.addLayout(languageLayout)
-        languageLayout.addWidget(QLabel(tr("Language:")))
+        languageLabel = QLabel(tr("Language:"))
+        languageLabel.setSizePolicy(QSizePolicy.Policy.Fixed, QSizePolicy.Policy.Fixed)
+        languageLayout.addWidget(languageLabel)
         self.languageCombo = QComboBox()
         self.languageCombo.addItems(language_options.keys())
-        self.languageCombo.setCurrentText(
-            self.find_settings_key(settings["language"], language_options))
+        self.languageCombo.setCurrentText(self.find_settings_key(settings["language"], language_options))
         languageLayout.addWidget(self.languageCombo)
 
-        # Server selection
-        serverLayout = QVBoxLayout()
-        serverLayout.setSpacing(2)
-        settingsWidgetsLayout.addLayout(serverLayout)
-        serverLayout.addWidget(QLabel(tr("Download Server:")))
-        self.serverCombo = QComboBox()
-        self.serverCombo.addItems(server_options.keys())
-        self.serverCombo.setCurrentText(
-            self.find_settings_key(settings["downloadServer"], server_options))
-        serverLayout.addWidget(self.serverCombo)
-
         # Always show english
-        self.alwaysEnCheckbox = QCheckBox(
-            tr("Always show search results in English"))
+        self.alwaysEnCheckbox = QCheckBox(tr("Always show search results in English"))
         self.alwaysEnCheckbox.setChecked(settings["enSearchResults"])
         settingsWidgetsLayout.addWidget(self.alwaysEnCheckbox)
 
-        # Remove trainer background music when downloading
-        self.removeBgMusicCheckbox = QCheckBox(
-            tr("Remove trainer background music"))
-        self.removeBgMusicCheckbox.setChecked(settings["removeBgMusic"])
-        settingsWidgetsLayout.addWidget(self.removeBgMusicCheckbox)
-
-        # Auto update trainer databases
-        self.autoUpdateDatabaseCheckbox = QCheckBox(
-            tr("Update trainer databases automatically"))
-        self.autoUpdateDatabaseCheckbox.setChecked(
-            settings["autoUpdateDatabase"])
-        settingsWidgetsLayout.addWidget(self.autoUpdateDatabaseCheckbox)
-
-        # Auto trainer updates
-        self.autoUpdateCheckbox = QCheckBox(
-            tr("Update trainers automatically"))
-        self.autoUpdateCheckbox.setChecked(settings["autoUpdate"])
-        settingsWidgetsLayout.addWidget(self.autoUpdateCheckbox)
-
         # Check software update at startup
-        self.appUpdateCheckbox = QCheckBox(
-            tr("Check for software update at startup"))
+        self.appUpdateCheckbox = QCheckBox(tr("Check for software update at startup"))
         self.appUpdateCheckbox.setChecked(settings["appUpdate"])
         settingsWidgetsLayout.addWidget(self.appUpdateCheckbox)
 
@@ -169,17 +136,18 @@ class SettingsDialog(QDialog):
         self.applyButton.clicked.connect(self.apply_settings_page)
         applyButtonLayout.addWidget(self.applyButton)
 
-    def find_settings_key(self, value, dict):
+    @staticmethod
+    def find_settings_key(value, dict):
         return next(key for key, val in dict.items() if val == value)
 
-    def add_or_remove_startup(self, app_name, path_to_exe, add=True):
+    @staticmethod
+    def add_or_remove_startup(app_name, path_to_exe, add=True):
         key = reg.HKEY_CURRENT_USER
         key_path = "Software\\Microsoft\\Windows\\CurrentVersion\\Run"
         try:
             registry_key = reg.OpenKey(key, key_path, 0, reg.KEY_WRITE)
             if add:
-                reg.SetValueEx(registry_key, app_name, 0,
-                               reg.REG_SZ, path_to_exe)
+                reg.SetValueEx(registry_key, app_name, 0, reg.REG_SZ, path_to_exe)
             else:
                 reg.DeleteValue(registry_key, app_name)
             reg.CloseKey(registry_key)
@@ -193,12 +161,8 @@ class SettingsDialog(QDialog):
         settings["theme"] = theme_options[self.themeCombo.currentText()]
         settings["language"] = language_options[self.languageCombo.currentText()]
         settings["enSearchResults"] = self.alwaysEnCheckbox.isChecked()
-        settings["removeBgMusic"] = self.removeBgMusicCheckbox.isChecked()
-        settings["autoUpdateDatabase"] = self.autoUpdateDatabaseCheckbox.isChecked()
-        settings["autoUpdate"] = self.autoUpdateCheckbox.isChecked()
         settings["appUpdate"] = self.appUpdateCheckbox.isChecked()
         settings["autoStart"] = self.autoStartCheckbox.isChecked()
-        settings["downloadServer"] = server_options[self.serverCombo.currentText()]
         apply_settings(settings)
 
         if getattr(sys, 'frozen', False):
@@ -225,8 +189,7 @@ class SettingsDialog(QDialog):
             reply = msg_box.exec()
 
             if reply == QMessageBox.StandardButton.Yes:
-                os.execl(sys.executable, sys.executable, *
-                         map(lambda arg: f'"{arg}"', sys.argv))
+                os.execl(sys.executable, sys.executable, * map(lambda arg: f'"{arg}"', sys.argv))
 
         else:
             QMessageBox.information(self, tr("Success"), tr("Settings saved."))
@@ -248,8 +211,7 @@ class AboutDialog(QDialog):
 
         # App logo
         logoPixmap = QPixmap(resource_path("assets/logo.png"))
-        scaledLogoPixmap = logoPixmap.scaled(
-            120, 120, Qt.AspectRatioMode.KeepAspectRatio, Qt.TransformationMode.SmoothTransformation)
+        scaledLogoPixmap = logoPixmap.scaled(120, 120, Qt.AspectRatioMode.KeepAspectRatio, Qt.TransformationMode.SmoothTransformation)
         logoLabel = QLabel()
         logoLabel.setAlignment(Qt.AlignmentFlag.AlignCenter)
         logoLabel.setPixmap(scaledLogoPixmap)
@@ -301,8 +263,7 @@ class AboutDialog(QDialog):
         aboutLayout.addLayout(linksLayout)
 
         githubUrl = self.parent().githubLink
-        githubText = f'GitHub: <a href="{
-            githubUrl}" style="text-decoration: none;">{githubUrl}</a>'
+        githubText = f'GitHub: <a href="{githubUrl}" style="text-decoration: none;">{githubUrl}</a>'
         githubLabel = QLabel(githubText)
         githubLabel.setAlignment(Qt.AlignmentFlag.AlignCenter)
         githubLabel.setTextFormat(Qt.TextFormat.RichText)
@@ -311,8 +272,7 @@ class AboutDialog(QDialog):
 
         bilibiliUrl = self.parent().bilibiliLink
         text = tr("Bilibili author homepage:")
-        bilibiliText = f'{text} <a href="{
-            bilibiliUrl}" style="text-decoration: none;">{bilibiliUrl}</a>'
+        bilibiliText = f'{text} <a href="{bilibiliUrl}" style="text-decoration: none;">{bilibiliUrl}</a>'
         bilibiliLabel = QLabel(bilibiliText)
         bilibiliLabel.setAlignment(Qt.AlignmentFlag.AlignCenter)
         bilibiliLabel.setTextFormat(Qt.TextFormat.RichText)

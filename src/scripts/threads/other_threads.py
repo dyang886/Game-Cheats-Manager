@@ -1,8 +1,11 @@
 import concurrent.futures
 import json
 import os
+import psutil
+import re
 import shutil
 import stat
+import subprocess
 import time
 
 from PyQt6.QtCore import QThread, pyqtSignal
@@ -171,3 +174,173 @@ class FetchTrainerDetails(DownloadBaseThread):
 
         print(f"Failed to fetch trainer detail page {page_number}")
         return None
+
+
+class WeModCustomization(QThread):
+    # Latest WeMod download: https://api.wemod.com/client/download
+    # Custom WeMod version download: https://storage-cdn.wemod.com/app/releases/stable/WeMod-9.10.3.exe
+    message = pyqtSignal(str, str)
+    finished = pyqtSignal()
+
+    def __init__(self, weModVersions, weModInstallPath, selectedWeModVersion, parent=None):
+        super().__init__(parent)
+        self.weModVersions = weModVersions
+        self.weModInstallPath = weModInstallPath
+        self.selectedWeModVersion = selectedWeModVersion
+        self.selectedWeModPath = os.path.join(weModInstallPath, f"app-{selectedWeModVersion}")
+    
+    def run(self):
+        asar = os.path.join(self.selectedWeModPath, "resources", "app.asar")
+        asar_copy = os.path.join(WEMOD_TEMP_DIR, "app.asar")
+        asar_bak = os.path.join(self.selectedWeModPath, "resources", "app.asar.bak")
+        weModExe = os.path.join(self.selectedWeModPath, "WeMod.exe")
+        weModExe_bak = os.path.join(self.selectedWeModPath, "WeMod.exe.bak")
+
+        # Terminate if WeMod is running
+        if self.is_program_running("WeMod.exe"):
+            self.message.emit(tr("WeMod is currently running,\nplease close the application first"), "error")
+            self.finished.emit()
+            return
+
+        # ===========================================================================
+        # Unlock WeMod Pro
+        if self.parent().weModProCheckbox.isChecked():
+            patch_success = True
+
+            # 1. Remove asar integrity check
+            shutil.copyfile(weModExe, weModExe_bak)
+            self.replace_hex_in_file(weModExe_bak, weModExe, '00001101', '00000101')
+            os.remove(weModExe_bak)
+
+            # 2. Patch app.asar
+            os.makedirs(WEMOD_TEMP_DIR, exist_ok=True)
+            if os.path.exists(asar_bak):
+                if os.path.exists(asar):
+                    os.remove(asar)
+                os.rename(asar_bak, asar)
+            shutil.copyfile(asar, asar_copy)
+
+            # Extract app.asar file
+            try:
+                command = [unzip_path, 'e', '-y', asar_copy, "app*bundle.js", "index.js", f"-o{WEMOD_TEMP_DIR}"]
+                subprocess.run(command, check=True, creationflags=subprocess.CREATE_NO_WINDOW)
+            except Exception as e:
+                self.message.emit(tr("Failed to extract file:") + f"\n{asar_copy}", "error")
+                patch_success = False
+        
+            patterns = {
+                r'(getUserAccount\()(.*)(}async getUserAccountFlags)': r'\1\2.then(function(response) {response.subscription={period:"yearly",state:"active"}; response.flags=78; return response;})\3',
+                r'(getUserAccountFlags\()(.*)(\)\).flags)': r'\1\2\3.then(function(response) {if (response.mask==4) {response.flags=4}; return response;})',
+                r'(changeAccountEmail\()(.*)(email:.?,currentPassword:.?}\))': r'\1\2\3.then(function(response) {response.subscription={period:"yearly", state:"active"}; response.flags=78; return response;})',
+                r'(getPromotion\()(.*)(collectMetrics:!0}\))': r'\1\2\3.then(function(response) {response.components.appBanner=null; response.flags=0; return response;})'
+            }
+
+            # Mapping of patterns to files where they were found: {pattern key: file path}
+            lines = {key: None for key in patterns}
+
+            # Check files for matching patterns
+            for pattern in patterns:
+                for filename in os.listdir(WEMOD_TEMP_DIR):
+                    if filename.endswith('.js'):
+                        file_path = os.path.join(WEMOD_TEMP_DIR, filename)
+                        try:
+                            with open(file_path, 'r', encoding='utf-8') as file:
+                                content = file.read()
+                                if re.search(pattern, content):
+                                    lines[pattern] = file_path
+                                    break
+                        except UnicodeDecodeError:
+                            continue
+
+            # Process each file with matched patterns
+            if all(lines.values()):
+                print(f"js file patched: {list(lines.items())[0][1]}")
+                for pattern, file_path in lines.items():
+                    self.apply_patch(file_path, pattern, patterns[pattern])
+            else:
+                self.message.emit(tr("Unsupported WeMod version"), "error")
+                patch_success = False
+
+            # pack patched js files back to app.asar
+            try:
+                shutil.copyfile(asar, asar_bak)
+                command = [unzip_path, 'a', '-y', asar_copy, os.path.join(WEMOD_TEMP_DIR, '*.js')]
+                subprocess.run(command, check=True, creationflags=subprocess.CREATE_NO_WINDOW)
+                shutil.move(asar_copy, asar)
+            except Exception as e:
+                self.message.emit(tr("Failed to patch file:") + f"\n{asar}", "error")
+                patch_success = False
+
+            # Clean up
+            shutil.rmtree(WEMOD_TEMP_DIR)
+            if patch_success:
+                self.message.emit(tr("WeMod Pro activated"), "success")
+            else:
+                self.message.emit(tr("Failed to activate WeMod Pro"), "error")
+
+        else:
+            if os.path.exists(asar_bak):
+                if os.path.exists(asar):
+                    os.remove(asar)
+                os.rename(asar_bak, asar)
+
+            self.message.emit(tr("WeMod Pro disabled"), "success")
+
+        # ===========================================================================
+        # Disable auto update
+        updateExe = os.path.join(self.weModInstallPath, "Update.exe")
+        updateExe_backup = os.path.join(self.weModInstallPath, "Update.exe.bak")
+        try:
+            if self.parent().disableUpdateCheckbox.isChecked():
+                if os.path.exists(updateExe):
+                    os.rename(updateExe, updateExe_backup)
+                    self.message.emit(tr("WeMod auto update disabled"), "success")
+            else:
+                if os.path.exists(updateExe_backup):
+                    os.rename(updateExe_backup, updateExe)
+                    self.message.emit(tr("WeMod auto update enabled"), "success")
+                elif not os.path.exists(updateExe):
+                    self.message.emit(tr("Failed to enable WeMod auto update,\nplease try reinstalling WeMod"), "error")
+        except Exception as e:
+            self.message.emit(tr("Failed to process WeMod update file:") + f"\n{str(e)}", "error")
+
+        # ===========================================================================
+        # Delete other version folders
+        if self.parent().delOtherVersionsCheckbox.isChecked():
+            for version in self.weModVersions:
+                if version != self.selectedWeModVersion:
+                    folder_path = os.path.join(self.weModInstallPath, f"app-{version}")
+                    try:
+                        shutil.rmtree(folder_path)
+                        self.message.emit(tr("Deleted WeMod version: ") + version, "success")
+                    except Exception as e:
+                        self.message.emit(tr("Failed to delete WeMod version: ") + version, "error")
+        
+        self.finished.emit()
+    
+    def is_program_running(self, program_name):
+        for proc in psutil.process_iter():
+            try:
+                if program_name == proc.name():
+                    return True
+            except (psutil.NoSuchProcess, psutil.AccessDenied, psutil.ZombieProcess):
+                pass
+        return False
+    
+    def apply_patch(self, file_path, pattern, replacement):
+        try:
+            with open(file_path, 'r+', encoding='utf-8') as file:
+                content = file.read()
+                modified_content = re.sub(pattern, replacement, content)
+                file.seek(0)
+                file.write(modified_content)
+                file.truncate()
+        except Exception as e:
+            self.message.emit(tr("Failed to patch file:") + f"\n{file_path}", "error")
+
+    def replace_hex_in_file(self, input_file, output_file, search_hex, replace_hex):
+        try:
+            command = [binmay_path, '-i', input_file, '-o', output_file, '-s', f"t:{search_hex}", '-r', f"t:{replace_hex}"]
+            subprocess.run(command, check=True, creationflags=subprocess.CREATE_NO_WINDOW)
+        except Exception as e:
+            self.message.emit(tr("Failed to patch file:") + f"\n{input_file}", "error")

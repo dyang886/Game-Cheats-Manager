@@ -55,8 +55,8 @@ msgstr "添加路径至白名单"
 msgid "About"
 msgstr "关于"
 
-msgid "WeMod Customization"
-msgstr "自定义 WeMod"
+msgid "Trainer Management"
+msgstr "修改器管理"
 
 msgid "Update Trainer Database"
 msgstr "更新修改器数据库"
@@ -256,6 +256,53 @@ msgstr "正在获取修改器翻译"
 msgid "Fetch trainer translations failed"
 msgstr "获取修改器翻译失败"
 
+msgid ""
+"WeMod is currently running,\n"
+"please close the application first"
+msgstr ""
+"WeMod 正在运行中，\n"
+"请先关闭该应用程序"
+
+msgid "Failed to extract file:"
+msgstr "提取文件失败："
+
+msgid "Unsupported WeMod version"
+msgstr "不支持的 WeMod 版本"
+
+msgid "Failed to patch file:"
+msgstr "修补文件失败："
+
+msgid "WeMod Pro activated"
+msgstr "WeMod 专业版已激活"
+
+msgid "Failed to activate WeMod Pro"
+msgstr "WeMod 专业版激活失败"
+
+msgid "WeMod Pro disabled"
+msgstr "WeMod 专业版已禁用"
+
+msgid "WeMod auto update disabled"
+msgstr "WeMod 自动更新已禁用"
+
+msgid "WeMod auto update enabled"
+msgstr "WeMod 自动更新已启用"
+
+msgid ""
+"Failed to enable WeMod auto update,\n"
+"please try reinstalling WeMod"
+msgstr ""
+"无法启用 WeMod 自动更新，\n"
+"请尝试重新安装 WeMod"
+
+msgid "Failed to process WeMod update file:"
+msgstr "无法处理 WeMod 更新文件："
+
+msgid "Deleted WeMod version: "
+msgstr "已删除 WeMod 版本："
+
+msgid "Failed to delete WeMod version: "
+msgstr "删除 WeMod 版本失败："
+
 msgid "Checking for trainer updates"
 msgstr "正在检查修改器更新"
 
@@ -294,20 +341,8 @@ msgstr "主题："
 msgid "Language:"
 msgstr "语言："
 
-msgid "Download Server:"
-msgstr "下载服务器："
-
 msgid "Always show search results in English"
 msgstr "始终以英文显示搜索结果"
-
-msgid "Remove trainer background music"
-msgstr "删除修改器背景音乐"
-
-msgid "Update trainer databases automatically"
-msgstr "自动更新修改器数据库"
-
-msgid "Update trainers automatically"
-msgstr "自动更新修改器"
 
 msgid "Check for software update at startup"
 msgstr "软件启动时检查更新"
@@ -336,11 +371,35 @@ msgstr "加载中..."
 msgid "Failed to load"
 msgstr "加载失败"
 
-msgid "Download WeMod: "
-msgstr "下载 WeMod："
+msgid "FLiNG"
+msgstr "风灵月影"
+
+msgid "XiaoXing"
+msgstr "小幸"
+
+msgid "Official Website: "
+msgstr "官方网站："
+
+msgid "Download Server:"
+msgstr "下载服务器："
+
+msgid "Remove trainer background music"
+msgstr "删除修改器背景音乐"
+
+msgid "Update trainer databases automatically"
+msgstr "自动更新修改器数据库"
+
+msgid "Update trainers automatically"
+msgstr "自动更新修改器"
+
+msgid "Enable search for Xiao Xing trainers"
+msgstr "允许搜索小幸修改器"
 
 msgid "WeMod installation path:"
 msgstr "WeMod 安装路径："
+
+msgid "Reset to default"
+msgstr "恢复默认"
 
 msgid "Installed WeMod Versions:"
 msgstr "已安装的 WeMod 版本："
@@ -354,55 +413,32 @@ msgstr "禁用 WeMod 自动更新"
 msgid "Delete All Other WeMod Versions"
 msgstr "删除所有其他 WeMod 版本"
 
+msgid "Cheat Engine installation path:"
+msgstr "Cheat Engine 安装路径："
+
+msgid "Add Simplified Chinese"
+msgstr "添加简体中文"
+
 msgid "Select WeMod installation path"
 msgstr "选择 WeMod 安装路径"
+
+msgid "Select Cheat Engine installation path"
+msgstr "选择 Cheat Engine 安装路径"
+
+msgid "Cheat Engine is installed"
+msgstr "已安装 Cheat Engine"
+
+msgid "Cheat Engine not installed"
+msgstr "未安装 Cheat Engine"
 
 msgid "WeMod not installed"
 msgstr "未安装 WeMod"
 
-msgid ""
-"WeMod is currently running,\n"
-"please close the application first."
-msgstr ""
-"WeMod 正在运行中，\n"
-"请先关闭该应用程序。"
+msgid "To proceed with adding translation files, administrator rights are needed. A User Account Control (UAC) prompt will appear for permission."
+msgstr "若要添加翻译文件，需要管理员权限。请留意将弹出的用户帐户控制（UAC）提示。"
 
-msgid "Failed to extract file:"
-msgstr "提取文件失败："
+msgid "Successfully added translation files"
+msgstr "成功添加翻译文件"
 
-msgid "Unsupported WeMod version."
-msgstr "不支持的 WeMod 版本。"
-
-msgid "Failed to patch file:"
-msgstr "修补文件失败："
-
-msgid "WeMod Pro activated."
-msgstr "WeMod 专业版已激活。"
-
-msgid "Failed to activate WeMod Pro."
-msgstr "WeMod 专业版激活失败。"
-
-msgid "WeMod Pro disabled."
-msgstr "WeMod 专业版已禁用。"
-
-msgid "WeMod auto update disabled."
-msgstr "WeMod 自动更新已禁用。"
-
-msgid "WeMod auto update enabled."
-msgstr "WeMod 自动更新已启用。"
-
-msgid ""
-"Failed to enable WeMod auto update,\n"
-"please try reinstalling WeMod."
-msgstr ""
-"无法启用 WeMod 自动更新，\n"
-"请尝试重新安装 WeMod。"
-
-msgid "Failed to process WeMod update file:"
-msgstr "无法处理 WeMod 更新文件："
-
-msgid "Deleted WeMod version: "
-msgstr "已删除 WeMod 版本："
-
-msgid "Failed to delete WeMod version: "
-msgstr "删除 WeMod 版本失败："
+msgid "Failed to add translation files"
+msgstr "添加翻译文件失败"

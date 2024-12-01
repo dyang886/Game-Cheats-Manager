@@ -2,6 +2,7 @@ import gettext
 import json
 import locale
 import os
+import re
 import shutil
 import sys
 import tempfile
@@ -50,14 +51,18 @@ def load_settings():
         "language": app_locale,
         "theme": "black",
         "enSearchResults": False,
-        "autoUpdateDatabase": True,
-        "autoUpdate": True,
         "appUpdate": True,
-        "WeModPath": os.path.join(os.environ["LOCALAPPDATA"], "WeMod"),
         "autoStart": False,
         "showWarning": True,
+
+        # Trainer management configs
         "downloadServer": "intl",
         "removeBgMusic": True,
+        "autoUpdateDatabase": True,
+        "autoUpdateFling": True,
+        "enableXiaoxing": True,
+        "weModPath": wemod_install_path,
+        "cePath": ce_install_path
     }
 
     try:
@@ -120,6 +125,27 @@ def ensure_trainer_download_path_is_valid():
         os.makedirs(settings["downloadPath"], exist_ok=True)
 
 
+def findCEInstallPath():
+    base_path = r'C:\Program Files'
+    latest_version = []
+    latest_path = None
+
+    if os.path.exists(base_path):
+        for folder in os.listdir(base_path):
+            if folder.startswith("Cheat Engine"):
+                match = re.search(r"Cheat Engine (\d+(?:\.\d+)*)", folder)
+                if match:
+                    # Parse version into a list of integers (e.g., '7.5.1' -> [7, 5, 1])
+                    version = list(map(int, match.group(1).split('.')))
+                    while len(version) < 3:
+                        version.append(0)
+                    if version > latest_version:
+                        latest_version = version
+                        latest_path = os.path.join(base_path, folder)
+
+    return latest_path
+
+
 setting_path = os.path.join(os.environ["APPDATA"], "GCM Settings")
 os.makedirs(setting_path, exist_ok=True)
 
@@ -129,6 +155,9 @@ os.makedirs(DATABASE_PATH, exist_ok=True)
 DOWNLOAD_TEMP_DIR = os.path.join(tempfile.gettempdir(), "GameCheatsManagerTemp", "download")
 VERSION_TEMP_DIR = os.path.join(tempfile.gettempdir(), "GameCheatsManagerTemp", "version")
 WEMOD_TEMP_DIR = os.path.join(tempfile.gettempdir(), "GameCheatsManagerTemp", "wemod")
+
+wemod_install_path = os.path.join(os.environ["LOCALAPPDATA"], "WeMod")
+ce_install_path = findCEInstallPath()
 
 settings = load_settings()
 tr = get_translator()
