@@ -21,13 +21,13 @@ class DownloadBaseThread(QThread):
     loadUrl = pyqtSignal(str, str)
     downloadFile = pyqtSignal(str, str, str)
 
-    trainer_urls = {}  # For intl download server: {trainer name: download link}; for china download server: {trainer name: [download link, anti-cheats download link]}
+    trainer_urls = []  # For intl download server: {trainer name: download link}; for china download server: {trainer name: [download link, anti-cheats download link]}
     headers = {
         'User-Agent': 'Mozilla/5.0 (Windows NT 10.0; Win64; x64) AppleWebKit/537.36 (KHTML, like Gecko) Chrome/58.0.3029.110 Safari/537.3',
     }
     translator_initializing = False
     translator_warnings_displayed = False  # make sure warning doesn't display more than once
-    
+
     def __init__(self, parent=None):
         super().__init__(parent)
         self.ts = None
@@ -69,7 +69,7 @@ class DownloadBaseThread(QThread):
         except Exception as e:
             print(f"Error requesting {url}: {str(e)}")
             return ""
-        
+
         if req.status_code != 200:
             self.loop = QEventLoop()
             self.downloadFile.emit(url, download_path, file_name)
@@ -106,7 +106,7 @@ class DownloadBaseThread(QThread):
             except requests.RequestException:
                 continue
         return False
-    
+
     def arabic_to_roman(self, num):
         if num == 0:
             return '0'
@@ -125,15 +125,15 @@ class DownloadBaseThread(QThread):
                     num -= i
 
         return roman
-    
+
     def sanitize(self, text):
         text = re.sub(r'\d+', lambda x: self.arabic_to_roman(int(x.group())), text)
         all_punctuation = string.punctuation + zhon.hanzi.punctuation
         return ''.join(char for char in text if char not in all_punctuation and not char.isspace()).lower()
-    
+
     def symbol_replacement(self, text):
         return text.replace(': ', ' - ').replace(':', '-').replace("/", "_").replace("?", "")
-    
+
     def find_best_trainer_match(self, targetEnName, threshold=85):
         trainer_details = self.load_json_content("xgqdetail.json")
         if not trainer_details:
@@ -149,7 +149,7 @@ class DownloadBaseThread(QThread):
             # Return the Chinese name corresponding to the best-matching English name
             return sanitized_to_original[best_match]
         return None
-    
+
     def initialize_translator(self):
         if not self.is_internet_connected():
             if not self.translator_warnings_displayed:
@@ -157,7 +157,7 @@ class DownloadBaseThread(QThread):
                 self.translator_warnings_displayed = True
                 time.sleep(1)
             return False
-        
+
         try:
             if self.ts is None and not self.translator_initializing:
                 self.translator_initializing = True
@@ -172,7 +172,7 @@ class DownloadBaseThread(QThread):
                         break
                     time.sleep(1)
             return True
-        
+
         except Exception as e:
             print("import translators failed or error occurred while translating: " + str(e))
             return False
@@ -197,7 +197,7 @@ class DownloadBaseThread(QThread):
                 best_match = self.find_best_trainer_match(original_trainerName)
                 if best_match:
                     trans_trainerName = f"《{best_match}》修改器"
-            
+
                 elif self.initialize_translator():
                     # Use direct translation if couldn't find a match
                     print("No matches found, using direct translation for: " + original_trainerName)
@@ -222,19 +222,19 @@ class DownloadBaseThread(QThread):
                 print(f"An error occurred while translating trainer name: {str(e)}")
 
         return trans_trainerName
-    
+
     def save_html_content(self, content, file_name):
         html_file = os.path.join(DATABASE_PATH, file_name)
         with open(html_file, 'w', encoding='utf-8') as file:
             file.write(content)
-    
+
     def load_html_content(self, file_name):
         html_file = os.path.join(DATABASE_PATH, file_name)
         if os.path.exists(html_file):
             with open(html_file, 'r', encoding='utf-8') as file:
                 return file.read()
         return ""
-    
+
     def load_json_content(self, file_name):
         json_file = os.path.join(DATABASE_PATH, file_name)
         if os.path.exists(json_file):

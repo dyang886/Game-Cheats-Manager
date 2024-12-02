@@ -48,7 +48,7 @@ class UpdateTrainers(DownloadBaseThread):
         else:
             self.update.emit(statusWidgetName, tr("Check trainer updates failed"), "error")
             time.sleep(2)
-        
+
         self.finished.emit(statusWidgetName)
 
     def process_trainer(self, trainerPath):
@@ -89,13 +89,13 @@ class UpdateTrainers(DownloadBaseThread):
                                 if score >= 85:
                                     targetGameObj = trainerNamesMap[best_match]
                                     version_entry = targetGameObj.find('div', class_='entry')
-                                
+
                             if version_entry:
                                 match = re.search(r'Last Updated:\s+(\d+\.\d+\.\d+)', version_entry.text)
                                 if match:
                                     trainerDstDate = datetime.datetime.strptime(match.group(1), '%Y.%m.%d')
                                     print(f"{tagName}\nTrainer source date: {trainerSrcDate.strftime('%Y-%m-%d')}\nNewest build date: {trainerDstDate.strftime('%Y-%m-%d')}\n")
-                                    
+
                                     if trainerDstDate > trainerSrcDate:
                                         # Special cases where trainers keep updating
                                         inconsistent_update_dates = ["dynasty-warriors-8-xtreme-legends-complete-edition", "dredge"]
@@ -105,7 +105,7 @@ class UpdateTrainers(DownloadBaseThread):
                                         update_url = targetGameObj.find('a', href=True, rel='bookmark')['href']
                                         return trainerPath, update_url
         return None
-    
+
     def get_webpage_content_with_lock(self, url, target_text):
         with self.browser_condition:
             self.browser_condition.wait_for(lambda: True)
@@ -116,7 +116,7 @@ class UpdateTrainers(DownloadBaseThread):
             self.browser_condition.notify_all()
 
         return content
-    
+
     def get_product_name(self, trainerPath):
         os.makedirs(VERSION_TEMP_DIR, exist_ok=True)
         unique_id = uuid.uuid4().hex

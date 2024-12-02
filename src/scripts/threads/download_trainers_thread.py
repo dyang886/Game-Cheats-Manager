@@ -35,37 +35,36 @@ class DownloadTrainersThread(DownloadBaseThread):
 
         if os.path.exists(DOWNLOAD_TEMP_DIR):
             shutil.rmtree(DOWNLOAD_TEMP_DIR)
-        antiUrl = ""
-        
+
         if self.update:
             self.trainerName = os.path.splitext(os.path.basename(self.trainerPath))[0]
             self.message.emit(tr("Updating ") + self.trainerName + "...", None)
+        else:
+            selected_trainer = DownloadBaseThread.trainer_urls[self.index]
+        antiUrl = ""
 
         if self.update or settings["downloadServer"] == "intl":
             # Trainer name check
             if not self.update:
-                trainer_list = list(DownloadBaseThread.trainer_urls.items())
-                filename = trainer_list[self.index][0]
-                trainerName_download = self.symbol_replacement(filename)
-                self.message.emit(tr("Translating trainer name..."), None)
-                trainerName_final = self.symbol_replacement(self.translate_trainer(trainerName_download))
+                trainerName_download = self.symbol_replacement(selected_trainer["trainer_name"])
+                trainerName_translated = self.symbol_replacement(selected_trainer["translated_name"])
 
                 for trainerPath in self.trainers.keys():
-                    if trainerName_download in trainerPath or trainerName_final in trainerPath:
+                    if trainerName_download in trainerPath or trainerName_translated in trainerPath:
                         self.message.emit(tr("Trainer already exists, aborted download."), "failure")
                         time.sleep(self.download_finish_delay)
                         self.finished.emit(1)
                         return
             else:
                 trainerName_download = self.trainerName
-                trainerName_final = self.trainerName
+                trainerName_translated = self.trainerName
 
             # Download trainer
             self.message.emit(tr("Downloading..."), None)
             try:
                 # Additional trainer file extraction for trainers from main site
                 if not self.update:
-                    targetUrl = DownloadBaseThread.trainer_urls[filename]
+                    targetUrl = DownloadBaseThread.trainer_urls[self.index]["url"]
                 else:
                     targetUrl = self.updateUrl
 
@@ -78,7 +77,7 @@ class DownloadTrainersThread(DownloadBaseThread):
                         targetUrl = targetObj.get("href")
                     else:
                         raise Exception(tr("Internet request failed."))
-                
+
                 os.makedirs(DOWNLOAD_TEMP_DIR, exist_ok=True)
                 trainerTemp = self.request_download(targetUrl, DOWNLOAD_TEMP_DIR, trainerName_download)
 
@@ -87,7 +86,7 @@ class DownloadTrainersThread(DownloadBaseThread):
                 time.sleep(self.download_finish_delay)
                 self.finished.emit(1)
                 return
-            
+
             # Ensure file is successfully downloaded
             found_trainer = False
             for i in range(30):
@@ -115,10 +114,10 @@ class DownloadTrainersThread(DownloadBaseThread):
 
             # Locate extracted .exe file
             cnt = 0
-            exeRawName = []
+            extractedTrainerNames = []
             for filename in os.listdir(DOWNLOAD_TEMP_DIR):
                 if "trainer" in filename.lower() and filename.endswith(".exe"):
-                    exeRawName.append(filename)
+                    extractedTrainerNames.append(filename)
                 elif "trainer" not in filename.lower():
                     cnt += 1
 
@@ -127,8 +126,8 @@ class DownloadTrainersThread(DownloadBaseThread):
                 self.messageBox.emit("info", tr("Attention"), tr("Please check folder for anti-cheat requirements!"))
                 os.startfile(DOWNLOAD_TEMP_DIR)
 
-            # Check if exeRawName is None
-            if not exeRawName:
+            # Check if extracted trainer name is None
+            if not extractedTrainerNames:
                 self.message.emit(tr("Could not find the downloaded trainer file, please try turning your antivirus software off."), "failure")
                 time.sleep(self.download_finish_delay)
                 self.finished.emit(1)
@@ -137,42 +136,41 @@ class DownloadTrainersThread(DownloadBaseThread):
             # Construct destination trainer name dict (may have multiple versions of a same game)
             os.makedirs(self.trainerDownloadPath, exist_ok=True)
             src_dst = {}  # {source file: destination file, ...}
-            if len(exeRawName) > 1:
+            if len(extractedTrainerNames) > 1:
                 if self.update:
-                    match = re.search(r'^(.*?)(\s+v\d+|\s+Early Access)', exeRawName[0])
+                    match = re.search(r'^(.*?)(\s+v\d+|\s+Early Access)', extractedTrainerNames[0])
                     trainerName = match.group(1) + " Trainer"
-                    trainerName_final = self.symbol_replacement(self.translate_trainer(trainerName))
+                    trainerName_translated = self.symbol_replacement(self.translate_trainer(trainerName))
 
-                for source_exe in exeRawName:
+                for extractedTrainerName in extractedTrainerNames:
                     trainer_details = ""
                     if domain == "flingtrainer.com":
                         pattern = r'trainer(.*)'
-                        match = re.search(pattern, source_exe, re.IGNORECASE)
+                        match = re.search(pattern, extractedTrainerName, re.IGNORECASE)
                         if match:
                             trainer_details = match.group(1)
                     else:
                         pattern = r"\s+Update.*|\s+v\d+.*"
-                        match = re.search(pattern, source_exe)
+                        match = re.search(pattern, extractedTrainerName)
                         if match:
                             trainer_details = match.group().replace(" Trainer", "")
 
-                    trainer_name = f"{trainerName_final}{trainer_details}"
-                
-                    source_file = os.path.join(DOWNLOAD_TEMP_DIR, source_exe)
+                    trainer_name = f"{trainerName_translated}{trainer_details}"
+
+                    source_file = os.path.join(DOWNLOAD_TEMP_DIR, extractedTrainerName)
                     destination_file = os.path.join(self.trainerDownloadPath, trainer_name)
                     src_dst[source_file] = destination_file
 
             else:
-                trainer_name = f"{trainerName_final}.exe"
-                source_file = os.path.join(DOWNLOAD_TEMP_DIR, exeRawName[0])
+                trainer_name = f"{trainerName_translated}.exe"
+                source_file = os.path.join(DOWNLOAD_TEMP_DIR, extractedTrainerNames[0])
                 destination_file = os.path.join(self.trainerDownloadPath, trainer_name)
                 src_dst[source_file] = destination_file
 
         elif settings["downloadServer"] == "china":
-            trainer_list = list(DownloadBaseThread.trainer_urls.items())
-            trainerName = self.symbol_replacement(trainer_list[self.index][0])
-            downloadUrl = trainer_list[self.index][1][0]
-            antiUrl = trainer_list[self.index][1][1]
+            trainerName = self.symbol_replacement(selected_trainer["trainer_name"])
+            downloadUrl = selected_trainer["url"]
+            antiUrl = selected_trainer["anti_url"]
             if os.path.splitext(urlparse(antiUrl).path)[1] == ".rar":
                 antiUrl = ""
 
@@ -182,7 +180,7 @@ class DownloadTrainersThread(DownloadBaseThread):
                     time.sleep(self.download_finish_delay)
                     self.finished.emit(1)
                     return
-            
+
             # Download trainer
             self.message.emit(tr("Downloading..."), None)
             base_url, filename = downloadUrl.rsplit('/', 1)
@@ -205,7 +203,7 @@ class DownloadTrainersThread(DownloadBaseThread):
                 time.sleep(self.download_finish_delay)
                 self.finished.emit(1)
                 return
-            
+
             os.makedirs(DOWNLOAD_TEMP_DIR, exist_ok=True)
             trainerTemp = os.path.join(DOWNLOAD_TEMP_DIR, trainerName + ".zip")
             with open(trainerTemp, "wb") as f:
@@ -230,7 +228,7 @@ class DownloadTrainersThread(DownloadBaseThread):
                 antiTemp = os.path.join(anti_folder, antiFileName)
                 with open(antiTemp, "wb") as f:
                     f.write(req.content)
-            
+
             # Decompress downloaded zip
             self.message.emit(tr("Decompressing..."), None)
             try:
@@ -248,17 +246,17 @@ class DownloadTrainersThread(DownloadBaseThread):
 
             # Locate extracted .exe file
             cnt = 0
-            exeRawName = None
+            extractedTrainerNames = None
             for filename in os.listdir(DOWNLOAD_TEMP_DIR):
                 if filename.endswith(".exe"):
-                    exeRawName = filename
+                    extractedTrainerNames = filename
 
             # Warn user if anti-cheat files found
             if antiUrl:
                 self.messageBox.emit("info", tr("Attention"), tr("Please check folder for anti-cheat requirements!"))
                 os.startfile(anti_folder)
-            
-            if not exeRawName:
+
+            if not extractedTrainerNames:
                 self.message.emit(tr("Could not find the downloaded trainer file, please try turning your antivirus software off."), "failure")
                 time.sleep(self.download_finish_delay)
                 self.finished.emit(1)
@@ -266,7 +264,7 @@ class DownloadTrainersThread(DownloadBaseThread):
 
             os.makedirs(self.trainerDownloadPath, exist_ok=True)
             src_dst = {}
-            source_file = os.path.join(DOWNLOAD_TEMP_DIR, exeRawName)
+            source_file = os.path.join(DOWNLOAD_TEMP_DIR, extractedTrainerNames)
             destination_file = os.path.join(self.trainerDownloadPath, trainerName + ".exe")
             src_dst[source_file] = destination_file
 
@@ -281,7 +279,7 @@ class DownloadTrainersThread(DownloadBaseThread):
 
         try:
             # Delete original trainer file (could not preserve original file name due to multiple versions when updating)
-            if len(exeRawName) > 1 and self.update:
+            if len(extractedTrainerNames) > 1 and self.update:
                 original_trainer_name = f"{self.trainerName}.exe"
                 original_trainer_file = os.path.join(self.trainerDownloadPath, original_trainer_name)
                 os.chmod(original_trainer_file, stat.S_IWRITE)
@@ -309,11 +307,11 @@ class DownloadTrainersThread(DownloadBaseThread):
             time.sleep(self.download_finish_delay)
             self.finished.emit(1)
             return
-        
+
         self.message.emit(tr("Download success!"), "success")
         time.sleep(self.download_finish_delay)
         self.finished.emit(0)
-    
+
     def modify_fling_settings(self, removeBgMusic):
         # replace bg music in Documents folder
         username = os.getlogin()

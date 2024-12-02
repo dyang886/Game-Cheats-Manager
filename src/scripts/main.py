@@ -37,7 +37,7 @@ class GameCheatsManager(QMainWindow):
         self.setMinimumSize(680, 520)
 
         # Version and links
-        self.appVersion = "2.1.3"
+        self.appVersion = "2.2.0"
         self.githubLink = "https://github.com/dyang886/Game-Cheats-Manager"
         self.updateLink = "https://api.github.com/repos/dyang886/Game-Cheats-Manager/releases/latest"
         self.bilibiliLink = "https://space.bilibili.com/256673766"
@@ -199,7 +199,7 @@ class GameCheatsManager(QMainWindow):
         if settings["showWarning"]:
             dialog = CopyRightWarning(self)
             dialog.show()
- 
+
         # Check for software update
         if settings['appUpdate']:
             self.versionFetcher = VersionFetchWorker(self.updateLink)
@@ -219,7 +219,7 @@ class GameCheatsManager(QMainWindow):
     def closeEvent(self, event):
         super().closeEvent(event)
         os._exit(0)
-    
+
     def send_notification(self, success, latest_version=0):
         tray_icon = QSystemTrayIcon(QIcon(resource_path("assets/logo.ico")), self)
         tray_icon.show()
@@ -332,7 +332,7 @@ class GameCheatsManager(QMainWindow):
         if index != -1:
             trainerName = self.flingListBox.item(index).text()
             trainerPath = self.trainers[trainerName]
-        
+
             msg_box = QMessageBox(
                 QMessageBox.Icon.Question,
                 tr('Delete trainer'),
@@ -340,7 +340,7 @@ class GameCheatsManager(QMainWindow):
                 QMessageBox.StandardButton.Yes | QMessageBox.StandardButton.No,
                 self
             )
-            
+
             yes_button = msg_box.button(QMessageBox.StandardButton.Yes)
             yes_button.setText(tr("Confirm"))
             no_button = msg_box.button(QMessageBox.StandardButton.No)
@@ -355,7 +355,7 @@ class GameCheatsManager(QMainWindow):
                     self.show_cheats()
                 except PermissionError as e:
                     QMessageBox.critical(self, tr("Error"), tr("Trainer is currently in use, please close any programs using the file and try again."))
-    
+
     def findWidgetInStatusBar(self, statusbar, widgetName):
         for widget in statusbar.children():
             if widget.objectName() == widgetName:
@@ -380,12 +380,12 @@ class GameCheatsManager(QMainWindow):
             migration_thread.finished.connect(self.on_migration_finished)
             migration_thread.error.connect(self.on_migration_error)
             migration_thread.start()
-        
+
         else:
             self.downloadListBox.addItem(tr("No path selected."))
             self.enable_all_widgets()
             return
-    
+
     def download_display(self, keyword):
         self.disable_download_widgets()
         self.downloadListBox.clear()
@@ -396,7 +396,7 @@ class GameCheatsManager(QMainWindow):
         display_thread.message.connect(self.on_message)
         display_thread.finished.connect(self.on_display_finished)
         display_thread.start()
-    
+
     def fetch_database(self):
         if not self.currentlyUpdatingFling:
             self.currentlyUpdatingFling = True
@@ -413,7 +413,7 @@ class GameCheatsManager(QMainWindow):
             fetch_trainer_details_thread.update.connect(self.on_status_update)
             fetch_trainer_details_thread.finished.connect(self.on_interval_finished)
             fetch_trainer_details_thread.start()
-    
+
     def update_trainers(self):
         if not self.currentlyUpdatingTrainers:
             self.currentlyUpdatingTrainers = True
@@ -423,7 +423,7 @@ class GameCheatsManager(QMainWindow):
             trainer_update_thread.updateTrainer.connect(self.on_trainer_update)
             trainer_update_thread.finished.connect(self.on_interval_finished)
             trainer_update_thread.start()
-    
+
     def on_main_interval(self):
         if settings["autoUpdateDatabase"]:
             self.fetch_database()
@@ -432,10 +432,10 @@ class GameCheatsManager(QMainWindow):
 
     def download_trainers(self, index):
         self.enqueue_download(index, self.trainers, self.trainerDownloadPath, False, None, None)
-    
+
     def on_trainer_update(self, trainerPath, updateUrl):
         self.enqueue_download(None, None, self.trainerDownloadPath, True, trainerPath, updateUrl)
-    
+
     def enqueue_download(self, index, trainers, trainerDownloadPath, update, trainerPath, updateUrl):
         self.downloadQueue.put((index, trainers, trainerDownloadPath, update, trainerPath, updateUrl))
         if not self.currentlyDownloading:
@@ -473,19 +473,19 @@ class GameCheatsManager(QMainWindow):
             self.downloadListBox.addItem(item)
         else:
             self.downloadListBox.addItem(item)
-            
+
     def on_message_box(self, type, title, text):
         if type == "info":
             QMessageBox.information(self, title, text)
         elif type == "error":
             QMessageBox.critical(self, title, text)
-    
+
     def on_migration_error(self, error_message):
         QMessageBox.critical(self, tr("Error"), tr("Error migrating trainers: ") + error_message)
         self.on_message(tr("Failed to change trainer download path."), "failure")
         self.show_cheats()
         self.enable_all_widgets()
-    
+
     def on_migration_finished(self, new_path):
         self.trainerDownloadPath = new_path
         settings["downloadPath"] = self.trainerDownloadPath
@@ -501,10 +501,10 @@ class GameCheatsManager(QMainWindow):
             self.downloadable = False
         else:
             self.downloadable = True
-            
+
         self.searchable = True
         self.enable_download_widgets()
-    
+
     def on_download_finished(self, status):
         self.downloadable = False
         self.searchable = True
@@ -555,7 +555,7 @@ class GameCheatsManager(QMainWindow):
                     shutil.copy(file_name, dst)
                     print("Trainer copied: ", file_name)
                 except Exception as e:
-                        QMessageBox.critical(self, tr("Failure"), tr("Failed to import trainer: ") + f"{file_name}\n{str(e)}")
+                    QMessageBox.critical(self, tr("Failure"), tr("Failed to import trainer: ") + f"{file_name}\n{str(e)}")
                 self.show_cheats()
 
             msg_box = QMessageBox(
@@ -565,7 +565,7 @@ class GameCheatsManager(QMainWindow):
                 QMessageBox.StandardButton.Yes | QMessageBox.StandardButton.No,
                 self
             )
-            
+
             yes_button = msg_box.button(QMessageBox.StandardButton.Yes)
             yes_button.setText(tr("Yes"))
             no_button = msg_box.button(QMessageBox.StandardButton.No)
@@ -581,17 +581,17 @@ class GameCheatsManager(QMainWindow):
 
     def open_trainer_directory(self):
         os.startfile(self.trainerDownloadPath)
-    
+
     def add_whitelist(self):
         msg_box = QMessageBox(
             QMessageBox.Icon.Question,
             tr("Administrator Access Required"),
             tr("To proceed with adding the trainer download paths to the Windows Defender whitelist, administrator rights are needed. A User Account Control (UAC) prompt will appear for permission.") +
-               "\n\n" + tr("Would you like to continue?"),
+            "\n\n" + tr("Would you like to continue?"),
             QMessageBox.StandardButton.Yes | QMessageBox.StandardButton.No,
             self
         )
-        
+
         yes_button = msg_box.button(QMessageBox.StandardButton.Yes)
         yes_button.setText(tr("Yes"))
         no_button = msg_box.button(QMessageBox.StandardButton.No)

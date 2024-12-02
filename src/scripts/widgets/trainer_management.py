@@ -1,14 +1,14 @@
 import subprocess
 import re
 
-from PyQt6.QtWidgets import QDialog, QVBoxLayout, QTabWidget, QWidget, QHBoxLayout, QLabel, QComboBox, QCheckBox, QLineEdit, QFileDialog, QMessageBox
+from PyQt6.QtWidgets import QCheckBox, QComboBox, QDialog, QFileDialog, QHBoxLayout, QLabel, QLineEdit, QMessageBox, QTabWidget, QVBoxLayout, QWidget
 from PyQt6.QtGui import QIcon, QPixmap
 from PyQt6.QtCore import Qt, QTimer
 
 from config import *
 from widgets.custom_widgets import AlertWidget, CustomButton
 from threads.other_threads import WeModCustomization
-import time
+
 
 class TrainerManagementDialog(QDialog):
     def __init__(self, parent=None):
@@ -33,7 +33,7 @@ class TrainerManagementDialog(QDialog):
         self.tabWidget.addTab(self.createXiaoxingTab(), tr("XiaoXing"))
         self.tabWidget.addTab(self.createWemodTab(), "WeMod")
         self.tabWidget.addTab(self.createCETab(), "Cheat Engine")
-    
+
     def closeEvent(self, event):
         super().closeEvent(event)
 
@@ -50,12 +50,12 @@ class TrainerManagementDialog(QDialog):
     @staticmethod
     def find_settings_key(value, dict):
         return next(key for key, val in dict.items() if val == value)
-    
+
     def show_alert(self, message, alert_type):
         alert = AlertWidget(self, message, alert_type)
         alert.show()
         QTimer.singleShot(5000, alert.close)
-   
+
     def moveEvent(self, event):
         super().moveEvent(event)
         for alert in self.active_alerts:
@@ -70,7 +70,7 @@ class TrainerManagementDialog(QDialog):
         officialLink.setOpenExternalLinks(True)
         layout.addWidget(officialLink)
         layout.addStretch(1)
-        
+
         columns = QHBoxLayout()
         columns.setContentsMargins(30, 20, 30, 20)
         columns.setSpacing(40)
@@ -128,7 +128,7 @@ class TrainerManagementDialog(QDialog):
         officialLink.setOpenExternalLinks(True)
         layout.addWidget(officialLink)
         layout.addStretch(1)
-        
+
         columns = QHBoxLayout()
         columns.setContentsMargins(30, 20, 30, 20)
         columns.setSpacing(40)
@@ -165,7 +165,7 @@ class TrainerManagementDialog(QDialog):
         officialLink.setOpenExternalLinks(True)
         layout.addWidget(officialLink)
         layout.addStretch(1)
-        
+
         columns = QHBoxLayout()
         columns.setContentsMargins(30, 20, 30, 20)
         columns.setSpacing(40)
@@ -248,7 +248,7 @@ class TrainerManagementDialog(QDialog):
 
         layout.addStretch(1)
         return wemodTab
-    
+
     def createCETab(self):
         ceTab = QWidget()
         layout = QVBoxLayout()
@@ -258,7 +258,7 @@ class TrainerManagementDialog(QDialog):
         officialLink.setOpenExternalLinks(True)
         layout.addWidget(officialLink)
         layout.addStretch(1)
-        
+
         columns = QHBoxLayout()
         columns.setContentsMargins(30, 20, 30, 20)
         columns.setSpacing(40)
@@ -341,13 +341,13 @@ class TrainerManagementDialog(QDialog):
             self.weModInstallLineEdit.setText(settings["weModPath"])
             apply_settings(settings)
             self.findWeModVersions(settings["weModPath"])
-    
+
     def resetWemodPath(self):
         self.weModInstallLineEdit.setText(wemod_install_path)
         settings["weModPath"] = os.path.normpath(wemod_install_path)
         apply_settings(settings)
         self.findWeModVersions(settings["weModPath"])
-    
+
     def selectCEPath(self):
         initialPath = self.ceInstallLineEdit.text() or os.path.expanduser("~")
         directory = QFileDialog.getExistingDirectory(self, tr("Select Cheat Engine installation path"), initialPath)
@@ -356,13 +356,13 @@ class TrainerManagementDialog(QDialog):
             self.ceInstallLineEdit.setText(settings["cePath"])
             apply_settings(settings)
             self.checkCEInstallStatus()
-    
+
     def resetCEPath(self):
         self.ceInstallLineEdit.setText(ce_install_path)
         settings["cePath"] = os.path.normpath(ce_install_path)
         apply_settings(settings)
         self.checkCEInstallStatus()
-    
+
     def checkCEInstallStatus(self):
         cePath = os.path.join(self.ceInstallLineEdit.text(), 'Cheat Engine.exe')
         if os.path.exists(cePath):
@@ -373,7 +373,7 @@ class TrainerManagementDialog(QDialog):
             self.installStatus.setText(tr("Cheat Engine not installed"))
             self.installStatus.setStyleSheet("color: red;")
             self.ceApplyButton.setDisabled(True)
-    
+
     def findWeModVersions(self, weModPath):
         self.weModVersions = []
         if not os.path.exists(weModPath):
@@ -394,17 +394,17 @@ class TrainerManagementDialog(QDialog):
             self.versionCombo.addItem(tr("WeMod not installed"))
             self.weModApplyButton.setDisabled(True)
             return
-        
+
         self.weModVersions.sort(key=lambda v: tuple(map(int, v.split('.'))), reverse=True)
         self.versionCombo.clear()
         self.versionCombo.addItems(self.weModVersions)
         self.weModApplyButton.setEnabled(True)
-    
+
     def on_finished(self):
         self.weModApplyButton.setEnabled(True)
         self.weModResetButton.setEnabled(True)
         self.findWeModVersions(settings["weModPath"])
-    
+
     def applyWeModCustomization(self):
         weModInstallPath = self.weModInstallLineEdit.text()
         selectedWeModVersion = self.versionCombo.currentText()
@@ -415,7 +415,7 @@ class TrainerManagementDialog(QDialog):
         self.apply_thread.message.connect(self.show_alert)
         self.apply_thread.finished.connect(self.on_finished)
         self.apply_thread.start()
-    
+
     def applyCheatEngineCustomization(self):
         self.ceApplyButton.setDisabled(True)
         self.ceResetButton.setDisabled(True)
@@ -429,7 +429,7 @@ class TrainerManagementDialog(QDialog):
                 QMessageBox.StandardButton.Yes | QMessageBox.StandardButton.No,
                 self
             )
-            
+
             yes_button = msg_box.button(QMessageBox.StandardButton.Yes)
             yes_button.setText(tr("Yes"))
             no_button = msg_box.button(QMessageBox.StandardButton.No)

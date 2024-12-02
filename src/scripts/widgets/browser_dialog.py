@@ -54,14 +54,14 @@ class BrowserDialog(QDialog):
             self.check_timer.stop()
             self.content_ready.emit(html)
             self.close()
-    
+
     def closeEvent(self, event):
         if not self.found_content == None and not self.found_content:
             self.check_timer.stop()
             self.browser.loadFinished.disconnect(self.on_load_finished)
             self.content_ready.emit("")
         event.accept()
-    
+
     def handle_download(self, url, download_path, file_name):
         self.download_path = download_path
         self.file_name = file_name
@@ -79,7 +79,7 @@ class BrowserDialog(QDialog):
 
         file_path = os.path.join(self.download_path, file_name)
         download.stateChanged.connect(lambda state: self.on_download_state_changed(state, file_path))
-    
+
     def on_download_state_changed(self, state, file_path):
         if state == QWebEngineDownloadRequest.DownloadState.DownloadCompleted:
             self.browser.page().profile().downloadRequested.disconnect(self.on_download_requested)

@@ -21,7 +21,7 @@ class CustomButton(QPushButton):
         if self.underMouse():
             QApplication.restoreOverrideCursor()
             QApplication.setOverrideCursor(self.cursor().shape())
-    
+
     def setDisabled(self, disabled):
         super().setDisabled(disabled)
         if disabled:

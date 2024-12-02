@@ -149,7 +149,7 @@ class FetchTrainerDetails(DownloadBaseThread):
                 time.sleep(2)
                 self.finished.emit(statusWidgetName)
                 return
-            
+
             all_data.extend(db_additions.additions)
 
             filepath = os.path.join(DATABASE_PATH, "xgqdetail.json")
@@ -159,9 +159,9 @@ class FetchTrainerDetails(DownloadBaseThread):
         else:
             self.update.emit(statusWidgetName, fetch_error, "error")
             time.sleep(2)
-        
+
         self.finished.emit(statusWidgetName)
-    
+
     def fetch_page(self, page_number):
         trainer_detail_page = f"https://dl.fucnm.com/datafile/xgqdetail/list_{page_number}.txt"
         try:
@@ -188,7 +188,7 @@ class WeModCustomization(QThread):
         self.weModInstallPath = weModInstallPath
         self.selectedWeModVersion = selectedWeModVersion
         self.selectedWeModPath = os.path.join(weModInstallPath, f"app-{selectedWeModVersion}")
-    
+
     def run(self):
         asar = os.path.join(self.selectedWeModPath, "resources", "app.asar")
         asar_copy = os.path.join(WEMOD_TEMP_DIR, "app.asar")
@@ -227,7 +227,7 @@ class WeModCustomization(QThread):
             except Exception as e:
                 self.message.emit(tr("Failed to extract file:") + f"\n{asar_copy}", "error")
                 patch_success = False
-        
+
             patterns = {
                 r'(getUserAccount\()(.*)(}async getUserAccountFlags)': r'\1\2.then(function(response) {response.subscription={period:"yearly",state:"active"}; response.flags=78; return response;})\3',
                 r'(getUserAccountFlags\()(.*)(\)\).flags)': r'\1\2\3.then(function(response) {if (response.mask==4) {response.flags=4}; return response;})',
@@ -315,9 +315,9 @@ class WeModCustomization(QThread):
                         self.message.emit(tr("Deleted WeMod version: ") + version, "success")
                     except Exception as e:
                         self.message.emit(tr("Failed to delete WeMod version: ") + version, "error")
-        
+
         self.finished.emit()
-    
+
     def is_program_running(self, program_name):
         for proc in psutil.process_iter():
             try:
@@ -326,7 +326,7 @@ class WeModCustomization(QThread):
             except (psutil.NoSuchProcess, psutil.AccessDenied, psutil.ZombieProcess):
                 pass
         return False
-    
+
     def apply_patch(self, file_path, pattern, replacement):
         try:
             with open(file_path, 'r+', encoding='utf-8') as file:
