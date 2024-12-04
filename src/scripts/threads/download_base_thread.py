@@ -2,7 +2,6 @@ import json
 import os
 import re
 import string
-import time
 from urllib.parse import urlparse
 
 from fuzzywuzzy import process
@@ -21,16 +20,13 @@ class DownloadBaseThread(QThread):
     loadUrl = pyqtSignal(str, str)
     downloadFile = pyqtSignal(str, str, str)
 
-    trainer_urls = []  # For intl download server: {trainer name: download link}; for china download server: {trainer name: [download link, anti-cheats download link]}
+    trainer_urls = []
     headers = {
         'User-Agent': 'Mozilla/5.0 (Windows NT 10.0; Win64; x64) AppleWebKit/537.36 (KHTML, like Gecko) Chrome/58.0.3029.110 Safari/537.3',
     }
-    translator_initializing = False
-    translator_warnings_displayed = False  # make sure warning doesn't display more than once
 
     def __init__(self, parent=None):
         super().__init__(parent)
-        self.ts = None
         self.html_content = ""
         self.downloaded_file_path = ""
         self.browser_dialog = BrowserDialog()
@@ -134,98 +130,70 @@ class DownloadBaseThread(QThread):
     def symbol_replacement(self, text):
         return text.replace(': ', ' - ').replace(':', '-').replace("/", "_").replace("?", "")
 
-    def find_best_trainer_match(self, targetEnName, threshold=85):
+    def find_best_trainer_match(self, target_name, target_language, threshold=85):
         trainer_details = self.load_json_content("xgqdetail.json")
         if not trainer_details:
             return None
 
-        # Create a mapping of sanitized English names to their original dictionary
-        sanitized_to_original = {self.sanitize(trainer['en_name']): trainer['keyw'] for trainer in trainer_details}
+        sanitized_to_original_en = {}
+        sanitized_to_original_zh = {}
+        for trainer in trainer_details:
+            if 'en_name' in trainer and 'keyw' in trainer:
+                sanitized_en = self.sanitize(trainer['en_name'])
+                sanitized_zh = self.sanitize(trainer['keyw'])
+                sanitized_to_original_en[sanitized_en] = trainer['keyw']
+                sanitized_to_original_zh[sanitized_zh] = trainer['en_name']
 
-        sanitized_target = self.sanitize(targetEnName)
+        # Determine the mapping and target based on the desired language
+        sanitized_target = self.sanitize(target_name)
+        if target_language == "zh":
+            sanitized_to_original = sanitized_to_original_en
+        elif target_language == "en":
+            sanitized_to_original = sanitized_to_original_zh
+
         best_match, score = process.extractOne(sanitized_target, sanitized_to_original.keys())
-
         if score >= threshold:
-            # Return the Chinese name corresponding to the best-matching English name
             return sanitized_to_original[best_match]
+
+        # Ignore cases where input trainer name and target language are the same language
+        if is_chinese(target_name) and target_language == 'zh':
+            pass
+        elif not is_chinese(target_name) and target_language == 'en':
+            pass
+        else:
+            print(f"No matchings found for {target_name}")
+
         return None
 
-    def initialize_translator(self):
-        if not self.is_internet_connected():
-            if not self.translator_warnings_displayed:
-                self.message.emit(tr("No internet connection, translation failed."), "failure")
-                self.translator_warnings_displayed = True
-                time.sleep(1)
-            return False
-
-        try:
-            if self.ts is None and not self.translator_initializing:
-                self.translator_initializing = True
-                self.message.emit(tr("Initializing translator..."), None)
-                import translators as trans
-                self.ts = trans
-                self.ts.translate_text("test")
-            elif self.ts is None:
-                # In process of initialization, wait until completed
-                for _ in range(10):
-                    if self.ts is not None:
-                        break
-                    time.sleep(1)
-            return True
-
-        except Exception as e:
-            print("import translators failed or error occurred while translating: " + str(e))
-            return False
-
-    def translate_trainer(self, trainerName):
-        """
-        For displaying trainer name only.
-        """
-
-        # =======================================================
+    def translate_trainer(self, trainerName, origin):
         # Special cases
-        if trainerName == "Bright.Memory.Episode.1 Trainer":
-            trainerName = "Bright Memory: Episode 1 Trainer"
+        if trainerName == "Bright.Memory.Episode.1":
+            trainerName = "Bright Memory: Episode 1"
 
-        trans_trainerName = trainerName
-
-        if (settings["language"] == "zh_CN" or settings["language"] == "zh_TW") and not settings["enSearchResults"]:
-            original_trainerName = trainerName.rsplit(" Trainer", 1)[0]
-
+        if settings["language"] in ["zh_CN", "zh_TW"] and not settings["enSearchResults"]:
+            # Target language is Chinese
             try:
-                # Using 3dm api to match en_names
-                best_match = self.find_best_trainer_match(original_trainerName)
-                if best_match:
-                    trans_trainerName = f"《{best_match}》修改器"
-
-                elif self.initialize_translator():
-                    # Use direct translation if couldn't find a match
-                    print("No matches found, using direct translation for: " + original_trainerName)
-                    trans_trainerName = self.ts.translate_text(original_trainerName, from_language='en', to_language='zh')
-
-                    # strip any game names that have their english names
-                    pattern = r'[A-Za-z0-9\s：&]+（([^\）]*)\）|\（[A-Za-z\s：&]+\）$'
-                    trans_trainerName = re.sub(pattern, lambda m: m.group(1) if m.group(1) else '', trans_trainerName)
-
-                    # do not alter if game name ends with roman numerics
-                    def is_roman_numeral(s):
-                        return bool(re.match(r'^(?=[MDCLXVI])M?(CM|CD|D?C{0,3})(XC|XL|L?X{0,3})(IX|IV|V?I{0,3})$', s.strip()))
-
-                    if not is_roman_numeral(trans_trainerName.split(" ")[-1]):
-                        pattern = r'[A-Za-z\s：&]+$'
-                        trans_trainerName = re.sub(pattern, '', trans_trainerName)
-
-                    trans_trainerName = trans_trainerName.replace("《", "").replace("》", "")
-                    trans_trainerName = f"《{trans_trainerName}》修改器"
-
+                prefix = "[小幸]" if origin == "xiaoxing" else ""
+                best_match = self.find_best_trainer_match(trainerName, "zh")
+                trainerName = f"{prefix}《{best_match or trainerName}》修改器"
             except Exception as e:
                 print(f"An error occurred while translating trainer name: {str(e)}")
 
-        return trans_trainerName
+        elif settings["language"] == "en_US" or settings["enSearchResults"]:
+            # Target language is English
+            try:
+                prefix = "[XiaoXing]" if origin == "xiaoxing" else ""
+                best_match = self.find_best_trainer_match(trainerName, "en")
+                trainerName = f"{prefix} {best_match or trainerName} Trainer"
+            except Exception as e:
+                print(f"An error occurred while translating trainer name: {str(e)}")
 
-    def save_html_content(self, content, file_name):
+        return trainerName
+
+    def save_html_content(self, content, file_name, overwrite=True):
         html_file = os.path.join(DATABASE_PATH, file_name)
-        with open(html_file, 'w', encoding='utf-8') as file:
+        mode = 'w' if overwrite else 'a'
+        with open(html_file, mode, encoding='utf-8') as file:
             file.write(content)
 
     def load_html_content(self, file_name):

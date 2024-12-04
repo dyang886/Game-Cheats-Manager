@@ -1,3 +1,4 @@
+from bs4 import BeautifulSoup
 import concurrent.futures
 import json
 import os
@@ -98,6 +99,44 @@ class FetchFlingSite(DownloadBaseThread):
             self.save_html_content(page_content, "fling_main.html")
 
         self.finished.emit(statusWidgetName)
+
+
+class FetchXiaoXingSite(DownloadBaseThread):
+    message = pyqtSignal(str, str)
+    update = pyqtSignal(str, str, str)
+    finished = pyqtSignal(str)
+
+    def __init__(self, parent=None):
+        super().__init__(parent)
+
+    def run(self):
+        statusWidgetName = "xiaoxing"
+        update_message = tr("Updating data from XiaoXing")
+        update_failed = tr("Update from XiaoXing failed")
+
+        self.message.emit(statusWidgetName, update_message)
+        self.save_html_content("", "xiaoxing.html")
+        page_number = 1
+        while True:
+            url = f"https://www.xiaoxingjie.com/page/{page_number}"
+            page_content = self.get_webpage_content(url, "小幸修改器官方网站")
+
+            if not page_content:
+                self.update.emit(statusWidgetName, update_failed, "error")
+                break
+
+            self.save_html_content(page_content, "xiaoxing.html", False)
+            if not self.has_next_page(page_content):
+                break
+
+            page_number += 1
+
+        self.finished.emit(statusWidgetName)
+
+    def has_next_page(self, page_content):
+        soup = BeautifulSoup(page_content, 'html.parser')
+        next_page_div = soup.find('div', class_='nav-next')
+        return next_page_div is not None and next_page_div.find('a') is not None
 
 
 class FetchTrainerDetails(DownloadBaseThread):

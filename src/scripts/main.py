@@ -54,6 +54,7 @@ class GameCheatsManager(QMainWindow):
         self.currentlyDownloading = False
         self.currentlyUpdatingTrainers = False
         self.currentlyUpdatingFling = False
+        self.currentlyUpdatingXiaoXing = False
         self.currentlyUpdatingTrans = False
 
         # Window references
@@ -406,6 +407,14 @@ class GameCheatsManager(QMainWindow):
             fetch_fling_site_thread.finished.connect(self.on_interval_finished)
             fetch_fling_site_thread.start()
 
+        if not self.currentlyUpdatingXiaoXing:
+            self.currentlyUpdatingXiaoXing = True
+            fetch_xiaoxing_site_thread = FetchXiaoXingSite(self)
+            fetch_xiaoxing_site_thread.message.connect(self.on_status_load)
+            fetch_xiaoxing_site_thread.update.connect(self.on_status_update)
+            fetch_xiaoxing_site_thread.finished.connect(self.on_interval_finished)
+            fetch_xiaoxing_site_thread.start()
+
         if not self.currentlyUpdatingTrans:
             self.currentlyUpdatingTrans = True
             fetch_trainer_details_thread = FetchTrainerDetails(self)
@@ -528,6 +537,8 @@ class GameCheatsManager(QMainWindow):
 
         if widgetName == "fling":
             self.currentlyUpdatingFling = False
+        elif widgetName == "xiaoxing":
+            self.currentlyUpdatingXiaoXing = False
         elif widgetName == "details":
             self.currentlyUpdatingTrans = False
         elif widgetName == "trainerUpdate":

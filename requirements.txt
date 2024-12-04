@@ -10,5 +10,4 @@ PyQt6-WebEngine
 python-Levenshtein
 requests
 tendo
-translators
 zhon

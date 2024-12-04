@@ -18,35 +18,35 @@ class DownloadDisplayThread(DownloadBaseThread):
 
     def run(self):
         DownloadBaseThread.trainer_urls = []
+        keywordList = self.translate_keyword(self.keyword)
+        self.message.emit(tr("Searching..."), None)
 
+        # ======================================================
+        # Fling
         if settings["downloadServer"] == "intl":
-            self.translator_warnings_displayed = False
-            keywordList = self.translate_keyword(self.keyword)
-
-            self.message.emit(tr("Searching..."), None)
-            status = self.search_from_archive(keywordList)
+            status = self.search_from_fling_archive(keywordList)
             if not status:
                 self.finished.emit(1)
                 return
-            status = self.search_from_main_site(keywordList)
+            status = self.search_from_fling_main(keywordList)
             if not status:
                 self.finished.emit(1)
                 return
 
             ignored_trainers = {
-                "Dying Light The Following Enhanced Edition Trainer",
-                "Monster Hunter World Trainer",
-                "Street Fighter V Trainer",
-                "World War Z Trainer"
+                "Dying Light The Following Enhanced Edition",
+                "Monster Hunter World",
+                "Street Fighter V",
+                "World War Z"
             }
 
             # Filter and prioritize trainers from the main site
             filtered_trainer_urls = {}
             for trainer in DownloadBaseThread.trainer_urls:
-                if trainer["trainer_name"] in ignored_trainers:
+                if trainer["game_name"] in ignored_trainers:
                     continue
 
-                norm_name = self.sanitize(trainer["trainer_name"])
+                norm_name = self.sanitize(trainer["game_name"])
 
                 # Add trainer if not already present or replace only if from fling_main and current is from fling_archive
                 if norm_name not in filtered_trainer_urls:
@@ -57,98 +57,86 @@ class DownloadDisplayThread(DownloadBaseThread):
             # Update trainer_urls with filtered and deduplicated results
             DownloadBaseThread.trainer_urls = list(filtered_trainer_urls.values())
 
-            if not DownloadBaseThread.trainer_urls:
-                self.message.emit(tr("No results found."), "failure")
-                self.finished.emit(1)
-                return
-
-            # Translate search results
-            self.message.emit(tr("Translating search results..."), None)
-            with concurrent.futures.ThreadPoolExecutor(max_workers=5) as executor:
-                futures = {
-                    executor.submit(self.translate_trainer, trainer["trainer_name"]): trainer
-                    for trainer in DownloadBaseThread.trainer_urls
-                }
-
-            # Update the translated names
-            for future in concurrent.futures.as_completed(futures):
-                trainer = futures[future]
-                trainer["translated_name"] = future.result()
-
-            # Sort based on translated names
-            DownloadBaseThread.trainer_urls.sort(key=lambda x: sort_trainers_key(x["translated_name"] or x["trainer_name"]))
-
-            # Display sorted results
-            self.message.emit("", "clear")
-            for count, trainer in enumerate(DownloadBaseThread.trainer_urls, start=1):
-                self.message.emit(f"{count}. {trainer['translated_name']}", None)
-                print(f"{count}. {trainer['trainer_name']} | {trainer['url']}")
-
         elif settings["downloadServer"] == "china":
-            self.message.emit(tr("Searching..."), None)
             status = self.search_from_xgqdetail(self.keyword)
             if not status:
                 self.finished.emit(1)
                 return
 
-            if not DownloadBaseThread.trainer_urls:
-                self.message.emit(tr("No results found."), "failure")
+        # ======================================================
+        # XiaoXing
+        if settings["enableXiaoxing"]:
+            status = self.search_from_xiaoxing(keywordList)
+            if not status:
                 self.finished.emit(1)
                 return
 
-            self.message.emit("", "clear")
-            DownloadBaseThread.trainer_urls.sort(key=lambda trainer: sort_trainers_key(trainer["trainer_name"]))
+        # ======================================================
+        # General
+        self.message.emit(tr("Translating search results..."), None)
+        with concurrent.futures.ThreadPoolExecutor(max_workers=5) as executor:
+            futures = {
+                executor.submit(self.translate_trainer, trainer["game_name"], trainer["origin"]): trainer
+                for trainer in DownloadBaseThread.trainer_urls
+            }
 
-            for count, trainer in enumerate(DownloadBaseThread.trainer_urls, start=1):
-                self.message.emit(f"{count}. {trainer['trainer_name']}", None)
-                print(f"{count}. {trainer['trainer_name']} | {trainer['url']} | Anti-URL: {trainer.get('anti_url', 'None')}")
+        # Update the translated names
+        for future in concurrent.futures.as_completed(futures):
+            trainer = futures[future]
+            trainer["trainer_name"] = future.result()
+
+        if not DownloadBaseThread.trainer_urls:
+            self.message.emit(tr("No results found."), "failure")
+            self.finished.emit(1)
+            return
+
+        # Sort based on translated names
+        DownloadBaseThread.trainer_urls.sort(key=lambda trainer: sort_trainers_key(trainer["trainer_name"]))
+
+        self.message.emit("", "clear")
+        for count, trainer in enumerate(DownloadBaseThread.trainer_urls, start=1):
+            self.message.emit(f"{count}. {trainer["trainer_name"]}", None)
+            print(f"{count}. {trainer["game_name"]} | {trainer["trainer_name"]} | {trainer["url"]} | Anti-URL: {trainer.get("anti_url", "None")}")
 
         self.finished.emit(0)
 
     def translate_keyword(self, keyword):
-        translations = []
-        if is_chinese(keyword):
-            self.message.emit(tr("Translating keywords..."), None)
+        translations = [keyword]
+        self.message.emit(tr("Translating keywords..."), None)
 
-            # Using 3dm api to match cn_names
-            trainer_details = self.load_json_content("xgqdetail.json")
-            if trainer_details:
-                for trainer in trainer_details:
-                    if self.sanitize(keyword) in self.sanitize(trainer.get("keyw", "")):
+        # Load trainer details from the JSON database
+        trainer_details = self.load_json_content("xgqdetail.json")
+        if trainer_details:
+            for trainer in trainer_details:
+                sanitized_keyword = self.sanitize(keyword)
+                if is_chinese(keyword):
+                    if sanitized_keyword in self.sanitize(trainer.get("keyw", "")):
                         translations.append(trainer.get("en_name", ""))
+                else:
+                    if sanitized_keyword in self.sanitize(trainer.get("en_name", "")):
+                        translations.append(trainer.get("keyw", ""))
 
-            elif self.initialize_translator():
-                # Direct translation
-                services = ["bing"]
-                for service in services:
-                    try:
-                        translated_keyword = self.ts.translate_text(
-                            keyword,
-                            from_language='zh',
-                            to_language='en',
-                            translator=service
-                        )
-                        translations.append(translated_keyword)
-                        print(f"Translated keyword using {service}: {translated_keyword}")
-                    except Exception as e:
-                        print(f"Translation failed with {service}: {str(e)}")
+        translations = list(filter(None, set(translations)))
+        print("\nKeyword translations:", translations)
+        return translations
 
-                if not translations:
-                    self.message.emit(tr("No translations found."), "failure")
+    def keyword_match(self, keywordList, targetString):
+        def is_match(sanitized_keyword, sanitized_targetString):
+            similarity_threshold = 80
+            similarity = fuzz.partial_ratio(sanitized_keyword, sanitized_targetString)
+            return similarity >= similarity_threshold
 
-            print("\nKeyword translations:", translations)
-            return translations
+        sanitized_targetString = self.sanitize(targetString)
 
-        return [keyword]
+        return any(is_match(self.sanitize(kw), sanitized_targetString) for kw in keywordList if len(kw) >= 2 and len(sanitized_targetString) >= 2)
 
-    def search_from_archive(self, keywordList):
-        # Search for results from fling archive
+    def search_from_fling_archive(self, keywordList):
         page_content = self.load_html_content("fling_archive.html")
         archiveHTML = BeautifulSoup(page_content, 'html.parser')
 
         # Check if the request was successful
         if archiveHTML.find():
-            self.message.emit(tr("Search success!") + " 1/2", "success")
+            self.message.emit(tr("Search from FLiNG success!") + " 1/2", "success")
         else:
             self.message.emit(tr("Search failed, please wait until all data is updated from FLiNG."), "failure")
             return False
@@ -157,14 +145,14 @@ class DownloadDisplayThread(DownloadBaseThread):
             # parse trainer name
             rawTrainerName = link.get_text()
             parsedTrainerName = re.sub(r' v[\d.]+.*|\.\bv.*| \d+\.\d+\.\d+.*| Plus\s\d+.*|Build\s\d+.*|(\d+\.\d+-Update.*)|Update\s\d+.*|\(Update\s.*| Early Access .*|\.Early.Access.*', '', rawTrainerName).replace("_", ": ")
-            trainerName = parsedTrainerName.strip() + " Trainer"
+            gameName = parsedTrainerName.strip()
 
             # search algorithm
             url = "https://archive.flingtrainer.com/"
-            if self.keyword_match(keywordList, trainerName):
+            if self.keyword_match(keywordList, gameName):
                 DownloadBaseThread.trainer_urls.append({
-                    "trainer_name": trainerName,
-                    "translated_name": None,
+                    "game_name": gameName,
+                    "trainer_name": None,
                     "origin": "fling_archive",
                     "url": urljoin(url, link.get("href")),
                     "anti_url": None
@@ -172,13 +160,13 @@ class DownloadDisplayThread(DownloadBaseThread):
 
         return True
 
-    def search_from_main_site(self, keywordList):
+    def search_from_fling_main(self, keywordList):
         # Search for results from fling main site, prioritized, will replace same trainer from archive
         page_content = self.load_html_content("fling_main.html")
         mainSiteHTML = BeautifulSoup(page_content, 'html.parser')
 
         if mainSiteHTML.find():
-            self.message.emit(tr("Search success!") + " 2/2", "success")
+            self.message.emit(tr("Search from FLiNG success!") + " 2/2", "success")
         else:
             self.message.emit(tr("Search failed, please wait until all data is updated from FLiNG."), "failure")
             return False
@@ -187,15 +175,15 @@ class DownloadDisplayThread(DownloadBaseThread):
         for ul in mainSiteHTML.find_all('ul'):
             for li in ul.find_all('li'):
                 for link in li.find_all('a'):
-                    trainerName = link.get_text().strip()
-                    if trainerName in ["Home", "Trainers", "Log In", "All Trainers (A-Z)", "Privacy Policy"]:
+                    gameName = link.get_text().strip().rsplit(" Trainer", 1)[0]
+                    if gameName in ["Home", "Trainers", "Log In", "All Trainers (A-Z)", "All", "Privacy Policy"]:
                         continue
 
                     # search algorithm
-                    if trainerName and self.keyword_match(keywordList, trainerName):
+                    if gameName and self.keyword_match(keywordList, gameName):
                         DownloadBaseThread.trainer_urls.append({
-                            "trainer_name": trainerName,
-                            "translated_name": None,
+                            "game_name": gameName,
+                            "trainer_name": None,
                             "origin": "fling_main",
                             "url": link.get("href"),
                             "anti_url": None
@@ -211,10 +199,10 @@ class DownloadDisplayThread(DownloadBaseThread):
                     full_url = ""
                     anti_url = ""
                     if settings["language"] == "en_US" or settings["enSearchResults"]:
-                        trainerDisplayName = f"{entry['en_name']} Trainer"
+                        gameName = entry['en_name']
                     elif settings["language"] == "zh_CN" or settings["language"] == "zh_TW":
                         pattern = r'\s(v[\d\.v\-]+.*|Early ?Access.*)'
-                        trainerDisplayName = f"《{re.sub(pattern, '', entry['title'])}》修改器"
+                        gameName = re.sub(pattern, '', entry['title'])
 
                     try:
                         # Construct download url, example: https://down.fucnm.com/Story.of.Seasons.A.Wonderful.Life.v1.0.Plus.24.Trainer-FLiNG.zip
@@ -235,28 +223,51 @@ class DownloadDisplayThread(DownloadBaseThread):
                         if "anti_url" in entry:
                             anti_url = entry["anti_url"]
                     except Exception as e:
-                        self.message.emit(tr("Failed to get trainer url: ") + trainerDisplayName, "failure")
+                        self.message.emit(tr("Failed to get trainer url: ") + gameName, "failure")
                         print(f"Constructing download url for {entry['keyw']} failed: {str(e)}")
 
-                    if trainerDisplayName and full_url:
+                    if gameName and full_url:
                         DownloadBaseThread.trainer_urls.append({
-                            "trainer_name": trainerDisplayName,
-                            "translated_name": None,
+                            "game_name": gameName,
+                            "trainer_name": None,
                             "origin": "fling_archive",
                             "url": full_url,
                             "anti_url": anti_url
                         })
 
-        self.message.emit(tr("Search success!"), "success")
+        self.message.emit(tr("Search from FLiNG success!"), "success")
         time.sleep(0.5)
         return True
 
-    def keyword_match(self, keywordList, targetString):
-        def is_match(sanitized_keyword, sanitized_targetString):
-            similarity_threshold = 80
-            similarity = fuzz.partial_ratio(sanitized_keyword, sanitized_targetString)
-            return similarity >= similarity_threshold
+    def search_from_xiaoxing(self, keywordList):
+        page_content = self.load_html_content("xiaoxing.html")
+        xiaoXingHTML = BeautifulSoup(page_content, 'html.parser')
 
-        sanitized_targetString = self.sanitize(targetString.rsplit(" Trainer", 1)[0])
+        if xiaoXingHTML.find():
+            self.message.emit(tr("Search from XiaoXing success!"), "success")
+        else:
+            self.message.emit(tr("Search failed, please wait until all data is updated from XiaoXing."), "failure")
+            return False
+        time.sleep(0.5)
 
-        return any(is_match(self.sanitize(kw), sanitized_targetString) for kw in keywordList if len(kw) >= 2 and len(sanitized_targetString) >= 2)
+        for article in xiaoXingHTML.find_all('article'):
+            link = article.find('a')
+            rawTrainerName = link.get_text()
+
+            pattern = r'辅助器.*|多功能.*|全版本.*|全功能.*|\s+\S*修改器.*|十二项修改器.*'
+            match = re.search(pattern, rawTrainerName)
+            if not match:
+                continue
+            gameName = re.sub(pattern, '', rawTrainerName).strip()
+
+            # search algorithm
+            if gameName and self.keyword_match(keywordList, gameName):
+                DownloadBaseThread.trainer_urls.append({
+                    "game_name": gameName,
+                    "trainer_name": None,
+                    "origin": "xiaoxing",
+                    "url": link.get("href"),
+                    "anti_url": None
+                })
+
+        return True

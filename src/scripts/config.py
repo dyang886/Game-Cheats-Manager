@@ -9,6 +9,7 @@ import tempfile
 
 import pinyin
 import polib
+import zhon.cedict as chinese_characters
 
 
 # All resources in development mode are relative to `src` folder
@@ -99,7 +100,7 @@ def get_translator():
 
 def is_chinese(text):
     for char in text:
-        if '\u4e00' <= char <= '\u9fff':
+        if char in chinese_characters.all:
             return True
     return False
 
