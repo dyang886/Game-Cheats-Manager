@@ -52,16 +52,18 @@ def load_settings():
         "language": app_locale,
         "theme": "black",
         "enSearchResults": False,
-        "appUpdate": True,
-        "autoStart": False,
+        "checkAppUpdate": True,
+        "launchAppOnStartup": False,
         "showWarning": True,
+        "autoUpdateTranslations": True,
 
         # Trainer management configs
-        "downloadServer": "intl",
-        "removeBgMusic": True,
-        "autoUpdateDatabase": True,
-        "autoUpdateFling": True,
-        "enableXiaoxing": True,
+        "flingDownloadServer": "intl",
+        "removeFlingBgMusic": True,
+        "autoUpdateFlingData": True,
+        "autoUpdateFlingTrainers": True,
+        "enableXiaoXing": True,
+        "autoUpdateXiaoXingData": True,
         "weModPath": wemod_install_path,
         "cePath": ce_install_path
     }
@@ -170,6 +172,7 @@ if settings["theme"] == "black":
     dropDownArrow_path = resource_path("assets/dropdown-white.png").replace("\\", "/")
 elif settings["theme"] == "white":
     dropDownArrow_path = resource_path("assets/dropdown-black.png").replace("\\", "/")
+checkMark_path = resource_path("assets/check-mark.png").replace("\\", "/")
 upArrow_path = resource_path("assets/up.png").replace("\\", "/")
 downArrow_path = resource_path("assets/down.png").replace("\\", "/")
 leftArrow_path = resource_path("assets/left.png").replace("\\", "/")

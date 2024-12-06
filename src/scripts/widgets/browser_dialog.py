@@ -24,10 +24,9 @@ class BrowserDialog(QDialog):
         self.setWindowIcon(QIcon(resource_path("assets/logo.ico")))
 
         self.check_timer = QTimer(self)
-        self.found_content = None
+        self.found_content = False
         self.check_count = 0
         self.download_path = ""
-        self.file_name = ""
 
     def load_url(self, url, target_text):
         self.url = url
@@ -62,22 +61,19 @@ class BrowserDialog(QDialog):
             self.content_ready.emit("")
         event.accept()
 
-    def handle_download(self, url, download_path, file_name):
+    def handle_download(self, url, download_path):
         self.download_path = download_path
-        self.file_name = file_name
         self.browser.page().profile().downloadRequested.connect(self.on_download_requested)
         self.browser.load(QUrl(url))
 
     def on_download_requested(self, download):
         suggested_filename = download.downloadFileName()
-        extension = os.path.splitext(suggested_filename)[1]
-        file_name = self.file_name + extension
 
         download.setDownloadDirectory(self.download_path)
-        download.setDownloadFileName(file_name)
+        download.setDownloadFileName(suggested_filename)
         download.accept()
 
-        file_path = os.path.join(self.download_path, file_name)
+        file_path = os.path.join(self.download_path, suggested_filename)
         download.stateChanged.connect(lambda state: self.on_download_state_changed(state, file_path))
 
     def on_download_state_changed(self, state, file_path):

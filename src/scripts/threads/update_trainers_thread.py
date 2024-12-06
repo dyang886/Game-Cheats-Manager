@@ -17,7 +17,7 @@ from config import *
 from threads.download_base_thread import DownloadBaseThread
 
 
-class UpdateTrainers(DownloadBaseThread):
+class UpdateFlingTrainers(DownloadBaseThread):
     message = pyqtSignal(str, str)
     update = pyqtSignal(str, str, str)
     updateTrainer = pyqtSignal(str, str)

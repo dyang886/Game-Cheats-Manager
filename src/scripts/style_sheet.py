@@ -1,6 +1,6 @@
 white = """
     QMainWindow {{
-        background-color: #f3f3f3;
+        background-color: #ffffff;
     }}
 
     QStatusBar::item {{
@@ -8,32 +8,32 @@ white = """
     }}
 
     QMenuBar {{
-        background-color: #fbfbfd;
+        background-color: #f9f9f9;
     }}
 
     QMenuBar::item {{
-        background-color: #fbfbfd;
+        background-color: #f9f9f9;
         color: #000000;
         padding: 5px;
     }}
 
     QMenuBar::item:selected {{
-        background-color: #e2e2e2;
+        background-color: #e6e6e6;
     }}
 
     QMenu {{
-        background-color: #f3f3f3;
+        background-color: #ffffff;
         border: 2px solid #000000;
         border-radius: 5px;
     }}
 
     QMenu::item {{
-        background-color: #f3f3f3;
+        background-color: #ffffff;
         color: #000000;
     }}
 
     QMenu::item:selected {{
-        background-color: #e2e2e2;
+        background-color: #e6e6e6;
     }}
 
     QStatusBar {{
@@ -44,34 +44,45 @@ white = """
         color: black;
     }}
 
-    QCheckBox::indicator:unchecked {{
-        background-color: #fbfbfd;
-        border: 1px solid #5e5e5e;
+    QCheckBox::indicator {{
+        width: 16px;
+        height: 16px;
         border-radius: 5px;
+    }}
+
+    QCheckBox::indicator:unchecked {{
+        background-color: #ffffff;
+        border: 1px solid #cccccc;
+    }}
+
+    QCheckBox::indicator:checked {{
+        background-color: #0057b7;
+        border: 1px solid #bbbbbb;
+        image: url({check_mark});
     }}
 
     QPushButton {{
         padding: 7px;
         border-radius: 3px;
-        border: 1px solid #e5e5e5;
-        background-color: #fbfbfd;
+        border: 1px solid #dddddd;
+        background-color: #f9f9f9;
         color: #000000;
         outline: none;
     }}
 
     QPushButton:hover {{
-        background-color: #f6f6f6;
+        background-color: #f2f2f2;
     }}
 
     QPushButton:pressed {{
-        background-color: #eaeaea;
+        background-color: #e6e6e6;
     }}
 
     QComboBox {{
         padding: 7px;
         border-radius: 3px;
-        border: 1px solid #e5e5e5;
-        background-color: #fbfbfd;
+        border: 1px solid #dddddd;
+        background-color: #f9f9f9;
         color: #000000;
     }}
 
@@ -86,13 +97,13 @@ white = """
     }}
 
     QComboBox QAbstractItemView {{
-        background-color: #fbfbfd;
+        background-color: #f9f9f9;
         color: #000000;
-        border: 1px solid #e5e5e5;
+        border: 1px solid #dddddd;
     }}
 
     QDialog {{
-        background-color: #f3f3f3;
+        background-color: #ffffff;
     }}
 
     QLabel {{
@@ -100,9 +111,9 @@ white = """
     }}
 
     QLineEdit {{
-        background-color: #fbfbfd;
+        background-color: #f9f9f9;
         color: #000000;
-        border: 1px solid #e5e5e5;
+        border: 1px solid #dddddd;
         border-radius: 3px;
         padding: 6px;
     }}
@@ -112,36 +123,36 @@ white = """
     }}
 
     QListWidget {{
-        border: 1px solid #8c8c8c;
+        border: 1px solid #bfbfbf;
         border-radius: 3px;
-        background-color: #fbfbfd;
+        background-color: #ffffff;
         color: #000000;
     }}
 
     QScrollBar:vertical {{
-        background-color: #f2f2f2;
+        background-color: #f0f0f0;
         width: 15px;
         margin: 15px 0 15px 0;
     }}
 
     QScrollBar::handle:vertical {{
-        background-color: #bfbfbf;
+        background-color: #cccccc;
         min-height: 20px;
         border-radius: 3px;
         margin: 0 4px 0 4px;
     }}
 
     QScrollBar::handle:vertical:hover {{
-        background-color: #c6c6c6;
+        background-color: #d6d6d6;
     }}
 
     QScrollBar::handle:vertical:pressed {{
-        background-color: #b1b1b1;
+        background-color: #bfbfbf;
     }}
 
     QScrollBar::sub-line:vertical {{
         image: url({scroll_bar_top});
-        background-color: #f2f2f2;
+        background-color: #f0f0f0;
         height: 15px;
         border-top-left-radius: 7px;
         border-top-right-radius: 7px;
@@ -151,7 +162,7 @@ white = """
 
     QScrollBar::add-line:vertical {{
         image: url({scroll_bar_bottom});
-        background-color: #f2f2f2;
+        background-color: #f0f0f0;
         height: 15px;
         border-bottom-left-radius: 7px;
         border-bottom-right-radius: 7px;
@@ -164,29 +175,29 @@ white = """
     }}
 
     QScrollBar:horizontal {{
-        background-color: #f2f2f2;
+        background-color: #f0f0f0;
         height: 15px;
         margin: 0 15px 0 15px;
     }}
 
     QScrollBar::handle:horizontal {{
-        background-color: #bfbfbf;
+        background-color: #cccccc;
         min-width: 20px;
         border-radius: 3px;
         margin: 4px 0 4px 0;
     }}
 
     QScrollBar::handle:horizontal:hover {{
-        background-color: #c6c6c6;
+        background-color: #d6d6d6;
     }}
 
     QScrollBar::handle:horizontal:pressed {{
-        background-color: #b1b1b1;
+        background-color: #bfbfbf;
     }}
 
     QScrollBar::sub-line:horizontal {{
         image: url({scroll_bar_left});
-        background-color: #f2f2f2;
+        background-color: #f0f0f0;
         width: 15px;
         border-top-left-radius: 7px;
         border-bottom-left-radius: 7px;
@@ -196,7 +207,7 @@ white = """
 
     QScrollBar::add-line:horizontal {{
         image: url({scroll_bar_right});
-        background-color: #f2f2f2;
+        background-color: #f0f0f0;
         width: 15px;
         border-top-right-radius: 7px;
         border-bottom-right-radius: 7px;
@@ -206,6 +217,28 @@ white = """
 
     QScrollBar::add-page:horizontal, QScrollBar::sub-page:horizontal {{
         background: none;
+    }}
+
+    QTabWidget::pane {{
+        border-top: 2px solid #cccccc;
+    }}
+
+    QTabBar::tab {{
+        background-color: #f9f9f9;
+        color: #000000;
+        padding: 10px;
+        border-radius: 3px;
+    }}
+
+    QTabBar::tab:hover {{
+        background-color: #f2f2f2;
+    }}
+
+    QTabBar::tab:selected {{
+        background-color: #e6e6e6;
+        color: #000000;
+        font-weight: bold;
+        border-bottom: 2px solid #0057b7;
     }}
 """
 
@@ -255,10 +288,21 @@ black = """
         color: white;
     }}
 
+    QCheckBox::indicator {{
+        width: 16px;
+        height: 16px;
+        border-radius: 5px;
+    }}
+
     QCheckBox::indicator:unchecked {{
         background-color: #2a2a2a;
         border: 1px solid #5e5e5e;
-        border-radius: 5px;
+    }}
+
+    QCheckBox::indicator:checked {{
+        background-color: #0080e3;
+        border: 1px solid #a6a6a6;
+        image: url({check_mark});
     }}
 
     QPushButton {{
@@ -431,10 +475,13 @@ black = """
     }}
 
     QTabBar::tab:hover {{
-        background-color: #2f2f2f;
+        background-color: #3a3a3a;
     }}
 
     QTabBar::tab:selected {{
-        background-color: #232323;
+        background-color: #4a4a4a;
+        color: #FFFFFF;
+        font-weight: bold;
+        border-bottom: 2px solid #0080e3;
     }}
 """

@@ -139,7 +139,7 @@ class FetchXiaoXingSite(DownloadBaseThread):
         return next_page_div is not None and next_page_div.find('a') is not None
 
 
-class FetchTrainerDetails(DownloadBaseThread):
+class FetchTrainerTranslations(DownloadBaseThread):
     message = pyqtSignal(str, str)
     update = pyqtSignal(str, str, str)
     finished = pyqtSignal(str)
@@ -148,7 +148,7 @@ class FetchTrainerDetails(DownloadBaseThread):
         super().__init__(parent)
 
     def run(self):
-        statusWidgetName = "details"
+        statusWidgetName = "translations"
         fetch_message = tr("Fetching trainer translations")
         fetch_error = tr("Fetch trainer translations failed")
 

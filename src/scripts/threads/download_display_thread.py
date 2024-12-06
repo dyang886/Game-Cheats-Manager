@@ -23,7 +23,7 @@ class DownloadDisplayThread(DownloadBaseThread):
 
         # ======================================================
         # Fling
-        if settings["downloadServer"] == "intl":
+        if settings["flingDownloadServer"] == "intl":
             status = self.search_from_fling_archive(keywordList)
             if not status:
                 self.finished.emit(1)
@@ -57,7 +57,7 @@ class DownloadDisplayThread(DownloadBaseThread):
             # Update trainer_urls with filtered and deduplicated results
             DownloadBaseThread.trainer_urls = list(filtered_trainer_urls.values())
 
-        elif settings["downloadServer"] == "china":
+        elif settings["flingDownloadServer"] == "china":
             status = self.search_from_xgqdetail(self.keyword)
             if not status:
                 self.finished.emit(1)
@@ -65,7 +65,7 @@ class DownloadDisplayThread(DownloadBaseThread):
 
         # ======================================================
         # XiaoXing
-        if settings["enableXiaoxing"]:
+        if settings["enableXiaoXing"]:
             status = self.search_from_xiaoxing(keywordList)
             if not status:
                 self.finished.emit(1)

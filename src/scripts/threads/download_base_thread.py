@@ -2,8 +2,9 @@ import json
 import os
 import re
 import string
-from urllib.parse import urlparse
+from urllib.parse import urlparse, unquote
 
+import cloudscraper
 from fuzzywuzzy import process
 from PyQt6.QtCore import QEventLoop, QThread, pyqtSignal
 import requests
@@ -18,11 +19,12 @@ class DownloadBaseThread(QThread):
     messageBox = pyqtSignal(str, str, str)
     finished = pyqtSignal(int)
     loadUrl = pyqtSignal(str, str)
-    downloadFile = pyqtSignal(str, str, str)
+    downloadFile = pyqtSignal(str, str)
 
     trainer_urls = []
     headers = {
-        'User-Agent': 'Mozilla/5.0 (Windows NT 10.0; Win64; x64) AppleWebKit/537.36 (KHTML, like Gecko) Chrome/58.0.3029.110 Safari/537.3',
+        "User-Agent": "Mozilla/5.0 (Windows NT 10.0; Win64; x64) AppleWebKit/537.36 (KHTML, like Gecko) Chrome/96.0.4664.110 Safari/537.36",
+        "Accept": "text/html,application/xhtml+xml,application/xml;q=0.9,image/avif,image/webp,*/*;q=0.8",
     }
 
     def __init__(self, parent=None):
@@ -35,12 +37,17 @@ class DownloadBaseThread(QThread):
         self.downloadFile.connect(self.browser_dialog.handle_download)
         self.browser_dialog.download_completed.connect(self.handle_download_completed)
 
-    def get_webpage_content(self, url, target_text):
+    def get_webpage_content(self, url, target_text, use_cloudScraper=False):
         if not self.is_internet_connected():
             return ""
 
         try:
-            req = requests.get(url, headers=self.headers)
+            if use_cloudScraper:
+                scraper = cloudscraper.create_scraper()
+                req = scraper.get(url, headers=self.headers)
+                req.raise_for_status()
+            else:
+                req = requests.get(url, headers=self.headers)
         except Exception as e:
             print(f"Error requesting {url}: {str(e)}")
             return ""
@@ -59,25 +66,45 @@ class DownloadBaseThread(QThread):
         if self.loop.isRunning():
             self.loop.quit()
 
-    def request_download(self, url, download_path, file_name):
+    def request_download(self, url, download_path, use_cloudScraper=False):
         try:
-            req = requests.get(url, headers=self.headers)
+            if use_cloudScraper:
+                scraper = cloudscraper.create_scraper()
+                req = scraper.get(url, headers=self.headers)
+                req.raise_for_status()
+            else:
+                req = requests.get(url, headers=self.headers)
         except Exception as e:
             print(f"Error requesting {url}: {str(e)}")
             return ""
 
         if req.status_code != 200:
             self.loop = QEventLoop()
-            self.downloadFile.emit(url, download_path, file_name)
+            self.downloadFile.emit(url, download_path)
             self.loop.exec()
         else:
-            extension = os.path.splitext(urlparse(req.url).path)[1]
-            trainerTemp = os.path.join(download_path, file_name + extension)
-            with open(trainerTemp, "wb") as f:
+            file_path = os.path.join(download_path, self.find_download_fname(req))
+            with open(file_path, "wb") as f:
                 f.write(req.content)
-            self.downloaded_file_path = trainerTemp
+            self.downloaded_file_path = file_path
 
         return self.downloaded_file_path
+    
+    def find_download_fname(self, response):
+        content_disposition = response.headers.get('content-disposition')
+        if content_disposition:
+            if "filename*=" in content_disposition:
+                filename_encoded = content_disposition.split("filename*=")[-1].strip('";')
+                if filename_encoded.startswith("UTF-8''"):
+                    filename_encoded = filename_encoded[len("UTF-8''"):]
+                filename = unquote(filename_encoded)
+                return filename
+
+            if "filename=" in content_disposition:
+                filename = content_disposition.split("filename=")[-1].strip('";')
+                return filename
+
+        return urlparse(response.url).path.split("/")[-1]
 
     def handle_download_completed(self, file_path):
         self.downloaded_file_path = file_path

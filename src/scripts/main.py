@@ -1,7 +1,9 @@
+import ctypes
 import os
 from queue import Queue
 import shutil
 import stat
+import subprocess
 import sys
 
 from PyQt6.QtCore import Qt, QTimer
@@ -100,14 +102,6 @@ class GameCheatsManager(QMainWindow):
         wemodAction.triggered.connect(self.open_trainer_management)
         menu.addAction(wemodAction)
 
-        updateDatabaseAction = QAction(tr("Update Trainer Database"), self)
-        updateDatabaseAction.triggered.connect(self.fetch_database)
-        menu.addAction(updateDatabaseAction)
-
-        updateTrainersAction = QAction(tr("Update Trainers"), self)
-        updateTrainersAction.triggered.connect(self.update_trainers)
-        menu.addAction(updateTrainersAction)
-
         # Status bar setup
         self.statusbar = QStatusBar()
         self.setStatusBar(self.statusbar)
@@ -202,7 +196,7 @@ class GameCheatsManager(QMainWindow):
             dialog.show()
 
         # Check for software update
-        if settings['appUpdate']:
+        if settings['checkAppUpdate']:
             self.versionFetcher = VersionFetchWorker(self.updateLink)
             self.versionFetcher.versionFetched.connect(lambda latest_version: self.send_notification(True, latest_version))
             self.versionFetcher.fetchFailed.connect(lambda: self.send_notification(False))
@@ -250,6 +244,7 @@ class GameCheatsManager(QMainWindow):
             style = style_sheet.white
 
         style = style.format(
+            check_mark=checkMark_path,
             drop_down_arrow=dropDownArrow_path,
             scroll_bar_top=upArrow_path,
             scroll_bar_bottom=downArrow_path,
@@ -311,22 +306,37 @@ class GameCheatsManager(QMainWindow):
 
         for trainer in entries:
             trainerPath = os.path.normpath(trainer.path)
-            trainerName, trainerExt = os.path.splitext(os.path.basename(trainerPath))
-            if trainerExt.lower() == ".exe" and os.path.getsize(trainerPath) != 0:
-                self.flingListBox.addItem(trainerName)
-                self.trainers[trainerName] = trainerPath
+            if os.path.isfile(trainerPath):
+                trainerName, trainerExt = os.path.splitext(os.path.basename(trainerPath))
+                if trainerExt.lower() == ".exe" and os.path.getsize(trainerPath) != 0:
+                    self.flingListBox.addItem(trainerName)
+                    self.trainers[trainerName] = trainerPath
+            else:
+                trainerName = os.path.basename(trainerPath)
+                exe_file_path = None
+                for file in os.scandir(trainerPath):
+                    filePath = os.path.normpath(file.path)
+                    fileName, fileExt = os.path.splitext(file.name)
+                    if file.is_file() and fileExt.lower() == ".exe":
+                        exe_file_path = filePath
+                        break
+                if exe_file_path:
+                    self.flingListBox.addItem(trainerName)
+                    self.trainers[trainerName] = exe_file_path
 
     def launch_trainer(self):
         try:
             selection = self.flingListBox.currentRow()
             if selection != -1:
                 trainerName = self.flingListBox.item(selection).text()
-                os.startfile(os.path.normpath(self.trainers[trainerName]))
-        except OSError as e:
-            if e.winerror == 1223:
-                print("[Launch Trainer] was canceled by the user.")
-            else:
-                raise
+                trainerPath = os.path.normpath(self.trainers[trainerName])
+                trainerDir = os.path.dirname(trainerPath)
+
+                ctypes.windll.shell32.ShellExecuteW(
+                    None, "runas", trainerPath, None, trainerDir, 1
+                )
+        except Exception as e:
+            print(str(e))
 
     def delete_trainer(self):
         index = self.flingListBox.currentRow()
@@ -351,7 +361,11 @@ class GameCheatsManager(QMainWindow):
             if reply == QMessageBox.StandardButton.Yes:
                 try:
                     os.chmod(trainerPath, stat.S_IWRITE)
-                    os.remove(trainerPath)
+                    parent_dir = os.path.dirname(trainerPath)
+                    if os.path.basename(parent_dir) == trainerName:
+                        shutil.rmtree(parent_dir)
+                    else:
+                        os.remove(trainerPath)
                     self.flingListBox.takeItem(index)
                     self.show_cheats()
                 except PermissionError as e:
@@ -398,7 +412,16 @@ class GameCheatsManager(QMainWindow):
         display_thread.finished.connect(self.on_display_finished)
         display_thread.start()
 
-    def fetch_database(self):
+    def fetch_trainer_translations(self):
+        if not self.currentlyUpdatingTrans:
+            self.currentlyUpdatingTrans = True
+            fetch_trainer_details_thread = FetchTrainerTranslations(self)
+            fetch_trainer_details_thread.message.connect(self.on_status_load)
+            fetch_trainer_details_thread.update.connect(self.on_status_update)
+            fetch_trainer_details_thread.finished.connect(self.on_interval_finished)
+            fetch_trainer_details_thread.start()
+
+    def fetch_fling_data(self):
         if not self.currentlyUpdatingFling:
             self.currentlyUpdatingFling = True
             fetch_fling_site_thread = FetchFlingSite(self)
@@ -407,6 +430,17 @@ class GameCheatsManager(QMainWindow):
             fetch_fling_site_thread.finished.connect(self.on_interval_finished)
             fetch_fling_site_thread.start()
 
+    def update_fling_trainers(self):
+        if not self.currentlyUpdatingTrainers:
+            self.currentlyUpdatingTrainers = True
+            trainer_update_thread = UpdateFlingTrainers(self.trainers, self)
+            trainer_update_thread.message.connect(self.on_status_load)
+            trainer_update_thread.update.connect(self.on_status_update)
+            trainer_update_thread.updateTrainer.connect(self.on_trainer_update)
+            trainer_update_thread.finished.connect(self.on_interval_finished)
+            trainer_update_thread.start()
+
+    def fetch_xiaoxing_data(self):
         if not self.currentlyUpdatingXiaoXing:
             self.currentlyUpdatingXiaoXing = True
             fetch_xiaoxing_site_thread = FetchXiaoXingSite(self)
@@ -415,29 +449,15 @@ class GameCheatsManager(QMainWindow):
             fetch_xiaoxing_site_thread.finished.connect(self.on_interval_finished)
             fetch_xiaoxing_site_thread.start()
 
-        if not self.currentlyUpdatingTrans:
-            self.currentlyUpdatingTrans = True
-            fetch_trainer_details_thread = FetchTrainerDetails(self)
-            fetch_trainer_details_thread.message.connect(self.on_status_load)
-            fetch_trainer_details_thread.update.connect(self.on_status_update)
-            fetch_trainer_details_thread.finished.connect(self.on_interval_finished)
-            fetch_trainer_details_thread.start()
-
-    def update_trainers(self):
-        if not self.currentlyUpdatingTrainers:
-            self.currentlyUpdatingTrainers = True
-            trainer_update_thread = UpdateTrainers(self.trainers, self)
-            trainer_update_thread.message.connect(self.on_status_load)
-            trainer_update_thread.update.connect(self.on_status_update)
-            trainer_update_thread.updateTrainer.connect(self.on_trainer_update)
-            trainer_update_thread.finished.connect(self.on_interval_finished)
-            trainer_update_thread.start()
-
     def on_main_interval(self):
-        if settings["autoUpdateDatabase"]:
-            self.fetch_database()
-        if settings["autoUpdate"]:
-            self.update_trainers()
+        if settings["autoUpdateTranslations"]:
+            self.fetch_trainer_translations()
+        if settings["autoUpdateFlingData"]:
+            self.fetch_fling_data()
+        if settings["autoUpdateFlingTrainers"]:
+            self.update_fling_trainers()
+        if settings["autoUpdateXiaoXingData"]:
+            self.fetch_xiaoxing_data()
 
     def download_trainers(self, index):
         self.enqueue_download(index, self.trainers, self.trainerDownloadPath, False, None, None)
@@ -539,7 +559,7 @@ class GameCheatsManager(QMainWindow):
             self.currentlyUpdatingFling = False
         elif widgetName == "xiaoxing":
             self.currentlyUpdatingXiaoXing = False
-        elif widgetName == "details":
+        elif widgetName == "translations":
             self.currentlyUpdatingTrans = False
         elif widgetName == "trainerUpdate":
             self.currentlyUpdatingTrainers = False

@@ -117,14 +117,19 @@ class SettingsDialog(QDialog):
         settingsWidgetsLayout.addWidget(self.alwaysEnCheckbox)
 
         # Check software update at startup
-        self.appUpdateCheckbox = QCheckBox(tr("Check for software update at startup"))
-        self.appUpdateCheckbox.setChecked(settings["appUpdate"])
-        settingsWidgetsLayout.addWidget(self.appUpdateCheckbox)
+        self.checkAppUpdateCheckbox = QCheckBox(tr("Check for software update at startup"))
+        self.checkAppUpdateCheckbox.setChecked(settings["checkAppUpdate"])
+        settingsWidgetsLayout.addWidget(self.checkAppUpdateCheckbox)
 
         # Launch app on startup
-        self.autoStartCheckbox = QCheckBox(tr("Launch app on system startup"))
-        self.autoStartCheckbox.setChecked(settings["autoStart"])
-        settingsWidgetsLayout.addWidget(self.autoStartCheckbox)
+        self.launchAppOnStarupCheckbox = QCheckBox(tr("Launch app on system startup"))
+        self.launchAppOnStarupCheckbox.setChecked(settings["launchAppOnStartup"])
+        settingsWidgetsLayout.addWidget(self.launchAppOnStarupCheckbox)
+
+        # Auto update translation json
+        self.autoUpdateTranslationsCheckbox = QCheckBox(tr("Update trainer translations automatically"))
+        self.autoUpdateTranslationsCheckbox.setChecked(settings["autoUpdateTranslations"])
+        settingsWidgetsLayout.addWidget(self.autoUpdateTranslationsCheckbox)
 
         # Apply button
         applyButtonLayout = QHBoxLayout()
@@ -161,14 +166,15 @@ class SettingsDialog(QDialog):
         settings["theme"] = theme_options[self.themeCombo.currentText()]
         settings["language"] = language_options[self.languageCombo.currentText()]
         settings["enSearchResults"] = self.alwaysEnCheckbox.isChecked()
-        settings["appUpdate"] = self.appUpdateCheckbox.isChecked()
-        settings["autoStart"] = self.autoStartCheckbox.isChecked()
+        settings["checkAppUpdate"] = self.checkAppUpdateCheckbox.isChecked()
+        settings["launchAppOnStartup"] = self.launchAppOnStarupCheckbox.isChecked()
+        settings["autoUpdateTranslations"] = self.autoUpdateTranslationsCheckbox.isChecked()
         apply_settings(settings)
 
         if getattr(sys, 'frozen', False):
             app_name = "Game Cheats Manager"
             app_path = sys.executable
-            if self.autoStartCheckbox.isChecked():
+            if self.launchAppOnStarupCheckbox.isChecked():
                 self.add_or_remove_startup(app_name, app_path, True)
             else:
                 self.add_or_remove_startup(app_name, app_path, False)

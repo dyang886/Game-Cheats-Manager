@@ -4,9 +4,10 @@ import shutil
 import stat
 import subprocess
 import time
-from urllib.parse import urlparse
+from urllib.parse import parse_qs, urlparse
 
 from bs4 import BeautifulSoup
+import cloudscraper
 import requests
 
 from config import *
@@ -35,6 +36,7 @@ class DownloadTrainersThread(DownloadBaseThread):
 
         if os.path.exists(DOWNLOAD_TEMP_DIR):
             shutil.rmtree(DOWNLOAD_TEMP_DIR)
+        os.makedirs(DOWNLOAD_TEMP_DIR, exist_ok=True)
 
         self.src_dst = []  # List content: { "src": source_path, "dst": destination_path }
         selected_trainer = None
@@ -44,10 +46,11 @@ class DownloadTrainersThread(DownloadBaseThread):
             if selected_trainer["origin"] == "xiaoxing":
                 origin = "xiaoxing"
 
+        result = True
         if origin == "fling" or self.update:
-            self.download_fling(selected_trainer)
+            result = self.download_fling(selected_trainer)
         elif origin == "xiaoxing":
-            self.download_xiaoxing(selected_trainer)
+            result = self.download_xiaoxing(selected_trainer)
 
         try:
             for item in self.src_dst:
@@ -70,9 +73,10 @@ class DownloadTrainersThread(DownloadBaseThread):
             self.finished.emit(1)
             return
 
-        self.message.emit(tr("Download success!"), "success")
-        time.sleep(self.download_finish_delay)
-        self.finished.emit(0)
+        if result:
+            self.message.emit(tr("Download success!"), "success")
+            time.sleep(self.download_finish_delay)
+            self.finished.emit(0)
 
     def modify_fling_settings(self, removeBgMusic):
         # replace bg music in Documents folder
@@ -80,7 +84,7 @@ class DownloadTrainersThread(DownloadBaseThread):
         flingSettings_path = f"C:/Users/{username}/Documents/FLiNGTrainer"
         bgMusic_path = os.path.join(flingSettings_path, "TrainerBGM.mid")
         if os.path.exists(bgMusic_path):
-            if settings["removeBgMusic"]:
+            if settings["removeFlingBgMusic"]:
                 shutil.copyfile(emptyMidi_path, bgMusic_path)
             else:
                 os.remove(bgMusic_path)
@@ -156,10 +160,9 @@ class DownloadTrainersThread(DownloadBaseThread):
             self.trainerName = os.path.splitext(os.path.basename(self.trainerPath))[0]
             self.message.emit(tr("Updating ") + self.trainerName + "...", None)
 
-        if self.update or settings["downloadServer"] == "intl":
+        if self.update or settings["flingDownloadServer"] == "intl":
             # Trainer name check
             if not self.update:
-                trainerName_download = self.symbol_replacement(selected_trainer["game_name"])
                 trainerName_display = self.symbol_replacement(selected_trainer["trainer_name"])
 
                 for trainerPath in self.trainers.keys():
@@ -167,9 +170,8 @@ class DownloadTrainersThread(DownloadBaseThread):
                         self.message.emit(tr("Trainer already exists, aborted download."), "failure")
                         time.sleep(self.download_finish_delay)
                         self.finished.emit(1)
-                        return
+                        return False
             else:
-                trainerName_download = self.trainerName
                 trainerName_display = self.trainerName
 
             # Download trainer
@@ -177,7 +179,7 @@ class DownloadTrainersThread(DownloadBaseThread):
             try:
                 # Additional trainer file extraction for trainers from main site
                 if not self.update:
-                    targetUrl = DownloadBaseThread.trainer_urls[self.index]["url"]
+                    targetUrl = selected_trainer["url"]
                 else:
                     targetUrl = self.updateUrl
 
@@ -191,14 +193,13 @@ class DownloadTrainersThread(DownloadBaseThread):
                     else:
                         raise Exception(tr("Internet request failed."))
 
-                os.makedirs(DOWNLOAD_TEMP_DIR, exist_ok=True)
-                trainerTemp = self.request_download(targetUrl, DOWNLOAD_TEMP_DIR, trainerName_download)
+                trainerTemp = self.request_download(targetUrl, DOWNLOAD_TEMP_DIR)
 
             except Exception as e:
                 self.message.emit(tr("An error occurred while downloading trainer: ") + str(e), "failure")
                 time.sleep(self.download_finish_delay)
                 self.finished.emit(1)
-                return
+                return False
 
             # Ensure file is successfully downloaded
             found_trainer = False
@@ -211,7 +212,7 @@ class DownloadTrainersThread(DownloadBaseThread):
                 self.message.emit(tr("Downloaded file not found."), "failure")
                 time.sleep(self.download_finish_delay)
                 self.finished.emit(1)
-                return
+                return False
 
             # Extract compressed file and rename
             self.message.emit(tr("Decompressing..."), None)
@@ -223,7 +224,7 @@ class DownloadTrainersThread(DownloadBaseThread):
                 self.message.emit(tr("An error occurred while extracting downloaded trainer: ") + str(e), "failure")
                 time.sleep(self.download_finish_delay)
                 self.finished.emit(1)
-                return
+                return False
 
             # Locate extracted .exe file
             cnt = 0
@@ -244,15 +245,14 @@ class DownloadTrainersThread(DownloadBaseThread):
                 self.message.emit(tr("Could not find the downloaded trainer file, please try turning your antivirus software off."), "failure")
                 time.sleep(self.download_finish_delay)
                 self.finished.emit(1)
-                return
+                return False
 
             # Construct destination trainer name dict (may have multiple versions of a same game)
             os.makedirs(self.trainerDownloadPath, exist_ok=True)
             if len(extractedTrainerNames) > 1:
                 if self.update:
                     match = re.search(r'^(.*?)(\s+v\d+|\s+Early Access)', extractedTrainerNames[0])
-                    trainerName_download = match.group(1)
-                    trainerName_display = self.symbol_replacement(self.translate_trainer(trainerName_download))
+                    trainerName_display = self.symbol_replacement(self.translate_trainer(match.group(1)))
 
                 for extractedTrainerName in extractedTrainerNames:
                     trainer_details = ""
@@ -279,8 +279,7 @@ class DownloadTrainersThread(DownloadBaseThread):
                 destination_file = os.path.join(self.trainerDownloadPath, trainer_name)
                 self.src_dst.append({"src": source_file, "dst": destination_file})
 
-        elif settings["downloadServer"] == "china":
-            trainerName_download = self.symbol_replacement(selected_trainer["game_name"])
+        elif settings["flingDownloadServer"] == "china":
             trainerName_display = self.symbol_replacement(selected_trainer["trainer_name"])
             downloadUrl = selected_trainer["url"]
             antiUrl = selected_trainer["anti_url"]
@@ -292,7 +291,7 @@ class DownloadTrainersThread(DownloadBaseThread):
                     self.message.emit(tr("Trainer already exists, aborted download."), "failure")
                     time.sleep(self.download_finish_delay)
                     self.finished.emit(1)
-                    return
+                    return False
 
             # Download trainer
             self.message.emit(tr("Downloading..."), None)
@@ -309,16 +308,15 @@ class DownloadTrainersThread(DownloadBaseThread):
                         break
             except Exception as e:
                 print(f"Error requesting {urls_to_try}: {str(e)}")
-                return
+                return False
 
             if not download_successful:
                 self.message.emit(tr("An error occurred while downloading trainer: ") + f"Status code {req.status_code}: {req.reason}", "failure")
                 time.sleep(self.download_finish_delay)
                 self.finished.emit(1)
-                return
+                return False
 
-            os.makedirs(DOWNLOAD_TEMP_DIR, exist_ok=True)
-            trainerTemp = os.path.join(DOWNLOAD_TEMP_DIR, trainerName_download + ".zip")
+            trainerTemp = os.path.join(DOWNLOAD_TEMP_DIR, filename)
             with open(trainerTemp, "wb") as f:
                 f.write(req.content)
 
@@ -331,10 +329,10 @@ class DownloadTrainersThread(DownloadBaseThread):
                         self.message.emit(tr("An error occurred while downloading trainer: ") + f"Status code {req.status_code}: {req.reason}", "failure")
                         time.sleep(self.download_finish_delay)
                         self.finished.emit(1)
-                        return
+                        return False
                 except Exception as e:
                     print(f"Error requesting {antiUrl}: {str(e)}")
-                    return
+                    return False
 
                 os.makedirs(anti_folder, exist_ok=True)
                 antiFileName = os.path.basename(urlparse(antiUrl).path)
@@ -355,7 +353,7 @@ class DownloadTrainersThread(DownloadBaseThread):
                 self.message.emit(tr("An error occurred while extracting downloaded trainer: ") + str(e), "failure")
                 time.sleep(self.download_finish_delay)
                 self.finished.emit(1)
-                return
+                return False
 
             # Locate extracted .exe file
             cnt = 0
@@ -373,7 +371,7 @@ class DownloadTrainersThread(DownloadBaseThread):
                 self.message.emit(tr("Could not find the downloaded trainer file, please try turning your antivirus software off."), "failure")
                 time.sleep(self.download_finish_delay)
                 self.finished.emit(1)
-                return
+                return False
 
             os.makedirs(self.trainerDownloadPath, exist_ok=True)
             source_file = os.path.join(DOWNLOAD_TEMP_DIR, extractedTrainerNames)
@@ -381,7 +379,7 @@ class DownloadTrainersThread(DownloadBaseThread):
             self.src_dst.append({"src": source_file, "dst": destination_file})
 
         # remove fling trainer bg music
-        if settings["removeBgMusic"]:
+        if settings["removeFlingBgMusic"]:
             self.message.emit(tr("Removing trainer background music..."), None)
             self.modify_fling_settings(True)
             for item in self.src_dst:
@@ -400,5 +398,100 @@ class DownloadTrainersThread(DownloadBaseThread):
         if antiUrl:
             os.remove(antiTemp)
 
-    def download_xiaoxing():
-        pass
+        return True
+
+    def get_onedrive_download_url(self, url):
+        # Construct api url from redirected OneDrive url
+        parsed_url = urlparse(url)
+        query_params = parse_qs(parsed_url.query)
+
+        authkey = query_params.get('authkey', [None])[0]
+        item_id = query_params.get('id', [None])[0]
+        cid = query_params.get('cid', [None])[0]
+
+        # Validate extracted parameters
+        if not all([authkey, item_id, cid]):
+            print("Missing required query parameters in OneDrive URL.")
+            return ""
+
+        item_id_formatted = item_id.replace('!', '%21')
+        api_url = (
+            f"https://api.onedrive.com/v1.0/drives/{cid}/items/{item_id_formatted}"
+            f"?select=id%2C%40content.downloadUrl&authkey={authkey}"
+        )
+
+        # Get download url from api url
+        scraper = cloudscraper.create_scraper()
+        req = scraper.get(api_url, headers=self.headers)
+        req.raise_for_status()
+        data = req.json()
+        download_url = data.get("@content.downloadUrl")
+        if not download_url:
+            print("OneDrive download URL not found in the API response.")
+            return ""
+
+        return download_url
+
+    def download_xiaoxing(self, selected_trainer):
+        # Download trainer archive (either MediaFire or OneDrive)
+        page_content = self.get_webpage_content(selected_trainer["url"], "小幸修改器官方网站")
+        trainerPage = BeautifulSoup(page_content, 'html.parser')
+        mediaFireTag = trainerPage.find('a', href=lambda href: href and "www.mediafire.com" in href)
+        oneDriveTag = trainerPage.find('a', href=lambda href: href and "1drv.ms" in href)
+
+        mediaFire_failed = False
+        oneDrive_failed = False
+        trainerTemp = None
+
+        try:
+            # Attempt MediaFire download
+            if mediaFireTag:
+                mediaFirePage = self.get_webpage_content(mediaFireTag.get("href"), None, True)
+                mediaFireHTML = BeautifulSoup(mediaFirePage, "html.parser")
+                mediaFireDownloadButton = mediaFireHTML.find(id="downloadButton")
+                if mediaFireDownloadButton:
+                    trainerTemp = self.request_download(mediaFireDownloadButton.get("href"), DOWNLOAD_TEMP_DIR, True)
+                else:
+                    mediaFire_failed = True
+            else:
+                mediaFire_failed = True
+
+            # Attempt OneDrive download if MediaFire failed
+            if mediaFire_failed and oneDriveTag:
+                scraper = cloudscraper.create_scraper()
+                req = scraper.get(oneDriveTag.get("href"), headers=self.headers)
+                req.raise_for_status()
+                oneDriveLink = self.get_onedrive_download_url(req.url)
+                if oneDriveLink:
+                    trainerTemp = self.request_download(oneDriveLink, DOWNLOAD_TEMP_DIR, True)
+                else:
+                    oneDrive_failed = True
+            elif not oneDriveTag:
+                oneDrive_failed = True
+
+            if mediaFire_failed and oneDrive_failed:
+                raise Exception(tr("Both MediaFire and OneDrive downloads failed."))
+
+        except Exception as e:
+            self.message.emit(tr("An error occurred while downloading trainer: ") + str(e), "failure")
+            time.sleep(self.download_finish_delay)
+            self.finished.emit(1)
+            return False
+
+        # Extract compressed file
+        self.message.emit(tr("Decompressing..."), None)
+        try:
+            command = [unzip_path, "x", "-y", trainerTemp, f"-o{DOWNLOAD_TEMP_DIR}"]
+            subprocess.run(command, check=True, creationflags=subprocess.CREATE_NO_WINDOW)
+
+        except Exception as e:
+            self.message.emit(tr("An error occurred while extracting downloaded trainer: ") + str(e), "failure")
+            time.sleep(self.download_finish_delay)
+            self.finished.emit(1)
+            return False
+
+        os.remove(trainerTemp)
+        destination_path = os.path.join(self.trainerDownloadPath, self.symbol_replacement(selected_trainer["trainer_name"]))
+        self.src_dst.append({"src": DOWNLOAD_TEMP_DIR, "dst": destination_path})
+
+        return True

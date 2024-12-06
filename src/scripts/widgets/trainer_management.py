@@ -1,7 +1,7 @@
 import subprocess
 import re
 
-from PyQt6.QtWidgets import QCheckBox, QComboBox, QDialog, QFileDialog, QHBoxLayout, QLabel, QLineEdit, QMessageBox, QTabWidget, QVBoxLayout, QWidget
+from PyQt6.QtWidgets import QCheckBox, QComboBox, QDialog, QFileDialog, QHBoxLayout, QLabel, QLineEdit, QMessageBox, QSizePolicy, QTabWidget, QVBoxLayout, QWidget
 from PyQt6.QtGui import QIcon, QPixmap
 from PyQt6.QtCore import Qt, QTimer
 
@@ -30,7 +30,7 @@ class TrainerManagementDialog(QDialog):
 
         # Add tabs
         self.tabWidget.addTab(self.createFlingTab(), tr("FLiNG"))
-        self.tabWidget.addTab(self.createXiaoxingTab(), tr("XiaoXing"))
+        self.tabWidget.addTab(self.createXiaoXingTab(), tr("XiaoXing"))
         self.tabWidget.addTab(self.createWemodTab(), "WeMod")
         self.tabWidget.addTab(self.createCETab(), "Cheat Engine")
 
@@ -40,11 +40,12 @@ class TrainerManagementDialog(QDialog):
         while self.active_alerts:
             self.active_alerts[0].close()
 
-        settings["downloadServer"] = server_options[self.serverCombo.currentText()]
-        settings["removeBgMusic"] = self.removeBgMusicCheckbox.isChecked()
-        settings["autoUpdateDatabase"] = self.autoUpdateDatabaseCheckbox.isChecked()
-        settings["autoUpdateFling"] = self.autoUpdateCheckbox.isChecked()
-        settings["enableXiaoxing"] = self.enableXiaoxingCheckbox.isChecked()
+        settings["flingDownloadServer"] = server_options[self.serverCombo.currentText()]
+        settings["removeFlingBgMusic"] = self.removeFlingBgMusicCheckbox.isChecked()
+        settings["autoUpdateFlingData"] = self.autoUpdateFlingDataCheckbox.isChecked()
+        settings["autoUpdateFlingTrainers"] = self.autoUpdateFlingTrainersCheckbox.isChecked()
+        settings["enableXiaoXing"] = self.enableXiaoXingCheckbox.isChecked()
+        settings["autoUpdateXiaoXingData"] = self.autoUpdateXiaoXingDataCheckbox.isChecked()
         apply_settings(settings)
 
     @staticmethod
@@ -69,7 +70,6 @@ class TrainerManagementDialog(QDialog):
         officialLink = QLabel(tr("Official Website: ") + '<a href="https://flingtrainer.com" style="text-decoration: none;">https://flingtrainer.com</a>')
         officialLink.setOpenExternalLinks(True)
         layout.addWidget(officialLink)
-        layout.addStretch(1)
 
         columns = QHBoxLayout()
         columns.setContentsMargins(30, 20, 30, 20)
@@ -77,7 +77,7 @@ class TrainerManagementDialog(QDialog):
         layout.addLayout(columns)
 
         column1 = QVBoxLayout()
-        columns.addLayout(column1)
+        columns.addLayout(column1, stretch=0)
 
         logoPixmap = QPixmap(resource_path("assets/fling.png"))
         scaledLogoPixmap = logoPixmap.scaled(130, 130, Qt.AspectRatioMode.KeepAspectRatio, Qt.TransformationMode.SmoothTransformation)
@@ -88,46 +88,47 @@ class TrainerManagementDialog(QDialog):
 
         column2 = QVBoxLayout()
         column2.setSpacing(15)
-        columns.addLayout(column2)
+        column2.addStretch(1)
+        columns.addLayout(column2, stretch=1)
+        columns.setAlignment(column2, Qt.AlignmentFlag.AlignHCenter)
 
-        # Server selection
+        # Fling server selection
         serverLayout = QVBoxLayout()
         serverLayout.setSpacing(2)
         column2.addLayout(serverLayout)
-        serverLabel = QLabel(tr("Download Server:"))
-        serverLayout.addWidget(serverLabel)
+        serverLayout.addWidget(QLabel(tr("Download Server:")))
         self.serverCombo = QComboBox()
         self.serverCombo.addItems(server_options.keys())
-        self.serverCombo.setCurrentText(self.find_settings_key(settings["downloadServer"], server_options))
-        serverLayout.addWidget(self.serverCombo)
+        self.serverCombo.setCurrentText(self.find_settings_key(settings["flingDownloadServer"], server_options))
+        self.serverCombo.setSizePolicy(QSizePolicy.Policy.Expanding, QSizePolicy.Policy.Fixed)
+        serverLayout.addWidget(self.serverCombo, stretch=1)
 
-        # Remove trainer background music when downloading
-        self.removeBgMusicCheckbox = QCheckBox(tr("Remove trainer background music"))
-        self.removeBgMusicCheckbox.setChecked(settings["removeBgMusic"])
-        column2.addWidget(self.removeBgMusicCheckbox)
+        # Remove Fling trainer background music when downloading
+        self.removeFlingBgMusicCheckbox = QCheckBox(tr("Remove trainer background music"))
+        self.removeFlingBgMusicCheckbox.setChecked(settings["removeFlingBgMusic"])
+        column2.addWidget(self.removeFlingBgMusicCheckbox)
 
-        # Auto update trainer databases
-        self.autoUpdateDatabaseCheckbox = QCheckBox(tr("Update trainer databases automatically"))
-        self.autoUpdateDatabaseCheckbox.setChecked(settings["autoUpdateDatabase"])
-        column2.addWidget(self.autoUpdateDatabaseCheckbox)
+        # Auto update Fling data
+        self.autoUpdateFlingDataCheckbox = QCheckBox(tr("Update FLiNG data automatically"))
+        self.autoUpdateFlingDataCheckbox.setChecked(settings["autoUpdateFlingData"])
+        column2.addWidget(self.autoUpdateFlingDataCheckbox)
 
-        # Auto trainer updates
-        self.autoUpdateCheckbox = QCheckBox(tr("Update trainers automatically"))
-        self.autoUpdateCheckbox.setChecked(settings["autoUpdate"])
-        column2.addWidget(self.autoUpdateCheckbox)
+        # Auto update Fling trainers
+        self.autoUpdateFlingTrainersCheckbox = QCheckBox(tr("Update trainers automatically"))
+        self.autoUpdateFlingTrainersCheckbox.setChecked(settings["autoUpdateFlingTrainers"])
+        column2.addWidget(self.autoUpdateFlingTrainersCheckbox)
 
-        layout.addStretch(1)
+        column2.addStretch(1)
         return flingTab
 
-    def createXiaoxingTab(self):
-        xiaoxingTab = QWidget()
+    def createXiaoXingTab(self):
+        xiaoXingTab = QWidget()
         layout = QVBoxLayout()
         layout.setContentsMargins(0, 15, 0, 0)
-        xiaoxingTab.setLayout(layout)
+        xiaoXingTab.setLayout(layout)
         officialLink = QLabel(tr("Official Website: ") + '<a href="https://www.xiaoxingjie.com" style="text-decoration: none;">https://www.xiaoxingjie.com</a>')
         officialLink.setOpenExternalLinks(True)
         layout.addWidget(officialLink)
-        layout.addStretch(1)
 
         columns = QHBoxLayout()
         columns.setContentsMargins(30, 20, 30, 20)
@@ -135,7 +136,7 @@ class TrainerManagementDialog(QDialog):
         layout.addLayout(columns)
 
         column1 = QVBoxLayout()
-        columns.addLayout(column1)
+        columns.addLayout(column1, stretch=0)
 
         logoPixmap = QPixmap(resource_path("assets/xiaoxing.png"))
         scaledLogoPixmap = logoPixmap.scaled(130, 130, Qt.AspectRatioMode.KeepAspectRatio, Qt.TransformationMode.SmoothTransformation)
@@ -146,15 +147,22 @@ class TrainerManagementDialog(QDialog):
 
         column2 = QVBoxLayout()
         column2.setSpacing(15)
-        columns.addLayout(column2)
+        column2.addStretch(1)
+        columns.addLayout(column2, stretch=1)
+        columns.setAlignment(column2, Qt.AlignmentFlag.AlignHCenter)
 
-        # Enable Xiaoxing trainer
-        self.enableXiaoxingCheckbox = QCheckBox(tr("Enable search for Xiao Xing trainers"))
-        self.enableXiaoxingCheckbox.setChecked(settings["enableXiaoxing"])
-        column2.addWidget(self.enableXiaoxingCheckbox)
+        # Enable XiaoXing trainer
+        self.enableXiaoXingCheckbox = QCheckBox(tr("Enable search for XiaoXing trainers"))
+        self.enableXiaoXingCheckbox.setChecked(settings["enableXiaoXing"])
+        column2.addWidget(self.enableXiaoXingCheckbox)
 
-        layout.addStretch(1)
-        return xiaoxingTab
+        # Auto update XiaoXing data
+        self.autoUpdateXiaoXingDataCheckbox = QCheckBox(tr("Update XiaoXing data automatically"))
+        self.autoUpdateXiaoXingDataCheckbox.setChecked(settings["autoUpdateXiaoXingData"])
+        column2.addWidget(self.autoUpdateXiaoXingDataCheckbox)
+
+        column2.addStretch(1)
+        return xiaoXingTab
 
     def createWemodTab(self):
         wemodTab = QWidget()
@@ -164,7 +172,6 @@ class TrainerManagementDialog(QDialog):
         officialLink = QLabel(tr("Official Website: ") + '<a href="https://www.wemod.com" style="text-decoration: none;">https://www.wemod.com</a>')
         officialLink.setOpenExternalLinks(True)
         layout.addWidget(officialLink)
-        layout.addStretch(1)
 
         columns = QHBoxLayout()
         columns.setContentsMargins(30, 20, 30, 20)
@@ -172,7 +179,7 @@ class TrainerManagementDialog(QDialog):
         layout.addLayout(columns)
 
         column1 = QVBoxLayout()
-        columns.addLayout(column1)
+        columns.addLayout(column1, stretch=0)
 
         logoPixmap = QPixmap(resource_path("assets/wemod.png"))
         scaledLogoPixmap = logoPixmap.scaled(130, 130, Qt.AspectRatioMode.KeepAspectRatio, Qt.TransformationMode.SmoothTransformation)
@@ -183,7 +190,9 @@ class TrainerManagementDialog(QDialog):
 
         column2 = QVBoxLayout()
         column2.setSpacing(15)
-        columns.addLayout(column2)
+        column2.addStretch(1)
+        columns.addLayout(column2, stretch=1)
+        columns.setAlignment(column2, Qt.AlignmentFlag.AlignHCenter)
 
         # WeMod installation path
         installLayout = QVBoxLayout()
@@ -246,7 +255,7 @@ class TrainerManagementDialog(QDialog):
         self.weModInstallLineEdit.setText(settings["weModPath"])
         self.findWeModVersions(settings["weModPath"])
 
-        layout.addStretch(1)
+        column2.addStretch(1)
         return wemodTab
 
     def createCETab(self):
@@ -257,7 +266,6 @@ class TrainerManagementDialog(QDialog):
         officialLink = QLabel(tr("Official Website: ") + '<a href="https://www.cheatengine.org" style="text-decoration: none;">https://www.cheatengine.org</a>')
         officialLink.setOpenExternalLinks(True)
         layout.addWidget(officialLink)
-        layout.addStretch(1)
 
         columns = QHBoxLayout()
         columns.setContentsMargins(30, 20, 30, 20)
@@ -265,7 +273,7 @@ class TrainerManagementDialog(QDialog):
         layout.addLayout(columns)
 
         column1 = QVBoxLayout()
-        columns.addLayout(column1)
+        columns.addLayout(column1, stretch=0)
 
         logoPixmap = QPixmap(resource_path("assets/ce.png"))
         scaledLogoPixmap = logoPixmap.scaled(130, 130, Qt.AspectRatioMode.KeepAspectRatio, Qt.TransformationMode.SmoothTransformation)
@@ -276,7 +284,9 @@ class TrainerManagementDialog(QDialog):
 
         column2 = QVBoxLayout()
         column2.setSpacing(15)
-        columns.addLayout(column2)
+        column2.addStretch(1)
+        columns.addLayout(column2, stretch=1)
+        columns.setAlignment(column2, Qt.AlignmentFlag.AlignHCenter)
 
         # CE installation status
         self.installStatus = QLabel()
@@ -327,7 +337,7 @@ class TrainerManagementDialog(QDialog):
         self.ceInstallLineEdit.setText(settings["cePath"])
         self.checkCEInstallStatus()
 
-        layout.addStretch(1)
+        column2.addStretch(1)
         return ceTab
 
     # ===========================================================================
