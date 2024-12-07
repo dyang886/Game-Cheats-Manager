@@ -423,7 +423,6 @@ class DownloadTrainersThread(DownloadBaseThread):
         # Get download url from api url
         scraper = cloudscraper.create_scraper()
         req = scraper.get(api_url, headers=self.headers)
-        req.raise_for_status()
         data = req.json()
         download_url = data.get("@content.downloadUrl")
         if not download_url:
@@ -438,10 +437,13 @@ class DownloadTrainersThread(DownloadBaseThread):
         trainerPage = BeautifulSoup(page_content, 'html.parser')
         mediaFireTag = trainerPage.find('a', href=lambda href: href and "www.mediafire.com" in href)
         oneDriveTag = trainerPage.find('a', href=lambda href: href and "1drv.ms" in href)
+        extractedContentPath = os.path.join(DOWNLOAD_TEMP_DIR, "extracted")
 
         mediaFire_failed = False
         oneDrive_failed = False
         trainerTemp = None
+
+        self.message.emit(tr("Downloading..."), None)
 
         try:
             # Attempt MediaFire download
@@ -460,7 +462,6 @@ class DownloadTrainersThread(DownloadBaseThread):
             if mediaFire_failed and oneDriveTag:
                 scraper = cloudscraper.create_scraper()
                 req = scraper.get(oneDriveTag.get("href"), headers=self.headers)
-                req.raise_for_status()
                 oneDriveLink = self.get_onedrive_download_url(req.url)
                 if oneDriveLink:
                     trainerTemp = self.request_download(oneDriveLink, DOWNLOAD_TEMP_DIR, True)
@@ -470,7 +471,7 @@ class DownloadTrainersThread(DownloadBaseThread):
                 oneDrive_failed = True
 
             if mediaFire_failed and oneDrive_failed:
-                raise Exception(tr("Both MediaFire and OneDrive downloads failed."))
+                raise Exception(tr("No download link available"))
 
         except Exception as e:
             self.message.emit(tr("An error occurred while downloading trainer: ") + str(e), "failure")
@@ -481,7 +482,7 @@ class DownloadTrainersThread(DownloadBaseThread):
         # Extract compressed file
         self.message.emit(tr("Decompressing..."), None)
         try:
-            command = [unzip_path, "x", "-y", trainerTemp, f"-o{DOWNLOAD_TEMP_DIR}"]
+            command = [unzip_path, "x", "-y", trainerTemp, f"-o{extractedContentPath}"]
             subprocess.run(command, check=True, creationflags=subprocess.CREATE_NO_WINDOW)
 
         except Exception as e:
@@ -491,7 +492,59 @@ class DownloadTrainersThread(DownloadBaseThread):
             return False
 
         os.remove(trainerTemp)
-        destination_path = os.path.join(self.trainerDownloadPath, self.symbol_replacement(selected_trainer["trainer_name"]))
-        self.src_dst.append({"src": DOWNLOAD_TEMP_DIR, "dst": destination_path})
+
+        if not self.handle_xiaoxing_special_cases(selected_trainer, extractedContentPath):
+            destination_path = os.path.join(self.trainerDownloadPath, self.symbol_replacement(selected_trainer["trainer_name"]))
+            self.src_dst.append({"src": extractedContentPath, "dst": destination_path})
 
         return True
+
+    def handle_xiaoxing_special_cases(self, selected_trainer, extractedContentPath):
+        # Specific game cases
+        folder_keywords = {
+            "轩辕剑6": "轩辕剑6",
+            "轩辕剑外传：穹之扉": "穹之扉"
+        }
+
+        if selected_trainer["game_name"] in folder_keywords.keys():
+            destination_path = os.path.join(self.trainerDownloadPath, self.symbol_replacement(selected_trainer["trainer_name"]))
+            keyword = folder_keywords.get(selected_trainer["game_name"])
+            for folder_name in os.listdir(extractedContentPath):
+                source_path = os.path.join(extractedContentPath, folder_name)
+                if os.path.isdir(source_path) and keyword in folder_name:
+                    self.src_dst.append({"src": source_path, "dst": destination_path})
+                    return True
+
+        # Multiple version case (check if there are only folders and no `.exe` files)
+        temp_contents = os.listdir(extractedContentPath)
+        has_exe = any(file.lower().endswith(".exe") for file in temp_contents if os.path.isfile(os.path.join(extractedContentPath, file)))
+        only_folders = all(os.path.isdir(os.path.join(extractedContentPath, item)) for item in temp_contents)
+
+        if not has_exe and only_folders:
+            for folder_name in temp_contents:
+                source_path = os.path.join(extractedContentPath, folder_name)
+                destination_path = os.path.join(self.trainerDownloadPath, self.symbol_replacement(f"{selected_trainer['trainer_name']} {folder_name}"))
+                self.src_dst.append({"src": source_path, "dst": destination_path})
+            return True
+
+        # Double extraction case (check if there is no `.exe` and a `.rar` file exists)
+        rar_file = next(
+            (file for file in temp_contents if file.lower().endswith(".rar") and os.path.isfile(os.path.join(extractedContentPath, file))),
+            None
+        )
+
+        if not has_exe and rar_file:
+            destination_path = os.path.join(self.trainerDownloadPath, self.symbol_replacement(selected_trainer["trainer_name"]))
+            file_path = os.path.join(extractedContentPath, rar_file)
+            try:
+                command = [unzip_path, "x", "-y", f"-p123", file_path, f"-o{extractedContentPath}"]
+                subprocess.run(command, check=True, creationflags=subprocess.CREATE_NO_WINDOW)
+                os.remove(file_path)
+                self.src_dst.append({"src": extractedContentPath, "dst": destination_path})
+            except Exception as e:
+                self.message.emit(tr("An error occurred while extracting downloaded trainer: ") + str(e), "failure")
+                time.sleep(self.download_finish_delay)
+                self.finished.emit(1)
+            return True
+
+        return False

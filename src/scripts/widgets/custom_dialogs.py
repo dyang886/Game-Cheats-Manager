@@ -111,20 +111,20 @@ class SettingsDialog(QDialog):
         self.languageCombo.setCurrentText(self.find_settings_key(settings["language"], language_options))
         languageLayout.addWidget(self.languageCombo)
 
-        # Always show english
-        self.alwaysEnCheckbox = QCheckBox(tr("Always show search results in English"))
-        self.alwaysEnCheckbox.setChecked(settings["enSearchResults"])
-        settingsWidgetsLayout.addWidget(self.alwaysEnCheckbox)
+        # Launch app on startup
+        self.launchAppOnStarupCheckbox = QCheckBox(tr("Launch app on system startup"))
+        self.launchAppOnStarupCheckbox.setChecked(settings["launchAppOnStartup"])
+        settingsWidgetsLayout.addWidget(self.launchAppOnStarupCheckbox)
 
         # Check software update at startup
         self.checkAppUpdateCheckbox = QCheckBox(tr("Check for software update at startup"))
         self.checkAppUpdateCheckbox.setChecked(settings["checkAppUpdate"])
         settingsWidgetsLayout.addWidget(self.checkAppUpdateCheckbox)
 
-        # Launch app on startup
-        self.launchAppOnStarupCheckbox = QCheckBox(tr("Launch app on system startup"))
-        self.launchAppOnStarupCheckbox.setChecked(settings["launchAppOnStartup"])
-        settingsWidgetsLayout.addWidget(self.launchAppOnStarupCheckbox)
+        # Always show english
+        self.alwaysEnCheckbox = QCheckBox(tr("Always show search results in English"))
+        self.alwaysEnCheckbox.setChecked(settings["enSearchResults"])
+        settingsWidgetsLayout.addWidget(self.alwaysEnCheckbox)
 
         # Auto update translation json
         self.autoUpdateTranslationsCheckbox = QCheckBox(tr("Update trainer translations automatically"))

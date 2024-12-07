@@ -119,7 +119,7 @@ class GameCheatsManager(QMainWindow):
         trainerSearchLayout.setContentsMargins(20, 0, 20, 0)
         trainersLayout.addLayout(trainerSearchLayout)
 
-        searchPixmap = QPixmap(search_path).scaled(25, 25, Qt.AspectRatioMode.KeepAspectRatio)
+        searchPixmap = QPixmap(search_path).scaled(25, 25, Qt.AspectRatioMode.KeepAspectRatio, Qt.TransformationMode.SmoothTransformation)
         searchLabel = QLabel()
         searchLabel.setPixmap(searchPixmap)
         trainerSearchLayout.addWidget(searchLabel)
@@ -161,7 +161,7 @@ class GameCheatsManager(QMainWindow):
         downloadsLayout.addLayout(downloadSearchLayout)
 
         searchLabel = QLabel()
-        searchLabel.setPixmap(QPixmap(search_path).scaled(25, 25, Qt.AspectRatioMode.KeepAspectRatio))
+        searchLabel.setPixmap(QPixmap(search_path).scaled(25, 25, Qt.AspectRatioMode.KeepAspectRatio, Qt.TransformationMode.SmoothTransformation))
         downloadSearchLayout.addWidget(searchLabel)
 
         self.downloadSearchEntry = QLineEdit()
@@ -175,17 +175,23 @@ class GameCheatsManager(QMainWindow):
         downloadsLayout.addWidget(self.downloadListBox)
 
         # Change trainer download path
-        changeDownloadPathLayout = QHBoxLayout()
-        changeDownloadPathLayout.setSpacing(5)
+        changeDownloadPathLayout = QVBoxLayout()
+        changeDownloadPathLayout.setSpacing(2)
         downloadsLayout.addLayout(changeDownloadPathLayout)
+
+        changeDownloadPathLayout.addWidget(QLabel(tr("Trainer download path:")))
+
+        downloadPathLayout = QHBoxLayout()
+        downloadPathLayout.setSpacing(5)
+        changeDownloadPathLayout.addLayout(downloadPathLayout)
 
         self.downloadPathEntry = QLineEdit()
         self.downloadPathEntry.setReadOnly(True)
         self.downloadPathEntry.setText(self.trainerDownloadPath)
-        changeDownloadPathLayout.addWidget(self.downloadPathEntry)
+        downloadPathLayout.addWidget(self.downloadPathEntry)
 
         self.fileDialogButton = CustomButton("...")
-        changeDownloadPathLayout.addWidget(self.fileDialogButton)
+        downloadPathLayout.addWidget(self.fileDialogButton)
         self.fileDialogButton.clicked.connect(self.change_path)
 
         self.show_cheats()
@@ -312,12 +318,13 @@ class GameCheatsManager(QMainWindow):
                     self.flingListBox.addItem(trainerName)
                     self.trainers[trainerName] = trainerPath
             else:
+                exe_exclusions = ["flashplayer_22.0.0.210_ax_debug.exe"]
                 trainerName = os.path.basename(trainerPath)
                 exe_file_path = None
                 for file in os.scandir(trainerPath):
                     filePath = os.path.normpath(file.path)
-                    fileName, fileExt = os.path.splitext(file.name)
-                    if file.is_file() and fileExt.lower() == ".exe":
+                    fileExt = os.path.splitext(file.name)[1]
+                    if file.is_file() and fileExt.lower() == ".exe" and file.name not in exe_exclusions:
                         exe_file_path = filePath
                         break
                 if exe_file_path:

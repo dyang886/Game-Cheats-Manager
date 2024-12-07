@@ -138,7 +138,7 @@ class DownloadDisplayThread(DownloadBaseThread):
         if archiveHTML.find():
             self.message.emit(tr("Search from FLiNG success!") + " 1/2", "success")
         else:
-            self.message.emit(tr("Search failed, please wait until all data is updated from FLiNG."), "failure")
+            self.message.emit(tr("Search failed, please update FLiNG data."), "failure")
             return False
 
         for link in archiveHTML.find_all(target="_self"):
@@ -168,7 +168,7 @@ class DownloadDisplayThread(DownloadBaseThread):
         if mainSiteHTML.find():
             self.message.emit(tr("Search from FLiNG success!") + " 2/2", "success")
         else:
-            self.message.emit(tr("Search failed, please wait until all data is updated from FLiNG."), "failure")
+            self.message.emit(tr("Search failed, please update FLiNG data."), "failure")
             return False
         time.sleep(0.5)
 
@@ -246,7 +246,7 @@ class DownloadDisplayThread(DownloadBaseThread):
         if xiaoXingHTML.find():
             self.message.emit(tr("Search from XiaoXing success!"), "success")
         else:
-            self.message.emit(tr("Search failed, please wait until all data is updated from XiaoXing."), "failure")
+            self.message.emit(tr("Search failed, please update XiaoXing data."), "failure")
             return False
         time.sleep(0.5)
 

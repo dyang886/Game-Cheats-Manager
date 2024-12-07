@@ -499,4 +499,98 @@ additions = [
         "en_name": "The Legend of Heroes: Trails through Daybreak",
         "keyw": "英雄传说：黎之轨迹",
     },
+
+    # XiaoXing
+    {
+        "en_name": "GuJian",
+        "keyw": "古剑奇谭"
+    },
+    {
+        "en_name": "GuJian2",
+        "keyw": "古剑奇谭2"
+    },
+    {
+        "en_name": "Luo Chuan Qun Xia Zhuan",
+        "keyw": "洛川群侠传"
+    },
+    {
+        "en_name": "Fate Seeker: Journey",
+        "keyw": "天命奇御：归途"
+    },
+    {
+        "en_name": "Traveler of Wuxia",
+        "keyw": "天外武林"
+    },
+    {
+        "en_name": "Sword and Fairy 1&2 (SDL Remastered)",
+        "keyw": "仙剑奇侠传1代和2代（SDL重制版）"
+    },
+    {
+        "en_name": "Sword and Fairy 3",
+        "keyw": "仙剑奇侠传三"
+    },
+    {
+        "en_name": "Sword and Fairy 3 Ex",
+        "keyw": "仙剑奇侠传三外传：问情篇"
+    },
+    {
+        "en_name": "Sword and Fairy 4",
+        "keyw": "仙剑奇侠传四"
+    },
+    {
+        "en_name": "Sword and Fairy 5",
+        "keyw": "仙剑奇侠传五"
+    },
+    {
+        "en_name": "Sword and Fairy 5 Prequel",
+        "keyw": "仙剑奇侠传五前传"
+    },
+    {
+        "en_name": "Sword and Fairy 6",
+        "keyw": "仙剑奇侠传六"
+    },
+    {
+        "en_name": "Sword and Fairy 7",
+        "keyw": "仙剑奇侠传七"
+    },
+    {
+        "en_name": "Xin Jian Xia Chuan Qi",
+        "keyw": "新剑侠传奇"
+    },
+    {
+        "en_name": "Xuan-Yuan Sword: The Scar of Sky (SDL Remastered)",
+        "keyw": "轩辕剑3外传：天之痕（SDL重制版）"
+    },
+    {
+        "en_name": "Xuan-Yuan Sword: Mists Beyond the Mountains (SDL Remastered)",
+        "keyw": "轩辕剑3：云和山的彼端（SDL重制版）"
+    },
+    {
+        "en_name": "Xuan-Yuan Sword V",
+        "keyw": "轩辕剑5"
+    },
+    {
+        "en_name": "Xuan-Yuan Sword VI",
+        "keyw": "轩辕剑6"
+    },
+    {
+        "en_name": "Xuan-Yuan Sword: The Cloud of Han",
+        "keyw": "轩辕剑外传：汉之云"
+    },
+    {
+        "en_name": "Xuan-Yuan Sword: The Clouds Faraway",
+        "keyw": "轩辕剑外传：云之遥"
+    },
+    {
+        "en_name": "Xuan-Yuan Sword: The Gate of Firmament",
+        "keyw": "轩辕剑外传：穹之扉"
+    },
+    {
+        "en_name": "Power Of Seasons",
+        "keyw": "亦春秋"
+    },
+    {
+        "en_name": "Lightning Returns: Final Fantasy XIII",
+        "keyw": "最终幻想13-3：雷霆归来"
+    },
 ]

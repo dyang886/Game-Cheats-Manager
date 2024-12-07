@@ -196,6 +196,8 @@ class DownloadBaseThread(QThread):
         # Special cases
         if trainerName == "Bright.Memory.Episode.1":
             trainerName = "Bright Memory: Episode 1"
+        if trainerName == "轩辕剑柒 / 轩辕剑7":
+            trainerName = "轩辕剑7"
 
         if settings["language"] in ["zh_CN", "zh_TW"] and not settings["enSearchResults"]:
             # Target language is Chinese

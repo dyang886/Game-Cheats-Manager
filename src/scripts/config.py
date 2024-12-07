@@ -131,7 +131,7 @@ def ensure_trainer_download_path_is_valid():
 def findCEInstallPath():
     base_path = r'C:\Program Files'
     latest_version = []
-    latest_path = None
+    latest_path = ""
 
     if os.path.exists(base_path):
         for folder in os.listdir(base_path):

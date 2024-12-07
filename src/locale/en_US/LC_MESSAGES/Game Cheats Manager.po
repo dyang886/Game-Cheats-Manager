@@ -58,17 +58,14 @@ msgstr "About"
 msgid "Trainer Management"
 msgstr "Trainer Management"
 
-msgid "Update Trainer Database"
-msgstr "Update Trainer Database"
-
-msgid "Update Trainers"
-msgstr "Update Trainers"
-
 msgid "Launch"
 msgstr "Launch"
 
 msgid "Delete"
 msgstr "Delete"
+
+msgid "Trainer download path:"
+msgstr "Trainer download path:"
 
 msgid "Update Available"
 msgstr "Update Available"
@@ -166,35 +163,32 @@ msgstr "Successfully added paths to Windows Defender whitelist."
 msgid "Failed to add paths to Windows Defender whitelist."
 msgstr "Failed to add paths to Windows Defender whitelist."
 
-msgid "No internet connection, translation failed."
-msgstr "No internet connection, translation failed."
-
-msgid "Initializing translator..."
-msgstr "Initializing translator..."
-
 msgid "Searching..."
 msgstr "Searching..."
-
-msgid "No results found."
-msgstr "No results found."
 
 msgid "Translating search results..."
 msgstr "Translating search results..."
 
+msgid "No results found."
+msgstr "No results found."
+
 msgid "Translating keywords..."
 msgstr "Translating keywords..."
 
-msgid "No translations found."
-msgstr "No translations found."
+msgid "Search from FLiNG success!"
+msgstr "Search from FLiNG success!"
 
-msgid "Search success!"
-msgstr "Search success!"
-
-msgid "Search failed, please wait until all data is updated from FLiNG."
-msgstr "Search failed, please wait until all data is updated from FLiNG."
+msgid "Search failed, please update FLiNG data."
+msgstr "Search failed, please update FLiNG data."
 
 msgid "Failed to get trainer url: "
 msgstr "Failed to get trainer url: "
+
+msgid "Search from XiaoXing success!"
+msgstr "Search from XiaoXing success!"
+
+msgid "Search failed, please update XiaoXing data."
+msgstr "Search failed, please update XiaoXing data."
 
 msgid "Checking for internet connection..."
 msgstr "Checking for internet connection..."
@@ -202,11 +196,14 @@ msgstr "Checking for internet connection..."
 msgid "No internet connection, download failed."
 msgstr "No internet connection, download failed."
 
+msgid "Could not find the downloaded trainer file, please try turning your antivirus software off."
+msgstr "Could not find the downloaded trainer file, please try turning your antivirus software off."
+
+msgid "Download success!"
+msgstr "Download success!"
+
 msgid "Updating "
 msgstr "Updating "
-
-msgid "Translating trainer name..."
-msgstr "Translating trainer name..."
 
 msgid "Trainer already exists, aborted download."
 msgstr "Trainer already exists, aborted download."
@@ -235,20 +232,23 @@ msgstr "Attention"
 msgid "Please check folder for anti-cheat requirements!"
 msgstr "Please check folder for anti-cheat requirements!"
 
-msgid "Could not find the downloaded trainer file, please try turning your antivirus software off."
-msgstr "Could not find the downloaded trainer file, please try turning your antivirus software off."
-
 msgid "Removing trainer background music..."
 msgstr "Removing trainer background music..."
 
-msgid "Download success!"
-msgstr "Download success!"
+msgid "No download link available"
+msgstr "No download link available"
 
 msgid "Updating data from FLiNG"
 msgstr "Updating data from FLiNG"
 
 msgid "Update from FLiGN failed"
 msgstr "Update from FLiGN failed"
+
+msgid "Updating data from XiaoXing"
+msgstr "Updating data from XiaoXing"
+
+msgid "Update from XiaoXing failed"
+msgstr "Update from XiaoXing failed"
 
 msgid "Fetching trainer translations"
 msgstr "Fetching trainer translations"
@@ -341,14 +341,17 @@ msgstr "Theme:"
 msgid "Language:"
 msgstr "Language:"
 
-msgid "Always show search results in English"
-msgstr "Always show search results in English"
+msgid "Launch app on system startup"
+msgstr "Launch app on system startup"
 
 msgid "Check for software update at startup"
 msgstr "Check for software update at startup"
 
-msgid "Launch app on system startup"
-msgstr "Launch app on system startup"
+msgid "Always show search results in English"
+msgstr "Always show search results in English"
+
+msgid "Update trainer translations automatically"
+msgstr "Update trainer translations automatically"
 
 msgid "Apply"
 msgstr "Apply"
@@ -386,14 +389,17 @@ msgstr "Download Server:"
 msgid "Remove trainer background music"
 msgstr "Remove trainer background music"
 
-msgid "Update trainer databases automatically"
-msgstr "Update trainer databases automatically"
+msgid "Update FLiNG data automatically"
+msgstr "Update FLiNG data automatically"
 
 msgid "Update trainers automatically"
 msgstr "Update trainers automatically"
 
-msgid "Enable search for Xiao Xing trainers"
-msgstr "Enable search for Xiao Xing trainers"
+msgid "Enable search for XiaoXing trainers"
+msgstr "Enable search for XiaoXing trainers"
+
+msgid "Update XiaoXing data automatically"
+msgstr "Update XiaoXing data automatically"
 
 msgid "WeMod installation path:"
 msgstr "WeMod installation path:"
