@@ -11,7 +11,7 @@ import subprocess
 import sys
 import threading
 import time
-from urllib.parse import urljoin, urlparse
+from urllib.parse import urljoin, urlparse, unquote
 import uuid
 import winreg as reg
 
@@ -597,13 +597,28 @@ class DownloadBaseThread(QThread):
             self.downloadFile.emit(url, download_path, file_name)
             self.loop.exec()
         else:
-            extension = os.path.splitext(urlparse(req.url).path)[1]
-            trainerTemp = os.path.join(download_path, file_name + extension)
-            with open(trainerTemp, "wb") as f:
+            file_path = os.path.join(download_path, self.find_download_fname(req))
+            with open(file_path, "wb") as f:
                 f.write(req.content)
-            self.downloaded_file_path = trainerTemp
+            self.downloaded_file_path = file_path
 
         return self.downloaded_file_path
+    
+    def find_download_fname(self, response):
+        content_disposition = response.headers.get('content-disposition')
+        if content_disposition:
+            if "filename*=" in content_disposition:
+                filename_encoded = content_disposition.split("filename*=")[-1].strip('";')
+                if filename_encoded.startswith("UTF-8''"):
+                    filename_encoded = filename_encoded[len("UTF-8''"):]
+                filename = unquote(filename_encoded)
+                return filename
+
+            if "filename=" in content_disposition:
+                filename = content_disposition.split("filename=")[-1].strip('";')
+                return filename
+
+        return urlparse(response.url).path.split("/")[-1]
 
     def handle_download_completed(self, file_path):
         self.downloaded_file_path = file_path
@@ -1345,17 +1360,18 @@ class DownloadTrainersThread(DownloadBaseThread):
                 self.finished.emit(1)
                 return
 
-            # Extract compressed file and rename
-            self.message.emit(tr("Decompressing..."), None)
-            try:
-                command = [unzip_path, "x", "-y", trainerTemp, f"-o{DOWNLOAD_TEMP_DIR}"]
-                subprocess.run(command, check=True, creationflags=subprocess.CREATE_NO_WINDOW)
+            if os.path.splitext(trainerTemp)[1] in [".zip", ".rar"]:
+                # Extract compressed file and rename
+                self.message.emit(tr("Decompressing..."), None)
+                try:
+                    command = [unzip_path, "x", "-y", trainerTemp, f"-o{DOWNLOAD_TEMP_DIR}"]
+                    subprocess.run(command, check=True, creationflags=subprocess.CREATE_NO_WINDOW)
 
-            except Exception as e:
-                self.message.emit(tr("An error occurred while extracting downloaded trainer: ") + str(e), "failure")
-                time.sleep(self.download_finish_delay)
-                self.finished.emit(1)
-                return
+                except Exception as e:
+                    self.message.emit(tr("An error occurred while extracting downloaded trainer: ") + str(e), "failure")
+                    time.sleep(self.download_finish_delay)
+                    self.finished.emit(1)
+                    return
 
             # Locate extracted .exe file
             cnt = 0
@@ -1536,7 +1552,8 @@ class DownloadTrainersThread(DownloadBaseThread):
                     os.chmod(dst, stat.S_IWRITE)
                 shutil.move(src, dst)
 
-            os.remove(trainerTemp)
+            if os.path.exists(trainerTemp):
+                os.remove(trainerTemp)
             if antiUrl:
                 os.remove(antiTemp)
             rhLog = os.path.join(DOWNLOAD_TEMP_DIR, "rh.log")
