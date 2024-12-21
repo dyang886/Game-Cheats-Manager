@@ -176,19 +176,19 @@ msgid "Translating keywords..."
 msgstr "翻譯關鍵字..."
 
 msgid "Search from FLiNG success!"
-msgstr "風靈月影搜索成功"
+msgstr "風靈月影搜尋成功"
 
 msgid "Search failed, please update FLiNG data."
-msgstr "搜索失敗，請更新風靈月影數據"
+msgstr "搜尋失敗，請更新風靈月影資料"
 
 msgid "Failed to get trainer url: "
 msgstr "無法取得修改器網址："
 
 msgid "Search from XiaoXing success!"
-msgstr "小幸搜索成功"
+msgstr "小幸搜尋成功"
 
 msgid "Search failed, please update XiaoXing data."
-msgstr "搜索失敗，請更新小幸數據"
+msgstr "搜尋失敗，請更新小幸資料"
 
 msgid "Checking for internet connection..."
 msgstr "正在檢查網際網路連接..."
@@ -245,10 +245,10 @@ msgid "Update from FLiGN failed"
 msgstr "更新風靈月影資料庫失敗"
 
 msgid "Updating data from XiaoXing"
-msgstr "正在更新小幸數據"
+msgstr "正在更新小幸資料"
 
 msgid "Update from XiaoXing failed"
-msgstr "更新小幸數據失敗"
+msgstr "更新小幸資料失敗"
 
 msgid "Fetching trainer translations"
 msgstr "正在獲取修改器翻譯"
@@ -279,10 +279,10 @@ msgid "Failed to activate WeMod Pro"
 msgstr "WeMod 專業版啟用失敗"
 
 msgid "WeMod Pro disabled"
-msgstr "WeMod 專業版已禁用"
+msgstr "WeMod 專業版已停用"
 
 msgid "WeMod auto update disabled"
-msgstr "WeMod 自動更新已禁用"
+msgstr "WeMod 自動更新已停用"
 
 msgid "WeMod auto update enabled"
 msgstr "WeMod 自動更新已啟用"
@@ -351,7 +351,7 @@ msgid "Always show search results in English"
 msgstr "始終以英文顯示搜尋結果"
 
 msgid "Update trainer translations automatically"
-msgstr "自動更新修改器翻譯數據"
+msgstr "自動更新修改器翻譯資料"
 
 msgid "Apply"
 msgstr "應用"
@@ -390,22 +390,22 @@ msgid "Remove trainer background music"
 msgstr "刪除修改器背景音樂"
 
 msgid "Update FLiNG data automatically"
-msgstr "自動更新風靈月影數據"
+msgstr "自動更新風靈月影資料"
 
 msgid "Update trainers automatically"
 msgstr "自動更新修改器"
 
 msgid "Enable search for XiaoXing trainers"
-msgstr "允許搜索小幸修改器"
+msgstr "允許搜尋小幸修改器"
 
 msgid "Update XiaoXing data automatically"
-msgstr "自動更新小幸數據"
+msgstr "自動更新小幸資料"
 
 msgid "WeMod installation path:"
 msgstr "WeMod 安裝路徑："
 
 msgid "Reset to default"
-msgstr "恢復默認"
+msgstr "復原預設"
 
 msgid "Installed WeMod Versions:"
 msgstr "已安裝的 WeMod 版本："
@@ -414,7 +414,7 @@ msgid "Activate WeMod Pro"
 msgstr "啟用 WeMod 專業版"
 
 msgid "Disable WeMod Auto Update"
-msgstr "禁用 WeMod 自動更新"
+msgstr "停用 WeMod 自動更新"
 
 msgid "Delete All Other WeMod Versions"
 msgstr "刪除所有其他 WeMod 版本"
@@ -441,7 +441,7 @@ msgid "WeMod not installed"
 msgstr "未安裝 WeMod"
 
 msgid "To proceed with adding translation files, administrator rights are needed. A User Account Control (UAC) prompt will appear for permission."
-msgstr "若要添加翻譯文件，需要管理員權限。請留意將彈出的用戶帳戶控制（UAC）提示。"
+msgstr "若要添加翻譯文件，需要管理員權限。請留意將彈出的使用者帳戶控制（UAC）提示。"
 
 msgid "Successfully added translation files"
 msgstr "成功添加翻譯文件"
