@@ -55,6 +55,18 @@ msgstr "添加路徑至白名單"
 msgid "About"
 msgstr "關於"
 
+msgid "Data Update"
+msgstr "數據更新"
+
+msgid "Update Translation Data"
+msgstr "更新翻譯數據"
+
+msgid "Update Trainer Search Data"
+msgstr "更新修改器檢索數據"
+
+msgid "Update Trainers"
+msgstr "更新修改器"
+
 msgid "Trainer Management"
 msgstr "修改器管理"
 
@@ -239,10 +251,10 @@ msgid "No download link available"
 msgstr "無可用下載連結"
 
 msgid "Updating data from FLiNG"
-msgstr "正在更新風靈月影資料庫"
+msgstr "正在更新風靈月影資料"
 
 msgid "Update from FLiGN failed"
-msgstr "更新風靈月影資料庫失敗"
+msgstr "更新風靈月影資料失敗"
 
 msgid "Updating data from XiaoXing"
 msgstr "正在更新小幸資料"

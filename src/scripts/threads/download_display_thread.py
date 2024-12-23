@@ -117,7 +117,7 @@ class DownloadDisplayThread(DownloadBaseThread):
                         translations.append(trainer.get("keyw", ""))
 
         translations = list(filter(None, set(translations)))
-        print("\nKeyword translations:", translations)
+        print("\nKeyword translations:", translations, "\n")
         return translations
 
     def keyword_match(self, keywordList, targetString):

@@ -55,6 +55,18 @@ msgstr "添加路径至白名单"
 msgid "About"
 msgstr "关于"
 
+msgid "Data Update"
+msgstr "数据更新"
+
+msgid "Update Translation Data"
+msgstr "更新翻译数据"
+
+msgid "Update Trainer Search Data"
+msgstr "更新修改器检索数据"
+
+msgid "Update Trainers"
+msgstr "更新修改器"
+
 msgid "Trainer Management"
 msgstr "修改器管理"
 
@@ -239,10 +251,10 @@ msgid "No download link available"
 msgstr "无可用下载链接"
 
 msgid "Updating data from FLiNG"
-msgstr "正在更新风灵月影数据库"
+msgstr "正在更新风灵月影数据"
 
 msgid "Update from FLiGN failed"
-msgstr "更新风灵月影数据库失败"
+msgstr "更新风灵月影数据失败"
 
 msgid "Updating data from XiaoXing"
 msgstr "正在更新小幸数据"

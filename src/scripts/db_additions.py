@@ -499,6 +499,10 @@ additions = [
         "en_name": "The Legend of Heroes: Trails through Daybreak",
         "keyw": "英雄传说：黎之轨迹",
     },
+    {
+        "en_name": "Age of Empires IV",
+        "keyw": "帝国时代4",
+    },
 
     # XiaoXing
     {

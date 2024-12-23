@@ -75,6 +75,8 @@ class GameCheatsManager(QMainWindow):
 
         # Menu setup
         menu = self.menuBar()
+
+        # Options menu
         optionMenu = menu.addMenu(tr("Options"))
 
         settingsAction = QAction(tr("Settings"), self)
@@ -97,10 +99,25 @@ class GameCheatsManager(QMainWindow):
         aboutAction.triggered.connect(self.open_about)
         optionMenu.addAction(aboutAction)
 
-        # Below are standalone menu actions
-        wemodAction = QAction(tr("Trainer Management"), self)
-        wemodAction.triggered.connect(self.open_trainer_management)
-        menu.addAction(wemodAction)
+        # Data update menu
+        dataMenu = menu.addMenu(tr("Data Update"))
+
+        updateTranslations = QAction(tr("Update Translation Data"), self)
+        updateTranslations.triggered.connect(self.fetch_trainer_translations)
+        dataMenu.addAction(updateTranslations)
+
+        updateTrainerSearchData = QAction(tr("Update Trainer Search Data"), self)
+        updateTrainerSearchData.triggered.connect(self.fetch_trainer_search_data)
+        dataMenu.addAction(updateTrainerSearchData)
+
+        updateTrainers = QAction(tr("Update Trainers"), self)
+        updateTrainers.triggered.connect(self.update_fling_trainers)
+        dataMenu.addAction(updateTrainers)
+
+        # Trainer management menu
+        trainerManagement = QAction(tr("Trainer Management"), self)
+        trainerManagement.triggered.connect(self.open_trainer_management)
+        menu.addAction(trainerManagement)
 
         # Status bar setup
         self.statusbar = QStatusBar()
@@ -456,15 +473,19 @@ class GameCheatsManager(QMainWindow):
             fetch_xiaoxing_site_thread.finished.connect(self.on_interval_finished)
             fetch_xiaoxing_site_thread.start()
 
+    def fetch_trainer_search_data(self):
+        self.fetch_fling_data()
+        self.fetch_xiaoxing_data()
+
     def on_main_interval(self):
         if settings["autoUpdateTranslations"]:
             self.fetch_trainer_translations()
         if settings["autoUpdateFlingData"]:
             self.fetch_fling_data()
-        if settings["autoUpdateFlingTrainers"]:
-            self.update_fling_trainers()
         if settings["autoUpdateXiaoXingData"]:
             self.fetch_xiaoxing_data()
+        if settings["autoUpdateFlingTrainers"]:
+            self.update_fling_trainers()
 
     def download_trainers(self, index):
         self.enqueue_download(index, self.trainers, self.trainerDownloadPath, False, None, None)

@@ -161,10 +161,10 @@ class DownloadTrainersThread(DownloadBaseThread):
             self.message.emit(tr("Updating ") + self.trainerName + "...", None)
 
         if self.update or settings["flingDownloadServer"] == "intl":
-            # Trainer name check
             if not self.update:
                 trainerName_display = self.symbol_replacement(selected_trainer["trainer_name"])
 
+                # Trainer duplication check
                 for trainerPath in self.trainers.keys():
                     if trainerName_display in trainerPath:
                         self.message.emit(tr("Trainer already exists, aborted download."), "failure")
@@ -215,16 +215,17 @@ class DownloadTrainersThread(DownloadBaseThread):
                 return False
 
             # Extract compressed file and rename
-            self.message.emit(tr("Decompressing..."), None)
-            try:
-                command = [unzip_path, "x", "-y", trainerTemp, f"-o{DOWNLOAD_TEMP_DIR}"]
-                subprocess.run(command, check=True, creationflags=subprocess.CREATE_NO_WINDOW)
+            if os.path.splitext(trainerTemp)[1] in [".zip", ".rar"]:
+                self.message.emit(tr("Decompressing..."), None)
+                try:
+                    command = [unzip_path, "x", "-y", trainerTemp, f"-o{DOWNLOAD_TEMP_DIR}"]
+                    subprocess.run(command, check=True, creationflags=subprocess.CREATE_NO_WINDOW)
 
-            except Exception as e:
-                self.message.emit(tr("An error occurred while extracting downloaded trainer: ") + str(e), "failure")
-                time.sleep(self.download_finish_delay)
-                self.finished.emit(1)
-                return False
+                except Exception as e:
+                    self.message.emit(tr("An error occurred while extracting downloaded trainer: ") + str(e), "failure")
+                    time.sleep(self.download_finish_delay)
+                    self.finished.emit(1)
+                    return False
 
             # Locate extracted .exe file
             cnt = 0
@@ -356,11 +357,10 @@ class DownloadTrainersThread(DownloadBaseThread):
                 return False
 
             # Locate extracted .exe file
-            cnt = 0
-            extractedTrainerNames = None
+            extractedTrainerNames = []
             for filename in os.listdir(DOWNLOAD_TEMP_DIR):
                 if filename.endswith(".exe"):
-                    extractedTrainerNames = filename
+                    extractedTrainerNames.append(filename)
 
             # Warn user if anti-cheat files found
             if antiUrl:
@@ -374,7 +374,7 @@ class DownloadTrainersThread(DownloadBaseThread):
                 return False
 
             os.makedirs(self.trainerDownloadPath, exist_ok=True)
-            source_file = os.path.join(DOWNLOAD_TEMP_DIR, extractedTrainerNames)
+            source_file = os.path.join(DOWNLOAD_TEMP_DIR, extractedTrainerNames[0])
             destination_file = os.path.join(self.trainerDownloadPath, trainerName_display + ".exe")
             self.src_dst.append({"src": source_file, "dst": destination_file})
 
@@ -394,7 +394,8 @@ class DownloadTrainersThread(DownloadBaseThread):
             os.chmod(original_trainer_file, stat.S_IWRITE)
             os.remove(original_trainer_file)
 
-        os.remove(trainerTemp)
+        if os.path.exists(trainerTemp) and os.path.basename(trainerTemp) not in extractedTrainerNames:
+            os.remove(trainerTemp)
         if antiUrl:
             os.remove(antiTemp)
 
@@ -432,6 +433,14 @@ class DownloadTrainersThread(DownloadBaseThread):
         return download_url
 
     def download_xiaoxing(self, selected_trainer):
+        # Trainer duplication check
+        for trainerPath in self.trainers.keys():
+            if self.symbol_replacement(selected_trainer["trainer_name"]) in trainerPath:
+                self.message.emit(tr("Trainer already exists, aborted download."), "failure")
+                time.sleep(self.download_finish_delay)
+                self.finished.emit(1)
+                return False
+
         # Download trainer archive (either MediaFire or OneDrive)
         page_content = self.get_webpage_content(selected_trainer["url"], "小幸修改器官方网站")
         trainerPage = BeautifulSoup(page_content, 'html.parser')

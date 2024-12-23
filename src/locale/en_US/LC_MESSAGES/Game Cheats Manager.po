@@ -55,6 +55,18 @@ msgstr "Add Paths to Whitelist"
 msgid "About"
 msgstr "About"
 
+msgid "Data Update"
+msgstr "Data Update"
+
+msgid "Update Translation Data"
+msgstr "Update Translation Data"
+
+msgid "Update Trainer Search Data"
+msgstr "Update Trainer Search Data"
+
+msgid "Update Trainers"
+msgstr "Update Trainers"
+
 msgid "Trainer Management"
 msgstr "Trainer Management"
 
