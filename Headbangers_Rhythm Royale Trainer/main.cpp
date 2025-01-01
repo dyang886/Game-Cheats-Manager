@@ -1,10 +1,15 @@
+#define _CRT_SECURE_NO_WARNINGS
+#define STB_IMAGE_IMPLEMENTATION
+
 #include <iostream>
 #include <vector>
 #include <dxgi1_4.h>
 #include <tlhelp32.h>
+#include "stb_image.h"
 #include "imgui.h"
 #include "imgui_impl_win32.h"
 #include "imgui_impl_dx12.h"
+#include "imgui_freetype.h"
 
 #ifdef _DEBUG
 #define DX12_ENABLE_DEBUG_LAYER
@@ -380,7 +385,233 @@ LRESULT WINAPI WndProc(HWND hWnd, UINT msg, WPARAM wParam, LPARAM lParam)
     return ::DefWindowProcW(hWnd, msg, wParam, lParam);
 }
 
-// Memory manipulation class
+// Simple helper function to load an image into a DX12 texture with common settings
+// Returns true on success, with the SRV CPU handle having an SRV for the newly-created texture placed in it (srv_cpu_handle must be a handle in a valid descriptor heap)
+bool LoadTextureFromMemory(const void *data, size_t data_size, ID3D12Device *d3d_device, D3D12_CPU_DESCRIPTOR_HANDLE srv_cpu_handle, ID3D12Resource **out_tex_resource, int *out_width, int *out_height)
+{
+    // Load from disk into a raw RGBA buffer
+    int image_width = 0;
+    int image_height = 0;
+    unsigned char *image_data = stbi_load_from_memory((const unsigned char *)data, (int)data_size, &image_width, &image_height, NULL, 4);
+    if (image_data == NULL)
+        return false;
+
+    // Create texture resource
+    D3D12_HEAP_PROPERTIES props;
+    memset(&props, 0, sizeof(D3D12_HEAP_PROPERTIES));
+    props.Type = D3D12_HEAP_TYPE_DEFAULT;
+    props.CPUPageProperty = D3D12_CPU_PAGE_PROPERTY_UNKNOWN;
+    props.MemoryPoolPreference = D3D12_MEMORY_POOL_UNKNOWN;
+
+    D3D12_RESOURCE_DESC desc;
+    ZeroMemory(&desc, sizeof(desc));
+    desc.Dimension = D3D12_RESOURCE_DIMENSION_TEXTURE2D;
+    desc.Alignment = 0;
+    desc.Width = image_width;
+    desc.Height = image_height;
+    desc.DepthOrArraySize = 1;
+    desc.MipLevels = 1;
+    desc.Format = DXGI_FORMAT_R8G8B8A8_UNORM;
+    desc.SampleDesc.Count = 1;
+    desc.SampleDesc.Quality = 0;
+    desc.Layout = D3D12_TEXTURE_LAYOUT_UNKNOWN;
+    desc.Flags = D3D12_RESOURCE_FLAG_NONE;
+
+    ID3D12Resource *pTexture = NULL;
+    d3d_device->CreateCommittedResource(&props, D3D12_HEAP_FLAG_NONE, &desc,
+                                        D3D12_RESOURCE_STATE_COPY_DEST, NULL, IID_PPV_ARGS(&pTexture));
+
+    // Create a temporary upload resource to move the data in
+    UINT uploadPitch = (image_width * 4 + D3D12_TEXTURE_DATA_PITCH_ALIGNMENT - 1u) & ~(D3D12_TEXTURE_DATA_PITCH_ALIGNMENT - 1u);
+    UINT uploadSize = image_height * uploadPitch;
+    desc.Dimension = D3D12_RESOURCE_DIMENSION_BUFFER;
+    desc.Alignment = 0;
+    desc.Width = uploadSize;
+    desc.Height = 1;
+    desc.DepthOrArraySize = 1;
+    desc.MipLevels = 1;
+    desc.Format = DXGI_FORMAT_UNKNOWN;
+    desc.SampleDesc.Count = 1;
+    desc.SampleDesc.Quality = 0;
+    desc.Layout = D3D12_TEXTURE_LAYOUT_ROW_MAJOR;
+    desc.Flags = D3D12_RESOURCE_FLAG_NONE;
+
+    props.Type = D3D12_HEAP_TYPE_UPLOAD;
+    props.CPUPageProperty = D3D12_CPU_PAGE_PROPERTY_UNKNOWN;
+    props.MemoryPoolPreference = D3D12_MEMORY_POOL_UNKNOWN;
+
+    ID3D12Resource *uploadBuffer = NULL;
+    HRESULT hr = d3d_device->CreateCommittedResource(&props, D3D12_HEAP_FLAG_NONE, &desc,
+                                                     D3D12_RESOURCE_STATE_GENERIC_READ, NULL, IID_PPV_ARGS(&uploadBuffer));
+    IM_ASSERT(SUCCEEDED(hr));
+
+    // Write pixels into the upload resource
+    void *mapped = NULL;
+    D3D12_RANGE range = {0, uploadSize};
+    hr = uploadBuffer->Map(0, &range, &mapped);
+    IM_ASSERT(SUCCEEDED(hr));
+    for (int y = 0; y < image_height; y++)
+        memcpy((void *)((uintptr_t)mapped + y * uploadPitch), image_data + y * image_width * 4, image_width * 4);
+    uploadBuffer->Unmap(0, &range);
+
+    // Copy the upload resource content into the real resource
+    D3D12_TEXTURE_COPY_LOCATION srcLocation = {};
+    srcLocation.pResource = uploadBuffer;
+    srcLocation.Type = D3D12_TEXTURE_COPY_TYPE_PLACED_FOOTPRINT;
+    srcLocation.PlacedFootprint.Footprint.Format = DXGI_FORMAT_R8G8B8A8_UNORM;
+    srcLocation.PlacedFootprint.Footprint.Width = image_width;
+    srcLocation.PlacedFootprint.Footprint.Height = image_height;
+    srcLocation.PlacedFootprint.Footprint.Depth = 1;
+    srcLocation.PlacedFootprint.Footprint.RowPitch = uploadPitch;
+
+    D3D12_TEXTURE_COPY_LOCATION dstLocation = {};
+    dstLocation.pResource = pTexture;
+    dstLocation.Type = D3D12_TEXTURE_COPY_TYPE_SUBRESOURCE_INDEX;
+    dstLocation.SubresourceIndex = 0;
+
+    D3D12_RESOURCE_BARRIER barrier = {};
+    barrier.Type = D3D12_RESOURCE_BARRIER_TYPE_TRANSITION;
+    barrier.Flags = D3D12_RESOURCE_BARRIER_FLAG_NONE;
+    barrier.Transition.pResource = pTexture;
+    barrier.Transition.Subresource = D3D12_RESOURCE_BARRIER_ALL_SUBRESOURCES;
+    barrier.Transition.StateBefore = D3D12_RESOURCE_STATE_COPY_DEST;
+    barrier.Transition.StateAfter = D3D12_RESOURCE_STATE_PIXEL_SHADER_RESOURCE;
+
+    // Create a temporary command queue to do the copy with
+    ID3D12Fence *fence = NULL;
+    hr = d3d_device->CreateFence(0, D3D12_FENCE_FLAG_NONE, IID_PPV_ARGS(&fence));
+    IM_ASSERT(SUCCEEDED(hr));
+
+    HANDLE event = CreateEvent(0, 0, 0, 0);
+    IM_ASSERT(event != NULL);
+
+    D3D12_COMMAND_QUEUE_DESC queueDesc = {};
+    queueDesc.Type = D3D12_COMMAND_LIST_TYPE_DIRECT;
+    queueDesc.Flags = D3D12_COMMAND_QUEUE_FLAG_NONE;
+    queueDesc.NodeMask = 1;
+
+    ID3D12CommandQueue *cmdQueue = NULL;
+    hr = d3d_device->CreateCommandQueue(&queueDesc, IID_PPV_ARGS(&cmdQueue));
+    IM_ASSERT(SUCCEEDED(hr));
+
+    ID3D12CommandAllocator *cmdAlloc = NULL;
+    hr = d3d_device->CreateCommandAllocator(D3D12_COMMAND_LIST_TYPE_DIRECT, IID_PPV_ARGS(&cmdAlloc));
+    IM_ASSERT(SUCCEEDED(hr));
+
+    ID3D12GraphicsCommandList *cmdList = NULL;
+    hr = d3d_device->CreateCommandList(0, D3D12_COMMAND_LIST_TYPE_DIRECT, cmdAlloc, NULL, IID_PPV_ARGS(&cmdList));
+    IM_ASSERT(SUCCEEDED(hr));
+
+    cmdList->CopyTextureRegion(&dstLocation, 0, 0, 0, &srcLocation, NULL);
+    cmdList->ResourceBarrier(1, &barrier);
+
+    hr = cmdList->Close();
+    IM_ASSERT(SUCCEEDED(hr));
+
+    // Execute the copy
+    cmdQueue->ExecuteCommandLists(1, (ID3D12CommandList *const *)&cmdList);
+    hr = cmdQueue->Signal(fence, 1);
+    IM_ASSERT(SUCCEEDED(hr));
+
+    // Wait for everything to complete
+    fence->SetEventOnCompletion(1, event);
+    WaitForSingleObject(event, INFINITE);
+
+    // Tear down our temporary command queue and release the upload resource
+    cmdList->Release();
+    cmdAlloc->Release();
+    cmdQueue->Release();
+    CloseHandle(event);
+    fence->Release();
+    uploadBuffer->Release();
+
+    // Create a shader resource view for the texture
+    D3D12_SHADER_RESOURCE_VIEW_DESC srvDesc;
+    ZeroMemory(&srvDesc, sizeof(srvDesc));
+    srvDesc.Format = DXGI_FORMAT_R8G8B8A8_UNORM;
+    srvDesc.ViewDimension = D3D12_SRV_DIMENSION_TEXTURE2D;
+    srvDesc.Texture2D.MipLevels = desc.MipLevels;
+    srvDesc.Texture2D.MostDetailedMip = 0;
+    srvDesc.Shader4ComponentMapping = D3D12_DEFAULT_SHADER_4_COMPONENT_MAPPING;
+    d3d_device->CreateShaderResourceView(pTexture, &srvDesc, srv_cpu_handle);
+
+    // Return results
+    *out_tex_resource = pTexture;
+    *out_width = image_width;
+    *out_height = image_height;
+    stbi_image_free(image_data);
+
+    return true;
+}
+
+// Open and read a file, then forward to LoadTextureFromMemory()
+bool LoadTextureFromResource(const char *resource_name, ID3D12Device *d3d_device, D3D12_CPU_DESCRIPTOR_HANDLE srv_cpu_handle, ID3D12Resource **out_tex_resource, int *out_width, int *out_height)
+{
+    // Locate the resource in the executable
+    HRSRC resource = FindResource(NULL, resource_name, RT_RCDATA);
+
+    // Load the resource into memory
+    HGLOBAL resourceData = LoadResource(NULL, resource);
+
+    // Get a pointer to the resource data
+    void *file_data = LockResource(resourceData);
+
+    // Get the size of the resource
+    size_t file_size = SizeofResource(NULL, resource);
+
+    // Pass the resource data to LoadTextureFromMemory
+    bool ret = LoadTextureFromMemory(file_data, file_size, d3d_device, srv_cpu_handle, out_tex_resource, out_width, out_height);
+
+    return ret;
+}
+
+void DestroyTexture(ID3D12Resource **tex_resources)
+{
+    (*tex_resources)->Release();
+    *tex_resources = NULL;
+}
+
+ImFont *LoadFontFromResource(const char *resource_name, float fontSize, ImGuiIO &io, ImFontConfig *customConfig = nullptr, const ImWchar *glyphRanges = nullptr)
+{
+    // Locate the resource in the executable
+    HRSRC fontResource = FindResource(NULL, resource_name, RT_RCDATA);
+
+    // Load the resource into memory
+    HGLOBAL fontData = LoadResource(NULL, fontResource);
+
+    // Get a pointer to the resource data
+    void *resourcePtr = LockResource(fontData);
+
+    // Get the size of the resource
+    size_t fontSizeInBytes = SizeofResource(NULL, fontResource);
+
+    // Allocate heap memory and copy the font data
+    void *fontHeapPtr = malloc(fontSizeInBytes);
+    memcpy(fontHeapPtr, resourcePtr, fontSizeInBytes);
+
+    // Create font configuration
+    ImFontConfig config;
+    if (customConfig)
+    {
+        config = *customConfig;
+    }
+    config.MergeMode = customConfig ? customConfig->MergeMode : false;
+
+    // Add the font to ImGui
+    ImFont *font = io.Fonts->AddFontFromMemoryTTF(fontHeapPtr, fontSizeInBytes, fontSize, &config, glyphRanges);
+    if (!font)
+    {
+        free(fontHeapPtr);
+        return nullptr;
+    }
+
+    // ImGui takes ownership of the memory and will free it
+    return font;
+}
+
+// ===========================================================================
+// Trainer class
+// ===========================================================================
 class GameTrainer
 {
 public:
@@ -533,14 +764,16 @@ private:
     }
 };
 
+// ===========================================================================
 // Main code
+// ===========================================================================
 int APIENTRY WinMain(HINSTANCE hInstance, HINSTANCE hPrevInstance, LPSTR lpCmdLine, int nCmdShow)
 {
     // Create application window
     // ImGui_ImplWin32_EnableDpiAwareness();
     WNDCLASSEXW wc = {sizeof(wc), CS_CLASSDC, WndProc, 0L, 0L, GetModuleHandleW(nullptr), nullptr, nullptr, nullptr, nullptr, L"Headbangers: Rhythm Royale Trainer", nullptr};
     ::RegisterClassExW(&wc);
-    HWND hwnd = ::CreateWindowW(wc.lpszClassName, L"Headbangers: Rhythm Royale Trainer", WS_OVERLAPPEDWINDOW, 100, 100, 1280, 800, nullptr, nullptr, wc.hInstance, nullptr);
+    HWND hwnd = ::CreateWindowW(wc.lpszClassName, L"Headbangers: Rhythm Royale Trainer", WS_OVERLAPPEDWINDOW, 100, 100, 700, 500, nullptr, nullptr, wc.hInstance, nullptr);
 
     // Initialize Direct3D
     if (!CreateDeviceD3D(hwnd))
@@ -565,6 +798,7 @@ int APIENTRY WinMain(HINSTANCE hInstance, HINSTANCE hPrevInstance, LPSTR lpCmdLi
     // Setup Dear ImGui style
     ImGui::StyleColorsDark();
     // ImGui::StyleColorsLight();
+    ImVec4 clear_color = ImVec4(0.45f, 0.55f, 0.60f, 1.00f);
 
     // Setup Platform/Renderer backends
     ImGui_ImplWin32_Init(hwnd);
@@ -585,27 +819,46 @@ int APIENTRY WinMain(HINSTANCE hInstance, HINSTANCE hPrevInstance, LPSTR lpCmdLi
     ImGui_ImplDX12_Init(&init_info);
 
     // Load Fonts
-    // - If no fonts are loaded, dear imgui will use the default font. You can also load multiple fonts and use ImGui::PushFont()/PopFont() to select them.
-    // - AddFontFromFileTTF() will return the ImFont* so you can store it if you need to select the font among multiple.
-    // - If the file cannot be loaded, the function will return a nullptr. Please handle those errors in your application (e.g. use an assertion, or display an error and quit).
-    // - The fonts will be rasterized at a given size (w/ oversampling) and stored into a texture when calling ImFontAtlas::Build()/GetTexDataAsXXXX(), which ImGui_ImplXXXX_NewFrame below will call.
-    // - Use '#define IMGUI_ENABLE_FREETYPE' in your imconfig file to use Freetype for higher quality font rendering.
-    // - Read 'docs/FONTS.md' for more instructions and details.
-    // - Remember that in C/C++ if you want to include a backslash \ in a string literal you need to write a double backslash \\ !
-    // io.Fonts->AddFontDefault();
-    // io.Fonts->AddFontFromFileTTF("c:\\Windows\\Fonts\\segoeui.ttf", 18.0f);
-    // io.Fonts->AddFontFromFileTTF("../../misc/fonts/DroidSans.ttf", 16.0f);
-    // io.Fonts->AddFontFromFileTTF("../../misc/fonts/Roboto-Medium.ttf", 16.0f);
-    // io.Fonts->AddFontFromFileTTF("../../misc/fonts/Cousine-Regular.ttf", 15.0f);
-    // ImFont* font = io.Fonts->AddFontFromFileTTF("c:\\Windows\\Fonts\\ArialUni.ttf", 18.0f, nullptr, io.Fonts->GetGlyphRangesJapanese());
-    // IM_ASSERT(font != nullptr);
+    static const ImWchar chinese_ranges[] = {0x4E00, 0x9FFF, 0}; // Simplified Chinese
 
-    // Our state
-    ImVec4 clear_color = ImVec4(0.45f, 0.55f, 0.60f, 1.00f);
+    // Load primary font for regular UI
+    ImFontConfig config;
+    ImFont *regularFont = LoadFontFromResource("IDR_EN_FONT", 20.0f, io, &config, nullptr);
+
+    // Merge Simplified Chinese glyphs into the primary font
+    config.MergeMode = true;
+    LoadFontFromResource("IDR_SC_FONT", 20.0f, io, &config, chinese_ranges);
+
+    // Load the same font with a larger size for titles
+    config.MergeMode = false;
+    ImFont *titleFont = LoadFontFromResource("IDR_EN_FONT", 28.0f, io, &config, nullptr);
+    config.MergeMode = true;
+    LoadFontFromResource("IDR_SC_FONT", 28.0f, io, &config, chinese_ranges);
+
+    // Load Image
+    // We need to pass a D3D12_CPU_DESCRIPTOR_HANDLE in ImTextureID, so make sure it will fit
+    static_assert(sizeof(ImTextureID) >= sizeof(D3D12_CPU_DESCRIPTOR_HANDLE), "D3D12_CPU_DESCRIPTOR_HANDLE is too large to fit in an ImTextureID");
+
+    // We presume here that we have our D3D device pointer in g_pd3dDevice
+    int logo_image_width = 0;
+    int logo_image_height = 0;
+    float logo_image_multiplier = 0.3f;
+    ID3D12Resource *logo_texture = NULL;
+
+    // Get CPU/GPU handles for the shader resource view
+    // Normally your engine will have some sort of allocator for these.
+    // In our example we use a simple ExampleDescriptorHeapAllocator helper.
+    D3D12_CPU_DESCRIPTOR_HANDLE my_texture_srv_cpu_handle;
+    D3D12_GPU_DESCRIPTOR_HANDLE my_texture_srv_gpu_handle;
+    g_pd3dSrvDescHeapAlloc.Alloc(&my_texture_srv_cpu_handle, &my_texture_srv_gpu_handle);
+
+    // Load the texture from a file
+    bool ret = LoadTextureFromResource("IDR_LOGO_IMAGE", g_pd3dDevice, my_texture_srv_cpu_handle, &logo_texture, &logo_image_width, &logo_image_height);
+    IM_ASSERT(ret);
 
     // Trainer logic
     GameTrainer trainer;
-    int newCurrencyValue = 0;
+    int newBreadValue = 0;
 
     // Main loop
     bool done = false;
@@ -626,31 +879,75 @@ int APIENTRY WinMain(HINSTANCE hInstance, HINSTANCE hPrevInstance, LPSTR lpCmdLi
         ImGui_ImplWin32_NewFrame();
         ImGui::NewFrame();
 
-        ImGui::Begin("Trainer");
+        ImGui::Begin("Trainer", nullptr, ImGuiWindowFlags_NoCollapse | ImGuiWindowFlags_NoResize | ImGuiWindowFlags_NoMove | ImGuiWindowFlags_NoDecoration);
 
-        // Check if process is running
-        bool processRunning = trainer.isProcessRunning();
-        if (processRunning)
-        {
-            ImGui::TextColored(ImVec4(0.0f, 1.0f, 0.0f, 1.0f), "Process Found: %ls", trainer.PROCESS_NAME);
-        }
-        else
-        {
-            ImGui::TextColored(ImVec4(1.0f, 0.0f, 0.0f, 1.0f), "Process Not Found: %ls", trainer.PROCESS_NAME);
-        }
+        // Set the window to fill the entire application
+        ImGui::SetWindowPos(ImVec2(0, 0));
+        ImGui::SetWindowSize(io.DisplaySize);
 
-        // Input and button
-        ImGui::InputInt("Edit bread", &newCurrencyValue);
-        if (ImGui::Button("Apply"))
+        // Trainer name at the top
+        ImGui::PushFont(titleFont);
+        ImGui::TextWrapped("Headbangers: Rhythm Royale Trainer");
+        ImGui::PopFont();
+        ImGui::Separator();
+        ImGui::Dummy(ImVec2(0.0f, 10.0f));
+
+        if (ImGui::BeginTable("TrainerLayout", 2, ImGuiTableFlags_SizingStretchProp | ImGuiTableFlags_NoBordersInBody))
         {
-            if (trainer.isProcessRunning())
+            // Column 1: Game image and process info
+            ImGui::TableNextColumn();
+
+            ImGui::Image((ImTextureID)my_texture_srv_gpu_handle.ptr, ImVec2((float)logo_image_width * logo_image_multiplier, (float)logo_image_height * logo_image_multiplier));
+
+            bool processRunning = trainer.isProcessRunning();
+            ImGui::Dummy(ImVec2(0.0f, 10.0f));
+            ImGui::TextWrapped("Process name:");
+            if (processRunning)
             {
-                trainer.setBread(newCurrencyValue);
+                ImGui::TextColored(ImVec4(0.0f, 1.0f, 0.0f, 1.0f), "%ls", trainer.PROCESS_NAME);
+                ImGui::Dummy(ImVec2(0.0f, 10.0f));
+                ImGui::Text("Process ID: %d", trainer.procId);
             }
             else
             {
-                MessageBoxW(nullptr, L"Please start the game first.", L"Warning", MB_ICONWARNING);
+                ImGui::TextColored(ImVec4(1.0f, 0.0f, 0.0f, 1.0f), "%ls", trainer.PROCESS_NAME);
+                ImGui::Dummy(ImVec2(0.0f, 10.0f));
+                ImGui::Text("Process ID: N/A");
             }
+
+            // Column 2: Center-aligned options
+            ImGui::TableNextColumn();
+
+            // Center widgets
+            float columnHeight = ImGui::GetContentRegionAvail().y;
+            float optionHeight = ImGui::GetFontSize() + ImGui::GetFrameHeight() + ImGui::GetStyle().ItemSpacing.y + 10.0f;
+            int numOptions = 2;
+            float offsetY = (columnHeight - optionHeight * numOptions - 28.0f) * 0.5f;
+            if (offsetY > 0.0f)
+                ImGui::SetCursorPosY(ImGui::GetCursorPosY() + offsetY);
+
+            // Option 1: Edit bread
+            ImGui::Text("Edit bread:");
+            if (newBreadValue < 0)
+                newBreadValue = 0;
+            if (newBreadValue > 9999999)
+                newBreadValue = 9999999;
+            ImGui::InputInt("##bread", &newBreadValue, 1, 10, ImGuiInputTextFlags_CharsDecimal);
+            ImGui::SameLine();
+            if (ImGui::Button("Apply"))
+            {
+                if (processRunning)
+                {
+                    trainer.setBread(newBreadValue);
+                }
+                else
+                {
+                    MessageBoxW(nullptr, L"Please start the game first.", L"Warning", MB_ICONWARNING);
+                }
+            }
+            ImGui::Dummy(ImVec2(0.0f, 10.0f));
+
+            ImGui::EndTable();
         }
 
         ImGui::End();

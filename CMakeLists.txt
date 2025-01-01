@@ -9,3 +9,4 @@ add_subdirectory(common)
 
 # Add each game-specific trainer
 add_subdirectory("Headbangers_Rhythm Royale Trainer")
+add_subdirectory("Arrow a Row Trainer")
