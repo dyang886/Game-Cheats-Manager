@@ -2,16 +2,13 @@
 #define STB_IMAGE_IMPLEMENTATION
 
 #include <iostream>
-#include <vector>
-#include <string>
-#include <sstream>
 #include <dxgi1_4.h>
-#include <tlhelp32.h>
 #include "stb_image.h"
 #include "imgui.h"
 #include "imgui_impl_win32.h"
 #include "imgui_impl_dx12.h"
 #include "imgui_freetype.h"
+#include "trainer.h"
 
 #ifdef _DEBUG
 #define DX12_ENABLE_DEBUG_LAYER
@@ -611,378 +608,6 @@ ImFont *LoadFontFromResource(const char *resource_name, float fontSize, ImGuiIO 
     return font;
 }
 
-// ---------------------------------------------------------------------------
-//  Helper: Case-insensitive compare wide
-// ---------------------------------------------------------------------------
-int wcasecmp(const wchar_t *a, const wchar_t *b)
-{
-    return _wcsicmp(a, b);
-}
-
-// ---------------------------------------------------------------------------
-//  Helper: Print addresses in hex
-// ---------------------------------------------------------------------------
-std::string toHex(uintptr_t val)
-{
-    char buf[64];
-    sprintf_s(buf, "0x%llX", static_cast<unsigned long long>(val));
-    return std::string(buf);
-}
-
-// ---------------------------------------------------------------------------
-//  Find a free region within ±2GB of a given address
-// ---------------------------------------------------------------------------
-LPVOID allocNearAddress(HANDLE hProc, uintptr_t target, size_t size)
-{
-    const size_t TWO_GB = (1ULL << 31);
-    const size_t stepSize = 0x10000; // 64KB step
-
-    uintptr_t start = (target > TWO_GB) ? (target - TWO_GB) : 0;
-    uintptr_t end = target + TWO_GB;
-
-    // Align start/end
-    start = (start / stepSize) * stepSize;
-    end = (end / stepSize) * stepSize;
-
-    for (uintptr_t addr = start; addr + size < end; addr += stepSize)
-    {
-        LPVOID p = VirtualAllocEx(hProc, (LPVOID)addr, size,
-                                  MEM_COMMIT | MEM_RESERVE,
-                                  PAGE_EXECUTE_READWRITE);
-        if (p)
-        {
-            // Check range
-            uintptr_t diff = (addr > target) ? (addr - target) : (target - addr);
-            if (diff <= TWO_GB)
-                return p;
-
-            // otherwise free and keep searching
-            VirtualFreeEx(hProc, p, 0, MEM_RELEASE);
-        }
-    }
-    return nullptr;
-}
-
-// ---------------------------------------------------------------------------
-//  The GameTrainer Class
-// ---------------------------------------------------------------------------
-class GameTrainer
-{
-public:
-    static inline const wchar_t *PROCESS_NAME = L"Arrow a Row.exe";
-    static inline const wchar_t *MODULE_NAME = L"GameAssembly.dll";
-
-    HANDLE hProcess = nullptr;
-    DWORD procId = 0;
-
-    uintptr_t hookAddr = 0; // Where F3 0F 11 73 4C is found
-    BYTE original[5] = {0}; // Original bytes
-    bool hookActive = false;
-
-    // Single block that holds both code + float
-    LPVOID nearBlock = nullptr;
-    size_t blockSize = 0x1000;
-
-public:
-    ~GameTrainer()
-    {
-        disableHook();
-        if (hProcess)
-            CloseHandle(hProcess);
-    }
-
-    // -----------------------------------------------------------------------
-    // 1) Attach to the game
-    // -----------------------------------------------------------------------
-    bool attach()
-    {
-        procId = getProcId(PROCESS_NAME);
-        if (!procId)
-        {
-            std::wcerr << L"[-] Could not find process: " << PROCESS_NAME << std::endl;
-            return false;
-        }
-
-        hProcess = OpenProcess(PROCESS_ALL_ACCESS, FALSE, procId);
-        if (!hProcess)
-        {
-            std::cerr << "[-] OpenProcess failed. Error: " << GetLastError() << std::endl;
-            return false;
-        }
-
-        std::wcout << L"[+] Attached to " << PROCESS_NAME << L" (PID=" << procId << L")\n";
-        return true;
-    }
-
-    // -----------------------------------------------------------------------
-    // 2) setArrowFrequency(newVal)
-    // -----------------------------------------------------------------------
-    bool setArrowFrequency(float newVal)
-    {
-        if (!hProcess)
-        {
-            std::cerr << "[!] No process handle.\n";
-            return false;
-        }
-        if (hookActive)
-            disableHook(); // remove old hook if any
-
-        // 1) Find instruction: "movss [rbx+4C], xmm6" => F3 0F 11 73 4C
-        std::vector<BYTE> pattern = {0xF3, 0x0F, 0x11, 0x73, 0x4C};
-        hookAddr = findPattern(MODULE_NAME, pattern);
-        if (!hookAddr)
-        {
-            std::cerr << "[!] Could not find pattern.\n";
-            return false;
-        }
-        std::cout << "[+] Found instruction at " << toHex(hookAddr) << "\n";
-
-        // 2) Save original 5 bytes
-        if (!ReadProcessMemory(hProcess, (LPCVOID)hookAddr, original, 5, nullptr))
-        {
-            std::cerr << "[!] Failed to read original bytes.\n";
-            return false;
-        }
-
-        // 3) Allocate a single 0x1000 block near the hook
-        nearBlock = allocNearAddress(hProcess, hookAddr, blockSize);
-        if (!nearBlock)
-        {
-            std::cerr << "[!] Could not allocate near block.\n";
-            return false;
-        }
-        std::cout << "[+] Allocated block at " << nearBlock << "\n";
-
-        uintptr_t base = (uintptr_t)nearBlock;
-        uintptr_t stubAddr = base + 0x0;    // Start of code
-        uintptr_t floatAddr = base + 0x400; // Where we put the float
-
-        // ----------------------------------------------------------------
-        // Build one combined buffer of size 'blockSize'
-        // ----------------------------------------------------------------
-        std::vector<BYTE> mem(blockSize, 0x90); // fill with NOP (0x90)
-
-        //
-        // A) Place the float bytes at offset 0x400
-        //
-        float *pFloatInMem = reinterpret_cast<float *>(&mem[0x400]);
-        *pFloatInMem = newVal; // Copies 4 bytes of the float
-
-        //
-        // B) Build the injection stub at offset 0x0
-        //    We'll do a minimal approach:
-        //      sub rsp,0x10
-        //      movss xmm6,[RIP+disp32]
-        //      movss [rbx+4C],xmm6
-        //      add rsp,0x10
-        //      jmp hookAddr+5
-        //
-        size_t writePos = 0; // Current position in 'mem' for the stub
-
-        // (1) sub rsp,0x10 => 48 83 EC 10
-        mem[writePos++] = 0x48;
-        mem[writePos++] = 0x83;
-        mem[writePos++] = 0xEC;
-        mem[writePos++] = 0x10;
-
-        // (2) movss xmm6, [RIP+disp32] => F3 0F 10 35 ?? ?? ?? ??
-        {
-            mem[writePos++] = 0xF3;
-            mem[writePos++] = 0x0F;
-            mem[writePos++] = 0x10;
-            mem[writePos++] = 0x35;
-
-            // disp32 = floatAddr - (stubAddr + writePos + 4)
-            uintptr_t nextInstr = stubAddr + writePos + 4;
-            int64_t diff = (int64_t)floatAddr - (int64_t)nextInstr;
-            int32_t disp = (int32_t)diff;
-            BYTE *pDisp = reinterpret_cast<BYTE *>(&disp);
-            for (int i = 0; i < 4; i++)
-                mem[writePos++] = pDisp[i];
-        }
-
-        // (3) movss [rbx+4C], xmm6 => F3 0F 11 73 4C
-        mem[writePos++] = 0xF3;
-        mem[writePos++] = 0x0F;
-        mem[writePos++] = 0x11;
-        mem[writePos++] = 0x73;
-        mem[writePos++] = 0x4C;
-
-        // (4) add rsp,0x10 => 48 83 C4 10
-        mem[writePos++] = 0x48;
-        mem[writePos++] = 0x83;
-        mem[writePos++] = 0xC4;
-        mem[writePos++] = 0x10;
-
-        // (5) jmp hookAddr+5 => E9 <rel32>
-        {
-            mem[writePos++] = 0xE9;
-            uintptr_t retAddr = hookAddr + 5;
-            uintptr_t nextInstr = stubAddr + writePos + 4;
-            int32_t rel = (int32_t)(retAddr - nextInstr);
-            BYTE *pRel = reinterpret_cast<BYTE *>(&rel);
-            for (int i = 0; i < 4; i++)
-                mem[writePos++] = pRel[i];
-        }
-
-        // The remainder of 'mem' is already 0x90 from the constructor
-
-        // ----------------------------------------------------------------
-        // Now write the entire buffer ONCE
-        // ----------------------------------------------------------------
-        SIZE_T written = 0;
-        if (!WriteProcessMemory(hProcess, nearBlock, mem.data(), mem.size(), &written))
-        {
-            std::cerr << "[!] WriteProcessMemory failed. Error: " << GetLastError() << std::endl;
-            cleanupAllocs();
-            return false;
-        }
-
-        // 4) Overwrite original 5 bytes with JMP <stubAddr>
-        //    E9 <rel32>
-        {
-            BYTE patch[5];
-            patch[0] = 0xE9;
-            int32_t rel = (int32_t)(stubAddr - (hookAddr + 5));
-            memcpy(&patch[1], &rel, 4);
-
-            if (!WriteProcessMemory(hProcess, (LPVOID)hookAddr, patch, 5, nullptr))
-            {
-                std::cerr << "[!] Failed to patch original bytes.\n";
-                cleanupAllocs();
-                return false;
-            }
-        }
-
-        FlushInstructionCache(hProcess, (LPCVOID)hookAddr, 5);
-        FlushInstructionCache(hProcess, nearBlock, mem.size());
-
-        hookActive = true;
-        std::cout << "[+] setArrowFrequency(" << newVal << ") hook installed.\n";
-        return true;
-    }
-
-    // -----------------------------------------------------------------------
-    // 3) disableHook
-    // -----------------------------------------------------------------------
-    void disableHook()
-    {
-        if (!hookActive)
-            return;
-
-        // Restore original 5 bytes
-        WriteProcessMemory(hProcess, (LPVOID)hookAddr, original, 5, nullptr);
-        FlushInstructionCache(hProcess, (LPCVOID)hookAddr, 5);
-
-        cleanupAllocs();
-        hookActive = false;
-
-        std::cout << "[+] Hook disabled.\n";
-    }
-
-private:
-    // -----------------------------------------------------------------------
-    // getProcId
-    // -----------------------------------------------------------------------
-    DWORD getProcId(const wchar_t *exeName)
-    {
-        DWORD pid = 0;
-        HANDLE snap = CreateToolhelp32Snapshot(TH32CS_SNAPPROCESS, 0);
-        if (snap == INVALID_HANDLE_VALUE)
-            return 0;
-
-        PROCESSENTRY32W pe;
-        pe.dwSize = sizeof(pe);
-        if (Process32FirstW(snap, &pe))
-        {
-            do
-            {
-                if (wcasecmp(pe.szExeFile, exeName) == 0)
-                {
-                    pid = pe.th32ProcessID;
-                    break;
-                }
-            } while (Process32NextW(snap, &pe));
-        }
-        CloseHandle(snap);
-        return pid;
-    }
-
-    // -----------------------------------------------------------------------
-    // getModuleInfo
-    // -----------------------------------------------------------------------
-    bool getModuleInfo(const wchar_t *modName, uintptr_t &modBase, size_t &modSize)
-    {
-        HANDLE snap = CreateToolhelp32Snapshot(TH32CS_SNAPMODULE | TH32CS_SNAPMODULE32, procId);
-        if (snap == INVALID_HANDLE_VALUE)
-            return false;
-
-        MODULEENTRY32W me;
-        me.dwSize = sizeof(me);
-        bool found = false;
-
-        if (Module32FirstW(snap, &me))
-        {
-            do
-            {
-                if (wcasecmp(me.szModule, modName) == 0)
-                {
-                    modBase = (uintptr_t)me.modBaseAddr;
-                    modSize = (size_t)me.modBaseSize;
-                    found = true;
-                    break;
-                }
-            } while (Module32NextW(snap, &me));
-        }
-        CloseHandle(snap);
-        return found;
-    }
-
-    // -----------------------------------------------------------------------
-    // findPattern (Exact, no wildcards)
-    // -----------------------------------------------------------------------
-    uintptr_t findPattern(const wchar_t *modName, const std::vector<BYTE> &pattern)
-    {
-        uintptr_t base = 0;
-        size_t size = 0;
-        if (!getModuleInfo(modName, base, size))
-            return 0;
-
-        std::vector<BYTE> buffer(size);
-        SIZE_T bytesRead = 0;
-        if (!ReadProcessMemory(hProcess, (LPCVOID)base, buffer.data(), size, &bytesRead))
-            return 0;
-
-        for (size_t i = 0; i + pattern.size() <= bytesRead; i++)
-        {
-            bool found = true;
-            for (size_t j = 0; j < pattern.size(); j++)
-            {
-                if (buffer[i + j] != pattern[j])
-                {
-                    found = false;
-                    break;
-                }
-            }
-            if (found)
-                return base + i;
-        }
-        return 0;
-    }
-
-    // -----------------------------------------------------------------------
-    // cleanupAllocs
-    // -----------------------------------------------------------------------
-    void cleanupAllocs()
-    {
-        if (nearBlock)
-        {
-            VirtualFreeEx(hProcess, nearBlock, 0, MEM_RELEASE);
-            nearBlock = nullptr;
-        }
-    }
-};
-
 // ===========================================================================
 // Main code
 // ===========================================================================
@@ -1085,9 +710,11 @@ int APIENTRY WinMain(HINSTANCE hInstance, HINSTANCE hPrevInstance, LPSTR lpCmdLi
 
     // Trainer logic
     GameTrainer trainer;
-    trainer.attach();
-    float newHealthValue = 0;
+    int newHealthValue = 0;
     int newArrowFrequency = 0;
+    int newArrowDamage = 0;
+    int newArrowSpeed = 0;
+    int newArrowDistance = 0;
 
     // Main loop
     bool done = false;
@@ -1128,8 +755,7 @@ int APIENTRY WinMain(HINSTANCE hInstance, HINSTANCE hPrevInstance, LPSTR lpCmdLi
 
             ImGui::Image((ImTextureID)my_texture_srv_gpu_handle.ptr, ImVec2((float)logo_image_width * logo_image_multiplier, (float)logo_image_height * logo_image_multiplier));
 
-            // bool processRunning = trainer.isProcessRunning();
-            bool processRunning = true;
+            bool processRunning = trainer.isProcessRunning();
             ImGui::Dummy(ImVec2(0.0f, 10.0f));
             ImGui::TextWrapped("Process name:");
             if (processRunning)
@@ -1151,7 +777,7 @@ int APIENTRY WinMain(HINSTANCE hInstance, HINSTANCE hPrevInstance, LPSTR lpCmdLi
             // Center widgets
             float columnHeight = ImGui::GetContentRegionAvail().y;
             float optionHeight = ImGui::GetFontSize() + ImGui::GetFrameHeight() + ImGui::GetStyle().ItemSpacing.y + 10.0f;
-            int numOptions = 2;
+            int numOptions = 5;
             float offsetY = (columnHeight - optionHeight * numOptions - 28.0f) * 0.5f;
             if (offsetY > 0.0f)
                 ImGui::SetCursorPosY(ImGui::GetCursorPosY() + offsetY);
@@ -1162,13 +788,13 @@ int APIENTRY WinMain(HINSTANCE hInstance, HINSTANCE hPrevInstance, LPSTR lpCmdLi
                 newHealthValue = 0;
             if (newHealthValue > 1.0E20f)
                 newHealthValue = 1.0E20f;
-            ImGui::InputFloat("##health", &newHealthValue, 1.0f, 10.0f, "%.1f");
+            ImGui::InputInt("##health", &newHealthValue, 1, 100);
             ImGui::SameLine();
             if (ImGui::Button("Apply##health"))
             {
                 if (processRunning)
                 {
-                    // trainer.setHealth(newHealthValue);
+                    trainer.setHealth((float)newHealthValue);
                 }
                 else
                 {
@@ -1191,6 +817,69 @@ int APIENTRY WinMain(HINSTANCE hInstance, HINSTANCE hPrevInstance, LPSTR lpCmdLi
                 {
                     float adjustedArrowFrequency = (float)newArrowFrequency / 10.0f;
                     trainer.setArrowFrequency(adjustedArrowFrequency);
+                }
+                else
+                {
+                    MessageBoxW(nullptr, L"Please start the game first.", L"Warning", MB_ICONWARNING);
+                }
+            }
+            ImGui::Dummy(ImVec2(0.0f, 10.0f));
+
+            // Option 3: Edit arrow damage
+            ImGui::Text("Edit arrow damage:");
+            if (newArrowDamage < 0)
+                newArrowDamage = 0;
+            if (newArrowDamage > 1000)
+                newArrowDamage = 1000;
+            ImGui::InputInt("##arrow_damage", &newArrowDamage, 1, 10);
+            ImGui::SameLine();
+            if (ImGui::Button("Apply##arrow_damage"))
+            {
+                if (processRunning)
+                {
+                    trainer.setArrowDamage((float)newArrowDamage);
+                }
+                else
+                {
+                    MessageBoxW(nullptr, L"Please start the game first.", L"Warning", MB_ICONWARNING);
+                }
+            }
+            ImGui::Dummy(ImVec2(0.0f, 10.0f));
+
+            // Option 4: Edit arrow speed
+            ImGui::Text("Edit arrow speed:");
+            if (newArrowSpeed < 0)
+                newArrowSpeed = 0;
+            if (newArrowSpeed > 1000)
+                newArrowSpeed = 1000;
+            ImGui::InputInt("##arrow_speed", &newArrowSpeed, 1, 10);
+            ImGui::SameLine();
+            if (ImGui::Button("Apply##arrow_speed"))
+            {
+                if (processRunning)
+                {
+                    trainer.setArrowSpeed((float)newArrowSpeed);
+                }
+                else
+                {
+                    MessageBoxW(nullptr, L"Please start the game first.", L"Warning", MB_ICONWARNING);
+                }
+            }
+            ImGui::Dummy(ImVec2(0.0f, 10.0f));
+
+            // Option 5: Edit arrow distance
+            ImGui::Text("Edit arrow distance:");
+            if (newArrowDistance < 0)
+                newArrowDistance = 0;
+            if (newArrowDistance > 1000)
+                newArrowDistance = 1000;
+            ImGui::InputInt("##arrow_distance", &newArrowDistance, 1, 10);
+            ImGui::SameLine();
+            if (ImGui::Button("Apply##arrow_distance"))
+            {
+                if (processRunning)
+                {
+                    trainer.setArrowDistance((float)newArrowDistance);
                 }
                 else
                 {
