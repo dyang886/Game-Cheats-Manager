@@ -1,3 +1,0 @@
-IDR_LOGO_IMAGE RCDATA "logo.jpg"
-IDR_EN_FONT RCDATA "../common/fonts/NotoSans-Regular.ttf"
-IDR_SC_FONT RCDATA "../common/fonts/NotoSansSC-Regular.ttf"

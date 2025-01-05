@@ -1,0 +1,47 @@
+#
+# Header Makefile for the Fast Light Tool Kit (FLTK).
+#
+# Copyright 1998-2021 by Bill Spitzak and others.
+#
+# This library is free software. Distribution and use rights are outlined in
+# the file "COPYING" which should have been included with this file.  If this
+# file is missing or damaged, see the license at:
+#
+#      https://www.fltk.org/COPYING.php
+#
+# Please see the following page on how to report bugs and issues:
+#
+#      https://www.fltk.org/bugs.php
+#
+
+include ../makeinclude
+
+all:
+
+clean:
+
+depend:
+
+install:
+	echo "Installing include files in $(DESTDIR)$(includedir)..."
+	$(RMDIR) "$(DESTDIR)$(includedir)/FL"
+	$(INSTALL_DIR) "$(DESTDIR)$(includedir)/FL"
+	for file in *.[hH]; do \
+		$(INSTALL_DATA) $$file "$(DESTDIR)$(includedir)/FL"; \
+	done
+@HLINKS@	cd "$(DESTDIR)$(includedir)/FL";\
+@HLINKS@	for file in *.H; do\
+@HLINKS@		$(RM) "`basename $$file H`h";\
+@HLINKS@		$(LN) $$file "`basename $$file H`h";\
+@HLINKS@	done
+@HLINKS@	$(RM) "$(DESTDIR)$(includedir)/FL/fl_file_chooser.H"
+@HLINKS@	$(LN) Fl_File_Chooser.H "$(DESTDIR)$(includedir)/FL/fl_file_chooser.H"
+@HLINKS@	$(RM) "$(DESTDIR)$(includedir)/FL/fl_file_chooser.h"
+@HLINKS@	$(LN) Fl_File_Chooser.H "$(DESTDIR)$(includedir)/FL/fl_file_chooser.h"
+@HLINKS@	$(RM) "$(DESTDIR)$(includedir)/Fl"
+@HLINKS@	$(LN) FL "$(DESTDIR)$(includedir)/Fl"
+
+uninstall:
+	echo "Uninstalling include files..."
+	$(RMDIR) "$(DESTDIR)$(includedir)/FL"
+@HLINKS@	$(RM) "$(DESTDIR)$(includedir)/Fl"

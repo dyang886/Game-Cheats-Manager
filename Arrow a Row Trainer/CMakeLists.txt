@@ -1,19 +1,10 @@
-# Use static runtime library for release builds
-set(CMAKE_MSVC_RUNTIME_LIBRARY "MultiThreaded$<$<CONFIG:Debug>:Debug>")
-set(RESOURCE_FILE ${CMAKE_CURRENT_SOURCE_DIR}/resources.rc)
-set(FREETYPE_LIB_DIR ${CMAKE_SOURCE_DIR}/common/libs)
+set(GAME_NAME Arrow_A_Row)
 
-# Add the executable for this trainer
-add_executable(ArrowARowTrainer WIN32 main.cpp)
+# Define the executable
+add_executable(${GAME_NAME} main.cpp)
 
-# Include the shared headers
-target_include_directories(ArrowARowTrainer PRIVATE ${CMAKE_SOURCE_DIR}/common/include)
+# Link against the Common library
+target_link_libraries(${GAME_NAME} PRIVATE Common)
 
-# Link the common library
-target_link_libraries(ArrowARowTrainer PRIVATE Common d3d12 dxgi dxguid)
-target_link_libraries(ArrowARowTrainer PRIVATE ${FREETYPE_LIB_DIR}/freetype_x64.lib)
-
-target_sources(ArrowARowTrainer PRIVATE ${RESOURCE_FILE})
-
-# Set custom output name
-set_target_properties(ArrowARowTrainer PROPERTIES OUTPUT_NAME "Arrow a Row Trainer")
+# Set a custom output name (optional)
+set_target_properties(${GAME_NAME} PROPERTIES OUTPUT_NAME "Arrow a Row Trainer")
