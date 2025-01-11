@@ -1,0 +1,22 @@
+{
+    "en_US": {
+        "Please run the game first.": "Please run the game first.",
+        "Failed to activate.": "Failed to activate.",
+        "Failed to activate/deactivate.": "Failed to activate/deactivate.",
+        "Process Name:": "Process Name:",
+        "Process ID:": "Process ID:",
+        "Plants vs. Zombies Trainer": "Plants vs. Zombies Trainer",
+        "Add Coin": "Add Coin",
+        "Add Sun": "Add Sun"
+    },
+    "zh_CN": {
+        "Please run the game first.": "请先运行游戏。",
+        "Failed to activate.": "激活失败。",
+        "Failed to activate/deactivate.": "激活/停用失败。",
+        "Process Name:": "进程名称：",
+        "Process ID:": "进程 ID：",
+        "Plants vs. Zombies Trainer": "植物大战僵尸修改器",
+        "Add Coin": "添加金币",
+        "Add Sun": "添加阳光"
+    }
+}

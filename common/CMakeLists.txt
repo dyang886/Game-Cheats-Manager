@@ -19,11 +19,17 @@ set(FLTK_LIB_DIR ${CMAKE_CURRENT_SOURCE_DIR}/libs)
 
 # Link FLTK libraries (adjust filenames as per your FLTK build)
 target_link_libraries(Common INTERFACE 
-    ${FLTK_LIB_DIR}/fltk.lib
-    ${FLTK_LIB_DIR}/fltk_forms.lib
-    ${FLTK_LIB_DIR}/fltk_images.lib
-    ${FLTK_LIB_DIR}/fltk_jpeg.lib
-    ${FLTK_LIB_DIR}/fltk_png.lib
+    ${FLTK_LIB_DIR}/fltk_x64.lib
+    ${FLTK_LIB_DIR}/fltk_forms_x64.lib
+    ${FLTK_LIB_DIR}/fltk_images_x64.lib
+    ${FLTK_LIB_DIR}/fltk_jpeg_x64.lib
+
+    # ${FLTK_LIB_DIR}/fltk_x86.lib
+    # ${FLTK_LIB_DIR}/fltk_forms_x86.lib
+    # ${FLTK_LIB_DIR}/fltk_images_x86.lib
+    # ${FLTK_LIB_DIR}/fltk_jpeg_x86.lib
+
+    # ${FLTK_LIB_DIR}/fltk_png.lib
 )
 
 target_link_libraries(Common INTERFACE comctl32 gdiplus ws2_32)

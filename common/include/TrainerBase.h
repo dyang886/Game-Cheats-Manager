@@ -3,13 +3,14 @@
 
 #include <Windows.h>
 #include <TlHelp32.h>
-#include <string>
-#include <map>
-#include <vector>
+#include <any>
 #include <functional>
 #include <iostream>
+#include <map>
+#include <string>
 #include <thread>
-#include <any>
+#include <vector>
+
 
 /***********************************************************************
  * HOOK_INFO: Track data about one named hook
@@ -66,10 +67,7 @@ public:
 
     virtual ~TrainerBase()
     {
-        disableAllHooks();
-        disableAllPointerToggles();
-        if (hProcess)
-            CloseHandle(hProcess);
+        cleanUp();
     }
 
     std::wstring getProcessName() const
@@ -82,6 +80,14 @@ public:
         return procId;
     }
 
+    void cleanUp() {
+        disableAllHooks();
+        disableAllPointerToggles();
+        if (hProcess)
+            CloseHandle(hProcess);
+        hProcess = nullptr;
+    }
+
     // Check if the target process is running and open a handle
     bool isProcessRunning()
     {
@@ -89,8 +95,7 @@ public:
         if (procId == 0)
         {
             std::wcerr << L"[!] Could not find process: " << processName << std::endl;
-            disableAllHooks();
-            disableAllPointerToggles();
+            cleanUp();
             return false;
         }
 
@@ -100,8 +105,7 @@ public:
             if (!hProcess)
             {
                 std::cerr << "[!] Failed to open process. Error: " << GetLastError() << std::endl;
-                disableAllHooks();
-                disableAllPointerToggles();
+                cleanUp();
                 return false;
             }
         }
