@@ -280,38 +280,10 @@ class WeModCustomization(QThread):
                 self.message.emit(tr("Failed to extract file:") + f"\n{asar_copy}", "error")
                 patch_success = False
 
-            patterns = {
-                r'(getUserAccount\()(.*)(}async getUserAccountFlags)': r'\1\2.then(function(response) {response.subscription={period:"yearly", state:"active"}; response.flags=78; return response;})\3',
-                r'(getUserAccountFlags\()(.*)(\)\).flags)': r'\1\2\3.then(function(response) {if (response.mask==4) {response.flags=4}; return response;})',
-                r'(changeAccountEmail\()(.*)(email:.?,currentPassword:.?}\))': r'\1\2\3.then(function(response) {response.subscription={period:"yearly", state:"active"}; response.flags=78; return response;})',
-                r'(getPromotion\()(.*)(collectMetrics:!0}\))': r'\1\2\3.then(function(response) {response.components.appBanner=null; response.flags=0; return response;})'
-            }
-
-            # Mapping of patterns to files where they were found: {pattern key: file path}
-            lines = {key: None for key in patterns}
-
-            # Check files for matching patterns
-            for pattern in patterns:
-                for filename in os.listdir(WEMOD_TEMP_DIR):
-                    if filename.endswith('.js'):
-                        file_path = os.path.join(WEMOD_TEMP_DIR, filename)
-                        try:
-                            with open(file_path, 'r', encoding='utf-8') as file:
-                                content = file.read()
-                                if re.search(pattern, content):
-                                    lines[pattern] = file_path
-                                    break
-                        except UnicodeDecodeError:
-                            continue
-
-            # Process each file with matched patterns
-            if all(lines.values()):
-                print(f"js file patched: {list(lines.items())[0][1]}")
-                for pattern, file_path in lines.items():
-                    self.apply_patch(file_path, pattern, patterns[pattern])
-            else:
-                self.message.emit(tr("Unsupported WeMod version"), "error")
-                patch_success = False
+            # Patching logic
+            patch_success = self.yearly_active_sub()
+            if not patch_success:
+                patch_success = self.gifted_sub()
 
             # pack patched js files back to app.asar
             try:
@@ -396,3 +368,72 @@ class WeModCustomization(QThread):
             subprocess.run(command, check=True, creationflags=subprocess.CREATE_NO_WINDOW)
         except Exception as e:
             self.message.emit(tr("Failed to patch file:") + f"\n{input_file}", "error")
+
+    def yearly_active_sub(self):
+        patterns = {
+            r'(getUserAccount\()(.*)(}async getUserAccountFlags)': r'\1\2.then(function(response) {response.subscription={period:"yearly", state:"active"}; response.flags=78; return response;})\3',
+            r'(getUserAccountFlags\()(.*)(\)\).flags)': r'\1\2\3.then(function(response) {if (response.mask==4) {response.flags=4}; return response;})',
+            r'(changeAccountEmail\()(.*)(email:.?,currentPassword:.?}\))': r'\1\2\3.then(function(response) {response.subscription={period:"yearly", state:"active"}; response.flags=78; return response;})',
+            r'(getPromotion\()(.*)(collectMetrics:!0}\))': r'\1\2\3.then(function(response) {response.components.appBanner=null; response.flags=0; return response;})'
+        }
+
+        # Mapping of patterns to files where they were found: {pattern key: file path}
+        lines = {key: None for key in patterns}
+
+        # Check files for matching patterns
+        for pattern in patterns:
+            for filename in os.listdir(WEMOD_TEMP_DIR):
+                if filename.endswith('.js'):
+                    file_path = os.path.join(WEMOD_TEMP_DIR, filename)
+                    try:
+                        with open(file_path, 'r', encoding='utf-8') as file:
+                            content = file.read()
+                            if re.search(pattern, content):
+                                lines[pattern] = file_path
+                                break
+                    except UnicodeDecodeError:
+                        continue
+
+        # Process each file with matched patterns
+        if all(lines.values()):
+            print(f"js file patched using yearly_active_sub method: {list(lines.items())[0][1]}")
+            for pattern, file_path in lines.items():
+                self.apply_patch(file_path, pattern, patterns[pattern])
+        else:
+            print("Pattern not found for yearly_active_sub patch")
+            return False
+
+        return True
+
+    def gifted_sub(self):
+        pattern = (
+            '{return"application/json"===e.headers.get("Content-Type")?await e.json():await e.text()}'
+        )
+        replacement = (
+            '{if("application/json"===e.headers.get("Content-Type")){var t=await e.json();'
+            'if(void 0!==t.subscription){class e{constructor(){var e=(new Date).getFullYear();'
+            'this.d=new Date(e)}plus(e,t){var i=Number(e);return"year"===t?this.d.setFullYear(this.d.getFullYear()+i):'
+            '"day"===t&&this.d.setDate(this.d.getDate()+i),this}minus(e,t){return this.plus(-1*e,t)}toISOString(){'
+            'return this.d.toISOString()}}var i=(new e).minus(1,"day"),n=i.toISOString(),s=i.plus(1,"year").toISOString(),'
+            'o=((new e).minus(1,"day").plus(3,"day").toISOString(),{startedAt:n,endsAt:s,period:"yearly",state:"active",'
+            'nextInvoice:{date:s,amount:0,currency:"USD"}});o={...o,gift:{senderName:"WeMod"}},t.subscription=o}'
+            'return t}return await e.text()}'
+        )
+
+        # Search for the original line in JS files
+        js_files = [f for f in os.listdir(WEMOD_TEMP_DIR) if f.endswith(".js")]
+        for js_file in js_files:
+            file_path = os.path.join(WEMOD_TEMP_DIR, js_file)
+            try:
+                with open(file_path, "r", encoding="utf-8") as file:
+                    content = file.read()
+
+                if pattern in content:
+                    self.apply_patch(file_path, re.escape(pattern), replacement)
+                    print(f"js file patched using gifted_sub method: {file_path}")
+                    return True
+            except UnicodeDecodeError:
+                pass
+
+        print("Pattern not found for gifted_sub patch")
+        return False
