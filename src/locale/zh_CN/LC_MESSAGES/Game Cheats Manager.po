@@ -278,9 +278,6 @@ msgstr ""
 msgid "Failed to extract file:"
 msgstr "提取文件失败："
 
-msgid "Unsupported WeMod version"
-msgstr "不支持的 WeMod 版本"
-
 msgid "Failed to patch file:"
 msgstr "修补文件失败："
 

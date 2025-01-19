@@ -278,9 +278,6 @@ msgstr ""
 msgid "Failed to extract file:"
 msgstr "Failed to extract file:"
 
-msgid "Unsupported WeMod version"
-msgstr "Unsupported WeMod version"
-
 msgid "Failed to patch file:"
 msgstr "Failed to patch file:"
 

@@ -145,6 +145,8 @@ def findCEInstallPath():
                     if version > latest_version:
                         latest_version = version
                         latest_path = os.path.join(base_path, folder)
+                else:
+                    latest_path = os.path.join(base_path, folder)
 
     return latest_path
 

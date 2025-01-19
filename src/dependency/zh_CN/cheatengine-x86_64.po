@@ -12,7 +12,7 @@ msgstr "你确定要启动 DBVM？你的系统是32位的, 所以最好不要使
 msgid ""
 "Did you really think you'd find an easter egg by doing this? Well, you know "
 "what? You where right!"
-msgstr "你这么做是想发现复活节彩蛋吗？你怎么做到的？恭喜你, 你找到了！"
+msgstr "你真的以为这样做就能找到复活节彩蛋吗？你知道吗？你做到了！"
 
 #: aboutunit.rslaunchdbvmwasnotassigned
 msgid "launchdbvm was not assigned"
@@ -2083,7 +2083,7 @@ msgstr "最后一次搜索的字节位数是 %s 而现在是 %s. 请指出应该
 
 #: formdifferentbitsizeunit.rswelldoneyoufoundaeasteregg
 msgid "Well done, you found a easter egg!"
-msgstr "你找到了复活节彩蛋!"
+msgstr "干得好，你找到了复活节彩蛋！"
 
 #: formfoundcodelistextraunit.rsneedsiptfindwhat
 msgid ""
@@ -4158,7 +4158,7 @@ msgstr "暂停"
 #: frmultimapunit.rsuupleaserunthe64bitversionofcheatenginetomakeuseofthisfeature
 msgid ""
 "Please run the 64-bit version of Cheat Engine to make use of this feature"
-msgstr "要使用到此特性请运行64位版本的Cheat Engine"
+msgstr "要使用到此特性请运行 64 位版本的 Cheat Engine"
 
 #: frmultimapunit.rsuuresume
 msgid "Resume"
@@ -4744,7 +4744,7 @@ msgstr "介于 % 之间"
 
 #: mainunit.rsbringscheatenginetofront
 msgid "brings Cheat Engine to front"
-msgstr "把Cheat Engine带到前面"
+msgstr "把 Cheat Engine 带到前面"
 
 #: mainunit.rsbusy
 msgid "<busy>"
@@ -4801,7 +4801,7 @@ msgstr "自定义类型的名称"
 
 #: mainunit.rsdbvmwatchfailed
 msgid "dbvm_watch failed"
-msgstr ""
+msgstr "dbvm_watch 失败"
 
 #: mainunit.rsdecimal
 msgid "Decimal"
@@ -4813,11 +4813,11 @@ msgstr "删除"
 
 #: mainunit.rsdoyouwantthegroupwithaddress
 msgid "Do you want a header with address support ?"
-msgstr ""
+msgstr "您想要一个支持地址的头文件吗？"
 
 #: mainunit.rsdoyouwanttogotothecheatenginewebsite
 msgid "Do you want to go to the Cheat Engine website?"
-msgstr "你想要访问 Cheat Engine 的网站吗?官方网站在国外,部分用户可能打不开！"
+msgstr "你想要访问 Cheat Engine 的网站吗？"
 
 #: mainunit.rsdoyouwanttoprotectthistrainerfilefromediting
 msgid "Do you want to protect this trainer file from editing?"
@@ -5837,11 +5837,11 @@ msgstr "MemoryBrowser"
 #: memorybrowserformunit.rsmemoryviewercurrentlydebuggingthread
 #, object-pascal-format
 msgid "Memory Viewer - Currently debugging thread %s"
-msgstr "内存查看器 - 当前正在调试的线程 %s"
+msgstr "内存浏览器 - 当前正在调试的线程 %s"
 
 #: memorybrowserformunit.rsmemoryviewerrunning
 msgid "Memory Viewer - Running"
-msgstr "内存查看器 - 已运行"
+msgstr "内存浏览器 - 已运行"
 
 #: memorybrowserformunit.rsneedtorundissectcode
 msgid ""
@@ -8538,9 +8538,8 @@ msgstr "Cheat Engine"
 #: tabout.label1.caption
 msgid "Made by: Dark Byte"
 msgstr ""
-"作者:Dark Byte\r\n"
-"汉化:红尘旧梦i\n"
-"QQ:260909016"
+"作者：Dark Byte\n"
+"翻译：B站 @Game-Zone"
 
 #: tabout.label10.caption
 msgid "Script engine powered by Lua"
@@ -8548,7 +8547,7 @@ msgstr "使用 Lua 脚本引擎"
 
 #: tabout.label2.caption
 msgid "Special thanks to:"
-msgstr "特别感谢:"
+msgstr "特别感谢："
 
 #: tabout.label21.caption
 msgid "Metael"
@@ -10887,7 +10886,7 @@ msgstr "自动汇编"
 
 #: tfrmautoinject.cheattablecompliantcodee1.caption
 msgid "Cheat Table Framework Code"
-msgstr ""
+msgstr "作弊表框架代码"
 
 #: tfrmautoinject.close1.caption
 msgid "Close"
@@ -10895,11 +10894,11 @@ msgstr "关闭"
 
 #: tfrmautoinject.codeinjection1.caption
 msgid "Code Injection"
-msgstr ""
+msgstr "代码注入"
 
 #: tfrmautoinject.coderelocation1.caption
 msgid "Code Relocation"
-msgstr ""
+msgstr "代码重定位"
 
 #: tfrmautoinject.emplate1.caption
 msgid "Template"
@@ -10939,31 +10938,31 @@ msgstr "全部注入"
 
 #: tfrmautoinject.menuitem1.caption
 msgid "C highlighting preferences"
-msgstr ""
+msgstr "C 语言高亮选项"
 
 #: tfrmautoinject.menuitem2.caption
 msgid "Lua syntax highlighting preferences"
-msgstr "Lua语法突出显示首选项"
+msgstr "Lua 语法高亮选项"
 
 #: tfrmautoinject.menuitem3.caption
 msgid "Auto assembler syntax highlighting preferences"
-msgstr "自动汇编程序语法突出显示首选项"
+msgstr "自动汇编器语法高亮选项"
 
 #: tfrmautoinject.mi14bytejmp.caption
 msgid "14 Byte JMP (>2GB Distance)"
-msgstr ""
+msgstr "14 字节 JMP（>2GB 距离）"
 
 #: tfrmautoinject.mi1byteexceptionjmp.caption
 msgid "1 Byte Exception JMP"
-msgstr ""
+msgstr "1 字节异常 JMP"
 
 #: tfrmautoinject.mi5bytejmp.caption
 msgid "5 Byte JMP (<2GB Distance)"
-msgstr ""
+msgstr "5 字节 JMP（<2GB 距离）"
 
 #: tfrmautoinject.micalllua.caption
 msgid "Call CE Lua Function"
-msgstr ""
+msgstr "调用 CE Lua 函数"
 
 #: tfrmautoinject.micopy.caption
 msgid "&Copy"
@@ -16224,7 +16223,7 @@ msgid ""
 "learn lua and the formdesigner and save as .exe manually to experience the "
 "full power of a Cheat Engine trainer"
 msgstr ""
-"提示: 修改器生成器是一个适合初学者的工具. 建议学习 LUA 和 窗口设计 并另存为可执行程序来动手体验Cheat Engine修改器的全部功能"
+"提示: 修改器生成器是一个适合初学者的工具. 建议学习 LUA 和 窗口设计 并另存为可执行程序来动手体验 Cheat Engine 修改器的全部功能"
 
 #: tfrmtrainergenerator.lblactivatesound.caption
 msgid "Activate"
@@ -17051,7 +17050,7 @@ msgstr "首次扫描 2"
 
 #: tmainform.btnmemoryview.caption
 msgid "Memory View"
-msgstr ""
+msgstr "内存视图"
 
 #: tmainform.btnnewscan.caption
 msgid "First Scan"
@@ -17190,7 +17189,7 @@ msgstr "百分比"
 
 #: tmainform.cbpresentmemoryonly.caption
 msgid "Active memory only"
-msgstr ""
+msgstr "仅活动内存"
 
 #: tmainform.cbpresentmemoryonly.hint
 msgid "Only scans the working set of a process"
@@ -17408,11 +17407,11 @@ msgstr "全选"
 
 #: tmainform.menuitem15.caption
 msgid "Cheat Engine Tutorial Games"
-msgstr "Cheat Engine 作弊教学"
+msgstr "Cheat Engine 游戏教程"
 
 #: tmainform.menuitem16.caption
 msgid "Cheat Engine Tutorial (AArch64)"
-msgstr ""
+msgstr "Cheat Engine 教程 (AArch64)"
 
 #: tmainform.menuitem17.caption
 msgid "Memory read method"
@@ -17576,7 +17575,7 @@ msgstr "十六进制"
 
 #: tmainform.midotnet.caption
 msgid ".Net"
-msgstr ""
+msgstr ".Net"
 
 #: tmainform.mieditcustomtype.caption
 msgid "Edit selected custom type"
@@ -17584,7 +17583,7 @@ msgstr "编辑所选的自定义类型"
 
 #: tmainform.mienablelcldebug.caption
 msgid "Generate errorlogs"
-msgstr ""
+msgstr "生成错误日志"
 
 #: tmainform.miflfindwhataccesses.caption
 msgid "Find out what accesses this address"
@@ -17648,7 +17647,7 @@ msgstr "在游戏窗口中锁定鼠标"
 
 #: tmainform.miluadocumentation.caption
 msgid "Lua documentation"
-msgstr "Cheat Engine Lua文件"
+msgstr "Lua 文档"
 
 #: tmainform.mimanualexpandcollapse.caption
 msgid "Manual expand/collapse"
@@ -17692,7 +17691,7 @@ msgstr ""
 
 #: tmainform.miobfuscatetable.caption
 msgid "Obfuscate currently loaded table"
-msgstr ""
+msgstr "混淆当前加载的表格"
 
 #: tmainform.mionlyshowcurrentcomparetocolumn.caption
 msgid "Only show current \"compare to\" column"
@@ -17816,11 +17815,11 @@ msgstr "表单"
 
 #: tmainform.mitestaccessviolationthread.caption
 msgid "Test access violation in thread"
-msgstr ""
+msgstr "测试线程中的违规访问"
 
 #: tmainform.mitriggeraccessviolation.caption
 msgid "Test access violation"
-msgstr ""
+msgstr "测试访问违规"
 
 #: tmainform.mitutorial.caption
 msgid "Cheat Engine Tutorial"
@@ -17828,7 +17827,7 @@ msgstr "Cheat Engine 教程"
 
 #: tmainform.mitutorial64.caption
 msgid "Cheat Engine Tutorial (x86_64)"
-msgstr ""
+msgstr "Cheat Engine 教程 (x86_64)"
 
 #: tmainform.miundovalue.caption
 msgid "Undo last edit"
@@ -18056,7 +18055,7 @@ msgstr "断点列表"
 
 #: tmemorybrowser.caption
 msgid "Memory Viewer"
-msgstr "内存浏览器"
+msgstr "内存视图"
 
 #: tmemorybrowser.cflabel.caption
 msgid "CF 0"
@@ -18362,7 +18361,7 @@ msgstr "将变更处应用到文件"
 
 #: tmemorybrowser.menuitem14.caption
 msgid "Use windows debug symbols"
-msgstr ""
+msgstr "使用 windows 调试符号"
 
 #: tmemorybrowser.menuitem15.caption
 msgid "Overlay with structure"

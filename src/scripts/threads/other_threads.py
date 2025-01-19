@@ -196,19 +196,6 @@ class FetchTrainerTranslations(DownloadBaseThread):
                 json.dump(all_data, file, ensure_ascii=False, indent=4)
 
         else:
-            file_path = resource_path("dependency/xgqdetail.json")
-            if os.path.exists(file_path):
-                with open(file_path, 'r', encoding='utf-8') as file:
-                    data = json.load(file)
-            else:
-                data = []
-
-            data.extend(db_additions.additions)
-
-            output_filepath = os.path.join(DATABASE_PATH, "xgqdetail.json")
-            with open(output_filepath, 'w', encoding='utf-8') as file:
-                json.dump(data, file, ensure_ascii=False, indent=4)
-
             self.update.emit(statusWidgetName, fetch_error, "error")
             time.sleep(2)
 
