@@ -556,7 +556,9 @@ msgid ""
 "executing the script anyhow and allocate on a region outside reach of 2GB? "
 "(The target will crash if the script was not designed with this failure in "
 "mind)"
-msgstr "此脚本使用附近分配，但不可能分配 %x 附近。请重写脚本，使其不使用附近分配。 试着无论如何执行脚本，并在 2GB 范围之外的区域进行分配？ （如果脚本在设计时没有考虑到这一故障，目标将崩溃）"
+msgstr ""
+"此脚本使用附近分配，但不可能分配 %x 附近。请重写脚本，使其不使用附近分配。 试着无论如何执行脚本，并在 2GB 范围之外的区域进行分配？ "
+"（如果脚本在设计时没有考虑到这一故障，目标将崩溃）"
 
 #: autoassembler.rsneedtousekernelmodereadwriteprocessmemory
 msgid ""
@@ -567,7 +569,7 @@ msgstr "如果要使用 KALLOC, 你需要使用 内核模式 读写进程内存"
 msgid ""
 "None of the ALLOC statements specify a prefered address.  Did you take into "
 "account that the JMP instruction is going to be 14 bytes long?"
-msgstr "所有 ALLOC 语句都没有指定首选地址。 你有没有考虑到 JMP 指令将有 14 个字节长？"
+msgstr "所有 ALLOC 语句都没有指定首选地址。你有没有考虑到 JMP 指令将有 14 个字节长？"
 
 #: autoassembler.rsnotallinstructionscouldbeinjected
 msgid "Not all instructions could be injected"
@@ -765,27 +767,27 @@ msgstr "\"CE 指针扫描\"内存管理器"
 
 #: byteinterpreter.rsbibyte
 msgid "(byte)"
-msgstr "(字节)"
+msgstr "（字节）"
 
 #: byteinterpreter.rsbidouble
 msgid "(double)"
-msgstr "(双浮点)"
+msgstr "（双浮点）"
 
 #: byteinterpreter.rsbidword
 msgid "(dword)"
-msgstr "(双字)"
+msgstr "（双字）"
 
 #: byteinterpreter.rsbifloat
 msgid "(float)"
-msgstr "(单浮点)"
+msgstr "（单浮点）"
 
 #: byteinterpreter.rsbiqword
 msgid "(qword)"
-msgstr "(四字)"
+msgstr "（四字）"
 
 #: byteinterpreter.rsbiword
 msgid "(word)"
-msgstr "(单字)"
+msgstr "（单字）"
 
 #: cedebugger.rscontinue
 msgid "Continue?"
@@ -849,7 +851,7 @@ msgstr "Dll 注入失败：符号查找错误"
 msgid ""
 "I can't get the process list. You are propably using windows NT. Use the "
 "window list instead!"
-msgstr "无法获取进程列表，你使用的或许是 windows NT，请改用窗口列表代替！"
+msgstr "无法获取进程列表, 你使用的或许是 windows NT, 现在改用窗口列表代替!"
 
 #: cefuncproc.rsclear
 msgid "Clear"
@@ -1007,7 +1009,7 @@ msgstr "滚动锁定"
 
 #: cefuncproc.rsselect
 msgid "Select"
-msgstr "选择"
+msgstr "Select"
 
 #: cefuncproc.rsseparator
 msgid "Separator"
@@ -1187,7 +1189,9 @@ msgid ""
 "The driver failed to load due to signing issues. If you have secure boot "
 "enabled in your BIOS, set it to \"Other OS\" or disable it. Alternatively, "
 "boot with driver signing policy disabled, or sign the driver yourself"
-msgstr "由于签名问题，驱动程序无法加载。如果在 BIOS 中启用了安全启动，请将其设置为 \"Other OS\" 或禁用。或者，在启动时禁用驱动程序签名策略，或自行签署驱动程序"
+msgstr ""
+"由于签名问题，驱动程序无法加载。如果在 BIOS 中启用了安全启动，请将其设置为 \"Other OS\" "
+"或禁用。或者，在启动时禁用驱动程序签名策略，或自行签署驱动程序"
 
 #: dbk32functions.rspleaserunthe64bitversionofce
 msgid "Please run the 64-bit version of Cheat Engine"
@@ -1224,7 +1228,8 @@ msgid ""
 "have the needed rights to create a service, or call your system admin "
 "(Who'll probably beat you up for even trying this). Until this is fixed you "
 "won't be able to make use of the enhancements the driver gives you"
-msgstr "服务无法打开，也无法创建。请检查您是否拥有创建服务所需的权限，或致电系统管理员（他可能会因为您尝试这样做而揍您一顿）。在问题解决之前，您将无法使用驱动程序为您提供的增强功能"
+msgstr ""
+"服务无法打开，也无法创建。请检查您是否拥有创建服务所需的权限，或致电系统管理员（他可能会因为您尝试这样做而揍您一顿）。在问题解决之前，您将无法使用驱动程序为您提供的增强功能"
 
 #: dbk32functions.rstheservicecouldntgetopenedultimap
 msgid ""
@@ -1308,7 +1313,7 @@ msgstr "更改注册"
 
 #: debuggertypedefinitions.rsdbvmbreakpoint
 msgid "DBVM Breakpoint"
-msgstr "DBVM 断点"
+msgstr "DBVM断点"
 
 #: debuggertypedefinitions.rsdbvmnativebreakpoint
 msgid "DBVM-Level Breakpoint"
@@ -1368,8 +1373,8 @@ msgid ""
 "For execute page exceptions the target process must support No-Execute page support. Currently this process doesn't have this enabled, but if you think the process itself does support it you can enable it.\n"
 "Do you wish to enable No-Execute support for this process?"
 msgstr ""
-"对于执行页面异常，目标进程必须支持 No-Execute 页面支持。目前该进程尚未启用此功能，但如果你认为该进程本身支持此功能，你可以启用它。"
-"您是否希望为该进程启用 No-Execute 支持？"
+"对于执行页面异常，目标进程必须支持 No-Execute "
+"页面支持。目前该进程尚未启用此功能，但如果你认为该进程本身支持此功能，你可以启用它。您是否希望为该进程启用 No-Execute 支持？"
 
 #: debughelper.rsbreakpointerror
 msgid "Breakpoint error:"
@@ -1481,8 +1486,7 @@ msgid ""
 "The debugger attach is taking a while. This is normal when there are many symbols or the system is slow so please be patient. But if you don't have the time to wait or the program has crashes to desktop, then you can cancel this wait. Beware though that you may have to restart the target process if you do wish to debug anyhow.\n"
 "Do you wish to wait longer?"
 msgstr ""
-"调试器连接需要一段时间。当符号较多或系统速度较慢时，这很正常，请耐心等待。但如果你没有时间等待，或者程序已经崩溃到桌面，那么你可以取消等待。不过请注意，如果你真的想调试，你可能不得不重新启动目标进程。"
-"您希望等待更长的时间吗？"
+"调试器连接需要一段时间。当符号较多或系统速度较慢时，这很正常，请耐心等待。但如果你没有时间等待，或者程序已经崩溃到桌面，那么你可以取消等待。不过请注意，如果你真的想调试，你可能不得不重新启动目标进程。您希望等待更长的时间吗？"
 
 #: debughelper.rsthefollowingaddressesexecute
 #, object-pascal-format
@@ -1517,7 +1521,9 @@ msgid ""
 "VMWare seems to be running. It's known that some versions of vmware will "
 "cause a BSOD in combination with intel IPT. Do you still want to use intel "
 "IPT?"
-msgstr "VMWare 似乎正在运行。众所周知，某些版本的 vmware 在与 intel IPT 结合使用时会导致 BSOD。你还想使用 intel IPT 吗？"
+msgstr ""
+"VMWare 似乎正在运行。众所周知，某些版本的 vmware 在与 intel IPT 结合使用时会导致 BSOD。你还想使用 intel IPT "
+"吗？"
 
 #: debughelper.rsyes
 msgid "Yes"
@@ -1525,11 +1531,11 @@ msgstr "是"
 
 #: disassemblerviewlinesunit.rscall
 msgid "(Call)"
-msgstr "(调用)"
+msgstr "（调用）"
 
 #: disassemblerviewlinesunit.rscon
 msgid "(Conditional)"
-msgstr "(条件)"
+msgstr "（条件）"
 
 #: disassemblerviewlinesunit.rsinvaliddisassembly
 msgid "Invalid disassembly"
@@ -1537,11 +1543,11 @@ msgstr "无效的反汇编"
 
 #: disassemblerviewlinesunit.rsmemory
 msgid "(Code/Data)"
-msgstr "(代码/数据)"
+msgstr "（代码/数据）"
 
 #: disassemblerviewlinesunit.rsun
 msgid "(Unconditional)"
-msgstr "(无条件)"
+msgstr "（无条件）"
 
 #: disassemblerviewunit.rsaddress
 msgid "Address"
@@ -1549,7 +1555,7 @@ msgstr "地址"
 
 #: disassemblerviewunit.rsbytes
 msgid "Bytes"
-msgstr "字节"
+msgstr ""
 
 #: disassemblerviewunit.rscomment
 msgid "Comment"
@@ -1620,7 +1626,7 @@ msgstr "2 字节"
 
 #: dotnettypes.rsdnt2bytesigned
 msgid "2 Byte (Signed)"
-msgstr "2 字节 (有符号)"
+msgstr "2 字节（有符号）"
 
 #: dotnettypes.rsdnt4byte
 msgid "4 Byte"
@@ -1628,7 +1634,7 @@ msgstr "4 字节"
 
 #: dotnettypes.rsdnt4bytesigned
 msgid "4 Byte (Signed)"
-msgstr "4 Byte (有符号)"
+msgstr "4 Byte（有符号）"
 
 #: dotnettypes.rsdnt8byte
 msgid "8 Byte"
@@ -1636,7 +1642,7 @@ msgstr "8 字节"
 
 #: dotnettypes.rsdnt8bytesigned
 msgid "8 Byte (Signed)"
-msgstr "8 字节 (有符号)"
+msgstr "8 字节（有符号）"
 
 #: dotnettypes.rsdntarray
 msgid "Array"
@@ -1652,7 +1658,7 @@ msgstr "字节"
 
 #: dotnettypes.rsdntbytesigned
 msgid "Byte (Signed)"
-msgstr "字节 (有符号)"
+msgstr "字节（有符号）"
 
 #: dotnettypes.rsdntchar
 msgid "char"
@@ -1772,7 +1778,7 @@ msgstr "未定义热键"
 
 #: feces.rsbcryptcouldnotbeused
 msgid "bcrypt could not be used"
-msgstr "无法使用 bcrypt(J跨平台加密工具)"
+msgstr "无法使用 bcrypt"
 
 #: feces.rscheatenginesignaturefiles
 msgid "Cheat Engine signature files"
@@ -1848,7 +1854,7 @@ msgstr "无法加载公匙表"
 msgid ""
 "The provided public key is invalid(Not signed by the Cheat Engine guy). "
 "Remove the signature section to load this table"
-msgstr "提供的公匙是无效的(不是由 Cheat Engine 签名的)。移除签名部分以便加载此表单"
+msgstr "提供的公匙是无效的（不是由 Cheat Engine 签名的）。移除签名部分以便加载此表单"
 
 #: feces.rsispasswordcorrect
 msgid "Is the password correct?"
@@ -1870,7 +1876,7 @@ msgstr "选择你的 Cheat Engine 签名文件"
 msgid ""
 "This table has been modified. To load this table, remove the signature part "
 "with an editor (And check the file for suspicious things while you're at it)"
-msgstr "表单已被修改。加载此表单, 并使用文本编辑器删除签名 (当操作的时候请检查文件是否有可疑之处)"
+msgstr "表单已被修改。加载此表单, 并使用文本编辑器删除签名（当操作的时候请检查文件是否有可疑之处）"
 
 #: fileaccess.rsnogetnamedsecurityinfo
 msgid "no GetNamedSecurityInfo"
@@ -2213,7 +2219,7 @@ msgstr "滚动锁定"
 
 #: formhotkeyunit.rsselect
 msgid "Select"
-msgstr "选择"
+msgstr "Select"
 
 #: formhotkeyunit.rsseparator
 msgid "Separator"
@@ -2321,7 +2327,7 @@ msgstr "保留"
 msgid ""
 "There are already memoryfiles with this name. Do you want to delete them? "
 "(choosing no will add the file(s) to empty slots)"
-msgstr "同名内存文件已存在. 删除它们吗? (选择\"否\"将添加文件至新的位置)"
+msgstr "同名内存文件已存在. 删除它们吗？（选择\"否\"将添加文件至新的位置）"
 
 #: formmemoryregionsunit.rsthereisnofreeslot
 msgid "There is no free slot"
@@ -2329,7 +2335,7 @@ msgstr "没有可用的空余位置"
 
 #: formmemoryregionsunit.rswritecombine
 msgid "Write Combine"
-msgstr "写入组合"
+msgstr ""
 
 #: formmemoryregionsunit.rswritecopy
 msgid "Write Copy"
@@ -2337,7 +2343,7 @@ msgstr "写时拷贝"
 
 #: formsettingsunit.rs2bytes
 msgid "2 Bytes"
-msgstr "2 字节"
+msgstr ""
 
 #: formsettingsunit.rs4bytes
 msgid "4 Bytes"
@@ -2345,7 +2351,7 @@ msgstr "4 字节"
 
 #: formsettingsunit.rs8bytes
 msgid "8 Bytes"
-msgstr "8 字节"
+msgstr ""
 
 #: formsettingsunit.rsallcustomtypes
 msgid "All Custom Types"
@@ -2361,7 +2367,7 @@ msgstr "附加到当前进程"
 
 #: formsettingsunit.rsbinary
 msgid "Binary"
-msgstr "二进制"
+msgstr ""
 
 #: formsettingsunit.rsbyte
 msgid "Byte"
@@ -2496,7 +2502,7 @@ msgstr "弹出/隐藏 Cheat Engine"
 
 #: formsettingsunit.rsrequiresdbvm
 msgid "(Requires DBVM)"
-msgstr "(需要 DBVM)"
+msgstr "（需要 DBVM）"
 
 #: formsettingsunit.rsrestartce
 msgid ""
@@ -2527,9 +2533,7 @@ msgstr "你的保护已经恢复。请重新启动系统以使其生效"
 msgid ""
 "WARNING! Making kernelmode possible will slightly increase the speed of your system, BUT it will make you vulnerable to Spectre attacks\n"
 "Are you ok with this? (You can later re-enable this protection)"
-msgstr ""
-"警告！使内核模式成为可能会略微提高系统速度，但会使你容易受到 Spectre 攻击/n"
-"你能接受吗？（您可以稍后重新启用此保护功能）"
+msgstr "警告！使内核模式成为可能会略微提高系统速度，但会使你容易受到 Spectre 攻击/n你能接受吗？（您可以稍后重新启用此保护功能）"
 
 #: formsettingsunit.rsspeedhackspeed
 msgid "Speedhack speed"
@@ -2597,7 +2601,7 @@ msgstr "禁止随机"
 msgid ""
 "You haven't selected any memory type. This will result in Cheat Engine "
 "finding NO memory! Are you stupid?"
-msgstr "你还没有选择任何内存类型。这将导致 Cheat Engine 无法找到内存！你是傻子吗？"
+msgstr "你还没有选择任何内存类型。这将导致 Cheat Engine 无法找到内存！你是不是傻？"
 
 #: formsettingsunit.strprocesswatcherwillpreventunloader
 msgid "Enabling the process watcher will prevent the unloader from working"
@@ -2699,7 +2703,7 @@ msgstr "这里的 '[DISABLE]' 代码将用于启用作弊"
 
 #: frmautoinjectunit.rsendaddresslastbytesareincludedifnecesary
 msgid "End address (last bytes are included if necessary)"
-msgstr "结束地址(如果有必要最后一个字节也包括在内)"
+msgstr "结束地址（如果有必要最后一个字节也包括在内）"
 
 #: frmautoinjectunit.rserrorcouldnotfinduniqueaobtriedcode
 msgid "ERROR: Could not find unique AOB, tried code \""
@@ -2765,7 +2769,7 @@ msgstr ">2GB 距离"
 
 #: frmautoinjectunit.rsnewnamequestion
 msgid "What should the new name be?"
-msgstr ""
+msgstr "新名称应该叫什么？"
 
 #: frmautoinjectunit.rsnotallcodeisinjectable
 #, object-pascal-format
@@ -2774,22 +2778,25 @@ msgid ""
 "%s\n"
 "Are you sure you want to edit it to this?"
 msgstr ""
+"不是所有代码都可以注入。\n"
+"%s\n"
+"你确定要编辑成这样吗？"
 
 #: frmautoinjectunit.rsonwhataddressdoyouwantthejump
 msgid "On what address do you want the jump?"
-msgstr "你要跳转到什么地址吗?"
+msgstr "你要跳转到什么地址吗？"
 
 #: frmautoinjectunit.rsoriginalcode
 msgid "Original code"
-msgstr ""
+msgstr "原始代码"
 
 #: frmautoinjectunit.rsplaceyourcodehere
 msgid "place your code here"
-msgstr ""
+msgstr "将代码放在此处"
 
 #: frmautoinjectunit.rsrenametab
 msgid "Rename tab"
-msgstr ""
+msgstr "重命名选项卡"
 
 #: frmautoinjectunit.rsscript
 msgid "Script "
@@ -2809,7 +2816,7 @@ msgstr "Thumb 指令尚未实现"
 
 #: frmautoinjectunit.rswhatidentifierdoyouwanttouse
 msgid "What do you want to name the symbol for the injection point?"
-msgstr "你想给注入点取个什么符号名呢?"
+msgstr "你想给注入点取个什么符号名呢？"
 
 #: frmautoinjectunit.rswritecode
 msgid "Write code"
@@ -2818,7 +2825,7 @@ msgstr "写入代码"
 #: frmbranchmapperunit.rsfoundnr
 #, object-pascal-format
 msgid "Found %d"
-msgstr ""
+msgstr "找到 %d"
 
 #: frmbranchmapperunit.rssaveresultstofile
 msgid "Save results to file"
@@ -2834,7 +2841,7 @@ msgstr "停止"
 
 #: frmbreakpointlistunit.rsbpareyousureyouwishtochangethistoapegewidebp
 msgid "Are you sure you wish to change this to a pagewide breakpoint?"
-msgstr "你确实想要更改这个pagewide断点吗?"
+msgstr "你确实想要更改这个 pagewide 断点吗?"
 
 #: frmchangedaddressescommonalityscannerunit.rsbaseaddress
 msgid "Base Address"
@@ -2842,19 +2849,19 @@ msgstr "基址"
 
 #: frmchangedaddressescommonalityscannerunit.rsdblclicklaunchcomp
 msgid "Doubleclick to launch structure compare"
-msgstr ""
+msgstr "双击启动结构比较"
 
 #: frmchangedaddressescommonalityscannerunit.rsshowresults
 msgid "Doubleclick to show scanner/results"
-msgstr ""
+msgstr "双击显示扫描仪/结果"
 
 #: frmcodecavescannerunit.rsclosingthiswindowwillalsostopthescannerareyousure
 msgid "Closing this window will also stop the scanner. Are you sure?"
-msgstr "关闭此窗口将会停止扫描. 你确定吗?"
+msgstr "关闭此窗口将会停止扫描。你确定吗？"
 
 #: frmcodecavescannerunit.rspleaseprovideavalidsizeforthewantedcodecave
 msgid "Please provide a valid size for the wanted code cave"
-msgstr "请提供有效的Code Cave大小"
+msgstr "请提供所需的 code cave 的有效大小"
 
 #: frmcodecavescannerunit.rspleaseprovideavalidstartaddress
 msgid "Please provide a valid start address"
@@ -2866,7 +2873,7 @@ msgstr "请提供一个有效的结束地址"
 
 #: frmcodecavescannerunit.rspleasetellmeyoudontneedacodecavethissmall
 msgid "Please tell me you don't need a code cave this small!!!"
-msgstr "请告诉我你不再需要这个区域的Code Cave!!!"
+msgstr "请告诉我你不需要这么小的 code cave！！！"
 
 #: frmcodefilterunit.rsaddresslist
 #, object-pascal-format
@@ -2875,11 +2882,11 @@ msgstr "地址列表 (%d)"
 
 #: frmcodefilterunit.rsassemblyscanpleasewait
 msgid "Assembly Scan. Please wait"
-msgstr ""
+msgstr "汇编扫描。请稍等"
 
 #: frmcodefilterunit.rscancel
 msgid "Cancel List Refresh"
-msgstr ""
+msgstr "取消列表刷新"
 
 #: frmcodefilterunit.rscodefilter
 msgid "Code Filter"
@@ -2887,7 +2894,7 @@ msgstr "代码过滤器"
 
 #: frmcodefilterunit.rsfilteringaddresses
 msgid "Filtering addresses"
-msgstr ""
+msgstr "正在过滤地址"
 
 #: frmcodefilterunit.rsno
 msgid "No"
@@ -2895,15 +2902,15 @@ msgstr "否"
 
 #: frmcodefilterunit.rsopenanaddressfile
 msgid "Open an address file"
-msgstr ""
+msgstr "打开地址文件"
 
 #: frmcodefilterunit.rssaveanaddressfile
 msgid "Save an address file"
-msgstr ""
+msgstr "保存地址文件"
 
 #: frmcodefilterunit.rssettingbreakpoints
 msgid "Setting breakpoints"
-msgstr ""
+msgstr "设置断点"
 
 #: frmcodefilterunit.rsshowrefreshlist
 msgid "Refresh list"
@@ -2912,7 +2919,7 @@ msgstr "刷新列表"
 #: frmcodefilterunit.rsxisaninvalidrange
 #, object-pascal-format
 msgid "%s is an invalid range (xxxx-xxxx)"
-msgstr ""
+msgstr "%s 是无效范围 (xxxx-xxxx)"
 
 #: frmcodefilterunit.rsyes
 msgid "Yes"
@@ -2920,23 +2927,23 @@ msgstr "是"
 
 #: frmcr3switcherunit.rsdbvmcr3log
 msgid "DBVM CR3 Log"
-msgstr ""
+msgstr "DBVM CR3 日志"
 
 #: frmcr3switcherunit.rsdescribedbvmroutine
 msgid ""
 "DBVM will record all CR3 values it encounters up to 512 unique ones). How "
 "long should it wait? (In seconds)"
-msgstr ""
+msgstr "DBVM 将记录遇到的所有最多 512 个唯一的 CR3 值）。需要等待多长时间？(以秒为单位）"
 
 #: frmcr3switcherunit.rslongwaitwarning
 #, object-pascal-format
 msgid "Are you sure you wish to wait %d seconds?"
-msgstr ""
+msgstr "您确定要等待 %d 秒吗？"
 
 #: frmdebugsymbolstructurelistunit.rstherearestructuresinthislist
 #, object-pascal-format
 msgid "There are %d structures in this list"
-msgstr ""
+msgstr "该列表中有 %d 个结构"
 
 #: frmdisassemblyscanunit.rsdone
 msgid "Done"
@@ -2973,11 +2980,11 @@ msgstr "什么都没找到"
 #: frmexceptionregionlistunit.rsconfirmdeleteregion
 #, object-pascal-format
 msgid "Are you sure you wish to remove the range %s?"
-msgstr ""
+msgstr "您确定要删除 %s 范围吗？"
 
 #: frmexceptionregionlistunit.rseraselistquestion
 msgid "Are you sure the erase the list?"
-msgstr ""
+msgstr "你确定要删除列表吗？"
 
 #: frmexetrainergeneratorunit.rsarchive
 msgid " ARCHIVE:"
@@ -3003,7 +3010,7 @@ msgstr "写入失败"
 msgid ""
 "Failure opening the trainer for resource updates. Make sure you do not watch"
 " the creation"
-msgstr "修改器资源更新失败. 你确认不再创建吗?"
+msgstr "无法打开修改资源的修改器。请确保未监视其创建过程"
 
 #: frmexetrainergeneratorunit.rsfastest
 msgid "Fastest"
@@ -3019,11 +3026,11 @@ msgstr "图标更新错误"
 
 #: frmexetrainergeneratorunit.rsinvalidicon
 msgid "(Invalid icon)"
-msgstr "(无效图标)"
+msgstr "（无效图标）"
 
 #: frmexetrainergeneratorunit.rsinvalidicontype
 msgid "(Invalid icon type)"
-msgstr "(无效图标类型)"
+msgstr "（无效图标类型）"
 
 #: frmexetrainergeneratorunit.rsmax
 msgid "Max"
@@ -3048,16 +3055,16 @@ msgstr "修改器已成功制作"
 #: frmexetrainergeneratorunit.rstrainerfilemissing
 #, object-pascal-format
 msgid "Copying %s.dat to %s failed. Please make sure the file still exists"
-msgstr ""
+msgstr "将 %s.dat 复制到 %s 失败。请确保文件仍然存在"
 
 #: frmexetrainergeneratorunit.rsupdatefailed
 #, object-pascal-format
 msgid "Failure updating the trainer resource information: %d"
-msgstr "更新修改器资源失败: %d"
+msgstr "更新修改器资源失败：%d"
 
 #: frmfilepatcherunit.rsfilepatcher
 msgid "File Patcher: "
-msgstr "文件补丁: "
+msgstr "文件补丁："
 
 #: frmfillmemoryunit.rsfmregiontoolarge
 msgid "Region too large"
@@ -3097,7 +3104,7 @@ msgstr "正在停止..."
 
 #: frmfloatingpointpanelunit.rsfppextended
 msgid "Extended (default)"
-msgstr ""
+msgstr "扩展（默认）"
 
 #: frmgdtunit.rsgdtaccessed
 msgid "Accessed="
@@ -3164,35 +3171,35 @@ msgstr "应至少 %d"
 msgid ""
 "When checked this element will get added to the addresslist. Note: If all "
 "checkboxes are disabled, ALL elements will be added"
-msgstr "勾选后将会把它加进地址列表中. 注意: 如果禁用所有复选框，将会添加所有元素"
+msgstr "勾选后将会把它加进地址列表中。注意：如果禁用所有复选框，将会添加所有元素"
 
 #: frmgroupscanalgoritmgeneratorunit.rsrange
 msgid "Range"
-msgstr ""
+msgstr "范围"
 
 #: frmgroupscanalgoritmgeneratorunit.rssstaticddynamiceexecutable
 msgid "S=Static D=Dynamic E=Executable"
-msgstr ""
+msgstr "S=静态 D=动态 E=可执行"
 
 #: frmgroupscanalgoritmgeneratorunit.rswildcard
 msgid "Skip nr of bytes:"
-msgstr "跳过多少字节:"
+msgstr "跳过多少字节："
 
 #: frmidtunit.rsidt16bitinterruptgate
 msgid "16-bit interrupt gate"
-msgstr "16位中断门"
+msgstr "16 位中断门"
 
 #: frmidtunit.rsidt16biytrapgate
 msgid "16-bit trap gate"
-msgstr "16位陷阱门"
+msgstr "16 位陷阱门"
 
 #: frmidtunit.rsidt32bitinterruptgate
 msgid "32-bit interrupt gate"
-msgstr "32位中断门"
+msgstr "32 位中断门"
 
 #: frmidtunit.rsidt32biytrapgate
 msgid "32-bit trap gate"
-msgstr "32位陷阱门"
+msgstr "32 位陷阱门"
 
 #: frmidtunit.rsidtdpl
 msgid " DPL="
@@ -3220,7 +3227,7 @@ msgid ""
 "Not all the memory can be written in the current memory region. Do you want "
 "to force as much as possible into the given region and just discard what can"
 " not be written? (Really bad idea)"
-msgstr "并不是所有的内存都可以写入当前的内存区域。你想强迫尽可能多的进入给定的区域，并放弃什么不能写的吗？(真是坏主意)"
+msgstr "并不是所有的内存都可以写入当前的内存区域。你想强迫尽可能多的进入给定的区域，并放弃什么不能写的吗？（真是坏主意）"
 
 #: frmloadmemoryunit.rswrotebytesoutof
 #, object-pascal-format
@@ -3231,7 +3238,7 @@ msgstr "写入 %d 个字节的 %d"
 msgid ""
 "This is a invalid memory region file. I'll assume this file has no header "
 "data"
-msgstr "该内存区域文件无效. 文件可能缺少头部数据(header data)"
+msgstr "该内存区域文件无效。文件可能缺少 header data"
 
 #: frmluaengineunit.rserror
 msgid "Script Error"
@@ -3245,7 +3252,7 @@ msgstr "错误行 "
 msgid ""
 "Only one script can be debugged at a time. Continue executing this script "
 "without the debugger?"
-msgstr "每次仅能调试一个脚本. 要继续执行这个脚本调试器吗?"
+msgstr "一次只能调试一个脚本。在不使用调试器的情况下继续执行此脚本？"
 
 #: frmluaengineunit.rsleundefinederror
 msgid "Undefined error"
@@ -3261,15 +3268,15 @@ msgstr "Lua 引擎"
 
 #: frmmemoryallochandlerunit.rsevent1failure
 msgid "Event1 failure:"
-msgstr "事件1 failure:"
+msgstr "事件 1 错误："
 
 #: frmmemoryallochandlerunit.rsevent2failure
 msgid "Event2 failure:"
-msgstr "事件2 failure:"
+msgstr "事件 2 错误："
 
 #: frmmemoryallochandlerunit.rsevent3failure
 msgid "Event3 failure:"
-msgstr "事件3 failure:"
+msgstr "事件 3 错误："
 
 #: frmmemoryallochandlerunit.rsfailuretohook
 msgid "Failure to hook"
@@ -3287,7 +3294,7 @@ msgstr "堆栈计数=%s"
 #: frmmemoryallochandlerunit.rsqueuedmemoryeventswaiting
 #, object-pascal-format
 msgid "Queued memory events waiting: %s"
-msgstr "内存事件等待队列: %s"
+msgstr "内存事件等待队列：%s"
 
 #: frmmemoryrecorddropdownsettingsunit.rsdddropdownotionsfor
 msgid "Dropdown options for "
@@ -3347,7 +3354,7 @@ msgstr "十六进制 颜色"
 
 #: frmmemviewpreferencesunit.rshexedit
 msgid "Hexedit"
-msgstr ""
+msgstr "十六进制编辑"
 
 #: frmmemviewpreferencesunit.rsnormalcolor
 msgid "Normal color"
@@ -3367,28 +3374,32 @@ msgstr "无条件跳转 颜色"
 
 #: frmmergepointerscanresultsettingsunit.rscopiesthesourceptrfilestotheworkingfolder
 msgid "Copies the source .ptr.# files to the working folder of the main PTR"
-msgstr "复制原始 .ptr.# 文件复制到PTR的主目录里"
+msgstr "将 .ptr.# 源文件复制到主 PTR 的工作文件夹中"
 
 #: frmmergepointerscanresultsettingsunit.rslinksdirectlytothepathsofthesourceptrfiles
 msgid ""
 "Links directly to the paths of the source .ptr.# files.\n"
 "Note: The result will be unusable by other systems that do not have the same path layout, until you generate new results"
 msgstr ""
+"直接链接到源 .ptr.# 文件的路径。\n"
+"注意：在你生成新结果之前，其他没有相同路径布局的系统将无法使用该结果"
 
 #: frmmergepointerscanresultsettingsunit.rsmovesthesourceptrfilestotheworkingfolder
 msgid ""
 "Moves the source .ptr.# files to the working folder of the main PTR\n"
 "Note: This destroys the source"
 msgstr ""
+"将 .ptr.# 源文件移动到主 PTR 的工作文件夹中\n"
+"注意：这将销毁源代码"
 
 #: frmmodifyregistersunit.rsfailuresettingdbvmchangeregonbp
 msgid "Failure setting a DBVM ChangeRegOnBP breakpoint"
-msgstr ""
+msgstr "设置 DBVM ChangeRegOnBP 断点失败"
 
 #: frmmodifyregistersunit.rsmodifyregisterssat
 #, object-pascal-format
 msgid "Modify registers(s) at %s"
-msgstr "修改寄存器 %s"
+msgstr "修改 %s 处的寄存器"
 
 #: frmmodifyregistersunit.rspleasefillinavalidvaluefor
 msgid "Please fill in a valid value for"
@@ -3413,11 +3424,11 @@ msgstr "主机:"
 #: frmpointerscanconnectdialogunit.rshostcouldnotberesolved
 #, object-pascal-format
 msgid "host: %s could not be resolved"
-msgstr "主机: %s 无法解析"
+msgstr "主机：%s 无法解析"
 
 #: frmpointerscanconnectdialogunit.rsuseloadedpointermap
 msgid "Use loaded pointermap:"
-msgstr "使用载入的\"指针映射集\":"
+msgstr "使用载入的\"指针映射集\"："
 
 #: frmprocesswatcherunit.rsconventionalids
 msgid "----Conventional ID's----"
@@ -3447,7 +3458,7 @@ msgstr "ProcessID="
 #: frmprocesswatcherunit.rsprocesswatcherthreaderror
 #, object-pascal-format
 msgid "processwatcher: thread error:%s"
-msgstr "监视进程: 线程错误:%s"
+msgstr "监视进程：线程错误：%s"
 
 #: frmprocesswatcherunit.rsthreadid
 msgid "ThreadID:"
@@ -3458,6 +3469,8 @@ msgid ""
 "DoubleClick: Browse this memory region.\n"
 "Right Mouse Click: Register Value will be copied to Clipboard and Context Menu will open."
 msgstr ""
+"鼠标双击：浏览此内存区域。\n"
+"鼠标右键单击：寄存器值将被复制到剪贴板，并打开上下文菜单。"
 
 #: frmregistersunit.rsnodescription
 msgid "No Description"
@@ -3481,7 +3494,7 @@ msgstr "移除"
 
 #: frmrescanpointerunit.rsrpentertheipaddressestonotifyexplicitly
 msgid "Enter the IP addresses to notify explicitly"
-msgstr "输入通知的IP地址"
+msgstr "输入要明确通知的 IP 地址"
 
 #: frmrescanpointerunit.rsrpfirstoffset
 msgid "First offset"
@@ -3500,11 +3513,11 @@ msgstr "最后一个偏移"
 msgid ""
 "The function %s(base, offsets, target) has not yet been defined. Please "
 "define it first"
-msgstr "函数 %s(基址, 偏移, 目标) 尚未定义. 请先定义它"
+msgstr "函数 %s（基址, 偏移, 目标）尚未定义. 请先定义它"
 
 #: frmrescanpointerunit.rsrpusesavedpointermap
 msgid "Use saved pointermap: "
-msgstr "使用保存的\"指针映射集\": "
+msgstr "使用保存的\"指针映射集\"："
 
 #: frmrescanpointerunit.rsrpusesavedpointermap2
 msgid "Use saved pointermap"
@@ -3520,7 +3533,7 @@ msgstr "新的指针映射集"
 
 #: frmresumepointerscanunit.rsrpsentertheipaddressestonotifyexplicitly
 msgid "Enter the IP addresses to notify explicitly"
-msgstr "输入通知的IP地址"
+msgstr "输入要明确通知的 IP 地址"
 
 #: frmresumepointerscanunit.rsrpsiplist
 msgid "IP List"
@@ -3540,7 +3553,7 @@ msgid ""
 "If you don't include the header data you'll have to specify the startaddress"
 " yourself when loading the file(That means Cheat Engine won't fill in the "
 "startaddress text field when loaded for you)"
-msgstr ""
+msgstr "如果不包含标题数据，则必须在加载文件时自行指定起始地址（这意味着 Cheat Engine 不会在为您加载文件时填写起始地址文本字段）。"
 
 #: frmsavememoryregionunit.rsnotallthememorywasreadablein
 msgid "Not all the memory was readable in"
@@ -4780,7 +4793,7 @@ msgstr "清空最近使用的文件列表"
 
 #: mainunit.rscomparetosavedscan
 msgid "Compare to first/saved scan"
-msgstr ""
+msgstr "与第一次/保存的扫描结果比较"
 
 #: mainunit.rscomparingto
 #, object-pascal-format
@@ -4891,7 +4904,7 @@ msgstr "找出是什么改写了该指针指向的地址"
 
 #: mainunit.rsfirst
 msgid "First"
-msgstr ""
+msgstr "初始值"
 
 #: mainunit.rsforcetermination
 msgid "Force termination"
@@ -5482,8 +5495,8 @@ msgid "Cheat Engine"
 msgstr "Cheat Engine"
 
 #: mainunit2.cenamewithversion
-msgid "Cheat Engine 7.6 Release Candidate 1"
-msgstr ""
+msgid "Cheat Engine 7.6"
+msgstr "Cheat Engine 7.6"
 
 #: mainunit2.rscheatengine
 msgid "Cheat Engine"
@@ -5563,7 +5576,7 @@ msgstr "减少的数值"
 
 #: mainunit2.strdecreasedvalueby
 msgid "Decreased value by ..."
-msgstr "数值减少了 ..."
+msgstr "数值减少了..."
 
 #: mainunit2.strexact
 msgid "Exact"
@@ -5591,7 +5604,7 @@ msgstr "增加的数值"
 
 #: mainunit2.strincreasedvalueby
 msgid "Increased value by ..."
-msgstr "数值增加了 ..."
+msgstr "数值增加了..."
 
 #: mainunit2.strneednewerwindowsversion
 msgid ""
@@ -6289,6 +6302,12 @@ msgstr "未知的扩展名"
 #: opensave.rsyoucanonlyprotectafileifithasancetrainerextension
 msgid "You can only protect a file if it has an .CETRAINER extension"
 msgstr "你只能保护以 .CETRAINER 为扩展名的文件"
+
+#: opensave.rsyoureabouttoloadanunsignedobfuscatedtableareyousure
+msgid ""
+"You're about to load an unsigned obfuscated table while running with admin "
+"privileges. Are you sure?"
+msgstr ""
 
 #: opensave.strcantloadfilepatcher
 msgid "The file patcher can't be loaded by Cheat Engine!"
@@ -10942,7 +10961,7 @@ msgstr "C 语言高亮选项"
 
 #: tfrmautoinject.menuitem2.caption
 msgid "Lua syntax highlighting preferences"
-msgstr "Lua 语法高亮选项"
+msgstr "Lua语法突出显示首选项"
 
 #: tfrmautoinject.menuitem3.caption
 msgid "Auto assembler syntax highlighting preferences"
@@ -17090,7 +17109,7 @@ msgstr ""
 
 #: tmainform.cbcomparetosavedscan.caption
 msgid "Compare to first/saved scan"
-msgstr ""
+msgstr "与第一次/保存的扫描结果比较"
 
 #: tmainform.cbcopyonwrite.caption
 msgid "CopyOnWrite"

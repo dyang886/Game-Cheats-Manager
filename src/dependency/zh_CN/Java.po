@@ -1,6 +1,10 @@
-﻿#: java-AAF
+#
+msgid ""
+msgstr ""
+
+#: java-AAF
 msgid "Auto assembler failed:"
-msgstr "自动汇编失败:"
+msgstr "自动汇编失败："
 
 #: java-JEST
 msgid "Java:eventserver terminated"
@@ -20,7 +24,7 @@ msgstr "Java:Event 中止处理"
 
 #: java-IJS
 msgid "Invalid java signature"
-msgstr "无效的java签名"
+msgstr "无效的 java 签名"
 
 #: java-ARTANS
 msgid "Array return types are not supported"
@@ -59,8 +63,9 @@ msgid "results"
 msgstr "结果"
 
 #: java-OWWTJAILAS
-msgid "java_find_what_writes only works when the jvmti agent is launched at start"
-msgstr "java_find_what_writes 仅在启动jvmti agent时才起作用"
+msgid ""
+"java_find_what_writes only works when the jvmti agent is launched at start"
+msgstr "java_find_what_writes 仅在启动 jvmti agent 时才起作用"
 
 #: java-Generic
 msgid "  Generic="
@@ -100,7 +105,7 @@ msgstr "首次扫描"
 
 #: java-JVScanner
 msgid "Java Variable Scanner"
-msgstr "扫描Java变量"
+msgstr "扫描 Java 变量"
 
 #: java-Value
 msgid "Value"
@@ -112,7 +117,7 @@ msgstr "再次扫描"
 
 #: java-Found
 msgid "Found:"
-msgstr "结果:"
+msgstr "结果："
 
 #: java-FWATV
 msgid "Find what accesses this value"
@@ -136,15 +141,15 @@ msgstr "编辑方法"
 
 #: java-AJF
 msgid "Activate java features"
-msgstr "激活java特性"
+msgstr "激活 java 特性"
 
 #: java-DJC
 msgid "Dissect java classes"
-msgstr "分析java类"
+msgstr "分析 java 类"
 
 #: java-JVScan
 msgid "Java variable scan"
-msgstr "扫描java变量"
+msgstr "扫描 java 变量"
 
 #: java-DCP
 msgid "Debug child processes"
@@ -152,19 +157,17 @@ msgstr "调试子进程"
 
 #: java-JHDTI
 msgid "The java handler failed to initialize"
-msgstr "java程序初始化失败"
-
-#: tformsettings.btnmakekerneldebugpossible.caption
-msgid "Make possible"
-msgstr "使成为可能"
+msgstr "java 程序初始化失败"
 
 #: java-SJMIEITTP
-msgid "Show java menu item even if the target process hasn't loaded jvm.dll (Used for the local setEnvironment option)"
-msgstr "即使目标进程未加载 jvm.dll也显示java菜单项 (使用本地设置环境选项)"
+msgid ""
+"Show java menu item even if the target process hasn't loaded jvm.dll (Used "
+"for the local setEnvironment option)"
+msgstr "即使目标进程未加载 jvm.dll 也显示 java 菜单项（使用本地设置环境选项）"
 
 #: javaclass-ICPTE
 msgid "Invalid constant pool tag encountered: "
-msgstr "遇到了无效的常量标记: "
+msgstr "遇到了无效的常量标记："
 
 #: javaclass-Tag
 msgid " (tag="
@@ -200,7 +203,7 @@ msgstr "此指令目前没有执行"
 
 #: javaclasseditor-UI
 msgid "unknown instruction:"
-msgstr "未知的指令:"
+msgstr "未知的指令："
 
 #: javaclasseditor-YCORI
 msgid "You can only replace instructions on an instruction boundary"
@@ -220,7 +223,7 @@ msgstr "输入行"
 
 #: javaclasseditor-ITJAC
 msgid "Input the java assembly code you wish to insert at line "
-msgstr "输入java汇编码要插入行 "
+msgstr "输入 java 汇编码要插入行 "
 
 #: javaclasseditor-EL
 msgid "Edit line"
@@ -248,7 +251,7 @@ msgstr "旧 size=%d 新 size=%d"
 
 #: javaclasseditor-Method
 msgid "Method: "
-msgstr "方法: "
+msgstr "方法："
 
 #: javaclasseditor-MS
 msgid "Max Stack"
@@ -284,4 +287,4 @@ msgstr "指令"
 
 #: javaclasseditor-DL
 msgid "Define label"
-msgstr "定义label"
+msgstr "定义 label"

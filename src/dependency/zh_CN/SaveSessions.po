@@ -1,4 +1,8 @@
-﻿#: SS-OaPF
+#
+msgid ""
+msgstr ""
+
+#: SS-OaPF
 msgid "Open a process first"
 msgstr "先打开进程"
 
@@ -16,4 +20,4 @@ msgstr "保存扫描"
 
 #: SS-LSS
 msgid "Load scan session"
-msgstr "加载扫描" 
+msgstr "加载扫描"

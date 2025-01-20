@@ -1,4 +1,8 @@
-﻿#: pseudocodediagram-file
+#
+msgid ""
+msgstr ""
+
+#: pseudocodediagram-file
 msgid "File"
 msgstr "文件"
 
@@ -44,7 +48,7 @@ msgstr "显示"
 
 #: pseudocodediagram-spfu2oc
 msgid "Show path from Ultimap1/2 or Codefilter"
-msgstr "显示来自Ultimap1/2或Codefilter的路径"
+msgstr "显示来自 Ultimap1/2 或 Codefilter 的路径"
 
 #: pseudocodediagram-spftw
 msgid "Show path from tracer window"
@@ -52,7 +56,7 @@ msgstr "从跟踪器窗口显示路径"
 
 #: pseudocodediagram-tsa
 msgid "Tracer starting at %8x (%s)"
-msgstr "跟踪程序从%8x开始（%s）"
+msgstr "跟踪程序从 %8x 开始（%s）"
 
 #: pseudocodediagram-tp
 msgid "Tracer paths"
@@ -168,11 +172,11 @@ msgstr "函数停止：X%X"
 
 #: pseudocodediagram-dbc
 msgid " Diagram blocks count: %d"
-msgstr "图表块计数%d"
+msgstr "图表块计数 %d"
 
 #: pseudocodediagram-dlc
 msgid " Diagram links count: %d"
-msgstr "图表链接计数%d"
+msgstr "图表链接计数 %d"
 
 #: pseudocodediagram-diagram
 msgid "Diagram"

@@ -1,10 +1,16 @@
-﻿#: monoscript-FITM
+#
+msgid ""
+msgstr ""
+
+#: monoscript-FITM
 msgid "Failure injecting the MonoDatacollector dll"
-msgstr "注入MonoDatacollector的dll失败"
+msgstr "注入 MonoDatacollector 的dll 失败"
 
 #: monoscript-DYWTL
-msgid "Do you wish to let the mono extention figure out the name and start address? If it's not a proper object this may crash the target."
-msgstr "您是否希望让mono扩展名确定名称和开始地址?如果它不是一个合适的对象,它可能会破坏目标."
+msgid ""
+"Do you wish to let the mono extention figure out the name and start address?"
+" If it's not a proper object this may crash the target."
+msgstr "您是否希望让 mono 扩展名确定名称和开始地址？如果它不是一个合适的对象，它可能会破坏目标。"
 
 #: monoscript-IO
 msgid "Instances of "
@@ -12,7 +18,7 @@ msgstr "实例 "
 
 #: monoscript-WTAJG
 msgid "Warning: These are just guesses. Validate them yourself"
-msgstr "警告:这些只是猜测. 请自行验证"
+msgstr "警告：这些只是猜测。请自行验证"
 
 #: monoscript-AN
 msgid "address==nil"
@@ -28,7 +34,7 @@ msgstr "示例地址"
 
 #: monoscript-PW
 msgid "<Please wait...>"
-msgstr "<请稍等…>"
+msgstr "<请稍等...>"
 
 #: monoscript-Parameters
 msgid "Parameters"
@@ -71,8 +77,10 @@ msgid "%x : %s (type: %s)"
 msgstr "%x : %s (类型: %s)"
 
 #: monoscript-AYSYWTE
-msgid "Are you sure you wish to expand the whole tree? This can take a while and Cheat Engine may look like it has crashed (It has not)"
-msgstr "你确定你希望把整分支都扩大吗?这可能需要一段时间，而Cheat Engine 可能看起来已经崩溃了(它没有)"
+msgid ""
+"Are you sure you wish to expand the whole tree? This can take a while and "
+"Cheat Engine may look like it has crashed (It has not)"
+msgstr "你确定你希望把整分支都扩大吗？这可能需要一段时间，而 Cheat Engine 可能看起来已经崩溃了（它没有）"
 
 #: monoscript-FTL
 msgid "Failure to launch"
@@ -84,27 +92,27 @@ msgstr "Mono"
 
 #: monoscript-AMF
 msgid "Activate mono features"
-msgstr "激活mono功能"
+msgstr "激活 mono 功能"
 
 #: monoscript-DM
 msgid "Dissect mono"
-msgstr "分析mono"
+msgstr "分析 mono"
 
 #: monoscript-TMHFTI
 msgid "The mono handler failed to initialize"
-msgstr "初始化mono处理程序失败"
+msgstr "初始化 mono 处理程序失败"
 
 #: monoscript-IPMN
 msgid "Invalid parameters (Methodname could not be determined)"
-msgstr "无效参数 (无法确定方法名)"
+msgstr "无效参数（无法确定方法名）"
 
 #: monoscript-IPCN
 msgid "Invalid parameters (Classname could not be determined)"
-msgstr "无效参数 (无法确定类名)"
+msgstr "无效参数（无法确定类名）"
 
 #: monoscript-IPN
 msgid "Invalid parameters (name could not be determined)"
-msgstr "无效参数 (无法确定名称)"
+msgstr "无效参数（无法确定名称）"
 
 #: monoscript-CNBF
 msgid " could not be found"
@@ -115,8 +123,10 @@ msgid " could not be jitted"
 msgstr " 无法即时编译"
 
 #: monoscript-STFDNWY
-msgid "Sorry this feature does not work yet.  getStructureCount needs patching first."
-msgstr "对不起,这个功能还没有完成.  需要先修复getStructureCount."
+msgid ""
+"Sorry this feature does not work yet.  getStructureCount needs patching "
+"first."
+msgstr "对不起，这个功能还没有完成。需要先修复 getStructureCount."
 
 #: monoscript-Removing
 msgid "Removing "
