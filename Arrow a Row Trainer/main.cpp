@@ -15,165 +15,8 @@
 #include <locale>
 #include <string>
 #include "trainer.h"
+#include "FLTKUtils.h"
 
-struct TimeoutData
-{
-  Trainer *trainer;
-  Fl_Box *process_exe;
-  Fl_Box *process_id;
-};
-
-// Structure to hold callback data for Apply button
-struct ApplyData
-{
-  Trainer *trainer;
-  std::string optionName;
-  Fl_Button *button;
-  Fl_Input *input;
-};
-
-// Structure to hold callback data for toggles
-struct ToggleData
-{
-  Trainer *trainer;
-  std::string optionName;
-  Fl_Check_Button *button;
-  Fl_Input *input;
-};
-
-const unsigned char *load_resource(const char *resource_name, DWORD &size)
-{
-  HRSRC hRes = FindResource(nullptr, resource_name, RT_RCDATA);
-  if (hRes)
-  {
-    HGLOBAL hData = LoadResource(nullptr, hRes);
-    size = SizeofResource(nullptr, hRes);
-    return (const unsigned char *)LockResource(hData);
-  }
-  return nullptr;
-}
-
-void uncheck_all_checkbuttons(Fl_Group *group)
-{
-  if (!group)
-    return;
-
-  for (int i = 0; i < group->children(); ++i)
-  {
-    Fl_Widget *child = group->child(i);
-    if (!child)
-      continue;
-
-    Fl_Check_Button *check_btn = dynamic_cast<Fl_Check_Button *>(child);
-    Fl_Input *input = dynamic_cast<Fl_Input *>(child);
-    if (check_btn)
-    {
-      check_btn->value(0);
-    }
-    if (input)
-    {
-      input->readonly(0);
-    }
-
-    // If the child is a group, recurse into it
-    Fl_Group *subgroup = dynamic_cast<Fl_Group *>(child);
-    if (subgroup)
-    {
-      uncheck_all_checkbuttons(subgroup);
-    }
-  }
-}
-
-void clean_up(Fl_Window *window, Trainer *trainer)
-{
-  trainer->cleanUp();
-  uncheck_all_checkbuttons(window);
-}
-
-bool compareNumericStrings(const std::string &a, const std::string &b)
-{
-  // Handle negative numbers
-  if (a[0] == '-' && b[0] != '-')
-    return true; // Negative is less than positive
-  if (a[0] != '-' && b[0] == '-')
-    return false; // Positive is greater than negative
-  if (a[0] == '-' && b[0] == '-')
-    return compareNumericStrings(b.substr(1), a.substr(1)); // Reverse comparison for negatives
-
-  // Remove leading zeros
-  std::string a_trim = a;
-  std::string b_trim = b;
-  a_trim.erase(0, a_trim.find_first_not_of('0'));
-  b_trim.erase(0, b_trim.find_first_not_of('0'));
-
-  // Compare by length
-  if (a_trim.size() != b_trim.size())
-    return a_trim.size() < b_trim.size();
-
-  // Compare lexicographically if lengths are equal
-  return a_trim < b_trim;
-}
-
-void set_input_values(Fl_Input *input, std::string def, std::string min, std::string max)
-{
-  input->value(def.c_str());
-
-  // A callback function to handle input changes
-  auto input_callback = [](Fl_Widget *widget, void *data)
-  {
-    Fl_Input *input = dynamic_cast<Fl_Input *>(widget);
-    if (!input)
-      return;
-
-    std::string value = input->value();
-
-    std::string min = ((std::pair<std::string, std::string> *)data)->first;
-    std::string max = ((std::pair<std::string, std::string> *)data)->second;
-
-    if (compareNumericStrings(value, min))
-    {
-      input->value(min.c_str());
-    }
-    else if (compareNumericStrings(max, value))
-    {
-      input->value(max.c_str());
-    }
-  };
-
-  // Associate the callback with the input field and pass the min/max data
-  std::pair<std::string, std::string> *constraints = new std::pair<std::string, std::string>(min, max);
-  input->callback(input_callback, (void *)constraints);
-}
-
-// Function to periodically check process status and update GUI
-void check_process_status(void *data)
-{
-  TimeoutData *timeoutData = static_cast<TimeoutData *>(data);
-  Trainer *trainer = timeoutData->trainer;
-  Fl_Box *process_exe = timeoutData->process_exe;
-  Fl_Box *process_id = timeoutData->process_id;
-
-  bool running = trainer->isProcessRunning();
-
-  // Retrieve process information
-  std::wstring processExeW = trainer->getProcessName();
-  std::string processExeStr(processExeW.begin(), processExeW.end());
-  DWORD processId = trainer->getProcessId();
-  std::string processIdStr = "Process ID: " + (processId ? std::to_string(processId) : "N/A");
-
-  // Set label color based on process status
-  process_exe->copy_label(processExeStr.c_str());
-  process_exe->labelcolor(running ? FL_DARK_GREEN : FL_RED);
-  process_id->copy_label(processIdStr.c_str());
-
-  if (!running)
-  {
-    clean_up(process_exe->window(), trainer);
-  }
-
-  // Schedule the next check after 1 second
-  Fl::repeat_timeout(1.0, check_process_status, data);
-}
 
 // Callback function for apply button
 void apply_callback(Fl_Widget *widget, void *data)
@@ -401,29 +244,42 @@ void toggle_callback(Fl_Widget *widget, void *data)
 int main(int argc, char **argv)
 {
   Trainer trainer;
+  load_translations("TRANSLATION_JSON");
 
   // Create the main window
-  Fl_Window *window = new Fl_Window(800, 600, "Trainer");
+  Fl_Window *window = new Fl_Window(800, 600);
+  window->user_data("Arrow a Row Trainer");
 
-  int font_size = 15;
   int left_margin = 20;
   int button_w = 50;
   int input_w = 200;
   int option_gap = 10;
   int option_h = static_cast<int>(font_size * 1.5);
 
-  fl_font(FL_HELVETICA, font_size);
+  // Setup fonts
+  Fl::set_font(FL_FREE_FONT, "Noto Sans SC");
+  fl_font(FL_FREE_FONT, font_size);
 
   // ------------------------------------------------------------------
   // Top Row: Language Selection
   // ------------------------------------------------------------------
   int lang_flex_height = 30;
+  int lang_flex_width = 200;
 
-  Fl_Flex lang_flex(window->w() * 0.8, 0, window->w() * 0.2, lang_flex_height, Fl_Flex::HORIZONTAL);
-  lang_flex.align(FL_ALIGN_RIGHT | FL_ALIGN_INSIDE);
+  Fl_Flex lang_flex(window->w() - lang_flex_width, 0, lang_flex_width, lang_flex_height, Fl_Flex::HORIZONTAL);
   lang_flex.color(FL_BLACK);
   Fl_Radio_Round_Button *lang_en = new Fl_Radio_Round_Button(0, 0, 0, 0, "English");
+  lang_en->labelfont(FL_FREE_FONT);
+  lang_en->labelsize(font_size);
+  ChangeLanguageData *changeLanguageDataEN = new ChangeLanguageData{"en_US", window};
+  lang_en->callback(change_language_callback, changeLanguageDataEN);
+
   Fl_Radio_Round_Button *lang_zh = new Fl_Radio_Round_Button(0, 0, 0, 0, "简体中文");
+  lang_zh->labelfont(FL_FREE_FONT);
+  lang_zh->labelsize(font_size);
+  ChangeLanguageData *changeLanguageDataSC = new ChangeLanguageData{"zh_CN", window};
+  lang_zh->callback(change_language_callback, changeLanguageDataSC);
+
   lang_flex.end();
 
   // ------------------------------------------------------------------
@@ -439,17 +295,15 @@ int main(int argc, char **argv)
   img_box->image(game_img);
 
   // Process Information
-  Fl_Box *process_name = new Fl_Box(left_margin, lang_flex_height + imageSize.second + 10, imageSize.first, font_size, "Process Name:");
+  Fl_Box *process_name = new Fl_Box(left_margin, lang_flex_height + imageSize.second + 10, imageSize.first, font_size);
+  process_name->user_data("Process Name:");
   process_name->align(FL_ALIGN_TOP_LEFT | FL_ALIGN_INSIDE);
-  process_name->labelsize(font_size);
 
   Fl_Box *process_exe = new Fl_Box(left_margin, lang_flex_height + imageSize.second + font_size + 15, imageSize.first, font_size);
   process_exe->align(FL_ALIGN_TOP_LEFT | FL_ALIGN_INSIDE);
-  process_exe->labelsize(font_size);
 
   Fl_Box *process_id = new Fl_Box(left_margin, lang_flex_height + imageSize.second + font_size + 45, imageSize.first, font_size);
   process_id->align(FL_ALIGN_TOP_LEFT | FL_ALIGN_INSIDE);
-  process_id->labelsize(font_size);
 
   TimeoutData *timeoutData = new TimeoutData{&trainer, process_exe, process_id};
   Fl::add_timeout(0, check_process_status, timeoutData);
@@ -474,9 +328,8 @@ int main(int argc, char **argv)
   Fl_Check_Button *coin_check_button = new Fl_Check_Button(0, 0, 0, 0);
   coin_flex->fixed(coin_check_button, button_w);
 
-  Fl_Box *coin_label = new Fl_Box(0, 0, 0, 0, "Set Coin");
-  coin_label->labelsize(font_size);
-  coin_flex->fixed(coin_label, fl_width(coin_label->label()));
+  Fl_Box *coin_label = new Fl_Box(0, 0, 0, 0);
+  coin_label->user_data("Set Coins");
 
   Fl_Input *coin_input = new Fl_Input(0, 0, 0, 0, "");
   coin_flex->fixed(coin_input, input_w);
@@ -758,6 +611,7 @@ int main(int argc, char **argv)
   options1_flex->fixed(sword_distance_flex, option_h);
 
   options1_flex->end();
+  change_language(window, language);
 
   // =========================
   // Finalize and Show Window

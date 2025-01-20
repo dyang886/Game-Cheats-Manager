@@ -1,1 +1,2 @@
 LOGO_IMG RCDATA "logo.jpg"
+TRANSLATION_JSON RCDATA "translations.json"

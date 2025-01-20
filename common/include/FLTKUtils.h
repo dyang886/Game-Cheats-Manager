@@ -17,29 +17,14 @@
 #include <fstream>
 #include <string>
 #include <unordered_map>
-#include "trainer.h"
+#include <shlobj.h>
 
 using json = nlohmann::json;
 
 int font_size = 15;
 std::unordered_map<std::string, std::unordered_map<std::string, std::string>> translations;
-std::string lang = "en_US";
-
-void load_translations(const std::string &filename)
-{
-    std::ifstream file(filename);
-    json j;
-    file >> j;
-
-    for (auto &lang : j.items())
-    {
-        std::string lang_code = lang.key();
-        for (auto &text : lang.value().items())
-        {
-            translations[lang_code][text.key()] = text.value();
-        }
-    }
-}
+std::string language = "en_US";
+std::string settings_path = "";
 
 struct TimeoutData
 {
@@ -75,13 +60,121 @@ struct ToggleData
 const unsigned char *load_resource(const char *resource_name, DWORD &size)
 {
     HRSRC hRes = FindResource(nullptr, resource_name, RT_RCDATA);
-    if (hRes)
+    if (!hRes)
     {
-        HGLOBAL hData = LoadResource(nullptr, hRes);
-        size = SizeofResource(nullptr, hRes);
-        return (const unsigned char *)LockResource(hData);
+        size = 0;
+        return nullptr;
     }
-    return nullptr;
+    HGLOBAL hData = LoadResource(nullptr, hRes);
+    if (!hData)
+    {
+        size = 0;
+        return nullptr;
+    }
+    size = SizeofResource(nullptr, hRes);
+
+    if (size == 0)
+    {
+        std::cerr << "Error: Failed to load resource: " << resource_name << std::endl;
+        return nullptr;
+    }
+
+    return static_cast<const unsigned char *>(LockResource(hData));
+}
+
+void load_translations(const char *resource_name)
+{
+    DWORD size = 0;
+    const unsigned char *data = load_resource(resource_name, size);
+
+    json j = json::parse(std::string(reinterpret_cast<const char *>(data), size));
+    for (auto &lang : j.items())
+    {
+        std::string lang_code = lang.key();
+        for (auto &text : lang.value().items())
+        {
+            translations[lang_code][text.key()] = text.value();
+        }
+    }
+}
+
+void saveSettings()
+{
+    json settings;
+
+    if (std::filesystem::exists(settings_path))
+    {
+        std::ifstream file(settings_path);
+        file >> settings;
+        file.close();
+    }
+    else
+    {
+        std::filesystem::create_directories(std::filesystem::path(settings_path).parent_path());
+    }
+
+    settings["language"] = language;
+
+    std::ofstream file(settings_path);
+    file << settings.dump(4);
+    file.close();
+}
+
+void getSettingsPath()
+{
+    PWSTR path = nullptr;
+    SHGetKnownFolderPath(FOLDERID_RoamingAppData, 0, nullptr, &path);
+    std::filesystem::path app_data_path(path);
+    std::filesystem::path full_path = app_data_path / "GCM Settings" / "trainers.json";
+    settings_path = full_path.string();
+    CoTaskMemFree(path);
+}
+
+void setupLanguage()
+{
+    getSettingsPath();
+
+    if (std::filesystem::exists(settings_path))
+    {
+        std::ifstream file(settings_path);
+        json settings;
+        file >> settings;
+        file.close();
+
+        if (settings.contains("language"))
+        {
+            language = settings["language"].get<std::string>();
+            return;
+        }
+    }
+
+    // If the file doesn't exist or "language" entry is missing, detect system locale
+    wchar_t locale_name[LOCALE_NAME_MAX_LENGTH];
+    if (GetUserDefaultLocaleName(locale_name, LOCALE_NAME_MAX_LENGTH) > 0)
+    {
+        int size_needed = WideCharToMultiByte(CP_UTF8, 0, locale_name, -1, nullptr, 0, nullptr, nullptr);
+        if (size_needed > 0)
+        {
+            std::string detected_locale(size_needed - 1, 0);
+            WideCharToMultiByte(CP_UTF8, 0, locale_name, -1, &detected_locale[0], size_needed, nullptr, nullptr);
+            std::cout << "Detected locale: " << detected_locale << std::endl;
+
+            if (detected_locale == "zh-CN" || detected_locale == "zh-Hans-HK" || detected_locale == "zh-Hans-MO" || detected_locale == "zh-SG")
+            {
+                language = "zh_CN";
+            }
+            else if (detected_locale == "zh-HK" || detected_locale == "zh-MO" || detected_locale == "zh-TW")
+            {
+                language = "zh_CN";
+            }
+            else if (detected_locale == "en-US")
+            {
+                language = "en_US";
+            }
+        }
+    }
+
+    saveSettings();
 }
 
 void change_language(Fl_Group *group, const std::string &lang)
@@ -143,6 +236,8 @@ void change_language(Fl_Group *group, const std::string &lang)
 
     group->redraw();
     group->show();
+    language = lang;
+    saveSettings();
 }
 
 void change_language_callback(Fl_Widget *widget, void *data)
@@ -272,7 +367,16 @@ void check_process_status(void *data)
 
     // Retrieve process information
     std::wstring processExeW = trainer->getProcessName();
-    std::string processExeStr(processExeW.begin(), processExeW.end());
+    std::string processExeStr;
+    if (!processExeW.empty())
+    {
+        int size_needed = WideCharToMultiByte(CP_UTF8, 0, processExeW.c_str(), -1, nullptr, 0, nullptr, nullptr);
+        if (size_needed > 0)
+        {
+            processExeStr.resize(size_needed - 1);
+            WideCharToMultiByte(CP_UTF8, 0, processExeW.c_str(), -1, &processExeStr[0], size_needed, nullptr, nullptr);
+        }
+    }
     DWORD processId = trainer->getProcessId();
     std::string processIdStr = "Process ID:" + std::string(" ") + (processId ? std::to_string(processId) : "N/A");
 

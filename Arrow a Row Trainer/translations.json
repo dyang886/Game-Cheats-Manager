@@ -1,0 +1,20 @@
+{
+    "en_US": {
+        "Please run the game first.": "Please run the game first.",
+        "Failed to activate.": "Failed to activate.",
+        "Failed to activate/deactivate.": "Failed to activate/deactivate.",
+        "Process Name:": "Process Name:",
+        "Process ID:": "Process ID:",
+        "Arrow a Row Trainer": "Arrow a Row Trainer",
+        "Set Coins": "Set Coins"
+    },
+    "zh_CN": {
+        "Please run the game first.": "请先运行游戏。",
+        "Failed to activate.": "激活失败。",
+        "Failed to activate/deactivate.": "激活/停用失败。",
+        "Process Name:": "进程名称：",
+        "Process ID:": "进程 ID：",
+        "Arrow a Row Trainer": "箭箭剑修改器",
+        "Set Coins": "设置金币"
+    }
+}

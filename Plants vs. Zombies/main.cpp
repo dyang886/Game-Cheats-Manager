@@ -14,9 +14,8 @@
 #include <iostream>
 #include <locale>
 #include <string>
-#include "FLTKUtils.h"
 #include "trainer.h"
-
+#include "FLTKUtils.h"
 
 // Callback function for apply button
 void apply_callback(Fl_Widget *widget, void *data)
@@ -30,7 +29,7 @@ void apply_callback(Fl_Widget *widget, void *data)
   // Check if the game process is running
   if (!applyData->trainer->isProcessRunning())
   {
-    fl_alert(t("Please run the game first.", lang));
+    fl_alert(t("Please run the game first.", language));
     return;
   }
 
@@ -63,7 +62,7 @@ void toggle_callback(Fl_Widget *widget, void *data)
 
   if (!toggleData->trainer->isProcessRunning())
   {
-    fl_alert(t("Please run the game first.", lang));
+    fl_alert(t("Please run the game first.", language));
     button->value(0);
     return;
   }
@@ -141,7 +140,8 @@ void toggle_callback(Fl_Widget *widget, void *data)
 int main(int argc, char **argv)
 {
   Trainer trainer;
-  load_translations("D:/Resources/Software/Game Trainers/Plants vs. Zombies/translations.json");
+  setupLanguage();
+  load_translations("TRANSLATION_JSON");
 
   // Create the main window
   Fl_Window *window = new Fl_Window(800, 600);
@@ -166,12 +166,16 @@ int main(int argc, char **argv)
   Fl_Flex lang_flex(window->w() - lang_flex_width, 0, lang_flex_width, lang_flex_height, Fl_Flex::HORIZONTAL);
   lang_flex.color(FL_BLACK);
   Fl_Radio_Round_Button *lang_en = new Fl_Radio_Round_Button(0, 0, 0, 0, "English");
+  if (language == "en_US")
+    lang_en->set();
   lang_en->labelfont(FL_FREE_FONT);
   lang_en->labelsize(font_size);
   ChangeLanguageData *changeLanguageDataEN = new ChangeLanguageData{"en_US", window};
   lang_en->callback(change_language_callback, changeLanguageDataEN);
 
   Fl_Radio_Round_Button *lang_zh = new Fl_Radio_Round_Button(0, 0, 0, 0, "简体中文");
+  if (language == "zh_CN")
+    lang_zh->set();
   lang_zh->labelfont(FL_FREE_FONT);
   lang_zh->labelsize(font_size);
   ChangeLanguageData *changeLanguageDataSC = new ChangeLanguageData{"zh_CN", window};
@@ -226,7 +230,7 @@ int main(int argc, char **argv)
   coin_flex->fixed(coin_check_button, button_w);
 
   Fl_Box *coin_label = new Fl_Box(0, 0, 0, 0);
-  coin_label->user_data("Add Coin");
+  coin_label->user_data("Add Coins");
 
   Fl_Input *coin_input = new Fl_Input(0, 0, 0, 0, "");
   coin_flex->fixed(coin_input, input_w);
@@ -240,7 +244,7 @@ int main(int argc, char **argv)
   options1_flex->fixed(coin_flex, option_h);
 
   // ------------------------------------------------------------------
-  // Option 2: Add sun (Toggle)
+  // Option 3: Add sun (Toggle)
   // ------------------------------------------------------------------
   Fl_Flex *sun_flex = new Fl_Flex(0, 0, 0, 0, Fl_Flex::HORIZONTAL);
   sun_flex->gap(option_gap);
@@ -263,7 +267,7 @@ int main(int argc, char **argv)
   options1_flex->fixed(sun_flex, option_h);
 
   options1_flex->end();
-  change_language(window, lang);
+  change_language(window, language);
 
   // =========================
   // Finalize and Show Window

@@ -1,4 +1,4 @@
-set(GAME_NAME PlantsVSZombies)
+set(GAME_NAME PVZ)
 
 # Define the executable
 add_executable(${GAME_NAME} main.cpp)
