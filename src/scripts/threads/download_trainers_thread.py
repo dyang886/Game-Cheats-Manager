@@ -166,7 +166,7 @@ class DownloadTrainersThread(DownloadBaseThread):
 
                 # Trainer duplication check
                 for trainerPath in self.trainers.keys():
-                    if trainerName_display in trainerPath:
+                    if trainerName_display == os.path.splitext(os.path.basename(trainerPath))[0]:
                         self.message.emit(tr("Trainer already exists, aborted download."), "failure")
                         time.sleep(self.download_finish_delay)
                         self.finished.emit(1)
@@ -435,7 +435,7 @@ class DownloadTrainersThread(DownloadBaseThread):
     def download_xiaoxing(self, selected_trainer):
         # Trainer duplication check
         for trainerPath in self.trainers.keys():
-            if self.symbol_replacement(selected_trainer["trainer_name"]) in trainerPath:
+            if self.symbol_replacement(selected_trainer["trainer_name"]) == os.path.splitext(os.path.basename(trainerPath))[0]:
                 self.message.emit(tr("Trainer already exists, aborted download."), "failure")
                 time.sleep(self.download_finish_delay)
                 self.finished.emit(1)
