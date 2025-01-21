@@ -359,9 +359,9 @@ class WeModCustomization(QThread):
     def yearly_active_sub(self):
         patterns = {
             r'(getUserAccount\()(.*)(}async getUserAccountFlags)': r'\1\2.then(function(response) {response.subscription={period:"yearly", state:"active"}; response.flags=78; return response;})\3',
-            r'(getUserAccountFlags\()(.*)(\)\).flags)': r'\1\2\3.then(function(response) {if (response.mask==4) {response.flags=4}; return response;})',
+            r'(getUserAccountFlags\()(.*)(\)\).flags)': r'\1\2\3.then(function(response) {if(response.mask==4) {response.flags=4}; return response;})',
             r'(changeAccountEmail\()(.*)(email:.?,currentPassword:.?}\))': r'\1\2\3.then(function(response) {response.subscription={period:"yearly", state:"active"}; response.flags=78; return response;})',
-            r'(getPromotion\()(.*)(collectMetrics:!0}\))': r'\1\2\3.then(function(response) {response.components.appBanner=null; response.flags=0; return response;})'
+            r'(getPromotion\()(.*)(collectMetrics:!\d}\))': r'\1\2\3.then(function(response) {response.components.appBanner=null; response.flags=0; return response;})'
         }
 
         # Mapping of patterns to files where they were found: {pattern key: file path}
@@ -376,6 +376,7 @@ class WeModCustomization(QThread):
                         with open(file_path, 'r', encoding='utf-8') as file:
                             content = file.read()
                             if re.search(pattern, content):
+                                print(f"Pattern {pattern} found in file {file_path}")
                                 lines[pattern] = file_path
                                 break
                     except UnicodeDecodeError:
@@ -383,11 +384,11 @@ class WeModCustomization(QThread):
 
         # Process each file with matched patterns
         if all(lines.values()):
-            print(f"js file patched using yearly_active_sub method: {list(lines.items())[0][1]}")
+            print("js file patched using yearly_active_sub method")
             for pattern, file_path in lines.items():
                 self.apply_patch(file_path, pattern, patterns[pattern])
         else:
-            print("Pattern not found for yearly_active_sub patch")
+            print("Not all 4 patterns found for yearly_active_sub patch")
             return False
 
         return True
