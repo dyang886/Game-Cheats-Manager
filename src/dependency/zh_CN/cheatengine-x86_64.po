@@ -2343,7 +2343,7 @@ msgstr "写时拷贝"
 
 #: formsettingsunit.rs2bytes
 msgid "2 Bytes"
-msgstr ""
+msgstr "2 字节"
 
 #: formsettingsunit.rs4bytes
 msgid "4 Bytes"
@@ -2351,7 +2351,7 @@ msgstr "4 字节"
 
 #: formsettingsunit.rs8bytes
 msgid "8 Bytes"
-msgstr ""
+msgstr "8 字节"
 
 #: formsettingsunit.rsallcustomtypes
 msgid "All Custom Types"
@@ -2367,7 +2367,7 @@ msgstr "附加到当前进程"
 
 #: formsettingsunit.rsbinary
 msgid "Binary"
-msgstr ""
+msgstr "二进制"
 
 #: formsettingsunit.rsbyte
 msgid "Byte"
@@ -3943,15 +3943,15 @@ msgstr "请先将调试器附加到此进程"
 
 #: frmthreadlistunit.rstl1bytes
 msgid "1 byte"
-msgstr ""
+msgstr "1 字节"
 
 #: frmthreadlistunit.rstl2bytes
 msgid "2 bytes"
-msgstr ""
+msgstr "2 字节"
 
 #: frmthreadlistunit.rstl4bytes
 msgid "4 bytes"
-msgstr ""
+msgstr "4 字节"
 
 #: frmthreadlistunit.rstl8bytes
 msgid "8 bytes"
@@ -7886,7 +7886,7 @@ msgstr "设置速度失败"
 
 #: structuresaddelementfrm.rssae2bytes
 msgid "2 Bytes"
-msgstr ""
+msgstr "2 字节"
 
 #: structuresaddelementfrm.rssae4bytes
 msgid "4 Bytes"
@@ -9701,7 +9701,7 @@ msgstr "由CE自动添加分配的内存作为监视区域"
 
 #: tformsettings.cballqword.caption
 msgid "8 Bytes"
-msgstr ""
+msgstr "8 字节"
 
 #: tformsettings.cballsingle.caption
 msgid "Float"
@@ -9709,15 +9709,11 @@ msgstr "单浮点"
 
 #: tformsettings.cballword.caption
 msgid "2 Bytes"
-msgstr ""
+msgstr "2 字节"
 
 #: tformsettings.cbalwaysaskforpassword.caption
 msgid "Always ask for password when signing"
-msgstr ""
-"#-#-#-#-#  catalog.po  #-#-#-#-#\n"
-"当签署时始终询问密码\n"
-"#-#-#-#-#  catalog.po  #-#-#-#-#\n"
-"签名时一定要询问密码"
+msgstr "当签署时始终询问密码"
 
 #: tformsettings.cbalwaysattempttolaunchasadmin.caption
 msgid "Always attempt to launch as admin"
@@ -15168,7 +15164,7 @@ msgstr "4 字节"
 
 #: tfrmstructurecompare.edtalignsize.hint
 msgid "1,2 or 4"
-msgstr ""
+msgstr "1，2，或者 4"
 
 #: tfrmstructurecompare.edtalignsize.text
 msgid "4"
@@ -17562,7 +17558,7 @@ msgstr "反汇编此内存区域"
 
 #: tmainform.midisplay2byte.caption
 msgid "2 Bytes"
-msgstr ""
+msgstr "2 字节"
 
 #: tmainform.midisplay4byte.caption
 msgid "4 Bytes"
@@ -17570,7 +17566,7 @@ msgstr "4 字节"
 
 #: tmainform.midisplay8byte.caption
 msgid "8 Bytes"
-msgstr ""
+msgstr "8 字节"
 
 #: tmainform.midisplaybyte.caption
 msgid "Byte"
@@ -18030,7 +18026,7 @@ msgstr "数值"
 
 #: tmainform.vartype.text
 msgid "Binary"
-msgstr ""
+msgstr "二进制"
 
 #: tmemorybrowser.addthisaddresstothelist1.caption
 msgid "Add this address to the list"
@@ -18725,7 +18721,7 @@ msgstr "分隔符"
 
 #: tmemorybrowser.misepevery2bytes.caption
 msgid "2 Bytes"
-msgstr ""
+msgstr "2 字节"
 
 #: tmemorybrowser.misepevery4bytes.caption
 msgid "4 Bytes"
@@ -18733,7 +18729,7 @@ msgstr "4 字节"
 
 #: tmemorybrowser.misepevery8bytes.caption
 msgid "8 Bytes"
-msgstr ""
+msgstr "8 字节"
 
 #: tmemorybrowser.misetbookmark0.caption
 msgid "Bookmark 0"
@@ -19554,7 +19550,7 @@ msgstr "10"
 
 #: ttypeform.vartype.text
 msgid "Binary"
-msgstr ""
+msgstr "二进制"
 
 #: tvaluechangeform.button1.caption
 msgid "OK"
@@ -19611,7 +19607,7 @@ msgstr "自动汇编脚本"
 
 #: vartypestrings.rs_vtbinary
 msgid "Binary"
-msgstr ""
+msgstr "二进制"
 
 #: vartypestrings.rs_vtbyte
 msgid "Byte"
@@ -19647,11 +19643,11 @@ msgstr "指针"
 
 #: vartypestrings.rs_vtpointerornested
 msgid "Pointer or Nested Structure"
-msgstr ""
+msgstr "指针或嵌套结构"
 
 #: vartypestrings.rs_vtqword
 msgid "8 Bytes"
-msgstr ""
+msgstr "8 字节"
 
 #: vartypestrings.rs_vtsingle
 msgid "Float"
@@ -19663,7 +19659,7 @@ msgstr "字符串"
 
 #: vartypestrings.rs_vtunicodestring
 msgid "Unicode String"
-msgstr ""
+msgstr "Unicode 字符串"
 
 #: vartypestrings.rs_vtwidestring
 msgid "Widestring"
@@ -19671,7 +19667,7 @@ msgstr "宽弦"
 
 #: vartypestrings.rs_vtword
 msgid "2 Bytes"
-msgstr ""
+msgstr "2 字节"
 
 #: vehdebugger.rscheatenginefailedtogetintotheconfig
 #, object-pascal-format
