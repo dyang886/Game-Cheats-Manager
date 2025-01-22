@@ -2251,7 +2251,7 @@ msgstr "完成"
 
 #: formmemoryregionsunit.rsdoyouwanttousethecopyonwritebit
 msgid "Do you want to use the COPY-ON-WRITE bit?"
-msgstr "你想要使用写时拷贝(Copy-On-Write)技术吗?"
+msgstr "你想要使用写入时拷贝技术吗?"
 
 #: formmemoryregionsunit.rsexecute
 msgid "Execute"
@@ -2267,7 +2267,7 @@ msgstr "可执行+读+写"
 
 #: formmemoryregionsunit.rsexecutewritecopy
 msgid "Execute+Write Copy"
-msgstr "可执行+写时拷贝"
+msgstr "可执行+写入时拷贝"
 
 #: formmemoryregionsunit.rsfailedtodelete
 #, object-pascal-format
@@ -2335,11 +2335,11 @@ msgstr "没有可用的空余位置"
 
 #: formmemoryregionsunit.rswritecombine
 msgid "Write Combine"
-msgstr ""
+msgstr "写入组合"
 
 #: formmemoryregionsunit.rswritecopy
 msgid "Write Copy"
-msgstr "写时拷贝"
+msgstr "写入时拷贝"
 
 #: formsettingsunit.rs2bytes
 msgid "2 Bytes"
@@ -4299,7 +4299,7 @@ msgstr "未知错误"
 
 #: hexviewunit.rsbytes
 msgid "bytes"
-msgstr ""
+msgstr "字节"
 
 #: hexviewunit.rsexecute
 msgid "Execute"
@@ -4315,7 +4315,7 @@ msgstr "可执行/读/写"
 
 #: hexviewunit.rsexecutewritecopy
 msgid "Execute/Write Copy"
-msgstr "可执行/写时拷贝"
+msgstr "可执行/写入时拷贝"
 
 #: hexviewunit.rsguarded
 msgid "Guarded"
@@ -4370,15 +4370,15 @@ msgstr "这看起来像一个普通字串. 你想视为字串并输入吗?"
 
 #: hexviewunit.rswritecombine
 msgid "Write Combine"
-msgstr ""
+msgstr "写入组合"
 
 #: hexviewunit.rswritecopy
 msgid "Write Copy"
-msgstr "写时拷贝"
+msgstr "写入时拷贝"
 
 #: hotkeys.rsdeactivateonrelease
 msgid "Deactivate on release"
-msgstr ""
+msgstr "释放时停用"
 
 #: hotkeys.rsdecreasevaluewith
 msgid "Decrease value with:"
@@ -9637,7 +9637,7 @@ msgstr "取消"
 
 #: tformsettings.btnmakekerneldebugpossible.caption
 msgid "Make possible"
-msgstr ""
+msgstr "使其成为可能"
 
 #: tformsettings.btnok.caption
 msgid "OK"
@@ -9717,7 +9717,7 @@ msgstr "当签署时始终询问密码"
 
 #: tformsettings.cbalwaysattempttolaunchasadmin.caption
 msgid "Always attempt to launch as admin"
-msgstr ""
+msgstr "始终尝试以管理员身份启动"
 
 #: tformsettings.cbalwaysautoattach.caption
 msgid "Even autoattach when another process has already been selected"
@@ -9739,11 +9739,11 @@ msgstr "始终在保存时签署Cheat Tables"
 
 #: tformsettings.cbasktoattachtorosetta.caption
 msgid "Ask to attach"
-msgstr ""
+msgstr "请求附加"
 
 #: tformsettings.cbasktoclearlistonopen.caption
 msgid "Ask to clear list on opening new process"
-msgstr ""
+msgstr "询问是否在打开新流程时清除列表"
 
 #: tformsettings.cbasktoclearlistonopen.hint
 msgid "When unchecked CE will not clear the list when opening a process"
@@ -9759,27 +9759,27 @@ msgstr "单步调试内核代码的能力"
 
 #: tformsettings.cbclearsymbolsonprocessopen.caption
 msgid "Clear all symbols when a new process is opened"
-msgstr ""
+msgstr "打开新进程时清除所有符号"
 
 #: tformsettings.cbdbvmdebugkernelmodebreaks.caption
 msgid "Kernelmode breaks (when possible)"
-msgstr ""
+msgstr "内核模式中断（如有可能）"
 
 #: tformsettings.cbdbvmdebugtargetedprocessonly.caption
 msgid "Targeted process only"
-msgstr ""
+msgstr "今目标进程"
 
 #: tformsettings.cbdbvmdebugtriggercow.caption
 msgid "Trigger copy-on-write before activating watches"
-msgstr ""
+msgstr "在激活监视之前触发\"写入时拷贝\""
 
 #: tformsettings.cbdisabledarkmodesupport.caption
 msgid "Disable Dark Mode support (Requires a restart)"
-msgstr ""
+msgstr "禁用深色模式支持（需要重新启动）"
 
 #: tformsettings.cbdontdeletesymbols.caption
 msgid "Don't delete symbols when synchronizing"
-msgstr ""
+msgstr "同步时不要删除符号"
 
 #: tformsettings.cbdontdeletesymbols.hint
 msgid ""
@@ -9806,35 +9806,35 @@ msgstr "默认开启快速扫描"
 
 #: tformsettings.cbgdbwritecode.caption
 msgid "Use GDB to write code"
-msgstr ""
+msgstr "使用 GDB 写入代码"
 
 #: tformsettings.cbgdbwritecode.hint
 msgid "Use this in case the target JIT's code to native code"
-msgstr ""
+msgstr "在目标将 JIT 的代码转换为本机代码的情况下使用此选项"
 
 #: tformsettings.cbgdbwritecode2.caption
 msgid "Use debugserver to write code"
-msgstr ""
+msgstr "使用调试服务器写入代码"
 
 #: tformsettings.cbgdbwritecode2.hint
 msgid "Use this in case the target JIT's code to native code"
-msgstr ""
+msgstr "在目标将 JIT 的代码转换为本机代码的情况下使用此选项"
 
 #: tformsettings.cbglobaldebug.caption
 msgid "Use Global Debug routines"
-msgstr "使用全局调试"
+msgstr "使用全局调试例程"
 
 #: tformsettings.cbhandlebreakpoints.caption
 msgid "Handle beakpoints not caused by CE"
-msgstr "处理非CE引起的中断"
+msgstr "处理非 CE 引起的断点"
 
 #: tformsettings.cbhideiptcapability.caption
 msgid "Hide IPT features from GUI"
-msgstr ""
+msgstr "从 GUI 隐藏 IPT 功能"
 
 #: tformsettings.cbhideiptcapability.hint
 msgid "In case you really do not wish to be reminded of this"
-msgstr ""
+msgstr "如果您确实不希望被提醒此功能"
 
 #: tformsettings.cbincremental.caption
 msgid "Incremental value"
@@ -9846,11 +9846,11 @@ msgstr "使用 APC 注入dll"
 
 #: tformsettings.cbipttracesize.text
 msgid "8KB"
-msgstr ""
+msgstr "8KB"
 
 #: tformsettings.cbkdebug.caption
 msgid "Kernelmode debugger"
-msgstr ""
+msgstr "内核模式调试器"
 
 #: tformsettings.cbkernelopenprocess.caption
 msgid "Open Process"
@@ -9952,21 +9952,23 @@ msgstr "打开并处理创建的进程"
 
 #: tformsettings.cbrecordiptforfindwhatroutines.caption
 msgid "Record trace in elements of \"Find what ... \" routines"
-msgstr ""
+msgstr "在 \"查找什么...\" 例程的元素中记录跟踪"
 
 #: tformsettings.cbrecordiptforfindwhatroutines.hint
 msgid ""
 "When selected every single element in \"find what ...\" routines will get a copy of the trace for that threat at that time. (Can eat a lot of memory if this is high)\n"
 "When deselected you can only get the trace information when stopped on a breakpoint. "
 msgstr ""
+"选中时，\"查找什么...\" 例程中的每个元素都会获取该时刻的线程跟踪副本。（如果此设置过高，可能会占用大量内存）\n"
+"取消选中时，您只能在断点处停止时获取跟踪信息。
 
 #: tformsettings.cbsavememoryregionscansettings.caption
 msgid "Save the memoryregions to scan options"
-msgstr ""
+msgstr "保存要扫描选项的内存区域"
 
 #: tformsettings.cbsavememoryregionscansettings.hint
 msgid "Saves \"Writable\" \"Executable\" \"Copy-On-Write\"  "
-msgstr ""
+msgstr "保存 \"可写\" \"可执行\" \"写入时拷贝\"  "
 
 #: tformsettings.cbsavewindowpos.caption
 msgid "Save window positions"
@@ -10008,15 +10010,11 @@ msgstr "简单粘贴"
 msgid ""
 "Do not load external debug symbols like .PDB/.DBG files (Breaks tables that "
 "use these symbols)"
-msgstr ""
+msgstr "不加载 .PDB/.DBG 文件等外部调试符号（使用这些符号的表格会遭破坏）"
 
 #: tformsettings.cbskip_page_nocache.caption
 msgid "Don't scan memory that is protected with the No Cache option"
-msgstr ""
-"#-#-#-#-#  catalog.po  #-#-#-#-#\n"
-"不要扫描没有缓存选项保护的内存\n"
-"#-#-#-#-#  catalog.po  #-#-#-#-#\n"
-"不扫描受保护的内存,也不缓存扫描数据"
+msgstr "不扫描使用无缓存选项且受保护的内存"
 
 #: tformsettings.cbskip_page_nocache.hint
 msgid ""
@@ -10030,48 +10028,48 @@ msgstr "不要扫描受写组合选项保护的内存"
 
 #: tformsettings.cbsymbolsyncinterval.caption
 msgid "Synchronize every few seconds"
-msgstr ""
+msgstr "每隔几秒钟同步一次"
 
 #: tformsettings.cbsymbolsyncinterval.hint
 msgid ""
 "When checked the symbols will be synchronized with other CE instances every "
 "few seconds. When not checked, only when a CE instance gets closed or a "
 "different process gets opened"
-msgstr ""
+msgstr "选中时，符号会每隔几秒与其他打开相同进程的 CE 实例同步。未选中时，只有在关闭 CE 实例或打开其他进程时才会同步符号。"
 
 #: tformsettings.cbsynchronizesymbols.caption
 msgid "Synchronize symbols"
-msgstr ""
+msgstr "同步符号"
 
 #: tformsettings.cbsynchronizesymbols.hint
 msgid ""
 "Share symbollists with other CE instances that have the same process open, "
 "and remember them when closing and reopening CE"
-msgstr ""
+msgstr "与打开相同进程的其他 CE 实例共享符号列表，并在关闭和重新打开 CE 时记住这些符号。"
 
 #: tformsettings.cbupdatefoundlist.caption
 msgid "Update the list of found addresses even after scanning"
-msgstr "扫描后平滑更新地址列表"
+msgstr "即使扫描后仍然更新找到的地址列表"
 
 #: tformsettings.cbusedbvmdebugger.caption
 msgid "DBVM-level debugger"
-msgstr ""
+msgstr "DBVM 级调试器"
 
 #: tformsettings.cbusegdbserver.caption
 msgid "GDB Server Debugger"
-msgstr ""
+msgstr "GDB 服务器调试器"
 
 #: tformsettings.cbuseintelpt.caption
 msgid "Use intel-PT feature when the debugger is enabled"
-msgstr ""
+msgstr "启用调试器时使用 Intel-PT 功能"
 
 #: tformsettings.cbusemacdebugger.caption
 msgid "MacOS debugger"
-msgstr ""
+msgstr "MacOS 调试器"
 
 #: tformsettings.cbuserosettadebugserver.caption
 msgid "Use rosetta debugserver on rosetta targets"
-msgstr ""
+msgstr "在 Rosetta 目标上使用 Rosetta 调试服务器"
 
 #: tformsettings.cbusethreadforfreeze.caption
 msgid "Use thread for freeze"
@@ -10083,7 +10081,7 @@ msgstr "VEH 调试器"
 
 #: tformsettings.cbusewindowsdebugger.caption
 msgid "Windows debugger"
-msgstr ""
+msgstr "Window 调试器"
 
 #: tformsettings.cbvehrealcontextonthreadcreation.caption
 msgid "Get/Set thread context on creation"
@@ -10252,7 +10250,7 @@ msgstr "调试器界面配置"
 #: tformsettings.groupbox3.caption
 msgid ""
 "Use the following CE Kernel routines instead of the original windows version"
-msgstr "更改 CE 工作方式以适应早期版本的Windows"
+msgstr "使用以下 CE 内核例程，而不是原始的 Windows 版本"
 
 #: tformsettings.groupbox4.caption
 msgid "Prefered breakpoint method"
@@ -10356,11 +10354,11 @@ msgstr "默认的返回值"
 
 #: tformsettings.label6.caption
 msgid "Size of stack to record on \"Find what... routines\""
-msgstr "在\"找出...代码\"中记录堆栈的大小"
+msgstr "在 \"查找什么...例程\" 中记录的堆栈大小"
 
 #: tformsettings.label7.caption
 msgid "Bytes"
-msgstr ""
+msgstr "字节"
 
 #: tformsettings.label8.caption
 msgid "Max log size (nr of entries)"
@@ -11888,11 +11886,7 @@ msgstr "                      "
 
 #: tfrmdisassemblyscan.menuitem1.caption
 msgid "Go to this address"
-msgstr ""
-"#-#-#-#-#  catalog.po  #-#-#-#-#\n"
-"转到这个地址\n"
-"#-#-#-#-#  catalog.po  #-#-#-#-#\n"
-"跳转到这个地址"
+msgstr "去这个地址"
 
 #: tfrmdisassemblyscan.menuitem2.caption
 msgid "Copy selection to clipboard"
@@ -15376,7 +15370,7 @@ msgstr "2 字节"
 
 #: tfrmstructures2.michangetype2bytehex.caption
 msgid "2 Byte (Hex)"
-msgstr ""
+msgstr "2 字节（十六进制）"
 
 #: tfrmstructures2.michangetype4byte.caption
 msgid "4 Byte"
@@ -15384,7 +15378,7 @@ msgstr "4 字节"
 
 #: tfrmstructures2.michangetype4bytehex.caption
 msgid "4 Byte (Hex)"
-msgstr ""
+msgstr "4 字节（十六进制）"
 
 #: tfrmstructures2.michangetype8byte.caption
 msgid "8 Byte"
@@ -15392,11 +15386,11 @@ msgstr "8 字节"
 
 #: tfrmstructures2.michangetype8bytehex.caption
 msgid "8 Byte (Hex)"
-msgstr ""
+msgstr "8 字节（十六进制）"
 
 #: tfrmstructures2.michangetypearrayofbyte.caption
 msgid "Array Of Byte"
-msgstr ""
+msgstr "字节数组"
 
 #: tfrmstructures2.michangetypebyte.caption
 msgid "Byte"
@@ -15404,7 +15398,7 @@ msgstr "字节"
 
 #: tfrmstructures2.michangetypebytehex.caption
 msgid "Byte (Hex)"
-msgstr ""
+msgstr "字节（十六进制）"
 
 #: tfrmstructures2.michangetypedouble.caption
 msgid "Double"
@@ -16083,7 +16077,7 @@ msgstr "硬件断点"
 
 #: tfrmtracerconfig.rbbpsoftware.caption
 msgid "Software breakpoint"
-msgstr ""
+msgstr "软件断点"
 
 #: tfrmtracerconfig.rbbreakonaccess.caption
 msgid "Break on Access"
@@ -17109,7 +17103,7 @@ msgstr "与第一次/保存的扫描结果比较"
 
 #: tmainform.cbcopyonwrite.caption
 msgid "CopyOnWrite"
-msgstr "写时拷贝"
+msgstr "写入时拷贝"
 
 #: tmainform.cbcopyonwrite.hint
 msgid ""
@@ -17498,15 +17492,11 @@ msgstr "此项目禁用后同时禁用它的子项"
 
 #: tmainform.michangecolor.caption
 msgid "Change color"
-msgstr ""
+msgstr "改变颜色"
 
 #: tmainform.michangevalue.caption
 msgid "Change value of selected addresses"
-msgstr ""
-"#-#-#-#-#  catalog.po  #-#-#-#-#\n"
-"更改选定地址的值\n"
-"#-#-#-#-#  catalog.po  #-#-#-#-#\n"
-"改变已选中地址的数值"
+msgstr 更改选定地址的数值"
 
 #: tmainform.michangevalueback.caption
 msgid "Change value of selected addresses back to previous/saved value"
@@ -17538,11 +17528,7 @@ msgstr "定义新的\"自定义类型\" (自动汇编)"
 
 #: tmainform.midefinenewcustomtypelua.caption
 msgid "Define new custom type (LUA)"
-msgstr ""
-"#-#-#-#-#  catalog.po  #-#-#-#-#\n"
-"定义新的自定义类型(LUA)\n"
-"#-#-#-#-#  catalog.po  #-#-#-#-#\n"
-"定义新的\"自定义类型\" (LUA)"
+msgstr "定义新的自定义类型（LUA）"
 
 #: tmainform.mideletecustomtype.caption
 msgid "Delete selected custom type"
@@ -17550,7 +17536,7 @@ msgstr "删除所选的\"自定义类型\""
 
 #: tmainform.mideletesavedscanresults.caption
 msgid "Delete scanresult"
-msgstr ""
+msgstr "删除扫描结果"
 
 #: tmainform.midisassemble.caption
 msgid "Disassemble this memory region"
