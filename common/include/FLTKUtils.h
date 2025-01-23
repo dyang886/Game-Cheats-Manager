@@ -1,25 +1,33 @@
-#include <FL/Fl.H>
-#include <FL/Fl_Window.H>
-#include <FL/Fl_Box.H>
-#include <FL/Fl_Radio_Round_Button.H>
-#include <FL/Fl_Check_Button.H>
-#include <FL/Fl_Button.H>
-#include <FL/Fl_Value_Input.H>
-#include <FL/Fl_JPEG_Image.H>
-#include <FL/fl_draw.H>
-#include <FL/Fl_Grid.H>
-#include <FL/Fl_Flex.H>
-#include <FL/forms.H>
-#include <iostream>
-#include <locale>
-#include <string>
-#include <nlohmann/json.hpp>
 #include <fstream>
-#include <string>
-#include <unordered_map>
+#include <nlohmann/json.hpp>
 #include <shlobj.h>
 
 using json = nlohmann::json;
+
+// Individual option template:
+
+// // ------------------------------------------------------------------
+// // Option x: Set {{}} (Apply/Toggle)
+// // ------------------------------------------------------------------
+// Fl_Flex *{{}}_flex = new Fl_Flex(0, 0, 0, 0, Fl_Flex::HORIZONTAL);
+// {{}}_flex->gap(option_gap);
+
+// Fl_Check_Button *{{}}_check_button = new Fl_Check_Button(0, 0, 0, 0);
+// {{}}_flex->fixed({{}}_check_button, button_w);
+
+// Fl_Box *{{}}_label = new Fl_Box(0, 0, 0, 0);
+// {{}}_label->user_data("Label");
+
+// Fl_Input *{{}}_input = new Fl_Input(0, 0, 0, 0, "");
+// {{}}_flex->fixed({{}}_input, input_w);
+// {{}}_input->type(FL_INT_INPUT);
+// set_input_values({{}}_input, "default", "minimum", "maximum");
+
+// ToggleData *td_{{}} = new ToggleData{&trainer, "OptionName", {{}}_check_button, {{}}_input};
+// {{}}_check_button->callback(toggle_callback, td_{{}});
+
+// {{}}_flex->end();
+// options1_flex->fixed({{}}_flex, option_h);
 
 int font_size = 15;
 std::unordered_map<std::string, std::unordered_map<std::string, std::string>> translations;
@@ -217,6 +225,7 @@ void change_language(Fl_Group *group, const std::string &lang)
                     child->copy_label(label_it->second.c_str());
                     child->labelsize(font_size);
                     child->labelfont(FL_FREE_FONT);
+                    child->labelcolor(FL_WHITE);
                     Fl_Flex *parent_flex = dynamic_cast<Fl_Flex *>(child->parent());
                     if (parent_flex)
                     {
@@ -378,13 +387,15 @@ void check_process_status(void *data)
         }
     }
     DWORD processId = trainer->getProcessId();
-    std::string processIdStr = "Process ID:" + std::string(" ") + (processId ? std::to_string(processId) : "N/A");
+    std::string processIdStr = processId ? std::to_string(processId) : "N/A";
 
     // Set label color based on process status
     process_exe->copy_label(processExeStr.c_str());
     process_exe->labelcolor(running ? FL_DARK_GREEN : FL_RED);
     process_exe->labelsize(font_size);
+
     process_id->copy_label(processIdStr.c_str());
+    process_id->labelcolor(FL_WHITE);
     process_id->labelsize(font_size);
 
     if (!running)

@@ -1,2 +1,3 @@
+APP_ICON ICON "../common/assets/logo.ico"
 LOGO_IMG RCDATA "logo.jpg"
 TRANSLATION_JSON RCDATA "translations.json"

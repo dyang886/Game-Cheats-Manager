@@ -1,19 +1,9 @@
 // main.cpp
 #include <FL/Fl.H>
-#include <FL/Fl_Window.H>
-#include <FL/Fl_Box.H>
 #include <FL/Fl_Radio_Round_Button.H>
-#include <FL/Fl_Check_Button.H>
-#include <FL/Fl_Button.H>
-#include <FL/Fl_Value_Input.H>
 #include <FL/Fl_JPEG_Image.H>
-#include <FL/fl_draw.H>
-#include <FL/Fl_Grid.H>
 #include <FL/Fl_Flex.H>
 #include <FL/forms.H>
-#include <iostream>
-#include <locale>
-#include <string>
 #include "trainer.h"
 #include "FLTKUtils.h"
 
@@ -41,12 +31,10 @@ void apply_callback(Fl_Widget *widget, void *data)
     inputValue = input->value();
   }
 
-  // Apply the value using the Trainer class
-
   // Finalize
   if (!status)
   {
-    fl_alert("Failed to activate.");
+    fl_alert(t("Failed to activate.", language));
   }
   button->value() ? input->readonly(1) : input->readonly(0);
 }
@@ -102,37 +90,11 @@ void toggle_callback(Fl_Widget *widget, void *data)
   // Finalize
   if (!status)
   {
-    fl_alert("Failed to activate/deactivate.");
+    fl_alert(t("Failed to activate/deactivate.", language));
     button->value(0);
   }
   button->value() ? input->readonly(1) : input->readonly(0);
 }
-
-// Individual option template:
-
-// // ------------------------------------------------------------------
-// // Option x: Set {{}} (Apply/Toggle)
-// // ------------------------------------------------------------------
-// Fl_Flex *{{}}_flex = new Fl_Flex(0, 0, 0, 0, Fl_Flex::HORIZONTAL);
-// {{}}_flex->gap(option_gap);
-
-// Fl_Check_Button *{{}}_check_button = new Fl_Check_Button(0, 0, 0, 0);
-// {{}}_flex->fixed({{}}_check_button, button_w);
-
-// Fl_Box *{{}}_label = new Fl_Box(0, 0, 0, 0, "Label");
-// {{}}_label->labelsize(font_size);
-// {{}}_flex->fixed({{}}_label, fl_width({{}}_label->label()));
-
-// Fl_Input *{{}}_input = new Fl_Input(0, 0, 0, 0, "");
-// {{}}_flex->fixed({{}}_input, input_w);
-// {{}}_input->type(FL_INT_INPUT);
-// set_input_values({{}}_input, "default", "minimum", "maximum");
-
-// ToggleData *td_{{}} = new ToggleData{&trainer, "OptionName", {{}}_check_button, {{}}_input};
-// {{}}_check_button->callback(toggle_callback, td_{{}});
-
-// {{}}_flex->end();
-// options1_flex->fixed({{}}_flex, option_h);
 
 // ===========================================================================
 // Main Function
@@ -145,6 +107,9 @@ int main(int argc, char **argv)
 
   // Create the main window
   Fl_Window *window = new Fl_Window(800, 600);
+  Fl::set_color(FL_FREE_COLOR, 0x1c1c1c00);
+  window->color(FL_FREE_COLOR);
+  window->icon((char *)LoadIcon(GetModuleHandle(NULL), "APP_ICON"));
   window->user_data("Plants vs. Zombies Trainer");
 
   int left_margin = 20;
@@ -170,6 +135,7 @@ int main(int argc, char **argv)
     lang_en->set();
   lang_en->labelfont(FL_FREE_FONT);
   lang_en->labelsize(font_size);
+  lang_en->labelcolor(FL_WHITE);
   ChangeLanguageData *changeLanguageDataEN = new ChangeLanguageData{"en_US", window};
   lang_en->callback(change_language_callback, changeLanguageDataEN);
 
@@ -178,6 +144,7 @@ int main(int argc, char **argv)
     lang_zh->set();
   lang_zh->labelfont(FL_FREE_FONT);
   lang_zh->labelsize(font_size);
+  lang_zh->labelcolor(FL_WHITE);
   ChangeLanguageData *changeLanguageDataSC = new ChangeLanguageData{"zh_CN", window};
   lang_zh->callback(change_language_callback, changeLanguageDataSC);
 
@@ -200,11 +167,20 @@ int main(int argc, char **argv)
   process_name->user_data("Process Name:");
   process_name->align(FL_ALIGN_TOP_LEFT | FL_ALIGN_INSIDE);
 
-  Fl_Box *process_exe = new Fl_Box(left_margin, lang_flex_height + imageSize.second + font_size + 15, imageSize.first, font_size);
+  Fl_Box *process_exe = new Fl_Box(left_margin, lang_flex_height + imageSize.second + font_size + 20, imageSize.first, font_size);
   process_exe->align(FL_ALIGN_TOP_LEFT | FL_ALIGN_INSIDE);
 
-  Fl_Box *process_id = new Fl_Box(left_margin, lang_flex_height + imageSize.second + font_size + 45, imageSize.first, font_size);
+  Fl_Flex *process_id_flex = new Fl_Flex(left_margin, lang_flex_height + imageSize.second + font_size + 55, imageSize.first, font_size, Fl_Flex::HORIZONTAL);
+  process_id_flex->gap(5);
+
+  Fl_Box *process_id_label = new Fl_Box(0, 0, 0, 0);
+  process_id_label->align(FL_ALIGN_LEFT | FL_ALIGN_INSIDE);
+  process_id_label->user_data("Process ID:");
+
+  Fl_Box *process_id = new Fl_Box(0, 0, 0, 0);
   process_id->align(FL_ALIGN_TOP_LEFT | FL_ALIGN_INSIDE);
+
+  process_id_flex->end();
 
   TimeoutData *timeoutData = new TimeoutData{&trainer, process_exe, process_id};
   Fl::add_timeout(0, check_process_status, timeoutData);
@@ -219,6 +195,7 @@ int main(int argc, char **argv)
   Fl_Flex *options1_flex = new Fl_Flex(col1_x, col1_y, col1_w, col1_h, Fl_Flex::VERTICAL);
   options1_flex->margin(50, 20, 20, 20);
   options1_flex->gap(10);
+  Fl_Box *spacerTop = new Fl_Box(0, 0, 0, 0);
 
   // ------------------------------------------------------------------
   // Option 2: Add coin (Toggle)
@@ -266,6 +243,7 @@ int main(int argc, char **argv)
   sun_flex->end();
   options1_flex->fixed(sun_flex, option_h);
 
+  Fl_Box *spacerBottom = new Fl_Box(0, 0, 0, 0);
   options1_flex->end();
   change_language(window, language);
 

@@ -1,22 +1,11 @@
 // main.cpp
 #include <FL/Fl.H>
-#include <FL/Fl_Window.H>
-#include <FL/Fl_Box.H>
 #include <FL/Fl_Radio_Round_Button.H>
-#include <FL/Fl_Check_Button.H>
-#include <FL/Fl_Button.H>
-#include <FL/Fl_Value_Input.H>
 #include <FL/Fl_JPEG_Image.H>
-#include <FL/fl_draw.H>
-#include <FL/Fl_Grid.H>
 #include <FL/Fl_Flex.H>
 #include <FL/forms.H>
-#include <iostream>
-#include <locale>
-#include <string>
 #include "trainer.h"
 #include "FLTKUtils.h"
-
 
 // Callback function for apply button
 void apply_callback(Fl_Widget *widget, void *data)
@@ -30,7 +19,7 @@ void apply_callback(Fl_Widget *widget, void *data)
   // Check if the game process is running
   if (!applyData->trainer->isProcessRunning())
   {
-    fl_alert("Please run the game first.");
+    fl_alert(t("Please run the game first.", language));
     return;
   }
 
@@ -51,7 +40,7 @@ void apply_callback(Fl_Widget *widget, void *data)
   // Finalize
   if (!status)
   {
-    fl_alert("Failed to activate.");
+    fl_alert(t("Failed to activate.", language));
   }
   button->value() ? input->readonly(1) : input->readonly(0);
 }
@@ -67,7 +56,7 @@ void toggle_callback(Fl_Widget *widget, void *data)
 
   if (!toggleData->trainer->isProcessRunning())
   {
-    fl_alert("Please run the game first.");
+    fl_alert(t("Please run the game first.", language));
     button->value(0);
     return;
   }
@@ -206,37 +195,11 @@ void toggle_callback(Fl_Widget *widget, void *data)
   // Finalize
   if (!status)
   {
-    fl_alert("Failed to activate/deactivate.");
+    fl_alert(t("Failed to activate/deactivate.", language));
     button->value(0);
   }
   button->value() ? input->readonly(1) : input->readonly(0);
 }
-
-// Individual option template:
-
-// // ------------------------------------------------------------------
-// // Option x: Set {{}} (Apply/Toggle)
-// // ------------------------------------------------------------------
-// Fl_Flex *{{}}_flex = new Fl_Flex(0, 0, 0, 0, Fl_Flex::HORIZONTAL);
-// {{}}_flex->gap(option_gap);
-
-// Fl_Check_Button *{{}}_check_button = new Fl_Check_Button(0, 0, 0, 0);
-// {{}}_flex->fixed({{}}_check_button, button_w);
-
-// Fl_Box *{{}}_label = new Fl_Box(0, 0, 0, 0, "Label");
-// {{}}_label->labelsize(font_size);
-// {{}}_flex->fixed({{}}_label, fl_width({{}}_label->label()));
-
-// Fl_Input *{{}}_input = new Fl_Input(0, 0, 0, 0, "");
-// {{}}_flex->fixed({{}}_input, input_w);
-// {{}}_input->type(FL_INT_INPUT);
-// set_input_values({{}}_input, "default", "minimum", "maximum");
-
-// ToggleData *td_{{}} = new ToggleData{&trainer, "OptionName", {{}}_check_button, {{}}_input};
-// {{}}_check_button->callback(toggle_callback, td_{{}});
-
-// {{}}_flex->end();
-// options1_flex->fixed({{}}_flex, option_h);
 
 // ===========================================================================
 // Main Function
@@ -244,10 +207,14 @@ void toggle_callback(Fl_Widget *widget, void *data)
 int main(int argc, char **argv)
 {
   Trainer trainer;
+  setupLanguage();
   load_translations("TRANSLATION_JSON");
 
   // Create the main window
   Fl_Window *window = new Fl_Window(800, 600);
+  Fl::set_color(FL_FREE_COLOR, 0x1c1c1c00);
+  window->color(FL_FREE_COLOR);
+  window->icon((char *)LoadIcon(GetModuleHandle(NULL), "APP_ICON"));
   window->user_data("Arrow a Row Trainer");
 
   int left_margin = 20;
@@ -269,14 +236,20 @@ int main(int argc, char **argv)
   Fl_Flex lang_flex(window->w() - lang_flex_width, 0, lang_flex_width, lang_flex_height, Fl_Flex::HORIZONTAL);
   lang_flex.color(FL_BLACK);
   Fl_Radio_Round_Button *lang_en = new Fl_Radio_Round_Button(0, 0, 0, 0, "English");
+  if (language == "en_US")
+    lang_en->set();
   lang_en->labelfont(FL_FREE_FONT);
   lang_en->labelsize(font_size);
+  lang_en->labelcolor(FL_WHITE);
   ChangeLanguageData *changeLanguageDataEN = new ChangeLanguageData{"en_US", window};
   lang_en->callback(change_language_callback, changeLanguageDataEN);
 
   Fl_Radio_Round_Button *lang_zh = new Fl_Radio_Round_Button(0, 0, 0, 0, "简体中文");
+  if (language == "zh_CN")
+    lang_zh->set();
   lang_zh->labelfont(FL_FREE_FONT);
   lang_zh->labelsize(font_size);
+  lang_zh->labelcolor(FL_WHITE);
   ChangeLanguageData *changeLanguageDataSC = new ChangeLanguageData{"zh_CN", window};
   lang_zh->callback(change_language_callback, changeLanguageDataSC);
 
@@ -299,11 +272,20 @@ int main(int argc, char **argv)
   process_name->user_data("Process Name:");
   process_name->align(FL_ALIGN_TOP_LEFT | FL_ALIGN_INSIDE);
 
-  Fl_Box *process_exe = new Fl_Box(left_margin, lang_flex_height + imageSize.second + font_size + 15, imageSize.first, font_size);
+  Fl_Box *process_exe = new Fl_Box(left_margin, lang_flex_height + imageSize.second + font_size + 20, imageSize.first, font_size);
   process_exe->align(FL_ALIGN_TOP_LEFT | FL_ALIGN_INSIDE);
 
-  Fl_Box *process_id = new Fl_Box(left_margin, lang_flex_height + imageSize.second + font_size + 45, imageSize.first, font_size);
+  Fl_Flex *process_id_flex = new Fl_Flex(left_margin, lang_flex_height + imageSize.second + font_size + 55, imageSize.first, font_size, Fl_Flex::HORIZONTAL);
+  process_id_flex->gap(5);
+
+  Fl_Box *process_id_label = new Fl_Box(0, 0, 0, 0);
+  process_id_label->align(FL_ALIGN_LEFT | FL_ALIGN_INSIDE);
+  process_id_label->user_data("Process ID:");
+
+  Fl_Box *process_id = new Fl_Box(0, 0, 0, 0);
   process_id->align(FL_ALIGN_TOP_LEFT | FL_ALIGN_INSIDE);
+
+  process_id_flex->end();
 
   TimeoutData *timeoutData = new TimeoutData{&trainer, process_exe, process_id};
   Fl::add_timeout(0, check_process_status, timeoutData);
@@ -318,6 +300,7 @@ int main(int argc, char **argv)
   Fl_Flex *options1_flex = new Fl_Flex(col1_x, col1_y, col1_w, col1_h, Fl_Flex::VERTICAL);
   options1_flex->margin(50, 20, 20, 20);
   options1_flex->gap(10);
+  Fl_Box *spacerTop = new Fl_Box(0, 0, 0, 0);
 
   // ------------------------------------------------------------------
   // Option 1: Set coin (Toggle)
@@ -348,22 +331,17 @@ int main(int argc, char **argv)
   Fl_Flex *health_flex = new Fl_Flex(0, 0, 0, 0, Fl_Flex::HORIZONTAL);
   health_flex->gap(option_gap);
 
-  // Apply Button for Health
   Fl_Button *health_apply_button = new Fl_Button(0, 0, 0, 0, "Apply");
   health_flex->fixed(health_apply_button, button_w);
 
-  // Label for Health
-  Fl_Box *health_label = new Fl_Box(0, 0, 0, 0, "Set Health");
-  health_label->labelsize(font_size);
-  health_flex->fixed(health_label, fl_width(health_label->label()));
+  Fl_Box *health_label = new Fl_Box(0, 0, 0, 0);
+  health_label->user_data("Set Health");
 
-  // Input for Health
   Fl_Input *health_input = new Fl_Input(0, 0, 0, 0, "");
   health_flex->fixed(health_input, input_w);
   health_input->type(FL_INT_INPUT);
   set_input_values(health_input, "9999999999", "0", "99999999999999999999999999999999999999");
 
-  // Assign a callback for apply button
   ApplyData *ad_health = new ApplyData{&trainer, "Health", health_apply_button, health_input};
   health_apply_button->callback(apply_callback, ad_health);
 
@@ -379,9 +357,8 @@ int main(int argc, char **argv)
   Fl_Check_Button *horizontal_speed_check_button = new Fl_Check_Button(0, 0, 0, 0);
   horizontal_speed_flex->fixed(horizontal_speed_check_button, button_w);
 
-  Fl_Box *horizontal_speed_label = new Fl_Box(0, 0, 0, 0, "Set Horizontal Speed");
-  horizontal_speed_label->labelsize(font_size);
-  horizontal_speed_flex->fixed(horizontal_speed_label, fl_width(horizontal_speed_label->label()));
+  Fl_Box *horizontal_speed_label = new Fl_Box(0, 0, 0, 0);
+  horizontal_speed_label->user_data("Set Horizontal Speed");
 
   Fl_Input *horizontal_speed_input = new Fl_Input(0, 0, 0, 0, "");
   horizontal_speed_flex->fixed(horizontal_speed_input, input_w);
@@ -403,9 +380,8 @@ int main(int argc, char **argv)
   Fl_Check_Button *arrow_damage_check_button = new Fl_Check_Button(0, 0, 0, 0);
   arrow_damage_flex->fixed(arrow_damage_check_button, button_w);
 
-  Fl_Box *arrow_damage_label = new Fl_Box(0, 0, 0, 0, "Set Arrow Damage");
-  arrow_damage_label->labelsize(font_size);
-  arrow_damage_flex->fixed(arrow_damage_label, fl_width(arrow_damage_label->label()));
+  Fl_Box *arrow_damage_label = new Fl_Box(0, 0, 0, 0);
+  arrow_damage_label->user_data("Set Arrow Damage");
 
   Fl_Input *arrow_damage_input = new Fl_Input(0, 0, 0, 0, "");
   arrow_damage_flex->fixed(arrow_damage_input, input_w);
@@ -427,9 +403,8 @@ int main(int argc, char **argv)
   Fl_Check_Button *arrow_frequency_check_button = new Fl_Check_Button(0, 0, 0, 0);
   arrow_frequency_flex->fixed(arrow_frequency_check_button, button_w);
 
-  Fl_Box *arrow_frequency_label = new Fl_Box(0, 0, 0, 0, "Set Arrow Frequency");
-  arrow_frequency_label->labelsize(font_size);
-  arrow_frequency_flex->fixed(arrow_frequency_label, fl_width(arrow_frequency_label->label()));
+  Fl_Box *arrow_frequency_label = new Fl_Box(0, 0, 0, 0);
+  arrow_frequency_label->user_data("Set Arrow Frequency");
 
   Fl_Input *arrow_frequency_input = new Fl_Input(0, 0, 0, 0, "");
   arrow_frequency_flex->fixed(arrow_frequency_input, input_w);
@@ -451,9 +426,8 @@ int main(int argc, char **argv)
   Fl_Check_Button *arrow_speed_check_button = new Fl_Check_Button(0, 0, 0, 0);
   arrow_speed_flex->fixed(arrow_speed_check_button, button_w);
 
-  Fl_Box *arrow_speed_label = new Fl_Box(0, 0, 0, 0, "Set Arrow Speed");
-  arrow_speed_label->labelsize(font_size);
-  arrow_speed_flex->fixed(arrow_speed_label, fl_width(arrow_speed_label->label()));
+  Fl_Box *arrow_speed_label = new Fl_Box(0, 0, 0, 0);
+  arrow_speed_label->user_data("Set Arrow Speed");
 
   Fl_Input *arrow_speed_input = new Fl_Input(0, 0, 0, 0, "");
   arrow_speed_flex->fixed(arrow_speed_input, input_w);
@@ -475,9 +449,8 @@ int main(int argc, char **argv)
   Fl_Check_Button *arrow_distance_check_button = new Fl_Check_Button(0, 0, 0, 0);
   arrow_distance_flex->fixed(arrow_distance_check_button, button_w);
 
-  Fl_Box *arrow_distance_label = new Fl_Box(0, 0, 0, 0, "Set Arrow Distance");
-  arrow_distance_label->labelsize(font_size);
-  arrow_distance_flex->fixed(arrow_distance_label, fl_width(arrow_distance_label->label()));
+  Fl_Box *arrow_distance_label = new Fl_Box(0, 0, 0, 0);
+  arrow_distance_label->user_data("Set Arrow Distance");
 
   Fl_Input *arrow_distance_input = new Fl_Input(0, 0, 0, 0, "");
   arrow_distance_flex->fixed(arrow_distance_input, input_w);
@@ -499,9 +472,8 @@ int main(int argc, char **argv)
   Fl_Check_Button *arrow_count_check_button = new Fl_Check_Button(0, 0, 0, 0);
   arrow_count_flex->fixed(arrow_count_check_button, button_w);
 
-  Fl_Box *arrow_count_label = new Fl_Box(0, 0, 0, 0, "Set Arrow Count");
-  arrow_count_label->labelsize(font_size);
-  arrow_count_flex->fixed(arrow_count_label, fl_width(arrow_count_label->label()));
+  Fl_Box *arrow_count_label = new Fl_Box(0, 0, 0, 0);
+  arrow_count_label->user_data("Set Arrow Count");
 
   Fl_Input *arrow_count_input = new Fl_Input(0, 0, 0, 0, "");
   arrow_count_flex->fixed(arrow_count_input, input_w);
@@ -523,9 +495,8 @@ int main(int argc, char **argv)
   Fl_Check_Button *sword_damage_check_button = new Fl_Check_Button(0, 0, 0, 0);
   sword_damage_flex->fixed(sword_damage_check_button, button_w);
 
-  Fl_Box *sword_damage_label = new Fl_Box(0, 0, 0, 0, "Set Sword Damage");
-  sword_damage_label->labelsize(font_size);
-  sword_damage_flex->fixed(sword_damage_label, fl_width(sword_damage_label->label()));
+  Fl_Box *sword_damage_label = new Fl_Box(0, 0, 0, 0);
+  sword_damage_label->user_data("Set Sword Damage");
 
   Fl_Input *sword_damage_input = new Fl_Input(0, 0, 0, 0, "");
   sword_damage_flex->fixed(sword_damage_input, input_w);
@@ -547,9 +518,8 @@ int main(int argc, char **argv)
   Fl_Check_Button *sword_cool_down_check_button = new Fl_Check_Button(0, 0, 0, 0);
   sword_cool_down_flex->fixed(sword_cool_down_check_button, button_w);
 
-  Fl_Box *sword_cool_down_label = new Fl_Box(0, 0, 0, 0, "Set Sword Cooldown");
-  sword_cool_down_label->labelsize(font_size);
-  sword_cool_down_flex->fixed(sword_cool_down_label, fl_width(sword_cool_down_label->label()));
+  Fl_Box *sword_cool_down_label = new Fl_Box(0, 0, 0, 0);
+  sword_cool_down_label->user_data("Set Sword Cooldown");
 
   Fl_Input *sword_cool_down_input = new Fl_Input(0, 0, 0, 0, "");
   sword_cool_down_flex->fixed(sword_cool_down_input, input_w);
@@ -571,9 +541,8 @@ int main(int argc, char **argv)
   Fl_Check_Button *sword_speed_check_button = new Fl_Check_Button(0, 0, 0, 0);
   sword_speed_flex->fixed(sword_speed_check_button, button_w);
 
-  Fl_Box *sword_speed_label = new Fl_Box(0, 0, 0, 0, "Set Sword Speed");
-  sword_speed_label->labelsize(font_size);
-  sword_speed_flex->fixed(sword_speed_label, fl_width(sword_speed_label->label()));
+  Fl_Box *sword_speed_label = new Fl_Box(0, 0, 0, 0);
+  sword_speed_label->user_data("Set Sword Speed");
 
   Fl_Input *sword_speed_input = new Fl_Input(0, 0, 0, 0, "");
   sword_speed_flex->fixed(sword_speed_input, input_w);
@@ -595,9 +564,8 @@ int main(int argc, char **argv)
   Fl_Check_Button *sword_distance_check_button = new Fl_Check_Button(0, 0, 0, 0);
   sword_distance_flex->fixed(sword_distance_check_button, button_w);
 
-  Fl_Box *sword_distance_label = new Fl_Box(0, 0, 0, 0, "Set Sword Distance");
-  sword_distance_label->labelsize(font_size);
-  sword_distance_flex->fixed(sword_distance_label, fl_width(sword_distance_label->label()));
+  Fl_Box *sword_distance_label = new Fl_Box(0, 0, 0, 0);
+  sword_distance_label->user_data("Set Sword Distance");
 
   Fl_Input *sword_distance_input = new Fl_Input(0, 0, 0, 0, "");
   sword_distance_flex->fixed(sword_distance_input, input_w);
@@ -610,6 +578,7 @@ int main(int argc, char **argv)
   sword_distance_flex->end();
   options1_flex->fixed(sword_distance_flex, option_h);
 
+  Fl_Box *spacerBottom = new Fl_Box(0, 0, 0, 0);
   options1_flex->end();
   change_language(window, language);
 
