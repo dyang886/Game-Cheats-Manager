@@ -1,0 +1,145 @@
+#
+msgid ""
+msgstr ""
+
+#: monoscript-FITM
+msgid "Failure injecting the MonoDatacollector dll"
+msgstr "注入 MonoDatacollector 的dll 失敗"
+
+#: monoscript-DYWTL
+msgid ""
+"Do you wish to let the mono extention figure out the name and start address?"
+" If it's not a proper object this may crash the target."
+msgstr "您是否希望讓 mono 副檔名確定名稱和開始地址？如果它不是一個合適的對象，它可能會破壞目標。"
+
+#: monoscript-IO
+msgid "Instances of "
+msgstr "實例 "
+
+#: monoscript-WTAJG
+msgid "Warning: These are just guesses. Validate them yourself"
+msgstr "警告：這些只是猜測。請自行驗證"
+
+#: monoscript-AN
+msgid "address==nil"
+msgstr "地址==nil"
+
+#: monoscript-Invoke
+msgid "Invoke "
+msgstr "調用 "
+
+#: monoscript-IA
+msgid "Instance address"
+msgstr "範例地址"
+
+#: monoscript-PW
+msgid "<Please wait...>"
+msgstr "<請稍等...>"
+
+#: monoscript-Parameters
+msgid "Parameters"
+msgstr "參數"
+
+#: monoscript-OK
+msgid "OK"
+msgstr "確定"
+
+#: monoscript-Cancel
+msgid "Cancel"
+msgstr "取消"
+
+#: monoscript-Parameter
+msgid "parameter "
+msgstr "參數 "
+
+#: monoscript-INAVA
+msgid " is not a valid address"
+msgstr " 不是有效地址"
+
+#: monoscript-INAVV
+msgid "is not a valid value"
+msgstr "不是一個有效數值"
+
+#: monoscript-IFT
+msgid "ILCode from %x to %x"
+msgstr "ILCode 從 %x 到 %x"
+
+#: monoscript-OX
+msgid "Offset %x"
+msgstr "偏移 %x"
+
+#: monoscript-Resolve
+msgid "Resolve "
+msgstr "解決 "
+
+#: monoscript-XSTS
+msgid "%x : %s (type: %s)"
+msgstr "%x : %s (類型: %s)"
+
+#: monoscript-AYSYWTE
+msgid ""
+"Are you sure you wish to expand the whole tree? This can take a while and "
+"Cheat Engine may look like it has crashed (It has not)"
+msgstr "你確定你希望把整分支都擴大嗎？這可能需要一段時間，而 Cheat Engine 可能看起來已經崩潰了（它沒有）"
+
+#: monoscript-FTL
+msgid "Failure to launch"
+msgstr "啟動失敗"
+
+#: monoscript-Mono
+msgid "Mono"
+msgstr "Mono"
+
+#: monoscript-AMF
+msgid "Activate mono features"
+msgstr "啟用 mono 功能"
+
+#: monoscript-DM
+msgid "Dissect mono"
+msgstr "分析 mono"
+
+#: monoscript-TMHFTI
+msgid "The mono handler failed to initialize"
+msgstr "初始化 mono 處理程序失敗"
+
+#: monoscript-IPMN
+msgid "Invalid parameters (Methodname could not be determined)"
+msgstr "無效參數（無法確定方法名）"
+
+#: monoscript-IPCN
+msgid "Invalid parameters (Classname could not be determined)"
+msgstr "無效參數（無法確定類名）"
+
+#: monoscript-IPN
+msgid "Invalid parameters (name could not be determined)"
+msgstr "無效參數（無法確定名稱）"
+
+#: monoscript-CNBF
+msgid " could not be found"
+msgstr " 找不到"
+
+#: monoscript-CNBJ
+msgid " could not be jitted"
+msgstr " 無法即時編譯"
+
+#: monoscript-STFDNWY
+msgid ""
+"Sorry this feature does not work yet.  getStructureCount needs patching "
+"first."
+msgstr "對不起，這個功能還沒有完成。需要先修復 getStructureCount."
+
+#: monoscript-Removing
+msgid "Removing "
+msgstr "移除 "
+
+#: monoscript-RS
+msgid "Reloading Structure "
+msgstr "重載結構 "
+
+#: monoscript-TC
+msgid "The class "
+msgstr "類 "
+
+#: monoscript-HNF
+msgid " has no fields"
+msgstr " 沒有欄位"
