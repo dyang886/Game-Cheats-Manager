@@ -32,10 +32,6 @@ void apply_callback(Fl_Widget *widget, void *data)
   }
 
   // Apply the value using the Trainer class
-  if (optionName == "Health")
-  {
-    status = trainer->setHealth(std::stof(inputValue));
-  }
 
   // Finalize
   if (!status)
@@ -75,6 +71,17 @@ void toggle_callback(Fl_Widget *widget, void *data)
     if (button->value())
     {
       status = trainer->setCoin(std::stoi(inputValue));
+    }
+    else
+    {
+      status = trainer->disableNamedPointerToggle(optionName);
+    }
+  }
+  else if (optionName == "Health")
+  {
+    if (button->value())
+    {
+      status = trainer->setHealth(std::stof(inputValue));
     }
     else
     {
@@ -211,6 +218,7 @@ int main(int argc, char **argv)
   load_translations("TRANSLATION_JSON");
 
   // Create the main window
+  Fl::scheme("gtk+");
   Fl_Window *window = new Fl_Window(800, 600);
   Fl::set_color(FL_FREE_COLOR, 0x1c1c1c00);
   window->color(FL_FREE_COLOR);
@@ -314,7 +322,7 @@ int main(int argc, char **argv)
   Fl_Box *coin_label = new Fl_Box(0, 0, 0, 0);
   coin_label->user_data("Set Coins");
 
-  Fl_Input *coin_input = new Fl_Input(0, 0, 0, 0, "");
+  Fl_Input *coin_input = new Fl_Input(0, 0, 0, 0);
   coin_flex->fixed(coin_input, input_w);
   coin_input->type(FL_INT_INPUT);
   set_input_values(coin_input, "9999", "0", "99999999");
@@ -326,24 +334,24 @@ int main(int argc, char **argv)
   options1_flex->fixed(coin_flex, option_h);
 
   // ------------------------------------------------------------------
-  // Option 2: Set health (Apply)
+  // Option 2: Set health (Toggle)
   // ------------------------------------------------------------------
   Fl_Flex *health_flex = new Fl_Flex(0, 0, 0, 0, Fl_Flex::HORIZONTAL);
   health_flex->gap(option_gap);
 
-  Fl_Button *health_apply_button = new Fl_Button(0, 0, 0, 0, "Apply");
-  health_flex->fixed(health_apply_button, button_w);
+  Fl_Check_Button *health_check_button = new Fl_Check_Button(0, 0, 0, 0);
+  health_flex->fixed(health_check_button, button_w);
 
   Fl_Box *health_label = new Fl_Box(0, 0, 0, 0);
   health_label->user_data("Set Health");
 
-  Fl_Input *health_input = new Fl_Input(0, 0, 0, 0, "");
+  Fl_Input *health_input = new Fl_Input(0, 0, 0, 0);
   health_flex->fixed(health_input, input_w);
   health_input->type(FL_INT_INPUT);
   set_input_values(health_input, "9999999999", "0", "99999999999999999999999999999999999999");
 
-  ApplyData *ad_health = new ApplyData{&trainer, "Health", health_apply_button, health_input};
-  health_apply_button->callback(apply_callback, ad_health);
+  ToggleData *td_health = new ToggleData{&trainer, "Health", health_check_button, health_input};
+  health_check_button->callback(toggle_callback, td_health);
 
   health_flex->end();
   options1_flex->fixed(health_flex, option_h);
@@ -360,7 +368,7 @@ int main(int argc, char **argv)
   Fl_Box *horizontal_speed_label = new Fl_Box(0, 0, 0, 0);
   horizontal_speed_label->user_data("Set Horizontal Speed");
 
-  Fl_Input *horizontal_speed_input = new Fl_Input(0, 0, 0, 0, "");
+  Fl_Input *horizontal_speed_input = new Fl_Input(0, 0, 0, 0);
   horizontal_speed_flex->fixed(horizontal_speed_input, input_w);
   horizontal_speed_input->type(FL_INT_INPUT);
   set_input_values(horizontal_speed_input, "30", "0", "99");
@@ -383,7 +391,7 @@ int main(int argc, char **argv)
   Fl_Box *arrow_damage_label = new Fl_Box(0, 0, 0, 0);
   arrow_damage_label->user_data("Set Arrow Damage");
 
-  Fl_Input *arrow_damage_input = new Fl_Input(0, 0, 0, 0, "");
+  Fl_Input *arrow_damage_input = new Fl_Input(0, 0, 0, 0);
   arrow_damage_flex->fixed(arrow_damage_input, input_w);
   arrow_damage_input->type(FL_INT_INPUT);
   set_input_values(arrow_damage_input, "99", "1", "9999");
@@ -406,7 +414,7 @@ int main(int argc, char **argv)
   Fl_Box *arrow_frequency_label = new Fl_Box(0, 0, 0, 0);
   arrow_frequency_label->user_data("Set Arrow Frequency");
 
-  Fl_Input *arrow_frequency_input = new Fl_Input(0, 0, 0, 0, "");
+  Fl_Input *arrow_frequency_input = new Fl_Input(0, 0, 0, 0);
   arrow_frequency_flex->fixed(arrow_frequency_input, input_w);
   arrow_frequency_input->type(FL_INT_INPUT);
   set_input_values(arrow_frequency_input, "99", "1", "999");
@@ -429,7 +437,7 @@ int main(int argc, char **argv)
   Fl_Box *arrow_speed_label = new Fl_Box(0, 0, 0, 0);
   arrow_speed_label->user_data("Set Arrow Speed");
 
-  Fl_Input *arrow_speed_input = new Fl_Input(0, 0, 0, 0, "");
+  Fl_Input *arrow_speed_input = new Fl_Input(0, 0, 0, 0);
   arrow_speed_flex->fixed(arrow_speed_input, input_w);
   arrow_speed_input->type(FL_INT_INPUT);
   set_input_values(arrow_speed_input, "99", "1", "999");
@@ -452,7 +460,7 @@ int main(int argc, char **argv)
   Fl_Box *arrow_distance_label = new Fl_Box(0, 0, 0, 0);
   arrow_distance_label->user_data("Set Arrow Distance");
 
-  Fl_Input *arrow_distance_input = new Fl_Input(0, 0, 0, 0, "");
+  Fl_Input *arrow_distance_input = new Fl_Input(0, 0, 0, 0);
   arrow_distance_flex->fixed(arrow_distance_input, input_w);
   arrow_distance_input->type(FL_INT_INPUT);
   set_input_values(arrow_distance_input, "99", "1", "999");
@@ -475,7 +483,7 @@ int main(int argc, char **argv)
   Fl_Box *arrow_count_label = new Fl_Box(0, 0, 0, 0);
   arrow_count_label->user_data("Set Arrow Count");
 
-  Fl_Input *arrow_count_input = new Fl_Input(0, 0, 0, 0, "");
+  Fl_Input *arrow_count_input = new Fl_Input(0, 0, 0, 0);
   arrow_count_flex->fixed(arrow_count_input, input_w);
   arrow_count_input->type(FL_INT_INPUT);
   set_input_values(arrow_count_input, "99", "1", "999");
@@ -498,7 +506,7 @@ int main(int argc, char **argv)
   Fl_Box *sword_damage_label = new Fl_Box(0, 0, 0, 0);
   sword_damage_label->user_data("Set Sword Damage");
 
-  Fl_Input *sword_damage_input = new Fl_Input(0, 0, 0, 0, "");
+  Fl_Input *sword_damage_input = new Fl_Input(0, 0, 0, 0);
   sword_damage_flex->fixed(sword_damage_input, input_w);
   sword_damage_input->type(FL_INT_INPUT);
   set_input_values(sword_damage_input, "99", "1", "999");
@@ -521,7 +529,7 @@ int main(int argc, char **argv)
   Fl_Box *sword_cool_down_label = new Fl_Box(0, 0, 0, 0);
   sword_cool_down_label->user_data("Set Sword Cooldown");
 
-  Fl_Input *sword_cool_down_input = new Fl_Input(0, 0, 0, 0, "");
+  Fl_Input *sword_cool_down_input = new Fl_Input(0, 0, 0, 0);
   sword_cool_down_flex->fixed(sword_cool_down_input, input_w);
   sword_cool_down_input->type(FL_INT_INPUT);
   set_input_values(sword_cool_down_input, "0", "0", "999");
@@ -544,7 +552,7 @@ int main(int argc, char **argv)
   Fl_Box *sword_speed_label = new Fl_Box(0, 0, 0, 0);
   sword_speed_label->user_data("Set Sword Speed");
 
-  Fl_Input *sword_speed_input = new Fl_Input(0, 0, 0, 0, "");
+  Fl_Input *sword_speed_input = new Fl_Input(0, 0, 0, 0);
   sword_speed_flex->fixed(sword_speed_input, input_w);
   sword_speed_input->type(FL_INT_INPUT);
   set_input_values(sword_speed_input, "99", "1", "999");
@@ -567,7 +575,7 @@ int main(int argc, char **argv)
   Fl_Box *sword_distance_label = new Fl_Box(0, 0, 0, 0);
   sword_distance_label->user_data("Set Sword Distance");
 
-  Fl_Input *sword_distance_input = new Fl_Input(0, 0, 0, 0, "");
+  Fl_Input *sword_distance_input = new Fl_Input(0, 0, 0, 0);
   sword_distance_flex->fixed(sword_distance_input, input_w);
   sword_distance_input->type(FL_INT_INPUT);
   set_input_values(sword_distance_input, "99", "1", "999");

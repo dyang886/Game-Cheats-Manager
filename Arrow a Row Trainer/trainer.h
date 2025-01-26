@@ -11,7 +11,6 @@ public:
 
     // Constants
     static inline const wchar_t *moduleName = L"GameAssembly.dll";
-    static inline const wchar_t *moduleName2 = L"UnityPlayer.dll";
 
     // Pointer-toggle approach
     inline bool setCoin(int newVal)
@@ -20,25 +19,13 @@ public:
         return createPointerToggle(moduleName, "Coin", offsets, newVal);
     }
 
-    // Pointer-apply approach
     inline bool setHealth(float newVal)
     {
         std::vector<unsigned int> offsets = {0x01918328, 0xC0, 0x90, 0x40, 0xB8, 0x20, 0x18, 0x28};
-
-        uintptr_t finalAddress = resolveModuleDynamicAddress(moduleName, offsets);
-        if (finalAddress == 0)
-        {
-            return false;
-        }
-
-        if (!WriteProcessMemory(hProcess, reinterpret_cast<LPVOID>(finalAddress), &newVal, sizeof(newVal), nullptr))
-        {
-            return false;
-        }
-
-        return true;
+        return createPointerToggle(moduleName, "Health", offsets, newVal);
     }
 
+    // AOB-toggle approach
     inline bool setHorizontalSpeed(float newVal)
     {
         // Target instruction bytes: F3 0F 11 40 20
@@ -98,7 +85,6 @@ public:
             buildFunc);
     }
 
-    // AOB-toggle approach
     inline bool setArrowDamage(float newVal)
     {
         // Target instruction bytes: F3 0F 11 43 44

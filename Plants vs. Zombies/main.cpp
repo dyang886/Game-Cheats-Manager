@@ -106,6 +106,7 @@ int main(int argc, char **argv)
   load_translations("TRANSLATION_JSON");
 
   // Create the main window
+  Fl::scheme("gtk+");
   Fl_Window *window = new Fl_Window(800, 600);
   Fl::set_color(FL_FREE_COLOR, 0x1c1c1c00);
   window->color(FL_FREE_COLOR);
@@ -209,7 +210,7 @@ int main(int argc, char **argv)
   Fl_Box *coin_label = new Fl_Box(0, 0, 0, 0);
   coin_label->user_data("Add Coins");
 
-  Fl_Input *coin_input = new Fl_Input(0, 0, 0, 0, "");
+  Fl_Input *coin_input = new Fl_Input(0, 0, 0, 0);
   coin_flex->fixed(coin_input, input_w);
   coin_input->type(FL_INT_INPUT);
   set_input_values(coin_input, "9999", "-999999", "999999");
@@ -232,7 +233,7 @@ int main(int argc, char **argv)
   Fl_Box *sun_label = new Fl_Box(0, 0, 0, 0);
   sun_label->user_data("Add Sun");
 
-  Fl_Input *sun_input = new Fl_Input(0, 0, 0, 0, "");
+  Fl_Input *sun_input = new Fl_Input(0, 0, 0, 0);
   sun_flex->fixed(sun_input, input_w);
   sun_input->type(FL_INT_INPUT);
   set_input_values(sun_input, "999", "-9990", "9990");

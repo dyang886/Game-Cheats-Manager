@@ -18,7 +18,7 @@ using json = nlohmann::json;
 // Fl_Box *{{}}_label = new Fl_Box(0, 0, 0, 0);
 // {{}}_label->user_data("Label");
 
-// Fl_Input *{{}}_input = new Fl_Input(0, 0, 0, 0, "");
+// Fl_Input *{{}}_input = new Fl_Input(0, 0, 0, 0);
 // {{}}_flex->fixed({{}}_input, input_w);
 // {{}}_input->type(FL_INT_INPUT);
 // set_input_values({{}}_input, "default", "minimum", "maximum");
@@ -210,6 +210,15 @@ void change_language(Fl_Group *group, const std::string &lang)
         if (!child)
             continue;
 
+        // If the child is a group, recurse into it
+        Fl_Group *subgroup = dynamic_cast<Fl_Group *>(child);
+        if (subgroup)
+        {
+            change_language(subgroup, lang);
+            continue;
+        }
+
+        // Process other widgets (non-groups)
         if (child->user_data())
         {
             const char *translation_id = static_cast<const char *>(child->user_data());
@@ -233,13 +242,6 @@ void change_language(Fl_Group *group, const std::string &lang)
                     }
                 }
             }
-        }
-
-        // If the child is a group, recurse into it
-        Fl_Group *subgroup = dynamic_cast<Fl_Group *>(child);
-        if (subgroup)
-        {
-            change_language(subgroup, lang);
         }
     }
 
