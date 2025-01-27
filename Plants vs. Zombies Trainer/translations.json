@@ -7,7 +7,11 @@
         "Process ID:": "Process ID:",
         "Plants vs. Zombies Trainer": "Plants vs. Zombies Trainer",
         "Add Coins": "Add Coins",
-        "Add Sun": "Add Sun"
+        "Add Sun": "Add Sun",
+        "Set Fertilizer": "Set Fertilizer",
+        "Set Bug Spray": "Set Bug Spray",
+        "Set Chocolate": "Set Chocolate",
+        "Set Tree Food": "Set Tree Food"
     },
     "zh_CN": {
         "Please run the game first.": "请先运行游戏。",
@@ -17,6 +21,10 @@
         "Process ID:": "进程 ID:",
         "Plants vs. Zombies Trainer": "植物大战僵尸修改器",
         "Add Coins": "添加金币",
-        "Add Sun": "添加阳光"
+        "Add Sun": "添加阳光",
+        "Set Fertilizer": "设置肥料",
+        "Set Bug Spray": "设置杀虫剂",
+        "Set Chocolate": "设置巧克力",
+        "Set Tree Food": "设置树肥"
     }
 }

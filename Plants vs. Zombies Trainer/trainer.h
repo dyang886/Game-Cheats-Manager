@@ -12,6 +12,30 @@ public:
     // Constants
     static inline const wchar_t *moduleName = L"popcapgame1.exe";
 
+    inline bool setFertilizer(int newVal)
+    {
+        std::vector<unsigned int> offsets = {0x00073A64, 0x44, 0x0, 0x10, 0x2C, 0x4, 0x18, 0x254};
+        return createPointerToggle(moduleName, "SetFertilizer", offsets, newVal);
+    }
+
+    inline bool setBugSpray(int newVal)
+    {
+        std::vector<unsigned int> offsets = {0x00073A64, 0x44, 0x0, 0x10, 0x28, 0x4, 0x18, 0x258};
+        return createPointerToggle(moduleName, "SetBugSpray", offsets, newVal);
+    }
+
+    inline bool setChocolate(int newVal)
+    {
+        std::vector<unsigned int> offsets = {0x00073A64, 0x44, 0x0, 0x10, 0x28, 0x0, 0x14, 0x284};
+        return createPointerToggle(moduleName, "SetChocolate", offsets, newVal);
+    }
+
+    inline bool setTreeFood(int newVal)
+    {
+        std::vector<unsigned int> offsets = {0x0032E77C, 0x10, 0x28, 0x0, 0x4, 0x4, 0x18, 0x28C};
+        return createPointerToggle(moduleName, "SetTreeFood", offsets, newVal);
+    }
+
     inline bool addCoin(int newVal)
     {
         // Target instruction bytes: 09 00 00 01 50 54 8B 48 54 81

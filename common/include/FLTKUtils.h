@@ -347,11 +347,16 @@ void set_input_values(Fl_Input *input, std::string def, std::string min, std::st
             return;
 
         std::string value = input->value();
+        auto constraints = static_cast<std::tuple<std::string, std::string, std::string> *>(data);
+        std::string def = std::get<0>(*constraints);
+        std::string min = std::get<1>(*constraints);
+        std::string max = std::get<2>(*constraints);
 
-        std::string min = ((std::pair<std::string, std::string> *)data)->first;
-        std::string max = ((std::pair<std::string, std::string> *)data)->second;
-
-        if (compareNumericStrings(value, min))
+        if (value.empty())
+        {
+            input->value(def.c_str());
+        }
+        else if (compareNumericStrings(value, min))
         {
             input->value(min.c_str());
         }
@@ -362,7 +367,7 @@ void set_input_values(Fl_Input *input, std::string def, std::string min, std::st
     };
 
     // Associate the callback with the input field and pass the min/max data
-    std::pair<std::string, std::string> *constraints = new std::pair<std::string, std::string>(min, max);
+    auto *constraints = new std::tuple<std::string, std::string, std::string>(def, min, max);
     input->callback(input_callback, (void *)constraints);
 }
 

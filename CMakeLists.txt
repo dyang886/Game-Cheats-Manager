@@ -8,6 +8,6 @@ set(CMAKE_MSVC_RUNTIME_LIBRARY "MultiThreaded$<$<CONFIG:Debug>:Debug>")
 add_subdirectory(common)
 
 # Add each game-specific trainer
-# add_subdirectory("Headbangers_Rhythm Royale Trainer")
 add_subdirectory("Arrow a Row Trainer")
-add_subdirectory("Plants vs. Zombies")
+add_subdirectory("Headbangers_Rhythm Royale Trainer")
+add_subdirectory("Plants vs. Zombies Trainer")

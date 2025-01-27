@@ -75,7 +75,7 @@ void toggle_callback(Fl_Widget *widget, void *data)
       status = trainer->disableNamedHook(optionName);
     }
   }
-  if (optionName == "AddSun")
+  else if (optionName == "AddSun")
   {
     if (button->value())
     {
@@ -84,6 +84,50 @@ void toggle_callback(Fl_Widget *widget, void *data)
     else
     {
       status = trainer->disableNamedHook(optionName);
+    }
+  }
+  else if (optionName == "SetFertilizer")
+  {
+    if (button->value())
+    {
+      status = trainer->setFertilizer(std::stoi(inputValue) + 1000);
+    }
+    else
+    {
+      status = trainer->disableNamedPointerToggle(optionName);
+    }
+  }
+  else if (optionName == "SetBugSpray")
+  {
+    if (button->value())
+    {
+      status = trainer->setBugSpray(std::stoi(inputValue) + 1000);
+    }
+    else
+    {
+      status = trainer->disableNamedPointerToggle(optionName);
+    }
+  }
+  else if (optionName == "SetChocolate")
+  {
+    if (button->value())
+    {
+      status = trainer->setChocolate(std::stoi(inputValue) + 1000);
+    }
+    else
+    {
+      status = trainer->disableNamedPointerToggle(optionName);
+    }
+  }
+  else if (optionName == "SetTreeFood")
+  {
+    if (button->value())
+    {
+      status = trainer->setTreeFood(std::stoi(inputValue) + 1000);
+    }
+    else
+    {
+      status = trainer->disableNamedPointerToggle(optionName);
     }
   }
 
@@ -199,7 +243,7 @@ int main(int argc, char **argv)
   Fl_Box *spacerTop = new Fl_Box(0, 0, 0, 0);
 
   // ------------------------------------------------------------------
-  // Option 2: Add coin (Toggle)
+  // Option 1: Add coin (Toggle)
   // ------------------------------------------------------------------
   Fl_Flex *coin_flex = new Fl_Flex(0, 0, 0, 0, Fl_Flex::HORIZONTAL);
   coin_flex->gap(option_gap);
@@ -222,7 +266,7 @@ int main(int argc, char **argv)
   options1_flex->fixed(coin_flex, option_h);
 
   // ------------------------------------------------------------------
-  // Option 3: Add sun (Toggle)
+  // Option 2: Add sun (Toggle)
   // ------------------------------------------------------------------
   Fl_Flex *sun_flex = new Fl_Flex(0, 0, 0, 0, Fl_Flex::HORIZONTAL);
   sun_flex->gap(option_gap);
@@ -243,6 +287,98 @@ int main(int argc, char **argv)
 
   sun_flex->end();
   options1_flex->fixed(sun_flex, option_h);
+
+  // ------------------------------------------------------------------
+  // Option 3: Set fertilizer (Toggle)
+  // ------------------------------------------------------------------
+  Fl_Flex *fertilizer_flex = new Fl_Flex(0, 0, 0, 0, Fl_Flex::HORIZONTAL);
+  fertilizer_flex->gap(option_gap);
+
+  Fl_Check_Button *fertilizer_check_button = new Fl_Check_Button(0, 0, 0, 0);
+  fertilizer_flex->fixed(fertilizer_check_button, button_w);
+
+  Fl_Box *fertilizer_label = new Fl_Box(0, 0, 0, 0);
+  fertilizer_label->user_data("Set Fertilizer");
+
+  Fl_Input *fertilizer_input = new Fl_Input(0, 0, 0, 0);
+  fertilizer_flex->fixed(fertilizer_input, input_w);
+  fertilizer_input->type(FL_INT_INPUT);
+  set_input_values(fertilizer_input, "99", "0", "999999999");
+
+  ToggleData *td_fertilizer = new ToggleData{&trainer, "SetFertilizer", fertilizer_check_button, fertilizer_input};
+  fertilizer_check_button->callback(toggle_callback, td_fertilizer);
+
+  fertilizer_flex->end();
+  options1_flex->fixed(fertilizer_flex, option_h);
+
+  // ------------------------------------------------------------------
+  // Option 4: Set bug_spray (Toggle)
+  // ------------------------------------------------------------------
+  Fl_Flex *bug_spray_flex = new Fl_Flex(0, 0, 0, 0, Fl_Flex::HORIZONTAL);
+  bug_spray_flex->gap(option_gap);
+
+  Fl_Check_Button *bug_spray_check_button = new Fl_Check_Button(0, 0, 0, 0);
+  bug_spray_flex->fixed(bug_spray_check_button, button_w);
+
+  Fl_Box *bug_spray_label = new Fl_Box(0, 0, 0, 0);
+  bug_spray_label->user_data("Set Bug Spray");
+
+  Fl_Input *bug_spray_input = new Fl_Input(0, 0, 0, 0);
+  bug_spray_flex->fixed(bug_spray_input, input_w);
+  bug_spray_input->type(FL_INT_INPUT);
+  set_input_values(bug_spray_input, "99", "0", "999999999");
+
+  ToggleData *td_bug_spray = new ToggleData{&trainer, "SetBugSpray", bug_spray_check_button, bug_spray_input};
+  bug_spray_check_button->callback(toggle_callback, td_bug_spray);
+
+  bug_spray_flex->end();
+  options1_flex->fixed(bug_spray_flex, option_h);
+
+  // ------------------------------------------------------------------
+  // Option 5: Set chocolate (Toggle)
+  // ------------------------------------------------------------------
+  Fl_Flex *chocolate_flex = new Fl_Flex(0, 0, 0, 0, Fl_Flex::HORIZONTAL);
+  chocolate_flex->gap(option_gap);
+
+  Fl_Check_Button *chocolate_check_button = new Fl_Check_Button(0, 0, 0, 0);
+  chocolate_flex->fixed(chocolate_check_button, button_w);
+
+  Fl_Box *chocolate_label = new Fl_Box(0, 0, 0, 0);
+  chocolate_label->user_data("Set Chocolate");
+
+  Fl_Input *chocolate_input = new Fl_Input(0, 0, 0, 0);
+  chocolate_flex->fixed(chocolate_input, input_w);
+  chocolate_input->type(FL_INT_INPUT);
+  set_input_values(chocolate_input, "99", "0", "999999999");
+
+  ToggleData *td_chocolate = new ToggleData{&trainer, "SetChocolate", chocolate_check_button, chocolate_input};
+  chocolate_check_button->callback(toggle_callback, td_chocolate);
+
+  chocolate_flex->end();
+  options1_flex->fixed(chocolate_flex, option_h);
+
+  // ------------------------------------------------------------------
+  // Option 6: Set tree_food (Toggle)
+  // ------------------------------------------------------------------
+  Fl_Flex *tree_food_flex = new Fl_Flex(0, 0, 0, 0, Fl_Flex::HORIZONTAL);
+  tree_food_flex->gap(option_gap);
+
+  Fl_Check_Button *tree_food_check_button = new Fl_Check_Button(0, 0, 0, 0);
+  tree_food_flex->fixed(tree_food_check_button, button_w);
+
+  Fl_Box *tree_food_label = new Fl_Box(0, 0, 0, 0);
+  tree_food_label->user_data("Set Tree Food");
+
+  Fl_Input *tree_food_input = new Fl_Input(0, 0, 0, 0);
+  tree_food_flex->fixed(tree_food_input, input_w);
+  tree_food_input->type(FL_INT_INPUT);
+  set_input_values(tree_food_input, "99", "0", "999999999");
+
+  ToggleData *td_tree_food = new ToggleData{&trainer, "SetTreeFood", tree_food_check_button, tree_food_input};
+  tree_food_check_button->callback(toggle_callback, td_tree_food);
+
+  tree_food_flex->end();
+  options1_flex->fixed(tree_food_flex, option_h);
 
   Fl_Box *spacerBottom = new Fl_Box(0, 0, 0, 0);
   options1_flex->end();
