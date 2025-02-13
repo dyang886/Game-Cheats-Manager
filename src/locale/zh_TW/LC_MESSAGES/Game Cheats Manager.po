@@ -29,7 +29,7 @@ msgid "China"
 msgstr "中國"
 
 msgid " (Some trainers cannot be downloaded)"
-msgstr "（部分修改器無法下載）"
+msgstr "(部分修改器無法下載)"
 
 msgid "Search for installed"
 msgstr "搜尋已安裝"
@@ -56,13 +56,13 @@ msgid "About"
 msgstr "關於"
 
 msgid "Data Update"
-msgstr "數據更新"
+msgstr "資料更新"
 
 msgid "Update Translation Data"
-msgstr "更新翻譯數據"
+msgstr "更新翻譯資料"
 
 msgid "Update Trainer Search Data"
-msgstr "更新修改器檢索數據"
+msgstr "更新修改器檢索資料"
 
 msgid "Update Trainers"
 msgstr "更新修改器"
