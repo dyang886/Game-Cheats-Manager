@@ -447,7 +447,7 @@ class TrainerManagementDialog(QDialog):
             reply = msg_box.exec()
 
             if reply == QMessageBox.StandardButton.Yes:
-                source_path = resource_path("dependency/zh_CN")
+                source_path = resource_path("dependency/CE Translations/zh_CN")
                 destination_path = os.path.join(self.ceInstallLineEdit.text(), "languages", "zh_CN")
 
                 try:
