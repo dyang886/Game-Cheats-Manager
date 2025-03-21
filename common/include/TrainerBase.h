@@ -7,10 +7,10 @@
 #include <functional>
 #include <iostream>
 #include <map>
+#include <regex>
 #include <string>
 #include <thread>
 #include <vector>
-
 
 /***********************************************************************
  * HOOK_INFO: Track data about one named hook
@@ -63,7 +63,10 @@ class TrainerBase
 {
 public:
     // Constructor and Destructor
-    TrainerBase(const std::wstring &processName) : processName(processName) {}
+    TrainerBase(const std::wstring &processIdentifier, bool useWindowTitle = false)
+        : processName(processIdentifier), useWindowTitle(useWindowTitle)
+    {
+    }
 
     virtual ~TrainerBase()
     {
@@ -80,7 +83,8 @@ public:
         return procId;
     }
 
-    void cleanUp() {
+    void cleanUp()
+    {
         disableAllHooks();
         disableAllPointerToggles();
         if (hProcess)
@@ -91,7 +95,15 @@ public:
     // Check if the target process is running and open a handle
     bool isProcessRunning()
     {
-        procId = getProcId(processName.c_str());
+        if (useWindowTitle)
+        {
+            procId = getProcIdByWindowTitle(processName);
+        }
+        else
+        {
+            procId = getProcId(processName.c_str());
+        }
+
         if (procId == 0)
         {
             std::wcerr << L"[!] Could not find process: " << processName << std::endl;
@@ -204,9 +216,13 @@ public:
 
 protected:
     // Process and module information
-    const std::wstring processName;
+    const std::wstring processName; // This can be either an exe name or a window title
+    bool useWindowTitle = false;    // Set to true if processName is a window title
     HANDLE hProcess = nullptr;
     DWORD procId = 0;
+
+    std::wstring injectedDllName = L"InjectedDLL.dll";
+    std::string injectedTempDllPath = "";
 
     // Maps to store hooks and pointer toggles by name
     std::map<std::string, HookInfo> hooks;
@@ -241,6 +257,37 @@ protected:
         return pid;
     }
 
+    struct EnumWindowsData
+    {
+        std::wstring targetTitle;
+        DWORD foundPID = 0;
+    };
+
+    static BOOL CALLBACK EnumWindowsProcCallback(HWND hwnd, LPARAM lParam)
+    {
+        EnumWindowsData *data = reinterpret_cast<EnumWindowsData *>(lParam);
+        if (!IsWindowVisible(hwnd))
+            return TRUE;
+
+        const int bufferSize = 256;
+        wchar_t windowTitle[bufferSize] = {0};
+        GetWindowTextW(hwnd, windowTitle, bufferSize);
+        if (data->targetTitle == windowTitle)
+        {
+            GetWindowThreadProcessId(hwnd, &(data->foundPID));
+            return FALSE;
+        }
+        return TRUE;
+    }
+
+    inline DWORD getProcIdByWindowTitle(const std::wstring &title)
+    {
+        EnumWindowsData data;
+        data.targetTitle = title;
+        EnumWindows(EnumWindowsProcCallback, reinterpret_cast<LPARAM>(&data));
+        return data.foundPID;
+    }
+
     // Get Module Base Address and Size
     inline bool getModuleInfo(const wchar_t *modName, uintptr_t &modBase, size_t &modSize)
     {
@@ -251,11 +298,23 @@ protected:
         MODULEENTRY32W me;
         me.dwSize = sizeof(me);
         bool found = false;
+
+        // Check if the module name starts with "$re$" for regex matching
+        bool useRegex = false;
+        std::wstring patternStr;
+        const wchar_t *prefix = L"$re$";
+        size_t prefixLen = wcslen(prefix);
+        if (wcsncmp(modName, prefix, prefixLen) == 0)
+        {
+            useRegex = true;
+            patternStr = std::wstring(modName).substr(prefixLen);
+        }
+
         if (Module32FirstW(snap, &me))
         {
             do
             {
-                if (!_wcsicmp(me.szModule, modName))
+                if ((!useRegex && _wcsicmp(me.szModule, modName)) || (useRegex && std::regex_match(me.szModule, std::wregex(patternStr))))
                 {
                     modBase = (uintptr_t)me.modBaseAddr;
                     modSize = (size_t)me.modBaseSize;
@@ -555,8 +614,8 @@ protected:
                 // Flush the instruction cache with the correct size
                 FlushInstructionCache(hProcess, reinterpret_cast<LPCVOID>(targetAddr), shared_pti->valueSize);
 
-                // Sleep for 100 milliseconds
-                std::this_thread::sleep_for(std::chrono::milliseconds(100));
+                // Sleep for 10 milliseconds
+                std::this_thread::sleep_for(std::chrono::milliseconds(10));
             }
         }
         else

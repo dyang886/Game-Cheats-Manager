@@ -1,0 +1,38 @@
+{
+    "en_US": {
+        "Please run the game first.": "Please run the game first.",
+        "Failed to activate.": "Failed to activate.",
+        "Failed to activate/deactivate.": "Failed to activate/deactivate.",
+        "Process Name:": "Process Name:",
+        "Process ID:": "Process ID:",
+        "Apply": "Apply",
+        "Trainer Name": "Heavy Weapon Trainer",
+        "Set Life Count": "Set Life Count",
+        "Set Shield Level": "Set Shield Level",
+        "Set Nuke Amount": "Set Nuke Amount",
+        "Set Defense Orbs Level": "Set Defense Orbs Level",
+        "Set Homing Missile Level": "Set Homing Missile Level",
+        "Set Laser Level": "Set Laser Level",
+        "Set Rockets Level": "Set Rockets Level",
+        "Set Flak Cannon Level": "Set Flak Cannon Level",
+        "Set Thunder Strike Level": "Set Thunder Strike Level"
+    },
+    "zh_CN": {
+        "Please run the game first.": "请先运行游戏。",
+        "Failed to activate.": "激活失败。",
+        "Failed to activate/deactivate.": "激活/停用失败。",
+        "Process Name:": "进程名称：",
+        "Process ID:": "进程 ID:",
+        "Apply": "应用",
+        "Trainer Name": "重装兵器修改器",
+        "Set Life Count": "设置生命数量",
+        "Set Shield Level": "设置护盾等级",
+        "Set Nuke Amount": "设置核弹数量",
+        "Set Defense Orbs Level": "设置防御球等级",
+        "Set Homing Missile Level": "设置追踪导弹等级",
+        "Set Laser Level": "设置激光等级",
+        "Set Rockets Level": "设置火箭等级",
+        "Set Flak Cannon Level": "设置高射炮等级",
+        "Set Thunder Strike Level": "设置雷霆打击等级"
+    }
+}

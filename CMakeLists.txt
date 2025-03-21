@@ -9,5 +9,7 @@ add_subdirectory(common)
 
 # Add each game-specific trainer
 add_subdirectory("Arrow a Row Trainer")
+add_subdirectory("DREDGE Trainer")
 add_subdirectory("Headbangers_Rhythm Royale Trainer")
+add_subdirectory("Heavy Weapon Trainer")
 add_subdirectory("Plants vs. Zombies Trainer")

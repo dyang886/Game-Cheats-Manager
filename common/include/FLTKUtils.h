@@ -23,8 +23,8 @@ using json = nlohmann::json;
 // {{}}_input->type(FL_INT_INPUT);
 // set_input_values({{}}_input, "default", "minimum", "maximum");
 
-// ToggleData *td_{{}} = new ToggleData{&trainer, "OptionName", {{}}_check_button, {{}}_input};
-// {{}}_check_button->callback(toggle_callback, td_{{}});
+// ToggleData *data_{{}} = new ToggleData{&trainer, "OptionName", {{}}_check_button, {{}}_input};
+// {{}}_check_button->callback(toggle_callback, data_{{}});
 
 // {{}}_flex->end();
 // options1_flex->fixed({{}}_flex, option_h);
