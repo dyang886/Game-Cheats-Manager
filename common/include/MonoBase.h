@@ -1,3 +1,4 @@
+// MonoBase.h
 #pragma once
 
 #include "TrainerBase.h"
@@ -19,10 +20,43 @@ public:
 
     virtual ~MonoBase()
     {
+        cleanUp();
+    }
+
+    void cleanUp() override
+    {
+        TrainerBase::cleanUp();
+
         if (!tempDllPath.empty())
         {
             DeleteFileW(tempDllPath.c_str());
+            tempDllPath.clear();
         }
+        dllInjected = false;
+    }
+
+    bool initializeDllInjection()
+    {
+        if (!dllInjected)
+        {
+            if (!injectBridgeDLL())
+                return false;
+
+            if (!getFunctionPointers())
+                return false;
+
+            if (!loadAssembly("GCMINJECTION_DLL"))
+                return false;
+
+            if (!invokeMethod("", "GCMInjection", "Initialize", {}))
+            {
+                std::cerr << "[!] Failed to initialize dispatcher.\n";
+                return false;
+            }
+
+            dllInjected = true;
+        }
+        return dllInjected;
     }
 
     /** Injects the C++ bridge DLL into the target process from embedded resources
@@ -371,6 +405,7 @@ public:
     }
 
 private:
+    bool dllInjected = false;
     std::vector<std::wstring> extractedFiles;
     std::wstring tempDllPath;
     uintptr_t bridgeDllBase = 0;

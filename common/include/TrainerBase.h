@@ -82,7 +82,7 @@ public:
         return procId;
     }
 
-    void cleanUp()
+    virtual void cleanUp()
     {
         disableAllHooks();
         disableAllPointerToggles();

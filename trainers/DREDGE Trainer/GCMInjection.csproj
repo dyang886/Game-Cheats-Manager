@@ -10,6 +10,9 @@
     <Reference Include="UnityEngine.CoreModule">
       <HintPath>F:/SteamLibrary/steamapps/common/DREDGE/DREDGE_Data/Managed/UnityEngine.CoreModule.dll</HintPath>
     </Reference>
+    <Reference Include="Unity.Localization">
+      <HintPath>F:/SteamLibrary/steamapps/common/DREDGE/DREDGE_Data/Managed/Unity.Localization.dll</HintPath>
+    </Reference>
     <Reference Include="Assembly-CSharp">
       <HintPath>F:/SteamLibrary/steamapps/common/DREDGE/DREDGE_Data/Managed/Assembly-CSharp.dll</HintPath>
     </Reference>
