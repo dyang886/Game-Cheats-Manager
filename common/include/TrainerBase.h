@@ -62,7 +62,6 @@ struct PointerToggleInfo
 class TrainerBase
 {
 public:
-    // Constructor and Destructor
     TrainerBase(const std::wstring &processIdentifier, bool useWindowTitle = false)
         : processName(processIdentifier), useWindowTitle(useWindowTitle)
     {
@@ -221,9 +220,6 @@ protected:
     HANDLE hProcess = nullptr;
     DWORD procId = 0;
 
-    std::wstring injectedDllName = L"InjectedDLL.dll";
-    std::string injectedTempDllPath = "";
-
     // Maps to store hooks and pointer toggles by name
     std::map<std::string, HookInfo> hooks;
     std::map<std::string, std::shared_ptr<PointerToggleInfo>> pointerToggles;
@@ -231,6 +227,20 @@ protected:
     /***********************************************************************
      * Helper Functions
      ***********************************************************************/
+
+    /** Converts std::wstring to std::string
+     * @param wstr The wide string to convert
+     * @return Converted narrow string
+     */
+    std::string wstringToString(const std::wstring &wstr)
+    {
+        if (wstr.empty())
+            return "";
+        int size = WideCharToMultiByte(CP_ACP, 0, &wstr[0], (int)wstr.size(), NULL, 0, NULL, NULL);
+        std::string str(size, 0);
+        WideCharToMultiByte(CP_ACP, 0, &wstr[0], (int)wstr.size(), &str[0], size, NULL, NULL);
+        return str;
+    }
 
     // Get Process ID by executable name
     inline DWORD getProcId(const wchar_t *exeName)

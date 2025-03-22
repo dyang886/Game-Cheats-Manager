@@ -1,74 +1,72 @@
-// MonoBase.h
 #pragma once
 
 #include "TrainerBase.h"
 #include <string>
+#include <variant>
+#include <vector>
 #include <windows.h>
-
-// For logging
-#include <stdio.h> // For sprintf and printf
+#include <iostream>
 
 class MonoBase : public TrainerBase
 {
 public:
+    using Param = std::variant<int, float, std::string>;
+
     MonoBase(const std::wstring &processIdentifier, bool useWindowTitle = false)
-        : TrainerBase(processIdentifier, useWindowTitle),
-          bridgeDllPath(L"D:/Resources/Software/Game Trainers/build/bin/Debug/MonoBridge.dll")
+        : TrainerBase(processIdentifier, useWindowTitle)
     {
-        // Log initialization
-        printf("MonoBase initialized.\n");
     }
 
     virtual ~MonoBase()
     {
-        printf("MonoBase destructor called.\n");
-        // Cleanup handled by TrainerBase::~TrainerBase via cleanUp()
+        if (!tempDllPath.empty())
+        {
+            DeleteFileW(tempDllPath.c_str());
+        }
     }
 
-    /** Injects the C++ bridge DLL into the target process.
-     * @param dllPath Path to MonoBridge.dll
+    /** Injects the C++ bridge DLL into the target process from embedded resources
      * @return True if injection succeeds, false otherwise
      */
-    bool injectBridgeDLL(const std::wstring &dllPath)
+    bool injectBridgeDLL()
     {
-        char logMsg[256];
+        // Extract the DLL from resources
+        tempDllPath = extractResourceToTempFile("MONOBRIDGE_DLL");
+        if (tempDllPath.empty())
+        {
+            std::cerr << "[!] Failed to extract MonoBridge.dll from resources.\n";
+            return false;
+        }
+
+        std::cout << "[+] Extracted MonoBridge.dll to " << wstringToString(tempDllPath) << std::endl;
 
         if (!hProcess || !isProcessRunning())
         {
-            printf("Error: Process not running or handle invalid.\n");
+            std::cerr << "[!] Process not running or handle invalid.\n";
             return false;
         }
 
-        sprintf(logMsg, "Attempting to inject DLL: %S\n", dllPath.c_str());
-        printf("%s", logMsg);
-
-        size_t pathSize = (dllPath.size() + 1) * sizeof(wchar_t);
+        size_t pathSize = (tempDllPath.size() + 1) * sizeof(wchar_t);
         LPVOID allocMem = VirtualAllocEx(hProcess, nullptr, pathSize, MEM_COMMIT | MEM_RESERVE, PAGE_READWRITE);
         if (!allocMem)
         {
-            printf("Error: Failed to allocate memory in target process. Error code: %lu\n", GetLastError());
+            std::cerr << "[!] Failed to allocate memory in target process.\n";
             return false;
         }
 
-        if (!WriteProcessMemory(hProcess, allocMem, dllPath.c_str(), pathSize, nullptr))
+        if (!WriteProcessMemory(hProcess, allocMem, tempDllPath.c_str(), pathSize, nullptr))
         {
-            printf("Error: Failed to write DLL path to target process. Error code: %lu\n", GetLastError());
+            std::cerr << "[!] Failed to write DLL path to target process.\n";
             VirtualFreeEx(hProcess, allocMem, 0, MEM_RELEASE);
             return false;
         }
 
+        // Combine kernel32 handle and LoadLibraryW address retrieval
         HMODULE kernel32 = GetModuleHandleW(L"kernel32.dll");
-        if (!kernel32)
-        {
-            printf("Error: Failed to get handle to kernel32.dll.\n");
-            VirtualFreeEx(hProcess, allocMem, 0, MEM_RELEASE);
-            return false;
-        }
-
-        LPVOID loadLibraryAddr = reinterpret_cast<LPVOID>(GetProcAddress(kernel32, "LoadLibraryW"));
+        LPVOID loadLibraryAddr = kernel32 ? reinterpret_cast<LPVOID>(GetProcAddress(kernel32, "LoadLibraryW")) : nullptr;
         if (!loadLibraryAddr)
         {
-            printf("Error: Failed to get address of LoadLibraryW.\n");
+            std::cerr << "[!] Failed to get LoadLibraryW address.\n";
             VirtualFreeEx(hProcess, allocMem, 0, MEM_RELEASE);
             return false;
         }
@@ -78,7 +76,7 @@ public:
                                             allocMem, 0, nullptr);
         if (!hThread)
         {
-            printf("Error: Failed to create remote thread for LoadLibraryW. Error code: %lu\n", GetLastError());
+            std::cerr << "[!] Failed to create remote thread for LoadLibraryW.\n";
             VirtualFreeEx(hProcess, allocMem, 0, MEM_RELEASE);
             return false;
         }
@@ -90,69 +88,41 @@ public:
 
         if (exitCode == 0)
         {
-            // Allocate space to retrieve remote error code
-            LPVOID errorMem = VirtualAllocEx(hProcess, nullptr, sizeof(DWORD), MEM_COMMIT | MEM_RESERVE, PAGE_READWRITE);
-            if (errorMem)
-            {
-                LPVOID getLastErrorAddr = reinterpret_cast<LPVOID>(GetProcAddress(kernel32, "GetLastError"));
-                if (getLastErrorAddr)
-                {
-                    HANDLE errorThread = CreateRemoteThread(hProcess, nullptr, 0,
-                                                            reinterpret_cast<LPTHREAD_START_ROUTINE>(getLastErrorAddr),
-                                                            nullptr, 0, nullptr);
-                    if (errorThread)
-                    {
-                        WaitForSingleObject(errorThread, INFINITE);
-                        DWORD remoteError = 0;
-                        GetExitCodeThread(errorThread, &remoteError);
-                        CloseHandle(errorThread);
-                        sprintf(logMsg, "Error: LoadLibraryW failed in target process. Remote error code: %lu\n", remoteError);
-                        printf("%s", logMsg);
-                    }
-                }
-                VirtualFreeEx(hProcess, errorMem, 0, MEM_RELEASE);
-            }
-            else
-            {
-                printf("Error: Failed to allocate memory for error code retrieval.\n");
-            }
+            std::cerr << "[!] LoadLibraryW failed in target process.\n";
             VirtualFreeEx(hProcess, allocMem, 0, MEM_RELEASE);
             return false;
         }
 
         bridgeDllBase = static_cast<uintptr_t>(exitCode);
         VirtualFreeEx(hProcess, allocMem, 0, MEM_RELEASE);
-        sprintf(logMsg, "Bridge DLL injected successfully at base: 0x%IX.\n", bridgeDllBase);
-        printf("%s", logMsg);
+        std::cout << "[+] Bridge DLL injected successfully at base: 0x" << std::hex << bridgeDllBase << std::dec << std::endl;
         return true;
     }
 
-    /** Retrieves function pointers from the injected bridge DLL.
-     * @return True if pointers are successfully retrieved, false otherwise
+    /** Retrieves function pointers from the injected bridge DLL
+     * @return True if pointers are retrieved, false otherwise
      */
     bool getFunctionPointers()
     {
-        char logMsg[256];
-
         if (!hProcess || !bridgeDllBase)
         {
-            printf("Error: Process handle invalid or bridge DLL not injected.\n");
+            std::cerr << "[!] Process handle invalid or bridge DLL not injected.\n";
             return false;
         }
 
-        printf("Attempting to retrieve function pointers.\n");
+        std::cout << "[+] Attempting to retrieve function pointers.\n";
 
-        HMODULE hLocalDll = LoadLibraryW(bridgeDllPath.c_str());
+        HMODULE hLocalDll = LoadLibraryW(tempDllPath.c_str());
         if (!hLocalDll)
         {
-            printf("Error: Failed to load bridge DLL locally.\n");
+            std::cerr << "[!] Failed to load bridge DLL locally from " << wstringToString(tempDllPath) << std::endl;
             return false;
         }
 
         FARPROC localGetFuncPtrs = GetProcAddress(hLocalDll, "GetFunctionPointersThread");
         if (!localGetFuncPtrs)
         {
-            printf("Error: Failed to get address of GetFunctionPointersThread.\n");
+            std::cerr << "[!] Failed to get address of GetFunctionPointersThread.\n";
             FreeLibrary(hLocalDll);
             return false;
         }
@@ -166,7 +136,7 @@ public:
                                          MEM_COMMIT | MEM_RESERVE, PAGE_READWRITE);
         if (!allocMem)
         {
-            printf("Error: Failed to allocate memory for function pointers.\n");
+            std::cerr << "[!] Failed to allocate memory for function pointers.\n";
             FreeLibrary(hLocalDll);
             return false;
         }
@@ -176,7 +146,7 @@ public:
                                             allocMem, 0, nullptr);
         if (!hThread)
         {
-            printf("Error: Failed to create remote thread for function pointers.\n");
+            std::cerr << "[!] Failed to create remote thread for function pointers.\n";
             VirtualFreeEx(hProcess, allocMem, 0, MEM_RELEASE);
             FreeLibrary(hLocalDll);
             return false;
@@ -187,7 +157,7 @@ public:
 
         if (!ReadProcessMemory(hProcess, allocMem, &funcPtrs, sizeof(FunctionPointers), nullptr))
         {
-            printf("Error: Failed to read function pointers from target process.\n");
+            std::cerr << "[!] Failed to read function pointers from target process.\n";
             VirtualFreeEx(hProcess, allocMem, 0, MEM_RELEASE);
             FreeLibrary(hLocalDll);
             return false;
@@ -195,145 +165,190 @@ public:
 
         VirtualFreeEx(hProcess, allocMem, 0, MEM_RELEASE);
         FreeLibrary(hLocalDll);
-        printf("Function pointers retrieved successfully.\n");
+        std::cout << "[+] Function pointers retrieved successfully.\n";
         return true;
     }
 
-    /** Loads a C# assembly into the Mono runtime via the bridge DLL.
-     * @param assemblyPath Path to the C# DLL (e.g., "GCMInjection.dll")
-     * @return True if loading succeeds, false otherwise
+    /** Loads a C# assembly from an embedded resource into the Mono runtime
+     * @param resourceName Name of the resource (e.g., "GCMINJECTION_DLL")
+     * @return True if successful, false otherwise
      */
-    bool loadAssembly(const std::wstring &assemblyPath)
+    bool loadAssembly(const std::string &resourceName)
     {
-        char logMsg[256];
-
-        // Validate process handle and function pointer
         if (!hProcess || !funcPtrs.LoadAssemblyThread)
         {
-            printf("Error: Process handle invalid or LoadAssemblyThread pointer missing.\n");
+            std::cerr << "[!] Process handle invalid or LoadAssemblyThread pointer missing.\n";
             return false;
         }
 
-        // Log the attempt
-        sprintf(logMsg, "Attempting to load assembly: %S\n", assemblyPath.c_str());
-        printf("%s", logMsg);
-
-        // Convert std::wstring to std::string using WideCharToMultiByte
-        int len = WideCharToMultiByte(CP_ACP, 0, assemblyPath.c_str(), -1, nullptr, 0, nullptr, nullptr);
-        if (len == 0)
+        std::wstring assemblyPath = extractResourceToTempFile(resourceName);
+        if (assemblyPath.empty())
         {
-            printf("Error: Failed to convert assembly path to multi-byte string.\n");
+            std::cerr << "[!] Failed to extract assembly from resource: " << resourceName << "\n";
             return false;
         }
+        extractedFiles.push_back(assemblyPath);
 
-        std::string pathStr(len, '\0');
-        WideCharToMultiByte(CP_ACP, 0, assemblyPath.c_str(), -1, &pathStr[0], len, nullptr, nullptr);
-        pathStr.resize(len - 1); // Remove the null terminator from the string
+        std::cout << "[+] Attempting to load assembly from: " << wstringToString(assemblyPath) << "\n";
 
-        // Allocate memory in the target process
+        std::string pathStr = wstringToString(assemblyPath);
         size_t pathLen = pathStr.size() + 1;
         size_t paramsSize = sizeof(LoadAssemblyParams) + pathLen;
 
-        LPVOID allocMem = VirtualAllocEx(hProcess, nullptr, paramsSize,
-                                         MEM_COMMIT | MEM_RESERVE, PAGE_READWRITE);
+        LPVOID allocMem = VirtualAllocEx(hProcess, nullptr, paramsSize, MEM_COMMIT | MEM_RESERVE, PAGE_READWRITE);
         if (!allocMem)
         {
-            printf("Error: Failed to allocate memory for assembly path.\n");
+            std::cerr << "[!] Failed to allocate memory for assembly path.\n";
             return false;
         }
 
-        // Write the path to the allocated memory
         LPVOID pathMem = reinterpret_cast<LPVOID>(reinterpret_cast<uintptr_t>(allocMem) + sizeof(LoadAssemblyParams));
         if (!WriteProcessMemory(hProcess, pathMem, pathStr.c_str(), pathLen, nullptr))
         {
-            printf("Error: Failed to write assembly path to target process.\n");
+            std::cerr << "[!] Failed to write assembly path to target process.\n";
             VirtualFreeEx(hProcess, allocMem, 0, MEM_RELEASE);
             return false;
         }
 
-        // Set up parameters and write them
-        LoadAssemblyParams params;
+        LoadAssemblyParams params{};
         params.path = reinterpret_cast<const char *>(pathMem);
         if (!WriteProcessMemory(hProcess, allocMem, &params, sizeof(LoadAssemblyParams), nullptr))
         {
-            printf("Error: Failed to write LoadAssemblyParams to target process.\n");
+            std::cerr << "[!] Failed to write LoadAssemblyParams to target process.\n";
             VirtualFreeEx(hProcess, allocMem, 0, MEM_RELEASE);
             return false;
         }
 
-        // Create a remote thread to load the assembly
         HANDLE hThread = CreateRemoteThread(hProcess, nullptr, 0,
                                             reinterpret_cast<LPTHREAD_START_ROUTINE>(funcPtrs.LoadAssemblyThread),
                                             allocMem, 0, nullptr);
         if (!hThread)
         {
-            printf("Error: Failed to create remote thread to load assembly.\n");
+            std::cerr << "[!] Failed to create remote thread to load assembly.\n";
             VirtualFreeEx(hProcess, allocMem, 0, MEM_RELEASE);
             return false;
         }
 
-        // Wait for the thread to complete and clean up
         WaitForSingleObject(hThread, INFINITE);
         CloseHandle(hThread);
         VirtualFreeEx(hProcess, allocMem, 0, MEM_RELEASE);
-        printf("Assembly load thread completed.\n");
+        std::cout << "[+] Assembly load thread completed.\n";
         return true;
     }
 
-    /** Invokes a static method in the loaded C# assembly.
-     * @param className Fully qualified class name (e.g., "GCMInjection")
-     * @param methodName Method name (e.g., "SpawnItem")
-     * @param param Integer parameter to pass to the method
-     * @return True if invocation succeeds, false otherwise
+    /** Invokes a static method in the loaded C# assembly
+     * @param namespaceName Namespace of the class (e.g., "MyNamespace")
+     * @param className Class name (e.g., "MyClass")
+     * @param methodName Method name (e.g., "MyMethod")
+     * @param params Vector of parameters
+     * @return True if successful, false otherwise
      */
-    bool invokeMethod(const std::string &className, const std::string &methodName, int param)
+    bool invokeMethod(const std::string &namespaceName, const std::string &className,
+                      const std::string &methodName, const std::vector<Param> &params)
     {
-        char logMsg[256];
-
         if (!hProcess || !funcPtrs.InvokeMethodThread)
         {
-            printf("Error: Process handle invalid or InvokeMethodThread pointer missing.\n");
+            std::cerr << "[!] Process handle invalid or InvokeMethodThread pointer missing.\n";
             return false;
         }
 
-        sprintf(logMsg, "Attempting to invoke %s.%s with param %d\n", className.c_str(), methodName.c_str(), param);
-        printf("%s", logMsg);
+        std::cout << "[+] Attempting to invoke " << namespaceName << "." << className << "." << methodName
+                  << " with " << params.size() << " parameters.\n";
 
-        size_t classNameLen = className.size() + 1;
-        size_t methodNameLen = methodName.size() + 1;
-        size_t paramsSize = sizeof(InvokeMethodParams) + classNameLen + methodNameLen;
+        size_t namespaceLen = namespaceName.size() + 1;
+        size_t classLen = className.size() + 1;
+        size_t methodLen = methodName.size() + 1;
+        size_t paramValuesSize = sizeof(ParamValue) * params.size();
+        size_t totalStringSize = 0;
+        for (const auto &p : params)
+        {
+            if (std::holds_alternative<std::string>(p))
+                totalStringSize += std::get<std::string>(p).size() + 1;
+        }
+        size_t totalSize = sizeof(InvokeMethodParams) + namespaceLen + classLen + methodLen + paramValuesSize + totalStringSize;
 
-        LPVOID allocMem = VirtualAllocEx(hProcess, nullptr, paramsSize,
-                                         MEM_COMMIT | MEM_RESERVE, PAGE_READWRITE);
+        LPVOID allocMem = VirtualAllocEx(hProcess, nullptr, totalSize, MEM_COMMIT | MEM_RESERVE, PAGE_READWRITE);
         if (!allocMem)
         {
-            printf("Error: Failed to allocate memory for method invocation.\n");
+            std::cerr << "[!] Failed to allocate memory for method invocation.\n";
             return false;
         }
 
-        LPVOID classNameMem = reinterpret_cast<LPVOID>(reinterpret_cast<uintptr_t>(allocMem) + sizeof(InvokeMethodParams));
-        if (!WriteProcessMemory(hProcess, classNameMem, className.c_str(), classNameLen, nullptr))
+        LPVOID currentMem = reinterpret_cast<LPVOID>(reinterpret_cast<uintptr_t>(allocMem) + sizeof(InvokeMethodParams));
+        InvokeMethodParams invokeParams{};
+
+        // Write namespace
+        invokeParams.namespaceName = reinterpret_cast<const char *>(currentMem);
+        if (!WriteProcessMemory(hProcess, currentMem, namespaceName.c_str(), namespaceLen, nullptr))
         {
-            printf("Error: Failed to write class name to target process.\n");
+            std::cerr << "[!] Failed to write namespace name.\n";
+            VirtualFreeEx(hProcess, allocMem, 0, MEM_RELEASE);
+            return false;
+        }
+        currentMem = reinterpret_cast<LPVOID>(reinterpret_cast<uintptr_t>(currentMem) + namespaceLen);
+
+        // Write class name
+        invokeParams.className = reinterpret_cast<const char *>(currentMem);
+        if (!WriteProcessMemory(hProcess, currentMem, className.c_str(), classLen, nullptr))
+        {
+            std::cerr << "[!] Failed to write class name.\n";
+            VirtualFreeEx(hProcess, allocMem, 0, MEM_RELEASE);
+            return false;
+        }
+        currentMem = reinterpret_cast<LPVOID>(reinterpret_cast<uintptr_t>(currentMem) + classLen);
+
+        // Write method name
+        invokeParams.methodName = reinterpret_cast<const char *>(currentMem);
+        if (!WriteProcessMemory(hProcess, currentMem, methodName.c_str(), methodLen, nullptr))
+        {
+            std::cerr << "[!] Failed to write method name.\n";
+            VirtualFreeEx(hProcess, allocMem, 0, MEM_RELEASE);
+            return false;
+        }
+        currentMem = reinterpret_cast<LPVOID>(reinterpret_cast<uintptr_t>(currentMem) + methodLen);
+
+        // Write parameter values
+        LPVOID paramValuesMem = currentMem;
+        std::vector<ParamValue> paramValues(params.size());
+        for (size_t i = 0; i < params.size(); ++i)
+        {
+            if (std::holds_alternative<int>(params[i]))
+            {
+                paramValues[i].type = ParamValue::INT;
+                paramValues[i].i = std::get<int>(params[i]);
+            }
+            else if (std::holds_alternative<float>(params[i]))
+            {
+                paramValues[i].type = ParamValue::FLOAT;
+                paramValues[i].f = std::get<float>(params[i]);
+            }
+            else if (std::holds_alternative<std::string>(params[i]))
+            {
+                paramValues[i].type = ParamValue::STRING;
+                const std::string &str = std::get<std::string>(params[i]);
+                paramValues[i].s = reinterpret_cast<const char *>(currentMem);
+                if (!WriteProcessMemory(hProcess, currentMem, str.c_str(), str.size() + 1, nullptr))
+                {
+                    std::cerr << "[!] Failed to write string parameter.\n";
+                    VirtualFreeEx(hProcess, allocMem, 0, MEM_RELEASE);
+                    return false;
+                }
+                currentMem = reinterpret_cast<LPVOID>(reinterpret_cast<uintptr_t>(currentMem) + str.size() + 1);
+            }
+        }
+        invokeParams.paramCount = static_cast<int>(params.size());
+        invokeParams.paramValues = reinterpret_cast<ParamValue *>(paramValuesMem);
+        if (!WriteProcessMemory(hProcess, paramValuesMem, paramValues.data(), paramValuesSize, nullptr))
+        {
+            std::cerr << "[!] Failed to write parameter values.\n";
             VirtualFreeEx(hProcess, allocMem, 0, MEM_RELEASE);
             return false;
         }
 
-        LPVOID methodNameMem = reinterpret_cast<LPVOID>(reinterpret_cast<uintptr_t>(classNameMem) + classNameLen);
-        if (!WriteProcessMemory(hProcess, methodNameMem, methodName.c_str(), methodNameLen, nullptr))
+        // Write InvokeMethodParams
+        if (!WriteProcessMemory(hProcess, allocMem, &invokeParams, sizeof(InvokeMethodParams), nullptr))
         {
-            printf("Error: Failed to write method name to target process.\n");
-            VirtualFreeEx(hProcess, allocMem, 0, MEM_RELEASE);
-            return false;
-        }
-
-        InvokeMethodParams params;
-        params.className = reinterpret_cast<const char *>(classNameMem);
-        params.methodName = reinterpret_cast<const char *>(methodNameMem);
-        params.param = param;
-        if (!WriteProcessMemory(hProcess, allocMem, &params, sizeof(InvokeMethodParams), nullptr))
-        {
-            printf("Error: Failed to write InvokeMethodParams to target process.\n");
+            std::cerr << "[!] Failed to write InvokeMethodParams.\n";
             VirtualFreeEx(hProcess, allocMem, 0, MEM_RELEASE);
             return false;
         }
@@ -343,7 +358,7 @@ public:
                                             allocMem, 0, nullptr);
         if (!hThread)
         {
-            printf("Error: Failed to create remote thread to invoke method.\n");
+            std::cerr << "[!] Failed to create remote thread for method invocation.\n";
             VirtualFreeEx(hProcess, allocMem, 0, MEM_RELEASE);
             return false;
         }
@@ -351,29 +366,102 @@ public:
         WaitForSingleObject(hThread, INFINITE);
         CloseHandle(hThread);
         VirtualFreeEx(hProcess, allocMem, 0, MEM_RELEASE);
-        printf("Method invocation thread completed.\n");
+        std::cout << "[+] Method invocation thread completed.\n";
         return true;
     }
 
 private:
-    std::wstring bridgeDllPath;
+    std::vector<std::wstring> extractedFiles;
+    std::wstring tempDllPath;
     uintptr_t bridgeDllBase = 0;
 
     struct FunctionPointers
     {
-        LPVOID LoadAssemblyThread;
-        LPVOID InvokeMethodThread;
-    } funcPtrs = {nullptr, nullptr};
+        LPVOID LoadAssemblyThread = nullptr;
+        LPVOID InvokeMethodThread = nullptr;
+    } funcPtrs;
 
     struct LoadAssemblyParams
     {
         const char *path;
     };
 
+    struct ParamValue
+    {
+        enum Type
+        {
+            INT,
+            FLOAT,
+            STRING
+        } type;
+        union
+        {
+            int i;
+            float f;
+            const char *s;
+        };
+    };
+
     struct InvokeMethodParams
     {
+        const char *namespaceName;
         const char *className;
         const char *methodName;
-        int param;
+        int paramCount;
+        ParamValue *paramValues;
     };
+
+    /** Extracts a DLL from embedded resources to a temporary file
+     * @param resourceName The resource identifier (e.g., "MONOBRIDGE_DLL")
+     * @return Path to the temporary file, or empty string if extraction fails
+     */
+    std::wstring extractResourceToTempFile(const std::string &resourceName)
+    {
+        HMODULE hModule = GetModuleHandle(nullptr);
+        HRSRC hResource = FindResourceA(hModule, resourceName.c_str(), MAKEINTRESOURCEA(10));
+        if (!hResource)
+        {
+            std::cerr << "[!] Failed to find resource: " << resourceName << "\n";
+            return L"";
+        }
+
+        HGLOBAL hData = LoadResource(hModule, hResource);
+        if (!hData)
+        {
+            std::cerr << "[!] Failed to load resource: " << resourceName << "\n";
+            return L"";
+        }
+
+        LPVOID pData = LockResource(hData);
+        if (!pData)
+        {
+            std::cerr << "[!] Failed to lock resource: " << resourceName << "\n";
+            return L"";
+        }
+
+        DWORD dwSize = SizeofResource(hModule, hResource);
+        WCHAR tempPath[MAX_PATH], tempFileName[MAX_PATH];
+        GetTempPathW(MAX_PATH, tempPath);
+        GetTempFileNameW(tempPath, L"RES", 0, tempFileName);
+
+        HANDLE hFile = CreateFileW(tempFileName, GENERIC_WRITE, 0, nullptr, CREATE_ALWAYS, FILE_ATTRIBUTE_NORMAL, nullptr);
+        if (hFile == INVALID_HANDLE_VALUE)
+        {
+            std::cerr << "[!] Failed to create temporary file for resource.\n";
+            return L"";
+        }
+
+        DWORD bytesWritten;
+        WriteFile(hFile, pData, dwSize, &bytesWritten, nullptr);
+        CloseHandle(hFile);
+
+        if (bytesWritten != dwSize)
+        {
+            std::cerr << "[!] Failed to write resource to temporary file.\n";
+            DeleteFileW(tempFileName);
+            return L"";
+        }
+
+        return std::wstring(tempFileName);
+    }
 };

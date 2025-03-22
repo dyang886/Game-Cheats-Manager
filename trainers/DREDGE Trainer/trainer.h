@@ -12,29 +12,34 @@ public:
 
     virtual ~Trainer() {}
 
-    // bool spawnItem(int itemIndex)
-    // {
-    //     if (!injected)
-    //     {
-    //         injectBridgeDLL(L"MonoBridge.dll");
-    //         getFunctionPointers();
-    //         loadAssembly(L"GCMInjection.dll"); // Adjust path as needed
-    //         injected = true;
-    //     }
-    //     return invokeMethod("GCMInjection", "SpawnItem", itemIndex);
-    // }
+    bool initializeDllInjection()
+    {
+        if (!dllInjected)
+        {
+            if (!injectBridgeDLL())
+                return false;
+
+            if (!getFunctionPointers())
+                return false;
+
+            if (!loadAssembly("GCMINJECTION_DLL"))
+                return false;
+
+            dllInjected = true;
+        }
+        return dllInjected;
+    }
+
     bool spawnItem(int itemIndex)
     {
-        if (!injected)
+        if (initializeDllInjection())
         {
-            injectBridgeDLL(L"D:/Resources/Software/Game Trainers/build/bin/Debug/MonoBridge.dll");
-            getFunctionPointers();
-            loadAssembly(L"D:/Resources/Software/Game Trainers/build/bin/Debug/GCMInjection.dll"); // Adjust path as needed
-            injected = true;
+            // return invokeMethod("", "GCMInjection", "Dump", std::vector<MonoBase::Param>{});
+            return invokeMethod("", "GCMInjection", "SpawnItem", std::vector<MonoBase::Param>{itemIndex});
         }
-        return invokeMethod("GCMInjection", "SpawnItem", itemIndex);
+        return false;
     }
 
 private:
-    bool injected = false;
+    bool dllInjected = false;
 };

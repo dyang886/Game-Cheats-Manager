@@ -197,7 +197,7 @@ int main(int argc, char **argv)
   Fl_Input *spawn_item_input = new Fl_Input(0, 0, 0, 0);
   spawn_item_flex->fixed(spawn_item_input, input_w);
   spawn_item_input->type(FL_INT_INPUT);
-  set_input_values(spawn_item_input, "273", "0", "9999999");
+  set_input_values(spawn_item_input, "35", "0", "9999999");
 
   ApplyData *ad_spawn_item = new ApplyData{&trainer, "SpawnItem", spawn_item_apply_button, spawn_item_input};
   spawn_item_apply_button->callback(apply_callback, ad_spawn_item);
