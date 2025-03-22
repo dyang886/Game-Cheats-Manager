@@ -1,15 +1,23 @@
 cmake_minimum_required(VERSION 3.15)
-project(GameTrainers)
 
+project(GameTrainers LANGUAGES CXX)
+
+# Set C++ standard and runtime library
 set(CMAKE_CXX_STANDARD 17)
+set(CMAKE_CXX_STANDARD_REQUIRED ON)
 set(CMAKE_MSVC_RUNTIME_LIBRARY "MultiThreaded$<$<CONFIG:Debug>:Debug>")
 
-# Add the common library
 add_subdirectory(common)
 
 # Add each game-specific trainer
-add_subdirectory("Arrow a Row Trainer")
-add_subdirectory("DREDGE Trainer")
-add_subdirectory("Headbangers_Rhythm Royale Trainer")
-add_subdirectory("Heavy Weapon Trainer")
-add_subdirectory("Plants vs. Zombies Trainer")
+set(TRAINER_DIRS
+    "trainers/Arrow a Row Trainer"
+    "trainers/DREDGE Trainer"
+    "trainers/Headbangers_Rhythm Royale Trainer"
+    "trainers/Heavy Weapon Trainer"
+    "trainers/Plants vs. Zombies Trainer"
+)
+
+foreach(TRAINER_DIR ${TRAINER_DIRS})
+    add_subdirectory(${TRAINER_DIR})
+endforeach()

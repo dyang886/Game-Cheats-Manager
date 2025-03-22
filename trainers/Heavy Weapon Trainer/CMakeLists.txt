@@ -1,15 +1,12 @@
-set(GAME_NAME Headbangers)
+set(GAME_NAME "Heavy_Weapon")
+set(TRAINER_NAME "Heavy Weapon Trainer")
 
-# Define the executable
+
 add_executable(${GAME_NAME} main.cpp)
-
-# Link against the Common library
 target_link_libraries(${GAME_NAME} PRIVATE Common)
-
-# Set a custom output name
-set_target_properties(${GAME_NAME} PROPERTIES 
+set_target_properties(${GAME_NAME} PROPERTIES
     WIN32_EXECUTABLE $<$<NOT:$<CONFIG:Debug>>:ON>
-    OUTPUT_NAME "Headbangers_Rhythm Royale Trainer"
+    OUTPUT_NAME "${TRAINER_NAME}"
 )
 
 if (WIN32)
