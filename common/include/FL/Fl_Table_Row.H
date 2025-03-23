@@ -157,19 +157,11 @@ public:
     return(_selectmode);
   }
 
-  /**
-   Checks to see if 'row' is selected. Returns 1 if selected, 0 if not. You can
-   change the selection of a row by clicking on it, or by using
-   select_row(row, flag)
-   */
-  int row_selected(int row);            // is row selected? (0=no, 1=yes, -1=range err)
+  // Checks to see if 'row' is selected. Returns 1 if selected, 0 if not.
+  int row_selected(int row);
 
-  /**
-   Changes the selection state for 'row', depending on the value
-   of 'flag'.  0=deselected, 1=select, 2=toggle existing state.
-   */
-  int select_row(int row, int flag=1);  // select state for row: flag:0=off, 1=on, 2=toggle
-  // returns: 0=no change, 1=changed, -1=range err
+  // Changes the selection state for 'row', depending on the value of 'flag'.
+  int select_row(int row, int flag = 1);
 
   /**
    This convenience function changes the selection state

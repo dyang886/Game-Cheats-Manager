@@ -351,7 +351,7 @@ protected:
                fl_push_clip(X, Y, W, H);
                {
                    // BG COLOR
-                   fl_color( row_selected(R) ? selection_color() : FL_WHITE);
+                   fl_color(is_selected(R, C) ? selection_color() : FL_WHITE);
                    fl_rectf(X, Y, W, H);
 
                    // TEXT

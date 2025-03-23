@@ -7,7 +7,7 @@ using json = nlohmann::json;
 // Individual option template:
 
 // // ------------------------------------------------------------------
-// // Option x: Set {{}} (Apply/Toggle)
+// // Option x: Set {{}} (Toggle)
 // // ------------------------------------------------------------------
 // Fl_Flex *{{}}_flex = new Fl_Flex(0, 0, 0, 0, Fl_Flex::HORIZONTAL);
 // {{}}_flex->gap(option_gap);
@@ -16,7 +16,7 @@ using json = nlohmann::json;
 // {{}}_flex->fixed({{}}_check_button, button_w);
 
 // Fl_Box *{{}}_label = new Fl_Box(0, 0, 0, 0);
-// {{}}_label->user_data("Label");
+// {{}}_label->tooltip("Label");
 
 // Fl_Input *{{}}_input = new Fl_Input(0, 0, 0, 0);
 // {{}}_flex->fixed({{}}_input, input_w);
@@ -25,6 +25,29 @@ using json = nlohmann::json;
 
 // ToggleData *data_{{}} = new ToggleData{&trainer, "OptionName", {{}}_check_button, {{}}_input};
 // {{}}_check_button->callback(toggle_callback, data_{{}});
+
+// {{}}_flex->end();
+// options1_flex->fixed({{}}_flex, option_h);
+
+// // ------------------------------------------------------------------
+// // Option x: Set {{}} (Apply)
+// // ------------------------------------------------------------------
+// Fl_Flex *{{}}_flex = new Fl_Flex(0, 0, 0, 0, Fl_Flex::HORIZONTAL);
+// {{}}_flex->gap(option_gap);
+
+// Fl_Button *{{}}_apply_button = new Fl_Button(0, 0, 0, 0);
+// {{}}_flex->fixed({{}}_apply_button, button_w);
+
+// Fl_Box *{{}}_label = new Fl_Box(0, 0, 0, 0);
+// {{}}_label->tooltip("Label");
+
+// Fl_Input *{{}}_input = new Fl_Input(0, 0, 0, 0);
+// {{}}_flex->fixed({{}}_input, input_w);
+// {{}}_input->type(FL_INT_INPUT);
+// set_input_values({{}}_input, "default", "minimum", "maximum");
+
+// ApplyData *data_{{}} = new ApplyData{&trainer, "OptionName", {{}}_apply_button, {{}}_input};
+// {{}}_apply_button->callback(apply_callback, data_{{}});
 
 // {{}}_flex->end();
 // options1_flex->fixed({{}}_flex, option_h);
@@ -188,15 +211,13 @@ void setupLanguage()
 void change_language(Fl_Group *group, const std::string &lang)
 {
     group->hide();
-    if (group->user_data())
+    if (group->tooltip())
     {
-        const char *translation_id = static_cast<const char *>(group->user_data());
-
         // Find the translation for the window title
         auto lang_translations = translations.find(lang);
         if (lang_translations != translations.end())
         {
-            auto label_it = lang_translations->second.find(translation_id);
+            auto label_it = lang_translations->second.find(group->tooltip());
             if (label_it != lang_translations->second.end())
             {
                 group->copy_label(label_it->second.c_str());
@@ -219,15 +240,13 @@ void change_language(Fl_Group *group, const std::string &lang)
         }
 
         // Process other widgets (non-groups)
-        if (child->user_data())
+        if (child->tooltip())
         {
-            const char *translation_id = static_cast<const char *>(child->user_data());
-
             // Find the translation for the current label
             auto lang_translations = translations.find(lang);
             if (lang_translations != translations.end())
             {
-                auto label_it = lang_translations->second.find(translation_id);
+                auto label_it = lang_translations->second.find(child->tooltip());
                 if (label_it != lang_translations->second.end())
                 {
                     // Update the label with the translated text
@@ -235,6 +254,14 @@ void change_language(Fl_Group *group, const std::string &lang)
                     child->labelsize(font_size);
                     child->labelfont(FL_FREE_FONT);
                     child->labelcolor(FL_WHITE);
+
+                    Fl_Button *button = dynamic_cast<Fl_Button *>(child);
+                    if (button)
+                    {
+                        button->labelcolor(FL_BLACK);
+                        continue;
+                    }
+
                     Fl_Flex *parent_flex = dynamic_cast<Fl_Flex *>(child->parent());
                     if (parent_flex)
                     {

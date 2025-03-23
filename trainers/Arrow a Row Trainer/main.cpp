@@ -223,7 +223,7 @@ int main(int argc, char **argv)
   Fl::set_color(FL_FREE_COLOR, 0x1c1c1c00);
   window->color(FL_FREE_COLOR);
   window->icon((char *)LoadIcon(GetModuleHandle(NULL), "APP_ICON"));
-  window->user_data("Arrow a Row Trainer");
+  window->tooltip("Arrow a Row Trainer");
 
   int left_margin = 20;
   int button_w = 50;
@@ -277,7 +277,7 @@ int main(int argc, char **argv)
 
   // Process Information
   Fl_Box *process_name = new Fl_Box(left_margin, lang_flex_height + imageSize.second + 10, imageSize.first, font_size);
-  process_name->user_data("Process Name:");
+  process_name->tooltip("Process Name:");
   process_name->align(FL_ALIGN_TOP_LEFT | FL_ALIGN_INSIDE);
 
   Fl_Box *process_exe = new Fl_Box(left_margin, lang_flex_height + imageSize.second + font_size + 20, imageSize.first, font_size);
@@ -288,7 +288,7 @@ int main(int argc, char **argv)
 
   Fl_Box *process_id_label = new Fl_Box(0, 0, 0, 0);
   process_id_label->align(FL_ALIGN_LEFT | FL_ALIGN_INSIDE);
-  process_id_label->user_data("Process ID:");
+  process_id_label->tooltip("Process ID:");
 
   Fl_Box *process_id = new Fl_Box(0, 0, 0, 0);
   process_id->align(FL_ALIGN_TOP_LEFT | FL_ALIGN_INSIDE);
@@ -320,7 +320,7 @@ int main(int argc, char **argv)
   coin_flex->fixed(coin_check_button, button_w);
 
   Fl_Box *coin_label = new Fl_Box(0, 0, 0, 0);
-  coin_label->user_data("Set Coins");
+  coin_label->tooltip("Set Coins");
 
   Fl_Input *coin_input = new Fl_Input(0, 0, 0, 0);
   coin_flex->fixed(coin_input, input_w);
@@ -343,7 +343,7 @@ int main(int argc, char **argv)
   health_flex->fixed(health_check_button, button_w);
 
   Fl_Box *health_label = new Fl_Box(0, 0, 0, 0);
-  health_label->user_data("Set Health");
+  health_label->tooltip("Set Health");
 
   Fl_Input *health_input = new Fl_Input(0, 0, 0, 0);
   health_flex->fixed(health_input, input_w);
@@ -366,7 +366,7 @@ int main(int argc, char **argv)
   horizontal_speed_flex->fixed(horizontal_speed_check_button, button_w);
 
   Fl_Box *horizontal_speed_label = new Fl_Box(0, 0, 0, 0);
-  horizontal_speed_label->user_data("Set Horizontal Speed");
+  horizontal_speed_label->tooltip("Set Horizontal Speed");
 
   Fl_Input *horizontal_speed_input = new Fl_Input(0, 0, 0, 0);
   horizontal_speed_flex->fixed(horizontal_speed_input, input_w);
@@ -389,7 +389,7 @@ int main(int argc, char **argv)
   arrow_damage_flex->fixed(arrow_damage_check_button, button_w);
 
   Fl_Box *arrow_damage_label = new Fl_Box(0, 0, 0, 0);
-  arrow_damage_label->user_data("Set Arrow Damage");
+  arrow_damage_label->tooltip("Set Arrow Damage");
 
   Fl_Input *arrow_damage_input = new Fl_Input(0, 0, 0, 0);
   arrow_damage_flex->fixed(arrow_damage_input, input_w);
@@ -412,7 +412,7 @@ int main(int argc, char **argv)
   arrow_frequency_flex->fixed(arrow_frequency_check_button, button_w);
 
   Fl_Box *arrow_frequency_label = new Fl_Box(0, 0, 0, 0);
-  arrow_frequency_label->user_data("Set Arrow Frequency");
+  arrow_frequency_label->tooltip("Set Arrow Frequency");
 
   Fl_Input *arrow_frequency_input = new Fl_Input(0, 0, 0, 0);
   arrow_frequency_flex->fixed(arrow_frequency_input, input_w);
@@ -435,7 +435,7 @@ int main(int argc, char **argv)
   arrow_speed_flex->fixed(arrow_speed_check_button, button_w);
 
   Fl_Box *arrow_speed_label = new Fl_Box(0, 0, 0, 0);
-  arrow_speed_label->user_data("Set Arrow Speed");
+  arrow_speed_label->tooltip("Set Arrow Speed");
 
   Fl_Input *arrow_speed_input = new Fl_Input(0, 0, 0, 0);
   arrow_speed_flex->fixed(arrow_speed_input, input_w);
@@ -458,7 +458,7 @@ int main(int argc, char **argv)
   arrow_distance_flex->fixed(arrow_distance_check_button, button_w);
 
   Fl_Box *arrow_distance_label = new Fl_Box(0, 0, 0, 0);
-  arrow_distance_label->user_data("Set Arrow Distance");
+  arrow_distance_label->tooltip("Set Arrow Distance");
 
   Fl_Input *arrow_distance_input = new Fl_Input(0, 0, 0, 0);
   arrow_distance_flex->fixed(arrow_distance_input, input_w);
@@ -481,7 +481,7 @@ int main(int argc, char **argv)
   arrow_count_flex->fixed(arrow_count_check_button, button_w);
 
   Fl_Box *arrow_count_label = new Fl_Box(0, 0, 0, 0);
-  arrow_count_label->user_data("Set Arrow Count");
+  arrow_count_label->tooltip("Set Arrow Count");
 
   Fl_Input *arrow_count_input = new Fl_Input(0, 0, 0, 0);
   arrow_count_flex->fixed(arrow_count_input, input_w);
@@ -504,7 +504,7 @@ int main(int argc, char **argv)
   sword_damage_flex->fixed(sword_damage_check_button, button_w);
 
   Fl_Box *sword_damage_label = new Fl_Box(0, 0, 0, 0);
-  sword_damage_label->user_data("Set Sword Damage");
+  sword_damage_label->tooltip("Set Sword Damage");
 
   Fl_Input *sword_damage_input = new Fl_Input(0, 0, 0, 0);
   sword_damage_flex->fixed(sword_damage_input, input_w);
@@ -527,7 +527,7 @@ int main(int argc, char **argv)
   sword_cool_down_flex->fixed(sword_cool_down_check_button, button_w);
 
   Fl_Box *sword_cool_down_label = new Fl_Box(0, 0, 0, 0);
-  sword_cool_down_label->user_data("Set Sword Cooldown");
+  sword_cool_down_label->tooltip("Set Sword Cooldown");
 
   Fl_Input *sword_cool_down_input = new Fl_Input(0, 0, 0, 0);
   sword_cool_down_flex->fixed(sword_cool_down_input, input_w);
@@ -550,7 +550,7 @@ int main(int argc, char **argv)
   sword_speed_flex->fixed(sword_speed_check_button, button_w);
 
   Fl_Box *sword_speed_label = new Fl_Box(0, 0, 0, 0);
-  sword_speed_label->user_data("Set Sword Speed");
+  sword_speed_label->tooltip("Set Sword Speed");
 
   Fl_Input *sword_speed_input = new Fl_Input(0, 0, 0, 0);
   sword_speed_flex->fixed(sword_speed_input, input_w);
@@ -573,7 +573,7 @@ int main(int argc, char **argv)
   sword_distance_flex->fixed(sword_distance_check_button, button_w);
 
   Fl_Box *sword_distance_label = new Fl_Box(0, 0, 0, 0);
-  sword_distance_label->user_data("Set Sword Distance");
+  sword_distance_label->tooltip("Set Sword Distance");
 
   Fl_Input *sword_distance_input = new Fl_Input(0, 0, 0, 0);
   sword_distance_flex->fixed(sword_distance_input, input_w);

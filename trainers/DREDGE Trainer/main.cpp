@@ -36,13 +36,26 @@ void apply_callback(Fl_Widget *widget, void *data)
   {
     status = trainer->spawnItem(std::stoi(inputValue));
   }
+  else if (optionName == "AddFunds")
+  {
+    status = trainer->addFunds(std::stof(inputValue));
+  }
+  else if (optionName == "RepairAll")
+  {
+    status = trainer->repairAll();
+  }
+  else if (optionName == "ClearWeather")
+  {
+    status = trainer->clearWeather();
+  }
 
   // Finalize
   if (!status)
   {
     fl_alert(t("Failed to activate.", language));
   }
-  button->value() ? input->readonly(1) : input->readonly(0);
+  if (input)
+    button->value() ? input->readonly(1) : input->readonly(0);
 }
 
 // Callback function for toggles
@@ -70,6 +83,17 @@ void toggle_callback(Fl_Widget *widget, void *data)
   }
 
   // Apply the value using the Trainer class
+  if (optionName == "FreezeTime")
+  {
+    if (button->value())
+    {
+      status = trainer->freezeTime(true);
+    }
+    else
+    {
+      status = trainer->freezeTime(false);
+    }
+  }
 
   // Finalize
   if (!status)
@@ -77,7 +101,8 @@ void toggle_callback(Fl_Widget *widget, void *data)
     fl_alert(t("Failed to activate/deactivate.", language));
     button->value(0);
   }
-  button->value() ? input->readonly(1) : input->readonly(0);
+  if (input)
+    button->value() ? input->readonly(1) : input->readonly(0);
 }
 
 // ===========================================================================
@@ -95,7 +120,7 @@ int main(int argc, char **argv)
   Fl::set_color(FL_FREE_COLOR, 0x1c1c1c00);
   window->color(FL_FREE_COLOR);
   window->icon((char *)LoadIcon(GetModuleHandle(NULL), "APP_ICON"));
-  window->user_data("DREDGE Trainer");
+  window->tooltip("DREDGE Trainer");
 
   int left_margin = 20;
   int button_w = 50;
@@ -149,7 +174,7 @@ int main(int argc, char **argv)
 
   // Process Information
   Fl_Box *process_name = new Fl_Box(left_margin, lang_flex_height + imageSize.second + 10, imageSize.first, font_size);
-  process_name->user_data("Process Name:");
+  process_name->tooltip("Process Name:");
   process_name->align(FL_ALIGN_TOP_LEFT | FL_ALIGN_INSIDE);
 
   Fl_Box *process_exe = new Fl_Box(left_margin, lang_flex_height + imageSize.second + font_size + 20, imageSize.first, font_size);
@@ -160,7 +185,7 @@ int main(int argc, char **argv)
 
   Fl_Box *process_id_label = new Fl_Box(0, 0, 0, 0);
   process_id_label->align(FL_ALIGN_LEFT | FL_ALIGN_INSIDE);
-  process_id_label->user_data("Process ID:");
+  process_id_label->tooltip("Process ID:");
 
   Fl_Box *process_id = new Fl_Box(0, 0, 0, 0);
   process_id->align(FL_ALIGN_TOP_LEFT | FL_ALIGN_INSIDE);
@@ -190,14 +215,15 @@ int main(int argc, char **argv)
 
   Fl_Button *spawn_item_apply_button = new Fl_Button(0, 0, 0, 0);
   spawn_item_flex->fixed(spawn_item_apply_button, button_w);
+  spawn_item_apply_button->tooltip("Apply");
 
   Fl_Box *spawn_item_label = new Fl_Box(0, 0, 0, 0);
-  spawn_item_label->user_data("Spawn Item");
+  spawn_item_label->tooltip("Spawn Item");
 
   Fl_Input *spawn_item_input = new Fl_Input(0, 0, 0, 0);
   spawn_item_flex->fixed(spawn_item_input, input_w);
   spawn_item_input->type(FL_INT_INPUT);
-  set_input_values(spawn_item_input, "35", "0", "9999999");
+  set_input_values(spawn_item_input, "0", "0", "419");
 
   ApplyData *ad_spawn_item = new ApplyData{&trainer, "SpawnItem", spawn_item_apply_button, spawn_item_input};
   spawn_item_apply_button->callback(apply_callback, ad_spawn_item);
@@ -205,6 +231,87 @@ int main(int argc, char **argv)
   spawn_item_flex->end();
   options1_flex->fixed(spawn_item_flex, option_h);
 
+  // ------------------------------------------------------------------
+  // Option 2: Add funds (Apply)
+  // ------------------------------------------------------------------
+  Fl_Flex *funds_flex = new Fl_Flex(0, 0, 0, 0, Fl_Flex::HORIZONTAL);
+  funds_flex->gap(option_gap);
+
+  Fl_Button *funds_apply_button = new Fl_Button(0, 0, 0, 0);
+  funds_flex->fixed(funds_apply_button, button_w);
+  funds_apply_button->tooltip("Apply");
+
+  Fl_Box *funds_label = new Fl_Box(0, 0, 0, 0);
+  funds_label->tooltip("Add Funds");
+
+  Fl_Input *funds_input = new Fl_Input(0, 0, 0, 0);
+  funds_flex->fixed(funds_input, input_w);
+  funds_input->type(FL_INT_INPUT);
+  set_input_values(funds_input, "999999", "-999999999", "999999999");
+
+  ApplyData *data_funds = new ApplyData{&trainer, "AddFunds", funds_apply_button, funds_input};
+  funds_apply_button->callback(apply_callback, data_funds);
+
+  funds_flex->end();
+  options1_flex->fixed(funds_flex, option_h);
+
+  // ------------------------------------------------------------------
+  // Option 3: repair_all (Apply)
+  // ------------------------------------------------------------------
+  Fl_Flex *repair_all_flex = new Fl_Flex(0, 0, 0, 0, Fl_Flex::HORIZONTAL);
+  repair_all_flex->gap(option_gap);
+
+  Fl_Button *repair_all_apply_button = new Fl_Button(0, 0, 0, 0);
+  repair_all_flex->fixed(repair_all_apply_button, button_w);
+  repair_all_apply_button->tooltip("Apply");
+
+  Fl_Box *repair_all_label = new Fl_Box(0, 0, 0, 0);
+  repair_all_label->tooltip("Repair All");
+
+  ApplyData *data_repair_all = new ApplyData{&trainer, "RepairAll", repair_all_apply_button, nullptr};
+  repair_all_apply_button->callback(apply_callback, data_repair_all);
+
+  repair_all_flex->end();
+  options1_flex->fixed(repair_all_flex, option_h);
+
+  // ------------------------------------------------------------------
+  // Option 4: clear_weather (Apply)
+  // ------------------------------------------------------------------
+  Fl_Flex *clear_weather_flex = new Fl_Flex(0, 0, 0, 0, Fl_Flex::HORIZONTAL);
+  clear_weather_flex->gap(option_gap);
+
+  Fl_Button *clear_weather_apply_button = new Fl_Button(0, 0, 0, 0);
+  clear_weather_flex->fixed(clear_weather_apply_button, button_w);
+  clear_weather_apply_button->tooltip("Apply");
+
+  Fl_Box *clear_weather_label = new Fl_Box(0, 0, 0, 0);
+  clear_weather_label->tooltip("Clear Weather");
+
+  ApplyData *data_clear_weather = new ApplyData{&trainer, "ClearWeather", clear_weather_apply_button, nullptr};
+  clear_weather_apply_button->callback(apply_callback, data_clear_weather);
+
+  clear_weather_flex->end();
+  options1_flex->fixed(clear_weather_flex, option_h);
+
+  // ------------------------------------------------------------------
+  // Option 5: freeze_time (Toggle)
+  // ------------------------------------------------------------------
+  Fl_Flex *freeze_time_flex = new Fl_Flex(0, 0, 0, 0, Fl_Flex::HORIZONTAL);
+  freeze_time_flex->gap(option_gap);
+
+  Fl_Check_Button *freeze_time_check_button = new Fl_Check_Button(0, 0, 0, 0);
+  freeze_time_flex->fixed(freeze_time_check_button, button_w);
+
+  Fl_Box *freeze_time_label = new Fl_Box(0, 0, 0, 0);
+  freeze_time_label->tooltip("Freeze Time");
+
+  ToggleData *data_freeze_time = new ToggleData{&trainer, "FreezeTime", freeze_time_check_button, nullptr};
+  freeze_time_check_button->callback(toggle_callback, data_freeze_time);
+
+  freeze_time_flex->end();
+  options1_flex->fixed(freeze_time_flex, option_h);
+
+  // ------------------------------------------------------------------
   Fl_Box *spacerBottom = new Fl_Box(0, 0, 0, 0);
   options1_flex->end();
   change_language(window, language);

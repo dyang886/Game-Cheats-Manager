@@ -193,7 +193,7 @@ int main(int argc, char **argv)
   Fl::set_color(FL_FREE_COLOR, 0x1c1c1c00);
   window->color(FL_FREE_COLOR);
   window->icon((char *)LoadIcon(GetModuleHandle(NULL), "APP_ICON"));
-  window->user_data("Trainer Name");
+  window->tooltip("Trainer Name");
 
   int left_margin = 20;
   int button_w = 50;
@@ -247,7 +247,7 @@ int main(int argc, char **argv)
 
   // Process Information
   Fl_Box *process_name = new Fl_Box(left_margin, lang_flex_height + imageSize.second + 10, imageSize.first, font_size);
-  process_name->user_data("Process Name:");
+  process_name->tooltip("Process Name:");
   process_name->align(FL_ALIGN_TOP_LEFT | FL_ALIGN_INSIDE);
 
   Fl_Box *process_exe = new Fl_Box(left_margin, lang_flex_height + imageSize.second + font_size + 20, imageSize.first, font_size);
@@ -258,7 +258,7 @@ int main(int argc, char **argv)
 
   Fl_Box *process_id_label = new Fl_Box(0, 0, 0, 0);
   process_id_label->align(FL_ALIGN_LEFT | FL_ALIGN_INSIDE);
-  process_id_label->user_data("Process ID:");
+  process_id_label->tooltip("Process ID:");
 
   Fl_Box *process_id = new Fl_Box(0, 0, 0, 0);
   process_id->align(FL_ALIGN_TOP_LEFT | FL_ALIGN_INSIDE);
@@ -290,7 +290,7 @@ int main(int argc, char **argv)
   life_flex->fixed(life_check_button, button_w);
 
   Fl_Box *life_label = new Fl_Box(0, 0, 0, 0);
-  life_label->user_data("Set Life Count");
+  life_label->tooltip("Set Life Count");
 
   Fl_Input *life_input = new Fl_Input(0, 0, 0, 0);
   life_flex->fixed(life_input, input_w);
@@ -313,7 +313,7 @@ int main(int argc, char **argv)
   shield_flex->fixed(shield_check_button, button_w);
 
   Fl_Box *shield_label = new Fl_Box(0, 0, 0, 0);
-  shield_label->user_data("Set Shield Level");
+  shield_label->tooltip("Set Shield Level");
 
   Fl_Input *shield_input = new Fl_Input(0, 0, 0, 0);
   shield_flex->fixed(shield_input, input_w);
@@ -336,7 +336,7 @@ int main(int argc, char **argv)
   nuke_flex->fixed(nuke_check_button, button_w);
 
   Fl_Box *nuke_label = new Fl_Box(0, 0, 0, 0);
-  nuke_label->user_data("Set Nuke Amount");
+  nuke_label->tooltip("Set Nuke Amount");
 
   Fl_Input *nuke_input = new Fl_Input(0, 0, 0, 0);
   nuke_flex->fixed(nuke_input, input_w);
@@ -359,7 +359,7 @@ int main(int argc, char **argv)
   defense_orbs_flex->fixed(defense_orbs_check_button, button_w);
 
   Fl_Box *defense_orbs_label = new Fl_Box(0, 0, 0, 0);
-  defense_orbs_label->user_data("Set Defense Orbs Level");
+  defense_orbs_label->tooltip("Set Defense Orbs Level");
 
   Fl_Input *defense_orbs_input = new Fl_Input(0, 0, 0, 0);
   defense_orbs_flex->fixed(defense_orbs_input, input_w);
@@ -382,7 +382,7 @@ int main(int argc, char **argv)
   homing_missile_flex->fixed(homing_missile_check_button, button_w);
 
   Fl_Box *homing_missile_label = new Fl_Box(0, 0, 0, 0);
-  homing_missile_label->user_data("Set Homing Missile Level");
+  homing_missile_label->tooltip("Set Homing Missile Level");
 
   Fl_Input *homing_missile_input = new Fl_Input(0, 0, 0, 0);
   homing_missile_flex->fixed(homing_missile_input, input_w);
@@ -405,7 +405,7 @@ int main(int argc, char **argv)
   laser_flex->fixed(laser_check_button, button_w);
 
   Fl_Box *laser_label = new Fl_Box(0, 0, 0, 0);
-  laser_label->user_data("Set Laser Level");
+  laser_label->tooltip("Set Laser Level");
 
   Fl_Input *laser_input = new Fl_Input(0, 0, 0, 0);
   laser_flex->fixed(laser_input, input_w);
@@ -428,7 +428,7 @@ int main(int argc, char **argv)
   rockets_flex->fixed(rockets_check_button, button_w);
 
   Fl_Box *rockets_label = new Fl_Box(0, 0, 0, 0);
-  rockets_label->user_data("Set Rockets Level");
+  rockets_label->tooltip("Set Rockets Level");
 
   Fl_Input *rockets_input = new Fl_Input(0, 0, 0, 0);
   rockets_flex->fixed(rockets_input, input_w);
@@ -451,7 +451,7 @@ int main(int argc, char **argv)
   flak_cannon_flex->fixed(flak_cannon_check_button, button_w);
 
   Fl_Box *flak_cannon_label = new Fl_Box(0, 0, 0, 0);
-  flak_cannon_label->user_data("Set Flak Cannon Level");
+  flak_cannon_label->tooltip("Set Flak Cannon Level");
 
   Fl_Input *flak_cannon_input = new Fl_Input(0, 0, 0, 0);
   flak_cannon_flex->fixed(flak_cannon_input, input_w);
@@ -474,7 +474,7 @@ int main(int argc, char **argv)
   thunder_strike_flex->fixed(thunder_strike_check_button, button_w);
 
   Fl_Box *thunder_strike_label = new Fl_Box(0, 0, 0, 0);
-  thunder_strike_label->user_data("Set Thunder Strike Level");
+  thunder_strike_label->tooltip("Set Thunder Strike Level");
 
   Fl_Input *thunder_strike_input = new Fl_Input(0, 0, 0, 0);
   thunder_strike_flex->fixed(thunder_strike_input, input_w);

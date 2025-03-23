@@ -896,22 +896,6 @@ public:
   /** \defgroup  fl_clipboard  Selection & Clipboard functions
         FLTK global copy/cut/paste functions declared in <FL/Fl.H>
    @{ */
-  // cut/paste:
-  /**
-  Copies the data pointed to by \p stuff to the selection buffer
-  (\p destination is 0), the clipboard (\p destination is 1), or
-  both (\p destination is 2). Copying to both is only relevant on X11,
-  on other platforms it maps to the clipboard (1).
-  \p len is the number of relevant bytes in \p stuff.
-  \p type is always Fl::clipboard_plain_text.
-  The selection buffer is used for
-  middle-mouse pastes and for drag-and-drop selections. The
-  clipboard is used for traditional copy/cut/paste operations.
-
-   \note This function is, at present, intended only to copy UTF-8 encoded textual data.
-   To copy graphical data, use the Fl_Copy_Surface class. The \p type argument may allow
-   in the future to copy other kinds of data.
-  */
 
   /**
     Copies data to the selection buffer, the clipboard, or both.
@@ -927,7 +911,7 @@ public:
     (\p destination = 0) is mapped to the clipboard, i.e. on platforms other than X11
     all \p destinations are equivalent and the data is always copied to the clipboard.
 
-    \note Please see Fl::section_to_clipboard() to enable duplication of the
+    \note Please see Fl::selection_to_clipboard() to enable duplication of the
       selection buffer to the clipboard on X11, i.e. if \p destination = 0
       (selection buffer) \b and Fl::selection_to_clipboard() is enabled, then
       the data is copied to both the selection buffer and the clipboard.

@@ -35,10 +35,9 @@ struct Fl_Menu_Item;
   \image html  tabs.png
   \image latex tabs.png "Fl_Tabs" width=8cm
 
-  Clicking the tab makes a child visible() by calling
-  show() on it, and all other children are made invisible
-  by calling hide() on them. Usually the children are Fl_Group widgets
-  containing several widgets themselves.
+  Clicking the tab makes a child visible() by calling show() on it, and all
+  other children are made invisible by calling hide() on them. Usually the
+  children are Fl_Group widgets containing several widgets themselves.
 
   Each child makes a card, and its label() is printed
   on the card tab, including the label font and style.  The
@@ -54,6 +53,17 @@ struct Fl_Menu_Item;
   gap is larger. It is easiest to lay this out in FLUID, using the
   FLUID browser to select each child group and resize them until
   the tabs look the way you want them to.
+
+  \b Note: The widgets contained in each child should leave some clear space
+  (five pixels as of FLTK 1.4.x) at the top or bottom of the group (where the
+  tabs are displayed). Otherwise drawing the children may interfere with the
+  selection border between the tabs and the children. This is particularly
+  important if the child group is an Fl_Scroll widget: either the Fl_Scroll
+  widget must be inset by five pixels relative to other children or it can
+  be wrapped inside another Fl_Group and inset by five pixels within this
+  group so the contents of the Fl_Scroll widget are kept away from the tabs
+  by this amount.
+  <!-- See GitHub issue #1175. -->
 
   The background area behind and to the right of the tabs is
   "transparent", exposing the background detail of the parent. The
@@ -185,12 +195,11 @@ struct Fl_Menu_Item;
 
   - Fl_Tabs::OVERFLOW_COMPRESS: proportionally compress the tabs to the left and right
     of the selected tab until they all fit within the widget.
-  - Fl_Tabs::OVERFLOW_CLIP: clips any tabs that extend beyond the right edge of the
+  - Fl_Tabs::OVERFLOW_CLIP: clip any tabs that extend beyond the right edge of the
     Fl_Tabs widget, making some tabs unreachable.
-  - Fl_Tabs::OVERFLOW_PULLDOWN: doesn't compress the tabs but instead generates a
-    pulldown menu at the right end of the tabs area, displaying
-    all available tabs.
-  - Fl_Tabs::OVERFLOW_DRAG: maintains the tabs' original sizes, allowing horizontal
+  - Fl_Tabs::OVERFLOW_PULLDOWN: don't compress the tabs but instead generate a
+    pulldown menu at the right end of the tabs area, displaying all available tabs.
+  - Fl_Tabs::OVERFLOW_DRAG: maintain the tabs' original sizes, allowing horizontal
     dragging of the tabs area using the mouse, a horizontal mouse wheel,
     or the horizontal scrolling gesture on touchpads.
 

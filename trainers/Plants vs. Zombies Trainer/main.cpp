@@ -155,7 +155,7 @@ int main(int argc, char **argv)
   Fl::set_color(FL_FREE_COLOR, 0x1c1c1c00);
   window->color(FL_FREE_COLOR);
   window->icon((char *)LoadIcon(GetModuleHandle(NULL), "APP_ICON"));
-  window->user_data("Plants vs. Zombies Trainer");
+  window->tooltip("Plants vs. Zombies Trainer");
 
   int left_margin = 20;
   int button_w = 50;
@@ -209,7 +209,7 @@ int main(int argc, char **argv)
 
   // Process Information
   Fl_Box *process_name = new Fl_Box(left_margin, lang_flex_height + imageSize.second + 10, imageSize.first, font_size);
-  process_name->user_data("Process Name:");
+  process_name->tooltip("Process Name:");
   process_name->align(FL_ALIGN_TOP_LEFT | FL_ALIGN_INSIDE);
 
   Fl_Box *process_exe = new Fl_Box(left_margin, lang_flex_height + imageSize.second + font_size + 20, imageSize.first, font_size);
@@ -220,7 +220,7 @@ int main(int argc, char **argv)
 
   Fl_Box *process_id_label = new Fl_Box(0, 0, 0, 0);
   process_id_label->align(FL_ALIGN_LEFT | FL_ALIGN_INSIDE);
-  process_id_label->user_data("Process ID:");
+  process_id_label->tooltip("Process ID:");
 
   Fl_Box *process_id = new Fl_Box(0, 0, 0, 0);
   process_id->align(FL_ALIGN_TOP_LEFT | FL_ALIGN_INSIDE);
@@ -252,7 +252,7 @@ int main(int argc, char **argv)
   coin_flex->fixed(coin_check_button, button_w);
 
   Fl_Box *coin_label = new Fl_Box(0, 0, 0, 0);
-  coin_label->user_data("Add Coins");
+  coin_label->tooltip("Add Coins");
 
   Fl_Input *coin_input = new Fl_Input(0, 0, 0, 0);
   coin_flex->fixed(coin_input, input_w);
@@ -275,7 +275,7 @@ int main(int argc, char **argv)
   sun_flex->fixed(sun_check_button, button_w);
 
   Fl_Box *sun_label = new Fl_Box(0, 0, 0, 0);
-  sun_label->user_data("Add Sun");
+  sun_label->tooltip("Add Sun");
 
   Fl_Input *sun_input = new Fl_Input(0, 0, 0, 0);
   sun_flex->fixed(sun_input, input_w);
@@ -298,7 +298,7 @@ int main(int argc, char **argv)
   fertilizer_flex->fixed(fertilizer_check_button, button_w);
 
   Fl_Box *fertilizer_label = new Fl_Box(0, 0, 0, 0);
-  fertilizer_label->user_data("Set Fertilizer");
+  fertilizer_label->tooltip("Set Fertilizer");
 
   Fl_Input *fertilizer_input = new Fl_Input(0, 0, 0, 0);
   fertilizer_flex->fixed(fertilizer_input, input_w);
@@ -321,7 +321,7 @@ int main(int argc, char **argv)
   bug_spray_flex->fixed(bug_spray_check_button, button_w);
 
   Fl_Box *bug_spray_label = new Fl_Box(0, 0, 0, 0);
-  bug_spray_label->user_data("Set Bug Spray");
+  bug_spray_label->tooltip("Set Bug Spray");
 
   Fl_Input *bug_spray_input = new Fl_Input(0, 0, 0, 0);
   bug_spray_flex->fixed(bug_spray_input, input_w);
@@ -344,7 +344,7 @@ int main(int argc, char **argv)
   chocolate_flex->fixed(chocolate_check_button, button_w);
 
   Fl_Box *chocolate_label = new Fl_Box(0, 0, 0, 0);
-  chocolate_label->user_data("Set Chocolate");
+  chocolate_label->tooltip("Set Chocolate");
 
   Fl_Input *chocolate_input = new Fl_Input(0, 0, 0, 0);
   chocolate_flex->fixed(chocolate_input, input_w);
@@ -367,7 +367,7 @@ int main(int argc, char **argv)
   tree_food_flex->fixed(tree_food_check_button, button_w);
 
   Fl_Box *tree_food_label = new Fl_Box(0, 0, 0, 0);
-  tree_food_label->user_data("Set Tree Food");
+  tree_food_label->tooltip("Set Tree Food");
 
   Fl_Input *tree_food_input = new Fl_Input(0, 0, 0, 0);
   tree_food_flex->fixed(tree_food_input, input_w);

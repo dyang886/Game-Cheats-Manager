@@ -122,7 +122,7 @@ int main(int argc, char **argv)
     Fl::set_color(FL_FREE_COLOR, 0x1c1c1c00);
     window->color(FL_FREE_COLOR);
     window->icon((char *)LoadIcon(GetModuleHandle(NULL), "APP_ICON"));
-    window->user_data("Headbangers: Rhythm Royale Trainer");
+    window->tooltip("Headbangers: Rhythm Royale Trainer");
 
     int left_margin = 20;
     int button_w = 50;
@@ -176,7 +176,7 @@ int main(int argc, char **argv)
 
     // Process Information
     Fl_Box *process_name = new Fl_Box(left_margin, lang_flex_height + imageSize.second + 10, imageSize.first, font_size);
-    process_name->user_data("Process Name:");
+    process_name->tooltip("Process Name:");
     process_name->align(FL_ALIGN_TOP_LEFT | FL_ALIGN_INSIDE);
 
     Fl_Box *process_exe = new Fl_Box(left_margin, lang_flex_height + imageSize.second + font_size + 20, imageSize.first, font_size);
@@ -187,7 +187,7 @@ int main(int argc, char **argv)
 
     Fl_Box *process_id_label = new Fl_Box(0, 0, 0, 0);
     process_id_label->align(FL_ALIGN_LEFT | FL_ALIGN_INSIDE);
-    process_id_label->user_data("Process ID:");
+    process_id_label->tooltip("Process ID:");
 
     Fl_Box *process_id = new Fl_Box(0, 0, 0, 0);
     process_id->align(FL_ALIGN_TOP_LEFT | FL_ALIGN_INSIDE);
@@ -219,7 +219,7 @@ int main(int argc, char **argv)
     bread_flex->fixed(bread_check_button, button_w);
 
     Fl_Box *bread_label = new Fl_Box(0, 0, 0, 0);
-    bread_label->user_data("Set Bread");
+    bread_label->tooltip("Set Bread");
 
     Fl_Input *bread_input = new Fl_Input(0, 0, 0, 0);
     bread_flex->fixed(bread_input, input_w);
@@ -242,7 +242,7 @@ int main(int argc, char **argv)
     exp_flex->fixed(exp_check_button, button_w);
 
     Fl_Box *exp_label = new Fl_Box(0, 0, 0, 0);
-    exp_label->user_data("Set Season Pass XP");
+    exp_label->tooltip("Set Season Pass XP");
 
     Fl_Input *exp_input = new Fl_Input(0, 0, 0, 0);
     exp_flex->fixed(exp_input, input_w);
@@ -265,7 +265,7 @@ int main(int argc, char **argv)
     wins_flex->fixed(wins_check_button, button_w);
 
     Fl_Box *wins_label = new Fl_Box(0, 0, 0, 0);
-    wins_label->user_data("Set Number of Wins");
+    wins_label->tooltip("Set Number of Wins");
 
     Fl_Input *wins_input = new Fl_Input(0, 0, 0, 0);
     wins_flex->fixed(wins_input, input_w);

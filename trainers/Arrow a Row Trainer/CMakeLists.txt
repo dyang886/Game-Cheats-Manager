@@ -14,3 +14,9 @@ if (WIN32)
     target_sources(${GAME_NAME} PRIVATE ${RESOURCE_FILE})
     set_source_files_properties(${RESOURCE_FILE} PROPERTIES LANGUAGE RC)
 endif()
+
+# Move trainer executable to build/bin/
+add_custom_command(TARGET ${GAME_NAME} POST_BUILD
+    COMMAND ${CMAKE_COMMAND} -E copy_if_different "$<TARGET_FILE:${GAME_NAME}>" "${CMAKE_BINARY_DIR}/bin/${TRAINER_NAME}.exe"
+    COMMENT "Moving ${TRAINER_NAME}.exe to ${CMAKE_BINARY_DIR}/bin"
+)
