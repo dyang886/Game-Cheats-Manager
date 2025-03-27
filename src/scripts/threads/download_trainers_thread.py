@@ -185,7 +185,7 @@ class DownloadTrainersThread(DownloadBaseThread):
 
                 domain = urlparse(targetUrl).netloc
                 if domain == "flingtrainer.com":
-                    page_content = self.get_webpage_content(targetUrl, "FLiNG Trainer")
+                    page_content = self.get_webpage_content(targetUrl, "FLiNG Trainer", True)
                     trainerPage = BeautifulSoup(page_content, 'html.parser')
                     targetObj = trainerPage.find(target="_self")
                     if targetObj:
@@ -193,7 +193,7 @@ class DownloadTrainersThread(DownloadBaseThread):
                     else:
                         raise Exception(tr("Internet request failed."))
 
-                trainerTemp = self.request_download(targetUrl, DOWNLOAD_TEMP_DIR)
+                trainerTemp = self.request_download(targetUrl, DOWNLOAD_TEMP_DIR, True)
 
             except Exception as e:
                 self.message.emit(tr("An error occurred while downloading trainer: ") + str(e), "failure")
@@ -233,7 +233,8 @@ class DownloadTrainersThread(DownloadBaseThread):
             for filename in os.listdir(DOWNLOAD_TEMP_DIR):
                 if "trainer" in filename.lower() and filename.endswith(".exe"):
                     extractedTrainerNames.append(filename)
-                elif "trainer" not in filename.lower() and filename != os.path.basename(trainerTemp):
+                # Count anti-cheat files
+                elif ("trainer" not in filename.lower() and filename != os.path.basename(trainerTemp)) and filename.lower() != "info.txt":
                     cnt += 1
 
             # Warn user if anti-cheat files found
@@ -442,7 +443,7 @@ class DownloadTrainersThread(DownloadBaseThread):
                 return False
 
         # Download trainer archive (either MediaFire or OneDrive)
-        page_content = self.get_webpage_content(selected_trainer["url"], "小幸修改器官方网站")
+        page_content = self.get_webpage_content(selected_trainer["url"], "小幸修改器官方网站", False)
         trainerPage = BeautifulSoup(page_content, 'html.parser')
         mediaFireTag = trainerPage.find('a', href=lambda href: href and "www.mediafire.com" in href)
         oneDriveTag = trainerPage.find('a', href=lambda href: href and "1drv.ms" in href)
@@ -457,11 +458,11 @@ class DownloadTrainersThread(DownloadBaseThread):
         try:
             # Attempt MediaFire download
             if mediaFireTag:
-                mediaFirePage = self.get_webpage_content(mediaFireTag.get("href"), None, True)
+                mediaFirePage = self.get_webpage_content(mediaFireTag.get("href"), None, True, True)
                 mediaFireHTML = BeautifulSoup(mediaFirePage, "html.parser")
                 mediaFireDownloadButton = mediaFireHTML.find(id="downloadButton")
                 if mediaFireDownloadButton:
-                    trainerTemp = self.request_download(mediaFireDownloadButton.get("href"), DOWNLOAD_TEMP_DIR, True)
+                    trainerTemp = self.request_download(mediaFireDownloadButton.get("href"), DOWNLOAD_TEMP_DIR, True, True)
                 else:
                     mediaFire_failed = True
             else:
@@ -473,7 +474,7 @@ class DownloadTrainersThread(DownloadBaseThread):
                 req = scraper.get(oneDriveTag.get("href"), headers=self.headers)
                 oneDriveLink = self.get_onedrive_download_url(req.url)
                 if oneDriveLink:
-                    trainerTemp = self.request_download(oneDriveLink, DOWNLOAD_TEMP_DIR, True)
+                    trainerTemp = self.request_download(oneDriveLink, DOWNLOAD_TEMP_DIR, True, True)
                 else:
                     oneDrive_failed = True
             elif not oneDriveTag:

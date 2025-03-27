@@ -3,6 +3,8 @@ import os
 import re
 import string
 from urllib.parse import urlparse, unquote
+from urllib3.exceptions import InsecureRequestWarning
+import warnings
 
 import cloudscraper
 from fuzzywuzzy import process
@@ -12,6 +14,8 @@ import zhon
 
 from config import *
 from widgets.browser_dialog import BrowserDialog
+
+warnings.simplefilter("ignore", InsecureRequestWarning)
 
 
 class DownloadBaseThread(QThread):
@@ -37,17 +41,17 @@ class DownloadBaseThread(QThread):
         self.downloadFile.connect(self.browser_dialog.handle_download)
         self.browser_dialog.download_completed.connect(self.handle_download_completed)
 
-    def get_webpage_content(self, url, target_text, use_cloudScraper=False):
+    def get_webpage_content(self, url, target_text, verify, use_cloudScraper=False):
         if not self.is_internet_connected():
             return ""
 
         try:
             if use_cloudScraper:
                 scraper = cloudscraper.create_scraper()
-                req = scraper.get(url, headers=self.headers)
+                req = scraper.get(url, headers=self.headers, verify=verify)
                 req.raise_for_status()
             else:
-                req = requests.get(url, headers=self.headers)
+                req = requests.get(url, headers=self.headers, verify=verify)
         except Exception as e:
             print(f"Error requesting {url}: {str(e)}")
             return ""
@@ -66,14 +70,14 @@ class DownloadBaseThread(QThread):
         if self.loop.isRunning():
             self.loop.quit()
 
-    def request_download(self, url, download_path, use_cloudScraper=False):
+    def request_download(self, url, download_path, verify, use_cloudScraper=False):
         try:
             if use_cloudScraper:
                 scraper = cloudscraper.create_scraper()
-                req = scraper.get(url, headers=self.headers)
+                req = scraper.get(url, headers=self.headers, verify=verify)
                 req.raise_for_status()
             else:
-                req = requests.get(url, headers=self.headers)
+                req = requests.get(url, headers=self.headers, verify=verify)
         except Exception as e:
             print(f"Error requesting {url}: {str(e)}")
             return ""
@@ -89,7 +93,7 @@ class DownloadBaseThread(QThread):
             self.downloaded_file_path = file_path
 
         return self.downloaded_file_path
-    
+
     def find_download_fname(self, response):
         content_disposition = response.headers.get('content-disposition')
         if content_disposition:

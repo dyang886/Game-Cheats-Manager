@@ -82,7 +82,7 @@ class FetchFlingSite(DownloadBaseThread):
 
         self.message.emit(statusWidgetName, update_message1)
         url = "https://archive.flingtrainer.com/"
-        page_content = self.get_webpage_content(url, "FLiNG Trainers Archive")
+        page_content = self.get_webpage_content(url, "FLiNG Trainers Archive", True)
         if not page_content:
             self.update.emit(statusWidgetName, update_failed1, "error")
             time.sleep(2)
@@ -91,7 +91,7 @@ class FetchFlingSite(DownloadBaseThread):
 
         self.update.emit(statusWidgetName, update_message2, "load")
         url = "https://flingtrainer.com/all-trainers-a-z/"
-        page_content = self.get_webpage_content(url, "All Trainers (A-Z)")
+        page_content = self.get_webpage_content(url, "All Trainers (A-Z)", True)
         if not page_content:
             self.update.emit(statusWidgetName, update_failed2, "error")
             time.sleep(2)
@@ -119,7 +119,7 @@ class FetchXiaoXingSite(DownloadBaseThread):
         page_number = 1
         while True:
             url = f"https://www.xiaoxingjie.com/page/{page_number}"
-            page_content = self.get_webpage_content(url, "小幸修改器官方网站")
+            page_content = self.get_webpage_content(url, "小幸修改器官方网站", False)
 
             if not page_content:
                 self.update.emit(statusWidgetName, update_failed, "error")

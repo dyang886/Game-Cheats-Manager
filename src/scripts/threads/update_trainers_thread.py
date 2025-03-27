@@ -111,7 +111,7 @@ class UpdateFlingTrainers(DownloadBaseThread):
             self.browser_condition.wait_for(lambda: True)
 
             # Trigger the browser dialog and wait for its completion
-            content = self.get_webpage_content(url, target_text)
+            content = self.get_webpage_content(url, target_text, True)
 
             self.browser_condition.notify_all()
 

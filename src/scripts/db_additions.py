@@ -503,6 +503,10 @@ additions = [
         "en_name": "Age of Empires IV",
         "keyw": "帝国时代4",
     },
+    {
+        "en_name": "Sid Meier’s Civilization VI",
+        "keyw": "文明6",
+    },
 
     # XiaoXing
     {
