@@ -115,7 +115,7 @@ class FetchXiaoXingSite(DownloadBaseThread):
         update_failed = tr("Update from XiaoXing failed")
 
         self.message.emit(statusWidgetName, update_message)
-        self.save_html_content("", "xiaoxing.html")
+        clearXiaoXingHtml = False
         page_number = 1
         while True:
             url = f"https://www.xiaoxingjie.com/page/{page_number}"
@@ -123,10 +123,16 @@ class FetchXiaoXingSite(DownloadBaseThread):
 
             if not page_content:
                 self.update.emit(statusWidgetName, update_failed, "error")
+                time.sleep(2)
                 break
+
+            if not clearXiaoXingHtml:
+                self.save_html_content("", "xiaoxing.html")
+                clearXiaoXingHtml = True
 
             self.save_html_content(page_content, "xiaoxing.html", False)
             if not self.has_next_page(page_content):
+                time.sleep(2)
                 break
 
             page_number += 1

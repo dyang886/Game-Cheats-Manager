@@ -184,7 +184,6 @@ unzip_path = resource_path("dependency/7z/7z.exe")
 binmay_path = resource_path("dependency/binmay.exe")
 emptyMidi_path = resource_path("dependency/TrainerBGM.mid")
 elevator_path = resource_path("dependency/Elevate.exe")
-search_path = resource_path("assets/search.png")
 
 language_options = {
     "English (US)": "en_US",

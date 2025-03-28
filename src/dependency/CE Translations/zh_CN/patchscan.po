@@ -1,6 +1,15 @@
-#
 msgid ""
 msgstr ""
+"Project-Id-Version: \n"
+"POT-Creation-Date: \n"
+"PO-Revision-Date: \n"
+"Last-Translator: gpt-po v1.2.3\n"
+"Language-Team: \n"
+"Language: new\n"
+"MIME-Version: 1.0\n"
+"Content-Type: text/plain; charset=UTF-8\n"
+"Content-Transfer-Encoding: 8bit\n"
+"X-Generator: Poedit 3.5\n"
 
 #: patchscan-nave
 msgid "Not a valid executable"
@@ -8,7 +17,7 @@ msgstr "不是有效的可执行文件"
 
 #: patchscan-navwe
 msgid "Not a valid windows executable"
-msgstr "不是有效的 windows 可执行文件"
+msgstr "不是有效的 Windows 可执行文件"
 
 #: patchscan-ttomicns
 msgid "This type of module is currently not supported"
@@ -16,21 +25,19 @@ msgstr "当前不支持此类型的模块"
 
 #: patchscan-ce
 msgid "Compare error. "
-msgstr "比较错误"
+msgstr "比较错误。"
 
 #: patchscan-ml
 msgid "Module List"
 msgstr "模块列表"
 
 #: patchscan-stmtsfp
-msgid ""
-"Select the modules to scan for patches. Hold shift/ctrl to select multiple "
-"modules"
-msgstr "选择要扫描修补程序的模块。按住 shift/ctrl 键可选择多个模块"
+msgid "Select the modules to scan for patches. Hold shift/ctrl to select multiple modules"
+msgstr "选择要扫描补丁的模块。按住 Shift/ctrl 选择多个模块"
 
 #: patchscan-ok
 msgid "  OK  "
-msgstr "好的"
+msgstr "  确定  "
 
 #: patchscan-cancel
 msgid "Cancel"
@@ -38,15 +45,15 @@ msgstr "取消"
 
 #: patchscan-scanning
 msgid "Scanning: %s"
-msgstr "正在扫描：%s"
+msgstr "扫描中：%s"
 
 #: patchscan-ei
 msgid "Error in "
-msgstr "错误"
+msgstr "错误在"
 
 #: patchscan-pl
 msgid "Patch list"
-msgstr "修补程序列表"
+msgstr "补丁列表"
 
 #: patchscan-address
 msgid "Address"
@@ -54,20 +61,20 @@ msgstr "地址"
 
 #: patchscan-original
 msgid "Original"
-msgstr "原件"
+msgstr "原始"
 
 #: patchscan-patched
 msgid "Patched"
-msgstr "修补"
+msgstr "已修补"
 
 #: patchscan-rwo
 msgid "Restore with original"
-msgstr "用原稿还原"
+msgstr "恢复为原始"
 
 #: patchscan-rp
 msgid "Reapply patch"
-msgstr "重新应用修补程序"
+msgstr "重新应用补丁"
 
 #: patchscan-sfp
 msgid "Scan for patches"
-msgstr "扫描修补程序"
+msgstr "扫描补丁"

@@ -1,23 +1,32 @@
-#
 msgid ""
 msgstr ""
+"Project-Id-Version: \n"
+"POT-Creation-Date: \n"
+"PO-Revision-Date: \n"
+"Last-Translator: gpt-po v1.2.3\n"
+"Language-Team: \n"
+"Language: new\n"
+"MIME-Version: 1.0\n"
+"Content-Type: text/plain; charset=utf-8\n"
+"Content-Transfer-Encoding: 8bit\n"
+"X-Generator: Poedit 3.5\n"
 
 #: SS-OaPF
 msgid "Open a process first"
-msgstr "先打开进程"
+msgstr "首先打开一个进程"
 
 #: SS-CESF
 msgid "Cheat Engine Scan files"
-msgstr "作弊引擎扫描文件"
+msgstr "Cheat Engine 扫描文件"
 
 #: SS-OaPFDaS
 msgid "Open a process first and do a scan"
-msgstr "先打开进程并进行扫描"
+msgstr "首先打开一个进程并进行扫描"
 
 #: SS-SSS
 msgid "Save scan session"
-msgstr "保存扫描"
+msgstr "保存扫描会话"
 
 #: SS-LSS
 msgid "Load scan session"
-msgstr "加载扫描"
+msgstr "加载扫描会话"
