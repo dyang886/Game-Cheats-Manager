@@ -3,7 +3,10 @@ using System.IO;
 using UnityEngine.Localization.Settings;
 using UnityEngine.Localization;
 using System;
+using System.Reflection;
+using System.Runtime.InteropServices;
 using System.Collections.Generic;
+using System.Text;
 
 public class MainThreadDispatcher : MonoBehaviour
 {
@@ -43,13 +46,37 @@ public class MainThreadDispatcher : MonoBehaviour
         }
     }
 }
-
 public static class GCMInjection
 {
+    [DllImport("MonoBridge.dll")]
+    private static extern void SendData(string message);
+
+    private static void Log(string message) {
+        string formattedMessage = "[GCMInjection] " + message;
+        SendData(formattedMessage);
+    }
+
     public static void Initialize()
     {
         GameObject go = new GameObject("MainThreadDispatcher");
         go.AddComponent<MainThreadDispatcher>();
+    }
+
+    public static void GodMode(bool enable)
+    {
+        MainThreadDispatcher.Enqueue(() =>
+        {
+            Player player = GameManager.Instance.Player;
+            if (player != null)
+            {
+                player.IsImmuneModeEnabled = enable;
+                FieldInfo godModeField = typeof(Player).GetField("IsGodModeEnabled", BindingFlags.NonPublic | BindingFlags.Instance);
+                if (godModeField != null)
+                {
+                    godModeField.SetValue(player, enable);
+                }
+            }
+        });
     }
 
     public static void SpawnItem(int index)
@@ -91,6 +118,18 @@ public static class GCMInjection
         });
     }
 
+    public static void RestockAll()
+    {
+        MainThreadDispatcher.Enqueue(() =>
+        {
+            HarvestPOI[] POIs = UnityEngine.Object.FindObjectsOfType<HarvestPOI>();
+            foreach (HarvestPOI harvest in POIs)
+            {
+                harvest.AddStock(harvest.MaxStock, true);
+            }
+        });
+    }
+
     public static void ClearWeather()
     {
         MainThreadDispatcher.Enqueue(() =>
@@ -112,15 +151,15 @@ public static class GCMInjection
     {
         MainThreadDispatcher.Enqueue(() =>
         {
+            StringBuilder sb = new StringBuilder();
             int i = 0;
             foreach (ItemData itemData in GameManager.Instance.ItemManager.allItems)
             {
-                StreamWriter writer = new StreamWriter("Dump.txt", true);
                 string localizedString = LocalizationSettings.StringDatabase.GetLocalizedString(itemData.itemNameKey.TableReference, itemData.itemNameKey.TableEntryReference, null, FallbackBehavior.UseProjectSettings, Array.Empty<object>());
-                writer.WriteLine(i.ToString() + ":" + localizedString);
-                writer.Close();
-                i = i + 1;
+                sb.AppendLine(i.ToString() + ":" + localizedString);
+                i++;
             }
+            Log(sb.ToString());
         });
     }
 }

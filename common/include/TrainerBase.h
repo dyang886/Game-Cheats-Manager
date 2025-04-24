@@ -65,6 +65,7 @@ public:
     TrainerBase(const std::wstring &processIdentifier, bool useWindowTitle = false)
         : processName(processIdentifier), useWindowTitle(useWindowTitle)
     {
+        SetConsoleOutputCP(CP_UTF8);
     }
 
     virtual ~TrainerBase()

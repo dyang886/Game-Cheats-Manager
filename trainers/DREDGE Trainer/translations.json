@@ -7,9 +7,11 @@
         "Process ID:": "Process ID:",
         "Apply": "Apply",
         "DREDGE Trainer": "DREDGE Trainer",
+        "God Mode": "God Mode",
         "Spawn Item": "Spawn Item",
         "Add Funds": "Add Funds",
         "Repair All": "Repair All",
+        "Restock All": "Restock All Fishing Spots",
         "Clear Weather": "Clear Weather",
         "Freeze Time": "Freeze Time"
     },
@@ -21,9 +23,11 @@
         "Process ID:": "进程 ID:",
         "Apply": "应用",
         "DREDGE Trainer": "渔帆暗涌修改器",
+        "God Mode": "无敌模式",
         "Spawn Item": "生成物品",
         "Add Funds": "增加资金",
         "Repair All": "全部修复",
+        "Restock All": "补充所有钓鱼点",
         "Clear Weather": "晴朗天气",
         "Freeze Time": "锁定时间"
     }

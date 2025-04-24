@@ -60,18 +60,81 @@ struct InvokeMethodParams
 MonoDomain *domain = nullptr;
 MonoAssembly *loadedAssembly = nullptr;
 
-void LogError(const char *message)
+static HANDLE hMapFile = NULL;
+static LPVOID pSharedMemory = NULL;
+static const size_t bufferSize = 1024 * 1024; // 1MB
+static const char *sharedMemoryName = "TrainerSharedMemory";
+
+extern "C" __declspec(dllexport) void SendData(const char *message)
 {
-    char buffer[512];
-    snprintf(buffer, sizeof(buffer), "[!] MonoBridge: %s\n", message);
-    OutputDebugStringA(buffer);
+    if (pSharedMemory == NULL)
+    {
+        hMapFile = OpenFileMappingA(
+            FILE_MAP_ALL_ACCESS,
+            FALSE,
+            sharedMemoryName
+        );
+
+        if (hMapFile == NULL)
+        {
+            DWORD errorCode = GetLastError();
+            return;
+        }
+
+        pSharedMemory = MapViewOfFile(
+            hMapFile,
+            FILE_MAP_ALL_ACCESS,
+            0,
+            0,
+            0
+        );
+
+        if (pSharedMemory == NULL)
+        {
+            DWORD errorCode = GetLastError();
+            CloseHandle(hMapFile);
+            hMapFile = NULL;
+            return;
+        }
+    }
+
+    // Validate the message
+    if (message == NULL)
+    {
+        return;
+    }
+    size_t length = strlen(message);
+    if (length + 8 > bufferSize)
+    {
+        return;
+    }
+
+    volatile bool *available = (volatile bool *)pSharedMemory;
+    int *lengthPtr = (int *)((char *)pSharedMemory + 4);
+    char *msgPtr = (char *)((char *)pSharedMemory + 8);
+
+    *available = false;
+    *lengthPtr = static_cast<int>(length);
+    memcpy(msgPtr, message, length);
+    *available = true;
 }
 
-void LogErrorWithDetails(const char *message, const char *namespaceName, const char *className)
+void Log(const char *message)
 {
-    char buffer[512];
-    snprintf(buffer, sizeof(buffer), "[!] MonoBridge: %s (Namespace: %s, Class: %s)\n", message, namespaceName, className);
-    OutputDebugStringA(buffer);
+    std::string formattedMessage = "[MonoBridge] " + std::string(message);
+    SendData(formattedMessage.c_str());
+}
+
+void LogToFile(const char *message)
+{
+    std::string formattedMessage = "[MonoBridge] " + std::string(message) + "\n";
+    HANDLE hFile = CreateFileA("monobridge_log.txt", FILE_APPEND_DATA, FILE_SHARE_READ, NULL, OPEN_ALWAYS, FILE_ATTRIBUTE_NORMAL, NULL);
+    if (hFile != INVALID_HANDLE_VALUE)
+    {
+        DWORD written;
+        WriteFile(hFile, formattedMessage.c_str(), static_cast<DWORD>(formattedMessage.size()), &written, NULL);
+        CloseHandle(hFile);
+    }
 }
 
 void InitializeMono()
@@ -81,20 +144,20 @@ void InitializeMono()
     HMODULE monoModule = GetModuleHandleA("mono-2.0-bdwgc.dll");
     if (!monoModule)
     {
-        LogError("Failed to find mono-2.0-bdwgc.dll");
+        Log("[!] Failed to find mono-2.0-bdwgc.dll");
         return;
     }
     auto getRootDomain = (MonoDomain * (*)()) GetProcAddress(monoModule, "mono_get_root_domain");
     auto threadAttach = (MonoThread * (*)(MonoDomain *)) GetProcAddress(monoModule, "mono_thread_attach");
     if (!getRootDomain || !threadAttach)
     {
-        LogError("Failed to get Mono functions");
+        Log("[!] Failed to get Mono functions");
         return;
     }
     domain = getRootDomain();
     if (!domain)
     {
-        LogError("Failed to get root domain");
+        Log("[!] Failed to get root domain");
         return;
     }
     threadAttach(domain);
@@ -105,20 +168,20 @@ void LoadAssembly(const char *path)
     InitializeMono();
     if (!domain)
     {
-        LogError("Mono domain not initialized");
+        Log("[!] Mono domain not initialized");
         return;
     }
     HMODULE monoModule = GetModuleHandleA("mono-2.0-bdwgc.dll");
     auto assemblyOpen = (MonoAssembly * (*)(const char *, void *)) GetProcAddress(monoModule, "mono_assembly_open");
     if (!assemblyOpen)
     {
-        LogError("Failed to get mono_assembly_open");
+        Log("[!] Failed to get mono_assembly_open");
         return;
     }
     loadedAssembly = assemblyOpen(path, nullptr);
     if (!loadedAssembly)
     {
-        LogError("Failed to load assembly");
+        Log("[!] Failed to load assembly");
     }
 }
 
@@ -135,7 +198,7 @@ extern "C" __declspec(dllexport) DWORD WINAPI InvokeMethodThread(LPVOID lpParam)
     InitializeMono();
     if (!domain)
     {
-        LogError("Mono domain not initialized");
+        Log("[!] Mono domain not initialized");
         return 1;
     }
 
@@ -151,7 +214,7 @@ extern "C" __declspec(dllexport) DWORD WINAPI InvokeMethodThread(LPVOID lpParam)
     }
     else
     {
-        LogError("Failed to get mono-2.0-bdwgc.dll handle");
+        Log("[!] Failed to get mono-2.0-bdwgc.dll handle");
         return 1;
     }
 
@@ -163,33 +226,33 @@ extern "C" __declspec(dllexport) DWORD WINAPI InvokeMethodThread(LPVOID lpParam)
 
     if (!getImage || !classFromName || !getMethod || !runtimeInvoke || !stringNew)
     {
-        LogError("Failed to get required Mono functions");
+        Log("[!] Failed to get required Mono functions");
         return 1;
     }
 
     if (!loadedAssembly)
     {
-        LogError("No assembly loaded");
+        Log("[!] No assembly loaded");
         return 1;
     }
     MonoImage *image = getImage(loadedAssembly);
     if (!image)
     {
-        LogError("Failed to get image");
+        Log("[!] Failed to get image");
         return 1;
     }
 
     MonoClass *klass = classFromName(image, params->namespaceName, params->className);
     if (!klass)
     {
-        LogErrorWithDetails("Failed to find class", params->namespaceName, params->className);
+        Log("[!] Failed to find class");
         return 1;
     }
 
     MonoMethod *method = getMethod(klass, params->methodName, params->paramCount);
     if (!method)
     {
-        LogError("Failed to find method");
+        Log("[!] Failed to find method");
         return 1;
     }
 
@@ -216,7 +279,7 @@ extern "C" __declspec(dllexport) DWORD WINAPI InvokeMethodThread(LPVOID lpParam)
             MonoString *monoStr = stringNew(domain, pv.s);
             if (!monoStr)
             {
-                LogError("Failed to create MonoString");
+                Log("[!] Failed to create MonoString");
                 return 1;
             }
             stringParams.push_back(monoStr);
@@ -224,7 +287,7 @@ extern "C" __declspec(dllexport) DWORD WINAPI InvokeMethodThread(LPVOID lpParam)
             break;
         }
         default:
-            LogError("Unsupported parameter type");
+            Log("[!] Unsupported parameter type");
             return 1;
         }
     }
@@ -233,7 +296,7 @@ extern "C" __declspec(dllexport) DWORD WINAPI InvokeMethodThread(LPVOID lpParam)
     runtimeInvoke(method, nullptr, args.empty() ? nullptr : args.data(), &exc);
     if (exc)
     {
-        LogError("Exception during method invocation");
+        Log("[!] Exception during method invocation");
         return 1;
     }
 

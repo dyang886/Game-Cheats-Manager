@@ -5,6 +5,7 @@
 #include <FL/Fl_Flex.H>
 #include <FL/forms.H>
 #include "trainer.h"
+#include "MonoBase.h"
 #include "FLTKUtils.h"
 
 // Callback function for apply button
@@ -43,6 +44,10 @@ void apply_callback(Fl_Widget *widget, void *data)
   else if (optionName == "RepairAll")
   {
     status = trainer->repairAll();
+  }
+  else if (optionName == "RestockAll")
+  {
+    status = trainer->restockAll();
   }
   else if (optionName == "ClearWeather")
   {
@@ -94,6 +99,17 @@ void toggle_callback(Fl_Widget *widget, void *data)
       status = trainer->freezeTime(false);
     }
   }
+  else if (optionName == "GodMode")
+  {
+    if (button->value())
+    {
+      status = trainer->godMode(true);
+    }
+    else
+    {
+      status = trainer->godMode(false);
+    }
+  }
 
   // Finalize
   if (!status)
@@ -131,6 +147,8 @@ int main(int argc, char **argv)
   // Setup fonts
   Fl::set_font(FL_FREE_FONT, "Noto Sans SC");
   fl_font(FL_FREE_FONT, font_size);
+
+  Fl::add_timeout(0, MonoBase::check_data_available, &trainer);
 
   // ------------------------------------------------------------------
   // Top Row: Language Selection
@@ -208,7 +226,25 @@ int main(int argc, char **argv)
   Fl_Box *spacerTop = new Fl_Box(0, 0, 0, 0);
 
   // ------------------------------------------------------------------
-  // Option 1: Spawn item (Apply)
+  // god_mode (Toggle)
+  // ------------------------------------------------------------------
+  Fl_Flex *god_mode_flex = new Fl_Flex(0, 0, 0, 0, Fl_Flex::HORIZONTAL);
+  god_mode_flex->gap(option_gap);
+
+  Fl_Check_Button *god_mode_check_button = new Fl_Check_Button(0, 0, 0, 0);
+  god_mode_flex->fixed(god_mode_check_button, button_w);
+
+  Fl_Box *god_mode_label = new Fl_Box(0, 0, 0, 0);
+  god_mode_label->tooltip("God Mode");
+
+  ToggleData *data_god_mode = new ToggleData{&trainer, "GodMode", god_mode_check_button, nullptr};
+  god_mode_check_button->callback(toggle_callback, data_god_mode);
+
+  god_mode_flex->end();
+  options1_flex->fixed(god_mode_flex, option_h);
+
+  // ------------------------------------------------------------------
+  // Spawn item (Apply)
   // ------------------------------------------------------------------
   Fl_Flex *spawn_item_flex = new Fl_Flex(0, 0, 0, 0, Fl_Flex::HORIZONTAL);
   spawn_item_flex->gap(option_gap);
@@ -232,7 +268,7 @@ int main(int argc, char **argv)
   options1_flex->fixed(spawn_item_flex, option_h);
 
   // ------------------------------------------------------------------
-  // Option 2: Add funds (Apply)
+  // Add funds (Apply)
   // ------------------------------------------------------------------
   Fl_Flex *funds_flex = new Fl_Flex(0, 0, 0, 0, Fl_Flex::HORIZONTAL);
   funds_flex->gap(option_gap);
@@ -256,7 +292,7 @@ int main(int argc, char **argv)
   options1_flex->fixed(funds_flex, option_h);
 
   // ------------------------------------------------------------------
-  // Option 3: repair_all (Apply)
+  // repair_all (Apply)
   // ------------------------------------------------------------------
   Fl_Flex *repair_all_flex = new Fl_Flex(0, 0, 0, 0, Fl_Flex::HORIZONTAL);
   repair_all_flex->gap(option_gap);
@@ -275,7 +311,26 @@ int main(int argc, char **argv)
   options1_flex->fixed(repair_all_flex, option_h);
 
   // ------------------------------------------------------------------
-  // Option 4: clear_weather (Apply)
+  // restock_all (Apply)
+  // ------------------------------------------------------------------
+  Fl_Flex *restock_all_flex = new Fl_Flex(0, 0, 0, 0, Fl_Flex::HORIZONTAL);
+  restock_all_flex->gap(option_gap);
+
+  Fl_Button *restock_all_apply_button = new Fl_Button(0, 0, 0, 0);
+  restock_all_flex->fixed(restock_all_apply_button, button_w);
+  restock_all_apply_button->tooltip("Apply");
+
+  Fl_Box *restock_all_label = new Fl_Box(0, 0, 0, 0);
+  restock_all_label->tooltip("Restock All");
+
+  ApplyData *data_restock_all = new ApplyData{&trainer, "RestockAll", restock_all_apply_button, nullptr};
+  restock_all_apply_button->callback(apply_callback, data_restock_all);
+
+  restock_all_flex->end();
+  options1_flex->fixed(restock_all_flex, option_h);
+
+  // ------------------------------------------------------------------
+  // clear_weather (Apply)
   // ------------------------------------------------------------------
   Fl_Flex *clear_weather_flex = new Fl_Flex(0, 0, 0, 0, Fl_Flex::HORIZONTAL);
   clear_weather_flex->gap(option_gap);
@@ -294,7 +349,7 @@ int main(int argc, char **argv)
   options1_flex->fixed(clear_weather_flex, option_h);
 
   // ------------------------------------------------------------------
-  // Option 5: freeze_time (Toggle)
+  // freeze_time (Toggle)
   // ------------------------------------------------------------------
   Fl_Flex *freeze_time_flex = new Fl_Flex(0, 0, 0, 0, Fl_Flex::HORIZONTAL);
   freeze_time_flex->gap(option_gap);

@@ -7,7 +7,7 @@ using json = nlohmann::json;
 // Individual option template:
 
 // // ------------------------------------------------------------------
-// // Option x: Set {{}} (Toggle)
+// // {{}} (Toggle)
 // // ------------------------------------------------------------------
 // Fl_Flex *{{}}_flex = new Fl_Flex(0, 0, 0, 0, Fl_Flex::HORIZONTAL);
 // {{}}_flex->gap(option_gap);
@@ -30,13 +30,14 @@ using json = nlohmann::json;
 // options1_flex->fixed({{}}_flex, option_h);
 
 // // ------------------------------------------------------------------
-// // Option x: Set {{}} (Apply)
+// // {{}} (Apply)
 // // ------------------------------------------------------------------
 // Fl_Flex *{{}}_flex = new Fl_Flex(0, 0, 0, 0, Fl_Flex::HORIZONTAL);
 // {{}}_flex->gap(option_gap);
 
 // Fl_Button *{{}}_apply_button = new Fl_Button(0, 0, 0, 0);
 // {{}}_flex->fixed({{}}_apply_button, button_w);
+// {{}}_apply_button->tooltip("Apply");
 
 // Fl_Box *{{}}_label = new Fl_Box(0, 0, 0, 0);
 // {{}}_label->tooltip("Label");

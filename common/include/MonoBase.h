@@ -2,11 +2,10 @@
 #pragma once
 
 #include "TrainerBase.h"
-#include <string>
+#include <FL/Fl.H>
 #include <variant>
-#include <vector>
-#include <windows.h>
-#include <iostream>
+#include <shlwapi.h>
+#include <sstream>
 
 class MonoBase : public TrainerBase
 {
@@ -25,13 +24,73 @@ public:
 
     void cleanUp() override
     {
+        // Fl::remove_timeout(check_data_available, this);
+
+        // if (dllInjected && hProcess && bridgeDllBase != 0)
+        // {
+        //     HMODULE kernel32 = GetModuleHandleW(L"kernel32.dll");
+        //     if (kernel32)
+        //     {
+        //         LPVOID freeLibraryAddr = reinterpret_cast<LPVOID>(GetProcAddress(kernel32, "FreeLibrary"));
+        //         if (freeLibraryAddr)
+        //         {
+        //             HANDLE hThread = CreateRemoteThread(hProcess, nullptr, 0, reinterpret_cast<LPTHREAD_START_ROUTINE>(freeLibraryAddr), reinterpret_cast<LPVOID>(bridgeDllBase), 0, nullptr);
+        //             if (hThread)
+        //             {
+        //                 WaitForSingleObject(hThread, INFINITE);
+        //                 CloseHandle(hThread);
+        //             }
+        //             else
+        //             {
+        //                 std::cerr << "[!] Failed to create remote thread for FreeLibrary.\n";
+        //             }
+        //         }
+        //         else
+        //         {
+        //             std::cerr << "[!] Failed to get FreeLibrary address.\n";
+        //         }
+        //     }
+        //     else
+        //     {
+        //         std::cerr << "[!] Failed to get kernel32.dll handle.\n";
+        //     }
+        //     bridgeDllBase = 0;
+        // }
+
         TrainerBase::cleanUp();
 
-        if (!tempDllPath.empty())
+        if (dataBuffer)
         {
-            DeleteFileW(tempDllPath.c_str());
-            tempDllPath.clear();
+            UnmapViewOfFile(dataBuffer);
+            dataBuffer = NULL;
         }
+
+        if (hMapFile)
+        {
+            CloseHandle(hMapFile);
+            hMapFile = NULL;
+        }
+
+        if (!bridgeDllPath.empty())
+        {
+            DeleteFileW(bridgeDllPath.c_str());
+            // Remove the subdirectory
+            WCHAR dirPath[MAX_PATH];
+            wcscpy_s(dirPath, MAX_PATH, bridgeDllPath.c_str());
+            PathRemoveFileSpecW(dirPath);
+            RemoveDirectoryW(dirPath);
+            bridgeDllPath.clear();
+        }
+
+        if (extractedFiles.size() > 0)
+        {
+            for (const auto &file : extractedFiles)
+            {
+                DeleteFileW(file.c_str());
+            }
+            extractedFiles.clear();
+        }
+
         dllInjected = false;
     }
 
@@ -54,9 +113,79 @@ public:
                 return false;
             }
 
+            if (!create_shared_memory())
+            {
+                std::cerr << "[!] Failed to create shared memory.\n";
+                return false;
+            }
+
             dllInjected = true;
         }
         return dllInjected;
+    }
+
+    bool create_shared_memory()
+    {
+        const char *sharedMemName = "TrainerSharedMemory";
+        hMapFile = CreateFileMappingA(
+            INVALID_HANDLE_VALUE,
+            NULL,
+            PAGE_READWRITE,
+            0,
+            bufferSize,
+            sharedMemName);
+
+        if (hMapFile == NULL)
+        {
+            std::cerr << "[!] Could not create file mapping object: " << GetLastError() << "\n";
+            return false;
+        }
+
+        dataBuffer = MapViewOfFile(
+            hMapFile,
+            FILE_MAP_ALL_ACCESS,
+            0,
+            0,
+            bufferSize);
+
+        if (dataBuffer == NULL)
+        {
+            std::cerr << "[!] Could not map view of file: " << GetLastError() << "\n";
+            CloseHandle(hMapFile);
+            hMapFile = NULL;
+            return false;
+        }
+
+        return true;
+    }
+
+    static void check_data_available(void *data)
+    {
+        MonoBase *self = static_cast<MonoBase *>(data);
+
+        if (self->dataBuffer != nullptr)
+        {
+            volatile bool *available = (volatile bool *)((char *)self->dataBuffer + 0);
+            int *lengthPtr = (int *)((char *)self->dataBuffer + 4);
+            char *msgPtr = (char *)((char *)self->dataBuffer + 8);
+
+            if (*available)
+            {
+                int length = *lengthPtr;
+                if (length > 0 && length < self->bufferSize - 8)
+                {
+                    std::string message(msgPtr, length);
+                    std::cout << message << "\n";
+                    *available = false;
+                }
+                else
+                {
+                    std::cerr << "[!] Invalid message length: " << length << "\n";
+                }
+            }
+        }
+
+        Fl::repeat_timeout(0.1, check_data_available, data);
     }
 
     /** Injects the C++ bridge DLL into the target process from embedded resources
@@ -65,14 +194,12 @@ public:
     bool injectBridgeDLL()
     {
         // Extract the DLL from resources
-        tempDllPath = extractResourceToTempFile("MONOBRIDGE_DLL");
-        if (tempDllPath.empty())
+        bridgeDllPath = extractResourceToTempFile("MONOBRIDGE_DLL");
+        if (bridgeDllPath.empty())
         {
             std::cerr << "[!] Failed to extract MonoBridge.dll from resources.\n";
             return false;
         }
-
-        std::cout << "[+] Extracted MonoBridge.dll to " << wstringToString(tempDllPath) << std::endl;
 
         if (!hProcess || !isProcessRunning())
         {
@@ -80,7 +207,7 @@ public:
             return false;
         }
 
-        size_t pathSize = (tempDllPath.size() + 1) * sizeof(wchar_t);
+        size_t pathSize = (bridgeDllPath.size() + 1) * sizeof(wchar_t);
         LPVOID allocMem = VirtualAllocEx(hProcess, nullptr, pathSize, MEM_COMMIT | MEM_RESERVE, PAGE_READWRITE);
         if (!allocMem)
         {
@@ -88,7 +215,7 @@ public:
             return false;
         }
 
-        if (!WriteProcessMemory(hProcess, allocMem, tempDllPath.c_str(), pathSize, nullptr))
+        if (!WriteProcessMemory(hProcess, allocMem, bridgeDllPath.c_str(), pathSize, nullptr))
         {
             std::cerr << "[!] Failed to write DLL path to target process.\n";
             VirtualFreeEx(hProcess, allocMem, 0, MEM_RELEASE);
@@ -105,9 +232,7 @@ public:
             return false;
         }
 
-        HANDLE hThread = CreateRemoteThread(hProcess, nullptr, 0,
-                                            reinterpret_cast<LPTHREAD_START_ROUTINE>(loadLibraryAddr),
-                                            allocMem, 0, nullptr);
+        HANDLE hThread = CreateRemoteThread(hProcess, nullptr, 0, reinterpret_cast<LPTHREAD_START_ROUTINE>(loadLibraryAddr), allocMem, 0, nullptr);
         if (!hThread)
         {
             std::cerr << "[!] Failed to create remote thread for LoadLibraryW.\n";
@@ -129,7 +254,6 @@ public:
 
         bridgeDllBase = static_cast<uintptr_t>(exitCode);
         VirtualFreeEx(hProcess, allocMem, 0, MEM_RELEASE);
-        std::cout << "[+] Bridge DLL injected successfully at base: 0x" << std::hex << bridgeDllBase << std::dec << std::endl;
         return true;
     }
 
@@ -144,12 +268,10 @@ public:
             return false;
         }
 
-        std::cout << "[+] Attempting to retrieve function pointers.\n";
-
-        HMODULE hLocalDll = LoadLibraryW(tempDllPath.c_str());
+        HMODULE hLocalDll = LoadLibraryW(bridgeDllPath.c_str());
         if (!hLocalDll)
         {
-            std::cerr << "[!] Failed to load bridge DLL locally from " << wstringToString(tempDllPath) << std::endl;
+            std::cerr << "[!] Failed to load bridge DLL locally from " << wstringToString(bridgeDllPath) << std::endl;
             return false;
         }
 
@@ -166,8 +288,7 @@ public:
         uintptr_t rva = localAddr - localBase;
         LPVOID remoteGetFuncPtrs = reinterpret_cast<LPVOID>(bridgeDllBase + rva);
 
-        LPVOID allocMem = VirtualAllocEx(hProcess, nullptr, sizeof(FunctionPointers),
-                                         MEM_COMMIT | MEM_RESERVE, PAGE_READWRITE);
+        LPVOID allocMem = VirtualAllocEx(hProcess, nullptr, sizeof(FunctionPointers), MEM_COMMIT | MEM_RESERVE, PAGE_READWRITE);
         if (!allocMem)
         {
             std::cerr << "[!] Failed to allocate memory for function pointers.\n";
@@ -175,9 +296,7 @@ public:
             return false;
         }
 
-        HANDLE hThread = CreateRemoteThread(hProcess, nullptr, 0,
-                                            reinterpret_cast<LPTHREAD_START_ROUTINE>(remoteGetFuncPtrs),
-                                            allocMem, 0, nullptr);
+        HANDLE hThread = CreateRemoteThread(hProcess, nullptr, 0, reinterpret_cast<LPTHREAD_START_ROUTINE>(remoteGetFuncPtrs), allocMem, 0, nullptr);
         if (!hThread)
         {
             std::cerr << "[!] Failed to create remote thread for function pointers.\n";
@@ -199,7 +318,6 @@ public:
 
         VirtualFreeEx(hProcess, allocMem, 0, MEM_RELEASE);
         FreeLibrary(hLocalDll);
-        std::cout << "[+] Function pointers retrieved successfully.\n";
         return true;
     }
 
@@ -222,8 +340,6 @@ public:
             return false;
         }
         extractedFiles.push_back(assemblyPath);
-
-        std::cout << "[+] Attempting to load assembly from: " << wstringToString(assemblyPath) << "\n";
 
         std::string pathStr = wstringToString(assemblyPath);
         size_t pathLen = pathStr.size() + 1;
@@ -253,9 +369,7 @@ public:
             return false;
         }
 
-        HANDLE hThread = CreateRemoteThread(hProcess, nullptr, 0,
-                                            reinterpret_cast<LPTHREAD_START_ROUTINE>(funcPtrs.LoadAssemblyThread),
-                                            allocMem, 0, nullptr);
+        HANDLE hThread = CreateRemoteThread(hProcess, nullptr, 0, reinterpret_cast<LPTHREAD_START_ROUTINE>(funcPtrs.LoadAssemblyThread), allocMem, 0, nullptr);
         if (!hThread)
         {
             std::cerr << "[!] Failed to create remote thread to load assembly.\n";
@@ -266,7 +380,6 @@ public:
         WaitForSingleObject(hThread, INFINITE);
         CloseHandle(hThread);
         VirtualFreeEx(hProcess, allocMem, 0, MEM_RELEASE);
-        std::cout << "[+] Assembly load thread completed.\n";
         return true;
     }
 
@@ -277,17 +390,13 @@ public:
      * @param params Vector of parameters
      * @return True if successful, false otherwise
      */
-    bool invokeMethod(const std::string &namespaceName, const std::string &className,
-                      const std::string &methodName, const std::vector<Param> &params)
+    bool invokeMethod(const std::string &namespaceName, const std::string &className, const std::string &methodName, const std::vector<Param> &params)
     {
         if (!hProcess || !funcPtrs.InvokeMethodThread)
         {
             std::cerr << "[!] Process handle invalid or InvokeMethodThread pointer missing.\n";
             return false;
         }
-
-        std::cout << "[+] Attempting to invoke " << namespaceName << "." << className << "." << methodName
-                  << " with " << params.size() << " parameters.\n";
 
         size_t namespaceLen = namespaceName.size() + 1;
         size_t classLen = className.size() + 1;
@@ -387,9 +496,7 @@ public:
             return false;
         }
 
-        HANDLE hThread = CreateRemoteThread(hProcess, nullptr, 0,
-                                            reinterpret_cast<LPTHREAD_START_ROUTINE>(funcPtrs.InvokeMethodThread),
-                                            allocMem, 0, nullptr);
+        HANDLE hThread = CreateRemoteThread(hProcess, nullptr, 0, reinterpret_cast<LPTHREAD_START_ROUTINE>(funcPtrs.InvokeMethodThread), allocMem, 0, nullptr);
         if (!hThread)
         {
             std::cerr << "[!] Failed to create remote thread for method invocation.\n";
@@ -397,18 +504,38 @@ public:
             return false;
         }
 
+        std::stringstream ss;
+        ss << "[+] Invoked method " << (namespaceName.empty() ? "" : namespaceName + ".") << className << "." << methodName << "(";
+        for (size_t i = 0; i < params.size(); ++i)
+        {
+            if (i > 0)
+                ss << ", ";
+            if (std::holds_alternative<int>(params[i]))
+                ss << std::get<int>(params[i]);
+            else if (std::holds_alternative<float>(params[i]))
+                ss << std::get<float>(params[i]);
+            else if (std::holds_alternative<std::string>(params[i]))
+                ss << "\"" << std::get<std::string>(params[i]) << "\"";
+        }
+        ss << ")\n";
+        std::cout << ss.str();
+
         WaitForSingleObject(hThread, INFINITE);
         CloseHandle(hThread);
         VirtualFreeEx(hProcess, allocMem, 0, MEM_RELEASE);
-        std::cout << "[+] Method invocation thread completed.\n";
         return true;
     }
 
 private:
     bool dllInjected = false;
     std::vector<std::wstring> extractedFiles;
-    std::wstring tempDllPath;
+    std::wstring bridgeDllPath;
     uintptr_t bridgeDllBase = 0;
+    HANDLE hMapFile = NULL;
+
+    // For injected dll communication
+    LPVOID dataBuffer = nullptr;
+    size_t bufferSize = 1024 * 1024;
 
     struct FunctionPointers
     {
@@ -475,28 +602,71 @@ private:
         }
 
         DWORD dwSize = SizeofResource(hModule, hResource);
-        WCHAR tempPath[MAX_PATH], tempFileName[MAX_PATH];
-        GetTempPathW(MAX_PATH, tempPath);
-        GetTempFileNameW(tempPath, L"RES", 0, tempFileName);
+        WCHAR tempPath[MAX_PATH];
 
-        HANDLE hFile = CreateFileW(tempFileName, GENERIC_WRITE, 0, nullptr, CREATE_ALWAYS, FILE_ATTRIBUTE_NORMAL, nullptr);
-        if (hFile == INVALID_HANDLE_VALUE)
+        if (resourceName == "MONOBRIDGE_DLL")
         {
-            std::cerr << "[!] Failed to create temporary file for resource.\n";
-            return L"";
+            // Create a unique subdirectory to avoid name collisions
+            GUID guid;
+            CoCreateGuid(&guid);
+            WCHAR subDir[MAX_PATH];
+            StringFromGUID2(guid, subDir, MAX_PATH); // Generates a unique string like "{xxxxxxxx-xxxx-xxxx-xxxx-xxxxxxxxxxxx}"
+            GetTempPathW(MAX_PATH, tempPath);
+            wcscat_s(tempPath, MAX_PATH, subDir);
+            CreateDirectoryW(tempPath, nullptr);
+
+            // Construct the full path with the desired name
+            WCHAR dllPath[MAX_PATH];
+            wcscpy_s(dllPath, MAX_PATH, tempPath);
+            wcscat_s(dllPath, MAX_PATH, L"\\");
+            wcscat_s(dllPath, MAX_PATH, L"MonoBridge.dll");
+
+            HANDLE hFile = CreateFileW(dllPath, GENERIC_WRITE, 0, nullptr, CREATE_ALWAYS, FILE_ATTRIBUTE_NORMAL, nullptr);
+            if (hFile == INVALID_HANDLE_VALUE)
+            {
+                std::cerr << "[!] Failed to create MonoBridge file: " << wstringToString(dllPath) << "\n";
+                return L"";
+            }
+
+            DWORD bytesWritten;
+            WriteFile(hFile, pData, dwSize, &bytesWritten, nullptr);
+            CloseHandle(hFile);
+
+            if (bytesWritten != dwSize)
+            {
+                std::cerr << "[!] Failed to write MonoBridge resource to file: " << wstringToString(dllPath) << "\n";
+                DeleteFileW(dllPath);
+                return L"";
+            }
+
+            return std::wstring(dllPath);
         }
-
-        DWORD bytesWritten;
-        WriteFile(hFile, pData, dwSize, &bytesWritten, nullptr);
-        CloseHandle(hFile);
-
-        if (bytesWritten != dwSize)
+        else
         {
-            std::cerr << "[!] Failed to write resource to temporary file.\n";
-            DeleteFileW(tempFileName);
-            return L"";
-        }
+            // Default behavior: use a temporary filename
+            WCHAR tempFileName[MAX_PATH];
+            GetTempPathW(MAX_PATH, tempPath);
+            GetTempFileNameW(tempPath, L"RES", 0, tempFileName);
 
-        return std::wstring(tempFileName);
+            HANDLE hFile = CreateFileW(tempFileName, GENERIC_WRITE, 0, nullptr, CREATE_ALWAYS, FILE_ATTRIBUTE_NORMAL, nullptr);
+            if (hFile == INVALID_HANDLE_VALUE)
+            {
+                std::cerr << "[!] Failed to create temporary file for resource.\n";
+                return L"";
+            }
+
+            DWORD bytesWritten;
+            WriteFile(hFile, pData, dwSize, &bytesWritten, nullptr);
+            CloseHandle(hFile);
+
+            if (bytesWritten != dwSize)
+            {
+                std::cerr << "[!] Failed to write resource to temporary file.\n";
+                DeleteFileW(tempFileName);
+                return L"";
+            }
+
+            return std::wstring(tempFileName);
+        }
     }
 };

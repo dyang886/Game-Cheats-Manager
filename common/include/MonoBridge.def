@@ -3,3 +3,4 @@ EXPORTS
     GetFunctionPointersThread
     LoadAssemblyThread
     InvokeMethodThread
+    SendData
