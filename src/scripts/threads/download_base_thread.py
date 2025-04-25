@@ -162,18 +162,18 @@ class DownloadBaseThread(QThread):
         return text.replace(': ', ' - ').replace(':', '-').replace("/", "_").replace("?", "")
 
     def find_best_trainer_match(self, target_name, target_language, threshold=85):
-        trainer_details = self.load_json_content("xgqdetail.json")
+        trainer_details = self.load_json_content("translations.json")
         if not trainer_details:
             return None
 
         sanitized_to_original_en = {}
         sanitized_to_original_zh = {}
         for trainer in trainer_details:
-            if 'en_name' in trainer and 'keyw' in trainer:
-                sanitized_en = self.sanitize(trainer['en_name'])
-                sanitized_zh = self.sanitize(trainer['keyw'])
-                sanitized_to_original_en[sanitized_en] = trainer['keyw']
-                sanitized_to_original_zh[sanitized_zh] = trainer['en_name']
+            if 'en_US' in trainer and 'zh_CN' in trainer:
+                sanitized_en = self.sanitize(trainer['en_US'])
+                sanitized_zh = self.sanitize(trainer['zh_CN'])
+                sanitized_to_original_en[sanitized_en] = trainer['zh_CN']
+                sanitized_to_original_zh[sanitized_zh] = trainer['en_US']
 
         # Determine the mapping and target based on the desired language
         sanitized_target = self.sanitize(target_name)

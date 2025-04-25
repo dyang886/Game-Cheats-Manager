@@ -114,9 +114,9 @@ def sort_trainers_key(name):
 
 
 def ensure_trainer_details_exist():
-    dst = os.path.join(DATABASE_PATH, "xgqdetail.json")
+    dst = os.path.join(DATABASE_PATH, "translations.json")
     if not os.path.exists(dst):
-        shutil.copyfile(resource_path("dependency/xgqdetail.json"), dst)
+        shutil.copyfile(resource_path("dependency/translations.json"), dst)
 
 
 def ensure_trainer_download_path_is_valid():
@@ -198,7 +198,6 @@ theme_options = {
 
 server_options = {
     tr("International"): "intl",
-    tr("China") + tr(" (Some trainers cannot be downloaded)"): "china"
 }
 
 font_config = {

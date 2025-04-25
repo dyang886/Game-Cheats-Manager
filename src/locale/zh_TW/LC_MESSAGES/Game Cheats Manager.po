@@ -25,12 +25,6 @@ msgstr "白色"
 msgid "International"
 msgstr "國際"
 
-msgid "China"
-msgstr "中國"
-
-msgid " (Some trainers cannot be downloaded)"
-msgstr "(部分修改器無法下載)"
-
 msgid "Search for installed"
 msgstr "搜尋已安裝"
 

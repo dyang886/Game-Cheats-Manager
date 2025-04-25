@@ -104,17 +104,17 @@ class DownloadDisplayThread(DownloadBaseThread):
         translations = [keyword]
         self.message.emit(tr("Translating keywords..."), None)
 
-        # Load trainer details from the JSON database
-        trainer_details = self.load_json_content("xgqdetail.json")
+        # Load trainer translations from the JSON database
+        trainer_details = self.load_json_content("translations.json")
         if trainer_details:
             for trainer in trainer_details:
                 sanitized_keyword = self.sanitize(keyword)
                 if is_chinese(keyword):
-                    if sanitized_keyword in self.sanitize(trainer.get("keyw", "")):
-                        translations.append(trainer.get("en_name", ""))
+                    if sanitized_keyword in self.sanitize(trainer.get("zh_CN", "")):
+                        translations.append(trainer.get("en_US", ""))
                 else:
-                    if sanitized_keyword in self.sanitize(trainer.get("en_name", "")):
-                        translations.append(trainer.get("keyw", ""))
+                    if sanitized_keyword in self.sanitize(trainer.get("en_US", "")):
+                        translations.append(trainer.get("zh_CN", ""))
 
         translations = list(filter(None, set(translations)))
         print("\nKeyword translations:", translations, "\n")
@@ -192,14 +192,14 @@ class DownloadDisplayThread(DownloadBaseThread):
         return True
 
     def search_from_xgqdetail(self, keyword):
-        trainer_details = self.load_json_content("xgqdetail.json")
+        trainer_details = self.load_json_content("translations.json")
         if trainer_details:
             for entry in trainer_details:
-                if "id" in entry and (keyword in entry["keyw"] or (len(keyword) >= 2 and keyword.lower() in entry["en_name"].lower())):
+                if "id" in entry and (keyword in entry["zh_CN"] or (len(keyword) >= 2 and keyword.lower() in entry["en_US"].lower())):
                     full_url = ""
                     anti_url = ""
                     if settings["language"] == "en_US" or settings["enSearchResults"]:
-                        gameName = entry['en_name']
+                        gameName = entry['en_US']
                     elif settings["language"] == "zh_CN" or settings["language"] == "zh_TW":
                         pattern = r'\s(v[\d\.v\-]+.*|Early ?Access.*)'
                         gameName = re.sub(pattern, '', entry['title'])
@@ -207,7 +207,7 @@ class DownloadDisplayThread(DownloadBaseThread):
                     try:
                         # Construct download url, example: https://down.fucnm.com/Story.of.Seasons.A.Wonderful.Life.v1.0.Plus.24.Trainer-FLiNG.zip
                         base_url = "https://down.fucnm.com/"
-                        trainer_name = entry["en_name"].replace(": ", ".").replace("：", ".").replace(",", "").replace("'", "").replace("’", "").replace("?", "").replace("/", ".").replace(" - ", ".").replace(" ", ".")
+                        trainer_name = entry["en_US"].replace(": ", ".").replace("：", ".").replace(",", "").replace("'", "").replace("’", "").replace("?", "").replace("/", ".").replace(" - ", ".").replace(" ", ".")
                         version = entry["version"]
                         if self.sanitize(version) == "earlyaccess":
                             version = "Early.Access"
@@ -224,7 +224,7 @@ class DownloadDisplayThread(DownloadBaseThread):
                             anti_url = entry["anti_url"]
                     except Exception as e:
                         self.message.emit(tr("Failed to get trainer url: ") + gameName, "failure")
-                        print(f"Constructing download url for {entry['keyw']} failed: {str(e)}")
+                        print(f"Constructing download url for {entry['zh_CN']} failed: {str(e)}")
 
                     if gameName and full_url:
                         DownloadBaseThread.trainer_urls.append({

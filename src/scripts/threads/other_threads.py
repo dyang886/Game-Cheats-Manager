@@ -13,7 +13,6 @@ from PyQt6.QtCore import QThread, pyqtSignal
 import requests
 
 from config import *
-import db_additions
 from threads.download_base_thread import DownloadBaseThread
 
 
@@ -160,8 +159,14 @@ class FetchTrainerTranslations(DownloadBaseThread):
 
         self.message.emit(statusWidgetName, fetch_message)
         total_pages = ""
+        translations = []
+        filepath = os.path.join(DATABASE_PATH, "translations.json")
 
         if self.is_internet_connected():
+            if os.path.exists(filepath):
+                with open(filepath, 'r', encoding='utf-8') as file:
+                    translations = json.load(file)
+
             index_page = "https://dl.fucnm.com/datafile/xgqdetail/index.txt"
             try:
                 total_pages_response = requests.get(index_page, headers=self.headers)
@@ -179,11 +184,22 @@ class FetchTrainerTranslations(DownloadBaseThread):
 
             with concurrent.futures.ThreadPoolExecutor(max_workers=5) as executor:
                 futures = [executor.submit(self.fetch_page, page) for page in range(1, total_pages + 1)]
-                all_data = []
                 for future in concurrent.futures.as_completed(futures):
                     result = future.result()
                     if result:
-                        all_data.extend(result)
+                        for item in result:
+                            en_name = item.get("en_name")
+                            zh_name = item.get("keyw")
+                            steam_id = item.get("steam_appid")
+
+                            if en_name and zh_name and not any(t["en_US"] == en_name for t in translations):
+                                translation_entry = {
+                                    "en_US": en_name,
+                                    "zh_CN": zh_name
+                                }
+                                if steam_id:
+                                    translation_entry["steam_id"] = steam_id
+                                translations.append(translation_entry)
                     else:
                         error = True
                     completed_pages += 1
@@ -195,11 +211,10 @@ class FetchTrainerTranslations(DownloadBaseThread):
                 self.finished.emit(statusWidgetName)
                 return
 
-            all_data.extend(db_additions.additions)
+            translations.sort(key=lambda x: x["en_US"].lower())
 
-            filepath = os.path.join(DATABASE_PATH, "xgqdetail.json")
             with open(filepath, 'w', encoding='utf-8') as file:
-                json.dump(all_data, file, ensure_ascii=False, indent=4)
+                json.dump(translations, file, ensure_ascii=False, indent=4)
 
         else:
             self.update.emit(statusWidgetName, fetch_error, "error")

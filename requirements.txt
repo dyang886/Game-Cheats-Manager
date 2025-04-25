@@ -1,4 +1,5 @@
 beautifulsoup4
+cloudscraper
 cn2an
 fuzzywuzzy
 pinyin

@@ -25,12 +25,6 @@ msgstr "white"
 msgid "International"
 msgstr "International"
 
-msgid "China"
-msgstr "China"
-
-msgid " (Some trainers cannot be downloaded)"
-msgstr " (Some trainers cannot be downloaded)"
-
 msgid "Search for installed"
 msgstr "Search for installed"
 
