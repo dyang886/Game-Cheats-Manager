@@ -1,5 +1,5 @@
-#include <fstream>
 #include <nlohmann/json.hpp>
+#include <fstream>
 #include <shlobj.h>
 
 using json = nlohmann::json;
@@ -91,7 +91,7 @@ struct ToggleData
 
 const unsigned char *load_resource(const char *resource_name, DWORD &size)
 {
-    HRSRC hRes = FindResource(nullptr, resource_name, RT_RCDATA);
+    HRSRC hRes = FindResourceA(nullptr, resource_name, MAKEINTRESOURCEA(10));
     if (!hRes)
     {
         size = 0;
@@ -438,6 +438,5 @@ void check_process_status(void *data)
         clean_up(process_exe->window(), trainer);
     }
 
-    // Schedule the next check after 1 second
     Fl::repeat_timeout(1.0, check_process_status, data);
 }

@@ -121,7 +121,7 @@ int main(int argc, char **argv)
     Fl_Window *window = new Fl_Window(800, 600);
     Fl::set_color(FL_FREE_COLOR, 0x1c1c1c00);
     window->color(FL_FREE_COLOR);
-    window->icon((char *)LoadIcon(GetModuleHandle(NULL), "APP_ICON"));
+    window->icon((char *)LoadIconA(GetModuleHandle(NULL), "APP_ICON"));
     window->tooltip("Headbangers: Rhythm Royale Trainer");
 
     int left_margin = 20;

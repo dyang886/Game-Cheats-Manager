@@ -46,12 +46,17 @@ public class MainThreadDispatcher : MonoBehaviour
         }
     }
 }
+
 public static class GCMInjection
 {
     [DllImport("MonoBridge.dll")]
     private static extern void SendData(string message);
 
-    private static void Log(string message) {
+    [DllImport("MonoBridge.dll")]
+    private static extern void SendResponse(string message);
+
+    private static void Log(string message)
+    {
         string formattedMessage = "[GCMInjection] " + message;
         SendData(formattedMessage);
     }
@@ -147,7 +152,7 @@ public static class GCMInjection
         });
     }
 
-    public static void Dump()
+    public static void GetItemList()
     {
         MainThreadDispatcher.Enqueue(() =>
         {
@@ -156,10 +161,10 @@ public static class GCMInjection
             foreach (ItemData itemData in GameManager.Instance.ItemManager.allItems)
             {
                 string localizedString = LocalizationSettings.StringDatabase.GetLocalizedString(itemData.itemNameKey.TableReference, itemData.itemNameKey.TableEntryReference, null, FallbackBehavior.UseProjectSettings, Array.Empty<object>());
-                sb.AppendLine(i.ToString() + ":" + localizedString);
+                sb.AppendLine(i.ToString() + ">" + localizedString);
                 i++;
             }
-            Log(sb.ToString());
+            SendResponse(sb.ToString());
         });
     }
 }

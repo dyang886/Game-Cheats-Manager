@@ -1,11 +1,12 @@
 // MonoBase.h
 #pragma once
 
-#include "TrainerBase.h"
 #include <FL/Fl.H>
-#include <variant>
+#include "TrainerBase.h"
+#include <mutex>
 #include <shlwapi.h>
 #include <sstream>
+#include <variant>
 
 class MonoBase : public TrainerBase
 {
@@ -24,51 +25,33 @@ public:
 
     void cleanUp() override
     {
-        // Fl::remove_timeout(check_data_available, this);
-
-        // if (dllInjected && hProcess && bridgeDllBase != 0)
-        // {
-        //     HMODULE kernel32 = GetModuleHandleW(L"kernel32.dll");
-        //     if (kernel32)
-        //     {
-        //         LPVOID freeLibraryAddr = reinterpret_cast<LPVOID>(GetProcAddress(kernel32, "FreeLibrary"));
-        //         if (freeLibraryAddr)
-        //         {
-        //             HANDLE hThread = CreateRemoteThread(hProcess, nullptr, 0, reinterpret_cast<LPTHREAD_START_ROUTINE>(freeLibraryAddr), reinterpret_cast<LPVOID>(bridgeDllBase), 0, nullptr);
-        //             if (hThread)
-        //             {
-        //                 WaitForSingleObject(hThread, INFINITE);
-        //                 CloseHandle(hThread);
-        //             }
-        //             else
-        //             {
-        //                 std::cerr << "[!] Failed to create remote thread for FreeLibrary.\n";
-        //             }
-        //         }
-        //         else
-        //         {
-        //             std::cerr << "[!] Failed to get FreeLibrary address.\n";
-        //         }
-        //     }
-        //     else
-        //     {
-        //         std::cerr << "[!] Failed to get kernel32.dll handle.\n";
-        //     }
-        //     bridgeDllBase = 0;
-        // }
-
+        // Note: MonoBridge.dll and GCMInjection.dll are not freed
         TrainerBase::cleanUp();
 
-        if (dataBuffer)
+        if (loggingBuffer)
         {
-            UnmapViewOfFile(dataBuffer);
-            dataBuffer = NULL;
+            UnmapViewOfFile(loggingBuffer);
+            loggingBuffer = NULL;
         }
-
-        if (hMapFile)
+        if (hLoggingMapFile)
         {
-            CloseHandle(hMapFile);
-            hMapFile = NULL;
+            CloseHandle(hLoggingMapFile);
+            hLoggingMapFile = NULL;
+        }
+        if (responseBuffer)
+        {
+            UnmapViewOfFile(responseBuffer);
+            responseBuffer = NULL;
+        }
+        if (hResponseMapFile)
+        {
+            CloseHandle(hResponseMapFile);
+            hResponseMapFile = NULL;
+        }
+        if (hResponseEvent)
+        {
+            CloseHandle(hResponseEvent);
+            hResponseEvent = NULL;
         }
 
         if (!bridgeDllPath.empty())
@@ -113,9 +96,15 @@ public:
                 return false;
             }
 
-            if (!create_shared_memory())
+            if (!initializeLoggingChannel())
             {
-                std::cerr << "[!] Failed to create shared memory.\n";
+                std::cerr << "[!] Failed to initialize data logging channel.\n";
+                return false;
+            }
+
+            if (!initializeRequestChannel())
+            {
+                std::cerr << "[!] Failed to initialize data request channel.\n";
                 return false;
             }
 
@@ -124,68 +113,84 @@ public:
         return dllInjected;
     }
 
-    bool create_shared_memory()
+    bool initializeLoggingChannel()
     {
-        const char *sharedMemName = "TrainerSharedMemory";
-        hMapFile = CreateFileMappingA(
-            INVALID_HANDLE_VALUE,
-            NULL,
-            PAGE_READWRITE,
-            0,
-            bufferSize,
-            sharedMemName);
-
-        if (hMapFile == NULL)
+        std::string loggingSharedMemName = "TrainerLoggingSharedMemory_" + std::to_string(procId);
+        hLoggingMapFile = CreateFileMappingA(INVALID_HANDLE_VALUE, NULL, PAGE_READWRITE, 0, loggingBufferSize, loggingSharedMemName.c_str());
+        if (hLoggingMapFile == NULL)
         {
             std::cerr << "[!] Could not create file mapping object: " << GetLastError() << "\n";
             return false;
         }
 
-        dataBuffer = MapViewOfFile(
-            hMapFile,
-            FILE_MAP_ALL_ACCESS,
-            0,
-            0,
-            bufferSize);
-
-        if (dataBuffer == NULL)
+        loggingBuffer = MapViewOfFile(hLoggingMapFile, FILE_MAP_ALL_ACCESS, 0, 0, 0);
+        if (loggingBuffer == NULL)
         {
             std::cerr << "[!] Could not map view of file: " << GetLastError() << "\n";
-            CloseHandle(hMapFile);
-            hMapFile = NULL;
+            CloseHandle(hLoggingMapFile);
+            hLoggingMapFile = NULL;
             return false;
         }
 
         return true;
     }
 
-    static void check_data_available(void *data)
+    static void check_logging_available(void *data)
     {
         MonoBase *self = static_cast<MonoBase *>(data);
 
-        if (self->dataBuffer != nullptr)
+        if (self->loggingBuffer != nullptr)
         {
-            volatile bool *available = (volatile bool *)((char *)self->dataBuffer + 0);
-            int *lengthPtr = (int *)((char *)self->dataBuffer + 4);
-            char *msgPtr = (char *)((char *)self->dataBuffer + 8);
+            SharedMemoryHeader *header = static_cast<SharedMemoryHeader *>(self->loggingBuffer);
+            char *bufferStart = static_cast<char *>(self->loggingBuffer) + sizeof(SharedMemoryHeader);
 
-            if (*available)
+            std::lock_guard<std::mutex> lock(header->mutex);
+
+            while (header->head != header->tail)
             {
-                int length = *lengthPtr;
-                if (length > 0 && length < self->bufferSize - 8)
-                {
-                    std::string message(msgPtr, length);
-                    std::cout << message << "\n";
-                    *available = false;
-                }
-                else
-                {
-                    std::cerr << "[!] Invalid message length: " << length << "\n";
-                }
+                size_t length = *reinterpret_cast<size_t *>(bufferStart + header->tail);
+                char *msgPtr = bufferStart + header->tail + sizeof(size_t);
+                std::string message(msgPtr, length);
+                std::cout << message << "\n";
+                header->tail = (header->tail + sizeof(size_t) + length) % (self->loggingBufferSize - sizeof(SharedMemoryHeader));
             }
         }
 
-        Fl::repeat_timeout(0.1, check_data_available, data);
+        Fl::repeat_timeout(0.1, check_logging_available, data);
+    }
+
+    bool initializeRequestChannel()
+    {
+        std::string responseSharedMemName = "TrainerResponseSharedMemory_" + std::to_string(procId);
+        hResponseMapFile = CreateFileMappingA(INVALID_HANDLE_VALUE, NULL, PAGE_READWRITE, 0, responseBufferSize, responseSharedMemName.c_str());
+        if (hResponseMapFile == NULL)
+        {
+            std::cerr << "[!] Could not create response file mapping object: " << GetLastError() << "\n";
+            return false;
+        }
+
+        responseBuffer = MapViewOfFile(hResponseMapFile, FILE_MAP_ALL_ACCESS, 0, 0, 0);
+        if (responseBuffer == NULL)
+        {
+            std::cerr << "[!] Could not map view of response file: " << GetLastError() << "\n";
+            CloseHandle(hResponseMapFile);
+            hResponseMapFile = NULL;
+            return false;
+        }
+
+        std::string eventName = "TrainerResponseEvent_" + std::to_string(procId);
+        hResponseEvent = CreateEventA(NULL, FALSE, FALSE, eventName.c_str());
+        if (hResponseEvent == NULL)
+        {
+            std::cerr << "[!] Could not create response event: " << GetLastError() << "\n";
+            UnmapViewOfFile(responseBuffer);
+            CloseHandle(hResponseMapFile);
+            hResponseMapFile = NULL;
+            responseBuffer = NULL;
+            return false;
+        }
+
+        return true;
     }
 
     /** Injects the C++ bridge DLL into the target process from embedded resources
@@ -526,16 +531,52 @@ public:
         return true;
     }
 
+    std::string invokeMethodReturn(const std::string &namespaceName, const std::string &className, const std::string &methodName, const std::vector<Param> &params)
+    {
+        if (!invokeMethod(namespaceName, className, methodName, params))
+        {
+            return "";
+        }
+
+        // Wait for the response event with a timeout
+        DWORD waitResult = WaitForSingleObject(hResponseEvent, 5000); // 5 seconds timeout
+        if (waitResult == WAIT_TIMEOUT)
+        {
+            std::cerr << "[!] WaitForSingleObject timed out after 5 seconds\n";
+            return "";
+        }
+        else if (waitResult == WAIT_FAILED)
+        {
+            std::cerr << "[!] WaitForSingleObject failed: " << GetLastError() << "\n";
+            return "";
+        }
+
+        // Read the response
+        size_t length = *reinterpret_cast<size_t *>(responseBuffer);
+        if (length >= responseBufferSize - sizeof(size_t))
+        {
+            std::cerr << "[!] Response length exceeds buffer size.\n";
+            return "";
+        }
+        char *msgPtr = static_cast<char *>(responseBuffer) + sizeof(size_t);
+        std::string response(msgPtr, length);
+        return response;
+    }
+
 private:
     bool dllInjected = false;
     std::vector<std::wstring> extractedFiles;
     std::wstring bridgeDllPath;
     uintptr_t bridgeDllBase = 0;
-    HANDLE hMapFile = NULL;
 
     // For injected dll communication
-    LPVOID dataBuffer = nullptr;
-    size_t bufferSize = 1024 * 1024;
+    HANDLE hLoggingMapFile = NULL;
+    LPVOID loggingBuffer = nullptr;
+    const size_t loggingBufferSize = 1024 * 1024;
+    HANDLE hResponseMapFile = NULL;
+    LPVOID responseBuffer = NULL;
+    HANDLE hResponseEvent = NULL;
+    const size_t responseBufferSize = 1024 * 1024;
 
     struct FunctionPointers
     {
@@ -571,6 +612,13 @@ private:
         const char *methodName;
         int paramCount;
         ParamValue *paramValues;
+    };
+
+    struct SharedMemoryHeader
+    {
+        size_t head;
+        size_t tail;
+        std::mutex mutex;
     };
 
     /** Extracts a DLL from embedded resources to a temporary file

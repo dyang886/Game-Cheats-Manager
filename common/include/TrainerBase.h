@@ -8,9 +8,7 @@
 #include <iostream>
 #include <map>
 #include <regex>
-#include <string>
 #include <thread>
-#include <vector>
 
 /***********************************************************************
  * HOOK_INFO: Track data about one named hook

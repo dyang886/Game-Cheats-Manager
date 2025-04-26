@@ -1,4 +1,5 @@
-#include <windows.h>
+#include <Windows.h>
+#include <mutex>
 #include <string>
 #include <vector>
 
@@ -44,10 +45,12 @@ struct FunctionPointers
     LPVOID LoadAssemblyThread;
     LPVOID InvokeMethodThread;
 };
+
 struct LoadAssemblyParams
 {
     const char *path;
 };
+
 struct InvokeMethodParams
 {
     const char *namespaceName;
@@ -57,43 +60,42 @@ struct InvokeMethodParams
     ParamValue *paramValues;
 };
 
+struct SharedMemoryHeader
+{
+    size_t head;
+    size_t tail;
+    std::mutex mutex;
+};
+
 MonoDomain *domain = nullptr;
 MonoAssembly *loadedAssembly = nullptr;
 
-static HANDLE hMapFile = NULL;
-static LPVOID pSharedMemory = NULL;
-static const size_t bufferSize = 1024 * 1024; // 1MB
-static const char *sharedMemoryName = "TrainerSharedMemory";
+static HANDLE hLoggingMapFile = NULL;
+static LPVOID loggingBuffer = NULL;
+static const size_t loggingBufferSize = 1024 * 1024; // 1MB
+static HANDLE hResponseMapFile = NULL;
+static LPVOID responseBuffer = NULL;
+static const size_t responseBufferSize = 1024 * 1024;
 
 extern "C" __declspec(dllexport) void SendData(const char *message)
 {
-    if (pSharedMemory == NULL)
+    if (loggingBuffer == NULL)
     {
-        hMapFile = OpenFileMappingA(
-            FILE_MAP_ALL_ACCESS,
-            FALSE,
-            sharedMemoryName
-        );
-
-        if (hMapFile == NULL)
+        DWORD pid = GetCurrentProcessId();
+        std::string loggingSharedMemName = "TrainerLoggingSharedMemory_" + std::to_string(pid);
+        hLoggingMapFile = OpenFileMappingA(FILE_MAP_ALL_ACCESS, FALSE, loggingSharedMemName.c_str());
+        if (hLoggingMapFile == NULL)
         {
             DWORD errorCode = GetLastError();
             return;
         }
 
-        pSharedMemory = MapViewOfFile(
-            hMapFile,
-            FILE_MAP_ALL_ACCESS,
-            0,
-            0,
-            0
-        );
-
-        if (pSharedMemory == NULL)
+        loggingBuffer = MapViewOfFile(hLoggingMapFile, FILE_MAP_ALL_ACCESS, 0, 0, 0);
+        if (loggingBuffer == NULL)
         {
             DWORD errorCode = GetLastError();
-            CloseHandle(hMapFile);
-            hMapFile = NULL;
+            CloseHandle(hLoggingMapFile);
+            hLoggingMapFile = NULL;
             return;
         }
     }
@@ -104,19 +106,27 @@ extern "C" __declspec(dllexport) void SendData(const char *message)
         return;
     }
     size_t length = strlen(message);
-    if (length + 8 > bufferSize)
+    if (length + sizeof(size_t) > loggingBufferSize)
     {
         return;
     }
 
-    volatile bool *available = (volatile bool *)pSharedMemory;
-    int *lengthPtr = (int *)((char *)pSharedMemory + 4);
-    char *msgPtr = (char *)((char *)pSharedMemory + 8);
+    SharedMemoryHeader *header = static_cast<SharedMemoryHeader *>(loggingBuffer);
+    char *bufferStart = static_cast<char *>(loggingBuffer) + sizeof(SharedMemoryHeader);
 
-    *available = false;
-    *lengthPtr = static_cast<int>(length);
-    memcpy(msgPtr, message, length);
-    *available = true;
+    std::lock_guard<std::mutex> lock(header->mutex);
+
+    size_t nextHead = (header->head + sizeof(size_t) + length) % (loggingBufferSize - sizeof(SharedMemoryHeader));
+    if ((header->head < header->tail && nextHead >= header->tail) ||
+        (header->head >= header->tail && nextHead < header->head && nextHead >= header->tail))
+    {
+        // Queue is full
+        return;
+    }
+
+    *reinterpret_cast<size_t *>(bufferStart + header->head) = length;
+    memcpy(bufferStart + header->head + sizeof(size_t), message, length);
+    header->head = nextHead;
 }
 
 void Log(const char *message)
@@ -134,6 +144,58 @@ void LogToFile(const char *message)
         DWORD written;
         WriteFile(hFile, formattedMessage.c_str(), static_cast<DWORD>(formattedMessage.size()), &written, NULL);
         CloseHandle(hFile);
+    }
+}
+
+extern "C" __declspec(dllexport) void SendResponse(const char *message)
+{
+    if (responseBuffer == NULL)
+    {
+        DWORD pid = GetCurrentProcessId();
+        std::string responseSharedMemName = "TrainerResponseSharedMemory_" + std::to_string(pid);
+        hResponseMapFile = OpenFileMappingA(FILE_MAP_ALL_ACCESS, FALSE, responseSharedMemName.c_str());
+        if (hResponseMapFile == NULL)
+        {
+            Log("[!] Could not open response file mapping object");
+            return;
+        }
+        responseBuffer = MapViewOfFile(hResponseMapFile, FILE_MAP_ALL_ACCESS, 0, 0, 0);
+        if (responseBuffer == NULL)
+        {
+            Log("[!] Could not map view of response file");
+            CloseHandle(hResponseMapFile);
+            hResponseMapFile = NULL;
+            return;
+        }
+    }
+
+    if (message == NULL)
+    {
+        Log("[!] Null message in SendResponse");
+        return;
+    }
+
+    size_t length = strlen(message);
+    if (length + sizeof(size_t) > responseBufferSize)
+    {
+        Log("[!] Response too large for buffer");
+        return;
+    }
+
+    *reinterpret_cast<size_t *>(responseBuffer) = length;
+    memcpy(static_cast<char *>(responseBuffer) + sizeof(size_t), message, length);
+
+    DWORD pid = GetCurrentProcessId();
+    std::string eventName = "TrainerResponseEvent_" + std::to_string(pid);
+    HANDLE hEvent = OpenEventA(EVENT_MODIFY_STATE, FALSE, eventName.c_str());
+    if (hEvent != NULL)
+    {
+        SetEvent(hEvent);
+        CloseHandle(hEvent);
+    }
+    else
+    {
+        Log("[!] Could not open response event");
     }
 }
 
