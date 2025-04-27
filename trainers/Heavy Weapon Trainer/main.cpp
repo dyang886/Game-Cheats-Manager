@@ -19,7 +19,7 @@ void apply_callback(Fl_Widget *widget, void *data)
     // Check if the game process is running
     if (!applyData->trainer->isProcessRunning())
     {
-        fl_alert(t("Please run the game first.", language));
+        fl_alert(t("Please run the game first."));
         return;
     }
 
@@ -36,7 +36,7 @@ void apply_callback(Fl_Widget *widget, void *data)
     // Finalize
     if (!status)
     {
-        fl_alert(t("Failed to activate.", language));
+        fl_alert(t("Failed to activate."));
     }
     if (input)
     {
@@ -55,7 +55,7 @@ void toggle_callback(Fl_Widget *widget, void *data)
 
     if (!toggleData->trainer->isProcessRunning())
     {
-        fl_alert(t("Please run the game first.", language));
+        fl_alert(t("Please run the game first."));
         button->value(0);
         return;
     }
@@ -172,7 +172,7 @@ void toggle_callback(Fl_Widget *widget, void *data)
     // Finalize
     if (!status)
     {
-        fl_alert(t("Failed to activate/deactivate.", language));
+        fl_alert(t("Failed to activate/deactivate."));
         button->value(0);
     }
     button->value() ? input->readonly(1) : input->readonly(0);
@@ -254,8 +254,8 @@ int main(int argc, char **argv)
 
     // Process Information
     Fl_Box *process_name = new Fl_Box(left_margin, lang_flex_height + imageSize.second + 10, imageSize.first, font_size);
-    process_name->tooltip("Process Name:");
     process_name->align(FL_ALIGN_TOP_LEFT | FL_ALIGN_INSIDE);
+    tr(process_name, "Process Name:");
 
     Fl_Box *process_exe = new Fl_Box(left_margin, lang_flex_height + imageSize.second + font_size + 20, imageSize.first, font_size);
     process_exe->align(FL_ALIGN_TOP_LEFT | FL_ALIGN_INSIDE);
@@ -265,7 +265,7 @@ int main(int argc, char **argv)
 
     Fl_Box *process_id_label = new Fl_Box(0, 0, 0, 0);
     process_id_label->align(FL_ALIGN_LEFT | FL_ALIGN_INSIDE);
-    process_id_label->tooltip("Process ID:");
+    tr(process_id_label, "Process ID:");
 
     Fl_Box *process_id = new Fl_Box(0, 0, 0, 0);
     process_id->align(FL_ALIGN_TOP_LEFT | FL_ALIGN_INSIDE);
@@ -297,7 +297,7 @@ int main(int argc, char **argv)
     life_flex->fixed(life_check_button, button_w);
 
     Fl_Box *life_label = new Fl_Box(0, 0, 0, 0);
-    life_label->tooltip("Set Life Count");
+    tr(life_label, "Set Life Count");
 
     Fl_Input *life_input = new Fl_Input(0, 0, 0, 0);
     life_flex->fixed(life_input, input_w);
@@ -320,7 +320,7 @@ int main(int argc, char **argv)
     shield_flex->fixed(shield_check_button, button_w);
 
     Fl_Box *shield_label = new Fl_Box(0, 0, 0, 0);
-    shield_label->tooltip("Set Shield Level");
+    tr(shield_label, "Set Shield Level");
 
     Fl_Input *shield_input = new Fl_Input(0, 0, 0, 0);
     shield_flex->fixed(shield_input, input_w);
@@ -343,7 +343,7 @@ int main(int argc, char **argv)
     nuke_flex->fixed(nuke_check_button, button_w);
 
     Fl_Box *nuke_label = new Fl_Box(0, 0, 0, 0);
-    nuke_label->tooltip("Set Nuke Amount");
+    tr(nuke_label, "Set Nuke Amount");
 
     Fl_Input *nuke_input = new Fl_Input(0, 0, 0, 0);
     nuke_flex->fixed(nuke_input, input_w);
@@ -366,7 +366,7 @@ int main(int argc, char **argv)
     defense_orbs_flex->fixed(defense_orbs_check_button, button_w);
 
     Fl_Box *defense_orbs_label = new Fl_Box(0, 0, 0, 0);
-    defense_orbs_label->tooltip("Set Defense Orbs Level");
+    tr(defense_orbs_label, "Set Defense Orbs Level");
 
     Fl_Input *defense_orbs_input = new Fl_Input(0, 0, 0, 0);
     defense_orbs_flex->fixed(defense_orbs_input, input_w);
@@ -389,7 +389,7 @@ int main(int argc, char **argv)
     homing_missile_flex->fixed(homing_missile_check_button, button_w);
 
     Fl_Box *homing_missile_label = new Fl_Box(0, 0, 0, 0);
-    homing_missile_label->tooltip("Set Homing Missile Level");
+    tr(homing_missile_label, "Set Homing Missile Level");
 
     Fl_Input *homing_missile_input = new Fl_Input(0, 0, 0, 0);
     homing_missile_flex->fixed(homing_missile_input, input_w);
@@ -412,7 +412,7 @@ int main(int argc, char **argv)
     laser_flex->fixed(laser_check_button, button_w);
 
     Fl_Box *laser_label = new Fl_Box(0, 0, 0, 0);
-    laser_label->tooltip("Set Laser Level");
+    tr(laser_label, "Set Laser Level");
 
     Fl_Input *laser_input = new Fl_Input(0, 0, 0, 0);
     laser_flex->fixed(laser_input, input_w);
@@ -435,7 +435,7 @@ int main(int argc, char **argv)
     rockets_flex->fixed(rockets_check_button, button_w);
 
     Fl_Box *rockets_label = new Fl_Box(0, 0, 0, 0);
-    rockets_label->tooltip("Set Rockets Level");
+    tr(rockets_label, "Set Rockets Level");
 
     Fl_Input *rockets_input = new Fl_Input(0, 0, 0, 0);
     rockets_flex->fixed(rockets_input, input_w);
@@ -458,7 +458,7 @@ int main(int argc, char **argv)
     flak_cannon_flex->fixed(flak_cannon_check_button, button_w);
 
     Fl_Box *flak_cannon_label = new Fl_Box(0, 0, 0, 0);
-    flak_cannon_label->tooltip("Set Flak Cannon Level");
+    tr(flak_cannon_label, "Set Flak Cannon Level");
 
     Fl_Input *flak_cannon_input = new Fl_Input(0, 0, 0, 0);
     flak_cannon_flex->fixed(flak_cannon_input, input_w);
@@ -481,7 +481,7 @@ int main(int argc, char **argv)
     thunder_strike_flex->fixed(thunder_strike_check_button, button_w);
 
     Fl_Box *thunder_strike_label = new Fl_Box(0, 0, 0, 0);
-    thunder_strike_label->tooltip("Set Thunder Strike Level");
+    tr(thunder_strike_label, "Set Thunder Strike Level");
 
     Fl_Input *thunder_strike_input = new Fl_Input(0, 0, 0, 0);
     thunder_strike_flex->fixed(thunder_strike_input, input_w);
@@ -496,7 +496,7 @@ int main(int argc, char **argv)
 
     Fl_Box *spacerBottom = new Fl_Box(0, 0, 0, 0);
     options1_flex->end();
-    change_language(window, language);
+    change_language(language, window);
 
     // =========================
     // Finalize and Show Window

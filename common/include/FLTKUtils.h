@@ -55,6 +55,7 @@ using json = nlohmann::json;
 
 int font_size = 15;
 std::unordered_map<std::string, std::unordered_map<std::string, std::string>> translations;
+std::vector<std::pair<Fl_Widget *, std::string>> translatable_widgets;
 std::string language = "en_US";
 std::string settings_path = "";
 
@@ -209,65 +210,35 @@ void setupLanguage()
     saveSettings();
 }
 
-void change_language(Fl_Group *group, const std::string &lang)
+void change_language(const std::string &lang, Fl_Group *group)
 {
     group->hide();
-    if (group->tooltip())
+
+    for (const auto &[child, key] : translatable_widgets)
     {
-        // Find the translation for the window title
         auto lang_translations = translations.find(lang);
         if (lang_translations != translations.end())
         {
-            auto label_it = lang_translations->second.find(group->tooltip());
+            auto label_it = lang_translations->second.find(key);
             if (label_it != lang_translations->second.end())
             {
-                group->copy_label(label_it->second.c_str());
-            }
-        }
-    }
+                // Update the label with the translated text
+                child->copy_label(label_it->second.c_str());
+                child->labelsize(font_size);
+                child->labelfont(FL_FREE_FONT);
+                child->labelcolor(FL_WHITE);
 
-    for (int i = 0; i < group->children(); ++i)
-    {
-        Fl_Widget *child = group->child(i);
-        if (!child)
-            continue;
-
-        // If the child is a group, recurse into it
-        Fl_Group *subgroup = dynamic_cast<Fl_Group *>(child);
-        if (subgroup)
-        {
-            change_language(subgroup, lang);
-            continue;
-        }
-
-        // Process other widgets (non-groups)
-        if (child->tooltip())
-        {
-            // Find the translation for the current label
-            auto lang_translations = translations.find(lang);
-            if (lang_translations != translations.end())
-            {
-                auto label_it = lang_translations->second.find(child->tooltip());
-                if (label_it != lang_translations->second.end())
+                Fl_Button *button = dynamic_cast<Fl_Button *>(child);
+                if (button)
                 {
-                    // Update the label with the translated text
-                    child->copy_label(label_it->second.c_str());
-                    child->labelsize(font_size);
-                    child->labelfont(FL_FREE_FONT);
-                    child->labelcolor(FL_WHITE);
+                    button->labelcolor(FL_BLACK);
+                    continue;
+                }
 
-                    Fl_Button *button = dynamic_cast<Fl_Button *>(child);
-                    if (button)
-                    {
-                        button->labelcolor(FL_BLACK);
-                        continue;
-                    }
-
-                    Fl_Flex *parent_flex = dynamic_cast<Fl_Flex *>(child->parent());
-                    if (parent_flex)
-                    {
-                        parent_flex->fixed(child, fl_width(child->label()));
-                    }
+                Fl_Flex *parent_flex = dynamic_cast<Fl_Flex *>(child->parent());
+                if (parent_flex)
+                {
+                    parent_flex->fixed(child, fl_width(child->label()));
                 }
             }
         }
@@ -285,21 +256,28 @@ void change_language_callback(Fl_Widget *widget, void *data)
     std::string lang = changeLanguageData->lang;
     Fl_Group *group = changeLanguageData->group;
 
-    change_language(group, lang);
+    change_language(lang, group);
 }
 
-const char *t(const std::string &message, const std::string &lang)
+// Assign translation key for translating widget's label
+void tr(Fl_Widget *widget, const std::string &key)
 {
-    auto lang_translations = translations.find(lang);
-    if (lang_translations != translations.end())
+    translatable_widgets.emplace_back(widget, key);
+}
+
+// Directly translate a string using the current language
+const char *t(const std::string &key)
+{
+    auto lang_it = translations.find(language);
+    if (lang_it != translations.end())
     {
-        auto message_it = lang_translations->second.find(message);
-        if (message_it != lang_translations->second.end())
+        auto trans_it = lang_it->second.find(key);
+        if (trans_it != lang_it->second.end())
         {
-            return message_it->second.c_str();
+            return trans_it->second.c_str();
         }
     }
-    return message.c_str();
+    return key.c_str();
 }
 
 void uncheck_all_checkbuttons(Fl_Group *group)

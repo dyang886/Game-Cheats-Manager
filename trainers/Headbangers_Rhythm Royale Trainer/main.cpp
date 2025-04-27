@@ -19,7 +19,7 @@ void apply_callback(Fl_Widget *widget, void *data)
     // Check if the game process is running
     if (!applyData->trainer->isProcessRunning())
     {
-        fl_alert(t("Please run the game first.", language));
+        fl_alert(t("Please run the game first."));
         return;
     }
 
@@ -34,7 +34,7 @@ void apply_callback(Fl_Widget *widget, void *data)
     // Finalize
     if (!status)
     {
-        fl_alert(t("Failed to activate.", language));
+        fl_alert(t("Failed to activate."));
     }
     button->value() ? input->readonly(1) : input->readonly(0);
 }
@@ -50,7 +50,7 @@ void toggle_callback(Fl_Widget *widget, void *data)
 
     if (!toggleData->trainer->isProcessRunning())
     {
-        fl_alert(t("Please run the game first.", language));
+        fl_alert(t("Please run the game first."));
         button->value(0);
         return;
     }
@@ -101,7 +101,7 @@ void toggle_callback(Fl_Widget *widget, void *data)
     // Finalize
     if (!status)
     {
-        fl_alert(t("Failed to activate/deactivate.", language));
+        fl_alert(t("Failed to activate/deactivate."));
         button->value(0);
     }
     button->value() ? input->readonly(1) : input->readonly(0);
@@ -183,8 +183,8 @@ int main(int argc, char **argv)
 
     // Process Information
     Fl_Box *process_name = new Fl_Box(left_margin, lang_flex_height + imageSize.second + 10, imageSize.first, font_size);
-    process_name->tooltip("Process Name:");
     process_name->align(FL_ALIGN_TOP_LEFT | FL_ALIGN_INSIDE);
+    tr(process_name, "Process Name:");
 
     Fl_Box *process_exe = new Fl_Box(left_margin, lang_flex_height + imageSize.second + font_size + 20, imageSize.first, font_size);
     process_exe->align(FL_ALIGN_TOP_LEFT | FL_ALIGN_INSIDE);
@@ -194,7 +194,7 @@ int main(int argc, char **argv)
 
     Fl_Box *process_id_label = new Fl_Box(0, 0, 0, 0);
     process_id_label->align(FL_ALIGN_LEFT | FL_ALIGN_INSIDE);
-    process_id_label->tooltip("Process ID:");
+    tr(process_id_label, "Process ID:");
 
     Fl_Box *process_id = new Fl_Box(0, 0, 0, 0);
     process_id->align(FL_ALIGN_TOP_LEFT | FL_ALIGN_INSIDE);
@@ -226,7 +226,7 @@ int main(int argc, char **argv)
     bread_flex->fixed(bread_check_button, button_w);
 
     Fl_Box *bread_label = new Fl_Box(0, 0, 0, 0);
-    bread_label->tooltip("Set Bread");
+    tr(bread_label, "Set Bread");
 
     Fl_Input *bread_input = new Fl_Input(0, 0, 0, 0);
     bread_flex->fixed(bread_input, input_w);
@@ -249,7 +249,7 @@ int main(int argc, char **argv)
     exp_flex->fixed(exp_check_button, button_w);
 
     Fl_Box *exp_label = new Fl_Box(0, 0, 0, 0);
-    exp_label->tooltip("Set Season Pass XP");
+    tr(exp_label, "Set Season Pass XP");
 
     Fl_Input *exp_input = new Fl_Input(0, 0, 0, 0);
     exp_flex->fixed(exp_input, input_w);
@@ -272,7 +272,7 @@ int main(int argc, char **argv)
     wins_flex->fixed(wins_check_button, button_w);
 
     Fl_Box *wins_label = new Fl_Box(0, 0, 0, 0);
-    wins_label->tooltip("Set Number of Wins");
+    tr(wins_label, "Set Number of Wins");
 
     Fl_Input *wins_input = new Fl_Input(0, 0, 0, 0);
     wins_flex->fixed(wins_input, input_w);
@@ -287,7 +287,7 @@ int main(int argc, char **argv)
 
     Fl_Box *spacerBottom = new Fl_Box(0, 0, 0, 0);
     options1_flex->end();
-    change_language(window, language);
+    change_language(language, window);
 
     // =========================
     // Finalize and Show Window

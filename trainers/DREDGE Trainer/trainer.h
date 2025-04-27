@@ -22,11 +22,11 @@ public:
         return false;
     }
 
-    std::string getItemList(std::string language)
+    std::string getItemList()
     {
         if (initializeDllInjection())
         {
-            return invokeMethodReturn("", "GCMInjection", "GetItemList", {language});
+            return invokeMethodReturn("", "GCMInjection", "GetItemList", {});
         }
         return "";
     }

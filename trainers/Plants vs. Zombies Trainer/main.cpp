@@ -19,7 +19,7 @@ void apply_callback(Fl_Widget *widget, void *data)
     // Check if the game process is running
     if (!applyData->trainer->isProcessRunning())
     {
-        fl_alert(t("Please run the game first.", language));
+        fl_alert(t("Please run the game first."));
         return;
     }
 
@@ -34,7 +34,7 @@ void apply_callback(Fl_Widget *widget, void *data)
     // Finalize
     if (!status)
     {
-        fl_alert(t("Failed to activate.", language));
+        fl_alert(t("Failed to activate."));
     }
     button->value() ? input->readonly(1) : input->readonly(0);
 }
@@ -50,7 +50,7 @@ void toggle_callback(Fl_Widget *widget, void *data)
 
     if (!toggleData->trainer->isProcessRunning())
     {
-        fl_alert(t("Please run the game first.", language));
+        fl_alert(t("Please run the game first."));
         button->value(0);
         return;
     }
@@ -134,7 +134,7 @@ void toggle_callback(Fl_Widget *widget, void *data)
     // Finalize
     if (!status)
     {
-        fl_alert(t("Failed to activate/deactivate.", language));
+        fl_alert(t("Failed to activate/deactivate."));
         button->value(0);
     }
     button->value() ? input->readonly(1) : input->readonly(0);
@@ -216,8 +216,8 @@ int main(int argc, char **argv)
 
     // Process Information
     Fl_Box *process_name = new Fl_Box(left_margin, lang_flex_height + imageSize.second + 10, imageSize.first, font_size);
-    process_name->tooltip("Process Name:");
     process_name->align(FL_ALIGN_TOP_LEFT | FL_ALIGN_INSIDE);
+    tr(process_name, "Process Name:");
 
     Fl_Box *process_exe = new Fl_Box(left_margin, lang_flex_height + imageSize.second + font_size + 20, imageSize.first, font_size);
     process_exe->align(FL_ALIGN_TOP_LEFT | FL_ALIGN_INSIDE);
@@ -227,7 +227,7 @@ int main(int argc, char **argv)
 
     Fl_Box *process_id_label = new Fl_Box(0, 0, 0, 0);
     process_id_label->align(FL_ALIGN_LEFT | FL_ALIGN_INSIDE);
-    process_id_label->tooltip("Process ID:");
+    tr(process_id_label, "Process ID:");
 
     Fl_Box *process_id = new Fl_Box(0, 0, 0, 0);
     process_id->align(FL_ALIGN_TOP_LEFT | FL_ALIGN_INSIDE);
@@ -259,7 +259,7 @@ int main(int argc, char **argv)
     coin_flex->fixed(coin_check_button, button_w);
 
     Fl_Box *coin_label = new Fl_Box(0, 0, 0, 0);
-    coin_label->tooltip("Add Coins");
+    tr(coin_label, "Add Coin");
 
     Fl_Input *coin_input = new Fl_Input(0, 0, 0, 0);
     coin_flex->fixed(coin_input, input_w);
@@ -282,7 +282,7 @@ int main(int argc, char **argv)
     sun_flex->fixed(sun_check_button, button_w);
 
     Fl_Box *sun_label = new Fl_Box(0, 0, 0, 0);
-    sun_label->tooltip("Add Sun");
+    tr(sun_label, "Add Sun");
 
     Fl_Input *sun_input = new Fl_Input(0, 0, 0, 0);
     sun_flex->fixed(sun_input, input_w);
@@ -305,7 +305,7 @@ int main(int argc, char **argv)
     fertilizer_flex->fixed(fertilizer_check_button, button_w);
 
     Fl_Box *fertilizer_label = new Fl_Box(0, 0, 0, 0);
-    fertilizer_label->tooltip("Set Fertilizer");
+    tr(fertilizer_label, "Set Fertilizer");
 
     Fl_Input *fertilizer_input = new Fl_Input(0, 0, 0, 0);
     fertilizer_flex->fixed(fertilizer_input, input_w);
@@ -328,7 +328,7 @@ int main(int argc, char **argv)
     bug_spray_flex->fixed(bug_spray_check_button, button_w);
 
     Fl_Box *bug_spray_label = new Fl_Box(0, 0, 0, 0);
-    bug_spray_label->tooltip("Set Bug Spray");
+    tr(bug_spray_label, "Set Bug Spray");
 
     Fl_Input *bug_spray_input = new Fl_Input(0, 0, 0, 0);
     bug_spray_flex->fixed(bug_spray_input, input_w);
@@ -351,7 +351,7 @@ int main(int argc, char **argv)
     chocolate_flex->fixed(chocolate_check_button, button_w);
 
     Fl_Box *chocolate_label = new Fl_Box(0, 0, 0, 0);
-    chocolate_label->tooltip("Set Chocolate");
+    tr(chocolate_label, "Set Chocolate");
 
     Fl_Input *chocolate_input = new Fl_Input(0, 0, 0, 0);
     chocolate_flex->fixed(chocolate_input, input_w);
@@ -374,7 +374,7 @@ int main(int argc, char **argv)
     tree_food_flex->fixed(tree_food_check_button, button_w);
 
     Fl_Box *tree_food_label = new Fl_Box(0, 0, 0, 0);
-    tree_food_label->tooltip("Set Tree Food");
+    tr(tree_food_label, "Set Tree Food");
 
     Fl_Input *tree_food_input = new Fl_Input(0, 0, 0, 0);
     tree_food_flex->fixed(tree_food_input, input_w);
@@ -389,7 +389,7 @@ int main(int argc, char **argv)
 
     Fl_Box *spacerBottom = new Fl_Box(0, 0, 0, 0);
     options1_flex->end();
-    change_language(window, language);
+    change_language(language, window);
 
     // =========================
     // Finalize and Show Window

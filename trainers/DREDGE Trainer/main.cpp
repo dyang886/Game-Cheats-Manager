@@ -9,6 +9,8 @@
 #include "MonoBase.h"
 #include "FLTKUtils.h"
 
+static Fl_Window *info_window = nullptr;
+
 // Callback function for apply button
 void apply_callback(Fl_Widget *widget, void *data)
 {
@@ -21,7 +23,7 @@ void apply_callback(Fl_Widget *widget, void *data)
     // Check if the game process is running
     if (!applyData->trainer->isProcessRunning())
     {
-        fl_alert(t("Please run the game first.", language));
+        fl_alert(t("Please run the game first."));
         return;
     }
 
@@ -58,7 +60,7 @@ void apply_callback(Fl_Widget *widget, void *data)
     // Finalize
     if (!status)
     {
-        fl_alert(t("Failed to activate.", language));
+        fl_alert(t("Failed to activate."));
     }
     if (input)
         button->value() ? input->readonly(1) : input->readonly(0);
@@ -75,7 +77,7 @@ void toggle_callback(Fl_Widget *widget, void *data)
 
     if (!toggleData->trainer->isProcessRunning())
     {
-        fl_alert(t("Please run the game first.", language));
+        fl_alert(t("Please run the game first."));
         button->value(0);
         return;
     }
@@ -115,7 +117,7 @@ void toggle_callback(Fl_Widget *widget, void *data)
     // Finalize
     if (!status)
     {
-        fl_alert(t("Failed to activate/deactivate.", language));
+        fl_alert(t("Failed to activate/deactivate."));
         button->value(0);
     }
     if (input)
@@ -149,9 +151,9 @@ protected:
             fl_rectf(x, y, w, h);
             fl_color(FL_WHITE);
             if (col == 0)
-                fl_draw("Item ID", x + 4, y, w, h, FL_ALIGN_LEFT);
+                fl_draw(t("Item ID"), x + 4, y, w, h, FL_ALIGN_LEFT);
             else
-                fl_draw("Item Name", x + 4, y, w, h, FL_ALIGN_LEFT);
+                fl_draw(t("Item Name"), x + 4, y, w, h, FL_ALIGN_LEFT);
             fl_pop_clip();
             return;
         case CONTEXT_CELL:
@@ -310,7 +312,6 @@ void info_callback(Fl_Widget *widget, void *data)
     Trainer *trainer = info_data->trainer;
     Fl_Input *input = info_data->input;
 
-    static Fl_Window *info_window = nullptr;
     if (info_window && info_window->shown())
     {
         info_window->show();
@@ -328,11 +329,10 @@ void info_callback(Fl_Widget *widget, void *data)
     int info_x = trainer_x + (trainer_w - info_w) / 2;
     int info_y = trainer_y + (trainer_h - info_h) / 2;
 
-    info_window = new Fl_Window(info_x, info_y, info_w, info_h, "Item List");
-    info_window->color(FL_FREE_COLOR);
-    info_window->tooltip(nullptr); // No tooltip display
+    info_window = new Fl_Window(info_x, info_y, info_w, info_h, t("Item List"));
+    info_window->icon((char *)LoadIconA(GetModuleHandle(NULL), "APP_ICON"));
 
-    std::string itemList = trainer->getItemList(language);
+    std::string itemList = trainer->getItemList();
     std::vector<std::pair<int, std::string>> items;
     std::istringstream iss(itemList);
     std::string line;
@@ -363,12 +363,21 @@ void info_callback(Fl_Widget *widget, void *data)
     info_window->show();
 }
 
+static void main_window_close_callback(Fl_Widget *w, void *)
+{
+    if (info_window)
+    {
+        Fl::delete_widget(info_window);
+        info_window = nullptr;
+    }
+    Fl::delete_widget(w);
+}
+
 // ===========================================================================
 // Main Function
 // ===========================================================================
 int main(int argc, char **argv)
 {
-    Fl::option(Fl::OPTION_SHOW_TOOLTIPS, false);
     Trainer trainer;
     setupLanguage();
     load_translations("TRANSLATION_JSON");
@@ -386,7 +395,8 @@ int main(int argc, char **argv)
     Fl::set_color(FL_FREE_COLOR, 0x1c1c1c00);
     window->color(FL_FREE_COLOR);
     window->icon((char *)LoadIconA(GetModuleHandle(NULL), "APP_ICON"));
-    window->tooltip("DREDGE Trainer");
+    window->callback(main_window_close_callback);
+    tr(window, "DREDGE Trainer");
 
     int left_margin = 20;
     int button_w = 50;
@@ -442,8 +452,8 @@ int main(int argc, char **argv)
 
     // Process Information
     Fl_Box *process_name = new Fl_Box(left_margin, lang_flex_height + imageSize.second + 10, imageSize.first, font_size);
-    process_name->tooltip("Process Name:");
     process_name->align(FL_ALIGN_TOP_LEFT | FL_ALIGN_INSIDE);
+    tr(process_name, "Process Name:");
 
     Fl_Box *process_exe = new Fl_Box(left_margin, lang_flex_height + imageSize.second + font_size + 20, imageSize.first, font_size);
     process_exe->align(FL_ALIGN_TOP_LEFT | FL_ALIGN_INSIDE);
@@ -453,7 +463,7 @@ int main(int argc, char **argv)
 
     Fl_Box *process_id_label = new Fl_Box(0, 0, 0, 0);
     process_id_label->align(FL_ALIGN_LEFT | FL_ALIGN_INSIDE);
-    process_id_label->tooltip("Process ID:");
+    tr(process_id_label, "Process ID:");
 
     Fl_Box *process_id = new Fl_Box(0, 0, 0, 0);
     process_id->align(FL_ALIGN_TOP_LEFT | FL_ALIGN_INSIDE);
@@ -485,7 +495,7 @@ int main(int argc, char **argv)
     god_mode_flex->fixed(god_mode_check_button, button_w);
 
     Fl_Box *god_mode_label = new Fl_Box(0, 0, 0, 0);
-    god_mode_label->tooltip("God Mode");
+    tr(god_mode_label, "God Mode");
 
     ToggleData *data_god_mode = new ToggleData{&trainer, "GodMode", god_mode_check_button, nullptr};
     god_mode_check_button->callback(toggle_callback, data_god_mode);
@@ -501,10 +511,10 @@ int main(int argc, char **argv)
 
     Fl_Button *spawn_item_apply_button = new Fl_Button(0, 0, 0, 0);
     spawn_item_flex->fixed(spawn_item_apply_button, button_w);
-    spawn_item_apply_button->tooltip("Apply");
+    tr(spawn_item_apply_button, "Apply");
 
     Fl_Box *spawn_item_label = new Fl_Box(0, 0, 0, 0);
-    spawn_item_label->tooltip("Spawn Item");
+    tr(spawn_item_label, "Spawn Item");
 
     Fl_Input *spawn_item_input = new Fl_Input(0, 0, 0, 0);
     spawn_item_flex->fixed(spawn_item_input, input_w);
@@ -538,10 +548,10 @@ int main(int argc, char **argv)
 
     Fl_Button *funds_apply_button = new Fl_Button(0, 0, 0, 0);
     funds_flex->fixed(funds_apply_button, button_w);
-    funds_apply_button->tooltip("Apply");
+    tr(funds_apply_button, "Apply");
 
     Fl_Box *funds_label = new Fl_Box(0, 0, 0, 0);
-    funds_label->tooltip("Add Funds");
+    tr(funds_label, "Add Funds");
 
     Fl_Input *funds_input = new Fl_Input(0, 0, 0, 0);
     funds_flex->fixed(funds_input, input_w);
@@ -562,10 +572,10 @@ int main(int argc, char **argv)
 
     Fl_Button *repair_all_apply_button = new Fl_Button(0, 0, 0, 0);
     repair_all_flex->fixed(repair_all_apply_button, button_w);
-    repair_all_apply_button->tooltip("Apply");
+    tr(repair_all_apply_button, "Apply");
 
     Fl_Box *repair_all_label = new Fl_Box(0, 0, 0, 0);
-    repair_all_label->tooltip("Repair All");
+    tr(repair_all_label, "Repair All");
 
     ApplyData *data_repair_all = new ApplyData{&trainer, "RepairAll", repair_all_apply_button, nullptr};
     repair_all_apply_button->callback(apply_callback, data_repair_all);
@@ -581,10 +591,10 @@ int main(int argc, char **argv)
 
     Fl_Button *restock_all_apply_button = new Fl_Button(0, 0, 0, 0);
     restock_all_flex->fixed(restock_all_apply_button, button_w);
-    restock_all_apply_button->tooltip("Apply");
+    tr(restock_all_apply_button, "Apply");
 
     Fl_Box *restock_all_label = new Fl_Box(0, 0, 0, 0);
-    restock_all_label->tooltip("Restock All");
+    tr(restock_all_label, "Restock All");
 
     ApplyData *data_restock_all = new ApplyData{&trainer, "RestockAll", restock_all_apply_button, nullptr};
     restock_all_apply_button->callback(apply_callback, data_restock_all);
@@ -600,10 +610,10 @@ int main(int argc, char **argv)
 
     Fl_Button *clear_weather_apply_button = new Fl_Button(0, 0, 0, 0);
     clear_weather_flex->fixed(clear_weather_apply_button, button_w);
-    clear_weather_apply_button->tooltip("Apply");
+    tr(clear_weather_apply_button, "Apply");
 
     Fl_Box *clear_weather_label = new Fl_Box(0, 0, 0, 0);
-    clear_weather_label->tooltip("Clear Weather");
+    tr(clear_weather_label, "Clear Weather");
 
     ApplyData *data_clear_weather = new ApplyData{&trainer, "ClearWeather", clear_weather_apply_button, nullptr};
     clear_weather_apply_button->callback(apply_callback, data_clear_weather);
@@ -621,7 +631,7 @@ int main(int argc, char **argv)
     freeze_time_flex->fixed(freeze_time_check_button, button_w);
 
     Fl_Box *freeze_time_label = new Fl_Box(0, 0, 0, 0);
-    freeze_time_label->tooltip("Freeze Time");
+    tr(freeze_time_label, "Freeze Time");
 
     ToggleData *data_freeze_time = new ToggleData{&trainer, "FreezeTime", freeze_time_check_button, nullptr};
     freeze_time_check_button->callback(toggle_callback, data_freeze_time);
@@ -632,7 +642,7 @@ int main(int argc, char **argv)
     // ------------------------------------------------------------------
     Fl_Box *spacerBottom = new Fl_Box(0, 0, 0, 0);
     options1_flex->end();
-    change_language(window, language);
+    change_language(language, window);
 
     // =========================
     // Finalize and Show Window
