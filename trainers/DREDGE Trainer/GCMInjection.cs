@@ -152,7 +152,7 @@ public static class GCMInjection
         });
     }
 
-    public static void GetItemList()
+    public static void GetItemList(string language)
     {
         MainThreadDispatcher.Enqueue(() =>
         {

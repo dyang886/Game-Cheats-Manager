@@ -1,5 +1,6 @@
 APP_ICON ICON "../../common/assets/logo.ico"
-LOGO_IMG RCDATA "logo.jpg"
+INFO_IMG RCDATA "../../common/assets/info.png"
+LOGO_IMG RCDATA "logo.png"
 TRANSLATION_JSON RCDATA "translations.json"
 MONOBRIDGE_DLL RCDATA "../../common/libs/x86/MonoBridge.dll"
 GCMINJECTION_DLL RCDATA "GCMInjection.dll"

@@ -17,9 +17,18 @@ public:
     {
         if (initializeDllInjection())
         {
-            std::cout << invokeMethodReturn("", "GCMInjection", "GetItemList", {}) << std::endl;
+            return invokeMethod("", "GCMInjection", "GodMode", {enable});
         }
-        return true;
+        return false;
+    }
+
+    std::string getItemList(std::string language)
+    {
+        if (initializeDllInjection())
+        {
+            return invokeMethodReturn("", "GCMInjection", "GetItemList", {language});
+        }
+        return "";
     }
 
     bool spawnItem(int itemIndex)

@@ -1,7 +1,7 @@
 // main.cpp
 #include <FL/Fl.H>
 #include <FL/Fl_Radio_Round_Button.H>
-#include <FL/Fl_JPEG_Image.H>
+#include <FL/Fl_PNG_Image.H>
 #include <FL/Fl_Flex.H>
 #include <FL/forms.H>
 #include "trainer.h"
@@ -117,8 +117,15 @@ int main(int argc, char **argv)
     load_translations("TRANSLATION_JSON");
 
     // Create the main window
+    int win_w = 800;
+    int win_h = 600;
+    int screen_w = Fl::w();
+    int screen_h = Fl::h();
+    int win_x = (screen_w - win_w) / 2;
+    int win_y = (screen_h - win_h) / 2;
+
+    Fl_Window *window = new Fl_Window(win_x, win_y, win_w, win_h);
     Fl::scheme("gtk+");
-    Fl_Window *window = new Fl_Window(800, 600);
     Fl::set_color(FL_FREE_COLOR, 0x1c1c1c00);
     window->color(FL_FREE_COLOR);
     window->icon((char *)LoadIconA(GetModuleHandle(NULL), "APP_ICON"));
@@ -169,7 +176,7 @@ int main(int argc, char **argv)
 
     DWORD img_size = 0;
     const unsigned char *data = load_resource("LOGO_IMG", img_size);
-    Fl_JPEG_Image *game_img = new Fl_JPEG_Image(nullptr, data, (int)img_size);
+    Fl_PNG_Image *game_img = new Fl_PNG_Image(nullptr, data, (int)img_size);
     game_img->scale(imageSize.first, imageSize.second, 1, 0);
     Fl_Box *img_box = new Fl_Box(20, lang_flex_height, imageSize.first, imageSize.second);
     img_box->image(game_img);

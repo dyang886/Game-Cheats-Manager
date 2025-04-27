@@ -13,7 +13,10 @@
         "Repair All": "Repair All",
         "Restock All": "Restock All Fishing Spots",
         "Clear Weather": "Clear Weather",
-        "Freeze Time": "Freeze Time"
+        "Freeze Time": "Freeze Time",
+        "Item List": "Item List",
+        "Item ID": "Item ID",
+        "Item Name": "Item Name"
     },
     "zh_CN": {
         "Please run the game first.": "请先运行游戏。",
@@ -29,6 +32,9 @@
         "Repair All": "全部修复",
         "Restock All": "补充所有钓鱼点",
         "Clear Weather": "晴朗天气",
-        "Freeze Time": "锁定时间"
+        "Freeze Time": "锁定时间",
+        "Item List": "物品列表",
+        "Item ID": "物品 ID",
+        "Item Name": "物品名称"
     }
 }

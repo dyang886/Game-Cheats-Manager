@@ -14,7 +14,8 @@ if(CMAKE_SIZEOF_VOID_P EQUAL 8)
         "${FLTK_LIB_DIR}/fltk.lib"
         "${FLTK_LIB_DIR}/fltk_forms.lib"
         "${FLTK_LIB_DIR}/fltk_images.lib"
-        "${FLTK_LIB_DIR}/fltk_jpeg.lib"
+        "${FLTK_LIB_DIR}/fltk_png.lib"
+        "${FLTK_LIB_DIR}/fltk_z.lib"
     )
     set(MONO_BRIDGE_DEST_DIR "${CMAKE_CURRENT_SOURCE_DIR}/libs/x64")
 else()
@@ -24,7 +25,8 @@ else()
         "${FLTK_LIB_DIR}/fltk.lib"
         "${FLTK_LIB_DIR}/fltk_forms.lib"
         "${FLTK_LIB_DIR}/fltk_images.lib"
-        "${FLTK_LIB_DIR}/fltk_jpeg.lib"
+        "${FLTK_LIB_DIR}/fltk_png.lib"
+        "${FLTK_LIB_DIR}/fltk_z.lib"
     )
     set(MONO_BRIDGE_DEST_DIR "${CMAKE_CURRENT_SOURCE_DIR}/libs/x86")
 endif()
