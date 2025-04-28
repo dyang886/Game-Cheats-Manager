@@ -1,5 +1,6 @@
 {
     "en_US": {
+        "English": "English",
         "Please run the game first.": "Please run the game first.",
         "Failed to activate.": "Failed to activate.",
         "Failed to activate/deactivate.": "Failed to activate/deactivate.",
@@ -21,6 +22,7 @@
         "Set Sword Distance": "Set Sword Distance"
     },
     "zh_CN": {
+        "简体中文": "简体中文",
         "Please run the game first.": "请先运行游戏。",
         "Failed to activate.": "激活失败。",
         "Failed to activate/deactivate.": "激活/停用失败。",
@@ -37,7 +39,7 @@
         "Set Arrow Distance": "设置弓箭距离",
         "Set Arrow Count": "设置弓箭数量",
         "Set Sword Damage": "设置御剑伤害",
-        "Set Sword Cooldown": "设置御剑CD",
+        "Set Sword Cooldown": "设置御剑 CD",
         "Set Sword Speed": "设置御剑速度",
         "Set Sword Distance": "设置御剑距离"
     }

@@ -1,0 +1,840 @@
+0>Fisherman's Note
+1>6th, 7th March 1927
+2>Tattered Receipt
+3>1st June 1927
+4>20th August 1927
+5>21st August 1927
+6>9th September 1927
+7>14th September 1927
+8>???
+9>???
+10>Artifact Manifest
+11>Captain's Log - 30th May, 1847
+12>Captain's Log - 1st June, 1847
+13>Captain's Log - 5th June, 1847
+14>Tattered Diary - 2nd June, 1847
+15>Tattered Diary - 4th June, 1847
+16>Tattered Diary - 5th June, 1847
+17>Leather Journal - 4th June, 1847
+18>Leather Journal - 7th June, 1847
+19>Leather Journal - 8th June, 1847
+20>Ragged Note
+21>Book of Astral Symbols
+22>Haggling and Bartering: A Guide
+23>Art of the Silver Tongue
+24>Sustainable Fishing
+25>A Plan For The Future
+26>The Engineer's Companion
+27>Nautical Engineering
+28>Rods, Reels and Rigs
+29>Advanced Fishing
+30>Correct Engine Operation
+31>Pushing The Limit: Engines
+32>The Relaxed Mind
+33>Getting Over It With Mind and Body
+34>Mixed Bait
+35>Aberrated Bait
+36>Insta-Crab Bait
+37>Exotic Bait
+38>Dark Canister
+39>Damage
+40>Dark Splash
+41>Dredge Crane
+42>Peculiar Engine
+43>Arterial Engine
+44>Rusty Outboard Engine
+45>Improved Outboard Engine
+46>Refined Outboard Engine
+47>Twin Prop Engine
+48>Jet Drive Engine
+49>Twin Jet Drive Engine
+50>Engine Stack
+51>Weak Valve Engine
+52>Cracked Bulb
+53>Cloudy Lens
+54>Halogen Spotlight
+55>Tungsten Floodlight
+56>Incandescent Array
+57>Flame of the Sky
+58>Basic Trawl Net
+59>Improved Trawl Net
+60>Silt Filtering Trawl Net
+61>Tempered Mesh Net
+62>Large Trawl Net
+63>Heavy-Duty Trawl Net
+64>Radiant Trawl Net
+65>Brittle Trawl Net
+66>Siphon Trawler
+67>Material Harvester
+68>Basic Crab Pot
+69>Efficient Crab Pot
+70>Hardy Crab Pot
+71>Large Crab Pot
+72>Complex Crab Pot
+73>Massive Crab Pot
+74>Reinforced Crab Pot
+75>Mouth of the Deep
+76>Flotsam Trap
+77>Basic Fishing Pole
+78>Fathomless Winch
+79>Heat-Resistant Line
+80>Anti-Tangle Line
+81>Versatile Rod
+82>Harvesting Platform
+83>Tendon Rod
+84>Encrusted Talisman
+85>Simple Skimmer
+86>Sinew Spindle
+87>Weighted Line
+88>Sign of Ruin
+89>Custom Rod
+90>Barbed Ice Rod
+91>Glacial Lance
+92>Hydraulic Rod
+93>Flexible Fishing Pole
+94>Sampling Device
+95>Bottomless Lines
+96>Viscera Crane
+97>Infused Winch
+98>Infused Rod
+99>Infused Hoist
+100>Infused Fireproof Rod
+101>Infused Coiling Rod
+102>Packed Explosives
+103>Anchovy King
+104>Anchovy
+105>Bursting Anglerfish
+106>Anglerfish
+107>Brood Squid
+108>Snag Squid
+109>Arrow Squid
+110>Parhelion Jellyfish
+111>Aurora Jellyfish
+112>Savage Barracuda
+113>Concertina Barracuda
+114>Barracuda
+115>Voideye
+116>Barreleye
+117>Tusked Grouper
+118>Voltaic Grouper
+119>Black Grouper
+120>Scouring Bass
+121>Black Sea Bass
+122>Razormouth Tuna
+123>Blackfin Tuna
+124>Decaying Blackmouth
+125>Blackmouth Salmon
+126>Cleft-mouth Shark
+127>Blacktip Reef Shark
+128>Blue Mackerel
+129>Bloodskin Shark
+130>Bronze Whaler
+131>Nightwing Catfish
+132>Catfish
+133>All-Seeing Cod
+134>Fanged Cod
+135>Three-Headed Cod
+136>Cod
+137>Coelacanth
+138>Sprouting Eel
+139>Conger Eel
+140>Consumed Grouper
+141>Coral Grouper
+142>Entangled Crab
+143>Blue Crab
+144>Cerebral Crab
+145>Common Crab
+146>Crown of Nadir
+147>Crown of Thorns
+148>Cortex Decorator
+149>Decorator Crab
+150>Malignant Pincer
+151>Fiddler Crab
+152>Mire Screecher
+153>Giant Mud Crab
+154>Effigy Crab
+155>Horseshoe Crab
+156>Splintered Crab
+157>Rock Crab
+158>Umbral Puppet
+159>Spider Crab
+160>Imperious Lobster
+161>Spiny Lobster
+162>Sable Reacher
+163>Squat Lobster
+164>Grasping Snail
+165>Volcano Snail
+166>Infernal Eel
+167>Cusk Eel
+168>Withered Ray
+169>Devil Ray
+170>Bubbling Char
+171>Char
+172>Pale Grasper
+173>Colossal Squid
+174>Grisly Shark
+175>Goblin Shark
+176>Fractalline Icefish
+177>Thawed Icefish
+178>Astral Icefish
+179>Icefish
+180>King's Wreath
+181>King Crab
+182>Feral Lizardfish
+183>Lizardfish
+184>Fallen Stars
+185>Sea Stars
+186>Sleeper Shark
+187>Craterous Seer
+188>Stargazer
+189>Bulbous Toothfish
+190>Toothfish
+191>Hinged Wolffish
+192>Wolffish
+193>Bifurcated Gar
+194>Abyssal Gar
+195>Broken Arapaima
+196>Arapaima
+197>Boreal Shell
+198>Boreaspis
+199>Shaper's Prime
+200>???
+201>Excoriated Fiend
+202>Dunkleosteus
+203>Sanguine Shark
+204>Eagle Shark
+205>Untouchable Wyrmfish
+206>Giant Dragonfish
+207>Brute's Crux
+208>Famine's End
+209>Drifting Chrysalis
+210>Kerygmachela
+211>Silvering Lancetfish
+212>Lancetfish
+213>Xeno Xeno
+214>Mahi Mahi
+215>Clutching Nautilus
+216>Nautilus
+217>Wretched Nipper
+218>Nipponites
+219>Archon's Burden
+220>Crawling Instar
+221>Opabinia
+222>Plated Osteostracan
+223>Osteostracan
+224>Anvilfish
+225>Paddlefish
+226>Plated Barbjaw
+227>Sawfish
+228>Inverted Husk
+229>Sea Cucumber
+230>Erupting Scorpion
+231>Sea Scorpion
+232>Mimic Slug
+233>Sea Slug
+234>Sleeper's Torment
+235>Vagrant Sollasina
+236>Sollasina
+237>Ivory Impaler
+238>Swordfish
+239>Cystic Trilobite
+240>Trilobite
+241>Stalking Spiderfish
+242>Tripod Spiderfish
+243>Axial Matron
+244>Tullimonstrum
+245>Unveiled Vetulicolia
+246>Vetulicolia
+247>Primordial Shadow
+248>Xiphactinus
+249>Cursed Fangtooth
+250>Fangtooth
+251>Radiant Squid
+252>Firefly Squid
+253>Twisted Shark
+254>Frilled Shark
+255>Clawfin Gar
+256>Grinning Gar
+257>Gar
+258>Rapt Shark
+259>Ghost Shark
+260>Ruptured Vessel
+261>Giant Amphipod
+262>Medusa Octopus
+263>Glowing Octopus
+264>Goliath Tigerfish
+265>Barbed Eel
+266>Host Eel
+267>Grey Eel
+268>Entwined Mullet
+269>Gleaming Mullet
+270>Grey Mullet
+271>Cyclopean Flounder
+272>Riddled Flounder
+273>Gulf Flounder
+274>Gulper Eel
+275>Gazing Shark
+276>Hammerhead Shark
+277>Twinned Eels
+278>Longfin Eel
+279>Perished Loosejaw
+280>Loosejaw
+281>Grotesque Mackerel
+282>Lumpy Mackerel
+283>Many-Eyed Mackerel
+284>Skeletal Moonfish
+285>Beaked Moonfish
+286>Moonfish
+287>Oarfish
+288>Gnashing Perch
+289>Oceanic Perch
+290>Defaced Skate
+291>Pale Skate
+292>Congealed Rattail
+293>Rattail
+294>Blood Snapper
+295>Latching Snapper
+296>Red Snapper
+297>Sallow Sailfish
+298>Hooked Sailfish
+299>Sailfish
+300>Leeching Prawn
+301>Scarlet Prawn
+302>Ossified Searobin
+303>Armored Searobin
+304>Vortex Interloper
+305>Sergeant Fish
+306>Calcified Snailfish
+307>Seizing Snailfish
+308>Snailfish
+309>Serpentine Mackerel
+310>Tattered Mackerel
+311>Snake Mackerel
+312>Shard Ray
+313>Stingray
+314>Gelatinous Stonefish
+315>Enthralled Stonefish
+316>Stonefish
+317>Translucent Sturgeon
+318>Sturgeon
+319>Charred Sunfish
+320>Glaring Sunfish
+321>Ocean Sunfish
+322>Blistered Tarpon
+323>Tarpon
+324>Flayed Mackerel
+325>Bearded Mackerel
+326>Tiger Mackerel
+327>Decrepit Viperfish
+328>Collapsed Viperfish
+329>Viperfish
+330>Shattered Wreckfish
+331>Bony Wreckfish
+332>Wreckfish
+333>Hook Flag
+334>Anchor Flag
+335>Fish Flag
+336>Pirate Flag
+337>Eyes Flag
+338>Serpent Flag
+339>Ouroboros Flag
+340>Rotor Reprogrammer
+341>Reverse Gear Router
+342>Chain Optimizer
+343>Reel Accelerator
+344>Heat Sink
+345>Trawl Guidance Chip
+346>Small Ice Block
+347>Large Ice Block
+348>Bolt of Cloth
+349>Ironhaven Crate
+350>Lumber
+351>Refined Metal
+352>Research Part
+353>Metal Scraps
+354>Bronze Belt Buckle
+355>Builder
+356>Photography Equipment
+357>Castaway
+358>Prototype Parts
+359>Chunk of Flesh
+360>Dog Tags
+361>Dog
+362>Family Crest
+363>Fathomless Flame
+364>Hermit
+365>Ice Axe
+366>Icebreaker Plow Half
+367>Icebreaker Bracing
+368>Icebreaker Plow Half
+369>Ice Shaper
+370>Frozen Heart
+371>Repulsion Machine
+372>Scrap of Paper
+373>Small Scrap of Paper
+374>Large Scrap of Paper
+375>Mortar Frame
+376>Mortar Barrel
+377>Small Package
+378>Large Package
+379>Pungent Bait
+380>Fetid Bait
+381>Reeking Bait
+382>Stone Tablet
+383>Stone Tablet
+384>Stone Tablet
+385>Fused Tablet
+386>Handkerchief
+387>Ornate Key
+388>Rusted Music Box
+389>Jewel Encrusted Band
+390>Shimmering Necklace
+391>Antique Pocket Watch
+392>Hull Repair Kit
+393>Soothing Tea
+394>Harvester's Repair Pack
+395>Rot
+396>Aurous Anchor
+397>Bag of Doubloons
+398>Big Bag of Doubloons
+399>Broken Monocle
+400>Broken Spectacles
+401>Doubloon
+402>Pearl Earrings
+403>Opal Earrings
+404>Sapphire Earrings
+405>Emerald Earrings
+406>Ruby Earrings
+407>Fancy Boot
+408>Goblet
+409>Old Iron Chain
+410>Worn Gold Ring
+411>Citrine Ring
+412>Opal Ring
+413>Sapphire Ring
+414>Emerald Ring
+415>Ruby Ring
+416>Signet Ring
+417>Sextant
+418>Silver Plate
+419>Silver Trinket
+0>渔夫的笔记
+1>1927 年 3 月 6 日，7 日
+2>破烂的收据
+3>1927 年 6 月 1 日
+4>1927 年 8 月 20 日
+5>1927 年 8 月 21 日
+6>1927 年 9 月 9 日
+7>1927 年 9 月 14 日
+8>？？？
+9>？？？
+10>文物清单
+11>船长的航海日志 - 1847 年 5 月 30 日
+12>船长的航海日志 - 1847 年 6 月 1 日
+13>船长的航海日志 - 1847 年 6 月 5 日
+14>破烂的日记 - 1847 年 6 月 2 日
+15>破烂的日记 - 1847 年 6 月 4 日
+16>破烂的日记 - 1847 年 6 月 5 日
+17>皮面日志 - 1847 年 6 月 4 日
+18>皮面日志 - 1847 年 6 月 7 日
+19>皮面日志 - 1847 年 6 月 8 日
+20>破旧的笔记
+21>星界符号之书
+22>讨价还价与实物交易指南
+23>口才的艺术
+24>可持续捕捞
+25>未来计划
+26>工程师之友
+27>航海工程
+28>鱼竿、卷线轮和钓鱼台
+29>高级捕捞
+30>引擎正确操作
+31>突破极限：引擎
+32>放松的心情
+33>从身心上克服它
+34>混合鱼饵
+35>畸变鱼饵
+36>速效蟹饵
+37>奇珍鱼饵
+38>漆黑罐子
+39>受损
+40>黑暗水花
+41>淤泥起重机
+42>特殊引擎
+43>动脉引擎
+44>生锈的舷外引擎
+45>改进的舷外引擎
+46>精制的舷外引擎
+47>双螺旋桨引擎
+48>喷气驱动引擎
+49>双喷气驱动引擎
+50>引擎堆栈
+51>弱阀引擎
+52>有裂痕的灯泡
+53>浑浊的透镜灯
+54>卤素聚光灯
+55>钨丝泛光灯
+56>白炽阵列灯
+57>天炎
+58>基础拖网
+59>升级拖网
+60>滤沙拖网
+61>恒温网
+62>大号拖网
+63>耐重拖网
+64>镭射拖网
+65>脆弱拖网
+66>虹吸过滤器
+67>材料捕网
+68>基础蟹笼
+69>高效蟹笼
+70>牢固蟹笼
+71>大蟹笼
+72>复杂蟹笼
+73>结实蟹笼
+74>加固蟹笼
+75>深渊巨口
+76>漂流物陷阱
+77>基础鱼竿
+78>深不可测的螺旋轮
+79>耐热线
+80>防绕线
+81>多功能鱼竿
+82>捕猎平台
+83>钢腱鱼竿
+84>裹壳护符
+85>简易蜻蜓
+86>筋线轴
+87>加重线
+88>废墟的印记
+89>定制鱼竿
+90>钩刺冰鱼竿
+91>冰川长矛
+92>液压鱼竿
+93>灵活的鱼竿
+94>取样装置
+95>无底鱼线
+96>肉色起重机
+97>注能绞盘
+98>注能鱼竿
+99>注能起重机
+100>注能防火竿
+101>注能线圈竿
+102>包好的炸药
+103>鳀鱼王
+104>鳀鱼
+105>残暴鮟鱇鱼
+106>鮟鱇鱼
+107>抱卵鱿
+108>恶霸乌贼
+109>箭鱿
+110>幻日水母
+111>海月水母
+112>野蛮梭子鱼
+113>六角梭子鱼
+114>梭子鱼
+115>虚空眼鱼
+116>管眼鱼
+117>长牙石斑鱼
+118>电流石斑鱼
+119>黑鲉
+120>搜查鲈鱼
+121>条纹锯鮨
+122>钢齿金枪鱼
+123>黑鳍金枪鱼
+124>腐烂的黑嘴
+125>黑嘴三文鱼
+126>裂嘴鲨
+127>黑鳍礁鲨
+128>蓝鲭
+129>血肤鲨
+130>短尾真鲨
+131>夜翼鲶鱼
+132>鲶鱼
+133>全视鳕鱼
+134>尖牙鳕鱼
+135>三头鳕鱼
+136>鳕鱼
+137>腔棘鱼
+138>发芽鳗
+139>康吉鳗
+140>绝望石斑鱼
+141>珊瑚石斑鱼
+142>触手缠缚蟹
+143>蓝蟹
+144>裸脑蟹
+145>普通螃蟹
+146>渊底之冠
+147>棘冠海星
+148>皮质修饰蟹
+149>装饰蟹
+150>恶毒巨螯蟹
+151>招潮蟹
+152>泥沼尖啸蟹
+153>巨泥蟹
+154>冥灯鲎
+155>马蹄蟹
+156>碎壳蟹
+157>石蟹
+158>幽影傀儡
+159>蜘蛛蟹
+160>蛮横龙虾
+161>大螯虾
+162>长臂黒虾
+163>东方扁虾
+164>攫握海螺
+165>火山蜗牛
+166>地狱鳗
+167>鼬鱼
+168>萎缩蝠鲼
+169>魔鬼鱼
+170>鼓泡鲑鱼
+171>鲑鱼
+172>冰霜触手怪
+173>大王鱿
+174>裂齿鲨
+175>哥布林鲨
+176>碎鳞冰鱼
+177>解冻的冰鱼
+178>星界冰鱼
+179>冰鱼
+180>帝王之冠
+181>帝王蟹
+182>蛮暴蜥蜴鱼
+183>蜥蜴鱼
+184>堕落之星
+185>海星
+186>睡鲨
+187>火口先知
+188>瞻星鱼
+189>球形犬牙鱼
+190>犬牙鱼
+191>铰链狼鱼
+192>狼鱼
+193>分叉雀鳝
+194>深渊雀鳝
+195>裂骨舌鱼
+196>巨骨舌鱼
+197>冰风骨鱼
+198>北甲鱼
+199>塑形者之巅
+200>？？？
+201>剥皮恶魔
+202>邓氏鱼
+203>猩红鹰鲨
+204>鹰鲨
+205>缥缈蛟鱼
+206>巨型龙鱼
+207>蛮勇之綮
+208>饥馑之末
+209>漂游虫蛹
+210>宣扬爪虫
+211>银辉帆蜥鱼
+212>帆蜥鱼
+213>异种鲯鳅鱼
+214>鲯鳅鱼
+215>断手鹦鹉螺
+216>鹦鹉螺
+217>卑啮菊石
+218>日本菊石
+219>承冠之重
+220>爬行龄虫
+221>欧巴宾海蝎
+222>重装骨甲鱼
+223>骨甲鱼
+224>砧头鲟
+225>匙吻鲟
+226>棘颚甲鳐
+227>锯鳐
+228>翻转空壳
+229>海参
+230>涌毒海蝎
+231>海蝎
+232>拟态蛞蝓
+233>海蛞蝓
+234>眠者之厄
+235>游荡海触角
+236>海触角
+237>长牙穿刺者
+238>剑鱼
+239>囊肿三叶虫
+240>三叶虫
+241>潜猎狗母鱼
+242>短头深海狗母鱼
+243>轴向主母鱼
+244>塔利怪物
+245>显真古虫
+246>古虫
+247>原始暗影
+248>剑射鱼
+249>被诅咒的尖牙鱼
+250>尖牙鱼
+251>发光鱿
+252>萤火鱿
+253>扭动鲨
+254>皱鳃鲨
+255>爪鳍雀鳝
+256>狞笑雀鳝
+257>雀鳝
+258>狂喜鲨
+259>魔鬼鲨
+260>断裂的宿主
+261>巨型端足目
+262>美杜莎章鱼
+263>发光章鱼
+264>巨型水虎鱼
+265>刺鳗
+266>宿主鳗
+267>灰海鳗
+268>缠绕乌鱼
+269>金光乌鱼
+270>乌鱼
+271>巨眼偏口鱼
+272>千疮百孔的偏口鱼
+273>白点牙鲆
+274>宽咽鱼
+275>凝视鲨
+276>锤头鲨
+277>双生鳗
+278>长鳍鳗
+279>濒亡柔骨鱼
+280>柔骨鱼
+281>怪诞鲭鱼
+282>肿块鲭鱼
+283>多眼鲭鱼
+284>骷髅月亮鱼
+285>尖喙月亮鱼
+286>月亮鱼
+287>桨鱼
+288>巨齿鲈鱼
+289>大洋鲈
+290>崩坏鳐鱼
+291>白鳐
+292>凝胶鼠尾鳕
+293>鼠尾鳕
+294>血红绸鱼
+295>紧锁鲷鱼
+296>红绸鱼
+297>土色旗鱼
+298>钩嘴旗鱼
+299>旗鱼
+300>寄生虾
+301>红魔虾
+302>骨化红娘鱼
+303>装甲红娘鱼
+304>旋涡的不速之客
+305>锯盖鱼
+306>石化狮子鱼
+307>撕咬狮子鱼
+308>狮子鱼
+309>阴险蛇鲭
+310>褴褛鲭鱼
+311>蛇鲭
+312>石鳐
+313>刺鳐
+314>胶状小口鮋
+315>寄居小口鲉
+316>小口鮋
+317>透明鲟鱼
+318>鲟鱼
+319>焦黑太阳鱼
+320>多眼太阳鱼
+321>翻车鲀
+322>起泡大海鲢
+323>大海鲢
+324>剥皮鲭
+325>长须鲭
+326>虎鲭
+327>老头毒蛇鱼
+328>崩坏毒蛇鱼
+329>毒蛇鱼
+330>破碎多锯鲷
+331>骨质多锯鲷
+332>多锯鲷
+333>铁钩旗帜
+334>船锚旗帜
+335>鱼儿旗帜
+336>海盗旗帜
+337>眼睛旗帜
+338>海蛇旗帜
+339>衔尾蛇旗帜
+340>转子再编码器
+341>倒挡增效器
+342>链条优化器
+343>快速拉线器
+344>散热器
+345>拖网导引芯片
+346>小冰块
+347>大冰块
+348>一卷布
+349>艾伦海文货箱
+350>木材
+351>精致的金属
+352>研究部件
+353>废旧金属
+354>铜色皮带扣
+355>建筑工人
+356>摄影设备
+357>遇难者
+358>原型零件
+359>大块肉
+360>身份识别牌
+361>狗
+362>家族徽章
+363>深渊烈焰
+364>隐居者
+365>冰斧
+366>破冰犁的半面犁刀
+367>破冰犁的支架
+368>破冰犁的半面犁刀
+369>锯冰机
+370>寒冰晶魄
+371>驱逐器
+372>一片纸
+373>小片纸
+374>大片纸
+375>迫击炮框架
+376>迫击炮炮管
+377>小包裹
+378>大包裹
+379>刺鼻的鱼饵
+380>腐臭的鱼饵
+381>臭气熏天的鱼饵
+382>石碑
+383>石碑
+384>石碑
+385>融合的石碑
+386>手帕
+387>华丽的钥匙
+388>生锈的音乐盒
+389>镶有宝石的戒指
+390>闪耀的项链
+391>古董怀表
+392>船体修补包
+393>安神茶
+394>捕获者的修补包
+395>腐烂物
+396>金锚
+397>一袋达布隆金币
+398>一大袋达布隆金币
+399>破损的单片眼镜
+400>破损的眼镜
+401>达布隆金币
+402>珍珠耳环
+403>猫眼石耳环
+404>蓝宝石耳环
+405>绿宝石耳环
+406>红宝石耳环
+407>华丽的靴子
+408>高脚杯
+409>旧铁链
+410>磨损的金戒指
+411>黄水晶戒指
+412>猫眼石戒指
+413>蓝宝石戒指
+414>绿宝石戒指
+415>红宝石戒指
+416>印章戒指
+417>六分仪
+418>银盘
+419>银饰

@@ -370,6 +370,7 @@ static void main_window_close_callback(Fl_Widget *w, void *)
         Fl::delete_widget(info_window);
         info_window = nullptr;
     }
+    RemoveFontMemResourceEx(font_handle);
     Fl::delete_widget(w);
 }
 
@@ -398,15 +399,19 @@ int main(int argc, char **argv)
     window->callback(main_window_close_callback);
     tr(window, "DREDGE Trainer");
 
+    // Setup fonts
+    DWORD font_mem_size = 0;
+    DWORD num_fonts = 0;
+    const unsigned char *font_data = load_resource("FONT_TTF", font_mem_size);
+    font_handle = AddFontMemResourceEx((void *)font_data, font_mem_size, nullptr, &num_fonts);
+    Fl::set_font(FL_FREE_FONT, "Noto Sans SC");
+    fl_font(FL_FREE_FONT, font_size);
+
     int left_margin = 20;
     int button_w = 50;
     int input_w = 200;
     int option_gap = 10;
     int option_h = static_cast<int>(font_size * 1.5);
-
-    // Setup fonts
-    Fl::set_font(FL_FREE_FONT, "Noto Sans SC");
-    fl_font(FL_FREE_FONT, font_size);
 
     Fl::add_timeout(0, MonoBase::check_logging_available, &trainer);
 

@@ -140,6 +140,12 @@ void toggle_callback(Fl_Widget *widget, void *data)
     button->value() ? input->readonly(1) : input->readonly(0);
 }
 
+static void main_window_close_callback(Fl_Widget *w, void *)
+{
+    RemoveFontMemResourceEx(font_handle);
+    Fl::delete_widget(w);
+}
+
 // ===========================================================================
 // Main Function
 // ===========================================================================
@@ -162,17 +168,22 @@ int main(int argc, char **argv)
     Fl::set_color(FL_FREE_COLOR, 0x1c1c1c00);
     window->color(FL_FREE_COLOR);
     window->icon((char *)LoadIconA(GetModuleHandle(NULL), "APP_ICON"));
-    window->tooltip("Plants vs. Zombies Trainer");
+    window->callback(main_window_close_callback);
+    tr(window, "Plants vs. Zombies Trainer");
+
+    // Setup fonts
+    DWORD font_mem_size = 0;
+    DWORD num_fonts = 0;
+    const unsigned char *font_data = load_resource("FONT_TTF", font_mem_size);
+    font_handle = AddFontMemResourceEx((void *)font_data, font_mem_size, nullptr, &num_fonts);
+    Fl::set_font(FL_FREE_FONT, "Noto Sans SC");
+    fl_font(FL_FREE_FONT, font_size);
 
     int left_margin = 20;
     int button_w = 50;
     int input_w = 200;
     int option_gap = 10;
     int option_h = static_cast<int>(font_size * 1.5);
-
-    // Setup fonts
-    Fl::set_font(FL_FREE_FONT, "Noto Sans SC");
-    fl_font(FL_FREE_FONT, font_size);
 
     // ------------------------------------------------------------------
     // Top Row: Language Selection
@@ -259,7 +270,7 @@ int main(int argc, char **argv)
     coin_flex->fixed(coin_check_button, button_w);
 
     Fl_Box *coin_label = new Fl_Box(0, 0, 0, 0);
-    tr(coin_label, "Add Coin");
+    tr(coin_label, "Add Coins");
 
     Fl_Input *coin_input = new Fl_Input(0, 0, 0, 0);
     coin_flex->fixed(coin_input, input_w);

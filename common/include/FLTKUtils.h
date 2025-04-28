@@ -54,6 +54,7 @@ using json = nlohmann::json;
 // options1_flex->fixed({{}}_flex, option_h);
 
 int font_size = 15;
+static HANDLE font_handle = nullptr;
 std::unordered_map<std::string, std::unordered_map<std::string, std::string>> translations;
 std::vector<std::pair<Fl_Widget *, std::string>> translatable_widgets;
 std::string language = "en_US";

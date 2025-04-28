@@ -1,12 +1,31 @@
 set(GAME_NAME "Arrow_A_Row")
 set(TRAINER_NAME "Arrow A Row Trainer")
 
+set(SUBSET_FONT_TARGET "${GAME_NAME}_SubsetFont")
+set(FONT_SUBSET_OUTPUT "${CMAKE_CURRENT_SOURCE_DIR}/NotoSansSC-Subset.ttf")
+set(FONT_SUBSET_SCRIPT "${CMAKE_SOURCE_DIR}/font_processor/main.py")
+set(FONT_FILE "${CMAKE_SOURCE_DIR}/font_processor/NotoSansSC-Regular.ttf")
+set(TRANSLATION_FILES "${CMAKE_CURRENT_SOURCE_DIR}/translations.json")
+
+# Run python script to generate the subsetted font
+add_custom_command(
+    OUTPUT ${FONT_SUBSET_OUTPUT}
+    COMMAND python ${FONT_SUBSET_SCRIPT} ${TRANSLATION_FILES}
+            --font ${FONT_FILE} --output ${FONT_SUBSET_OUTPUT}
+    DEPENDS ${FONT_SUBSET_SCRIPT} ${FONT_FILE} ${TRANSLATION_FILES}
+    COMMENT "Subsetting NotoSansSC-Regular.ttf in ${CMAKE_CURRENT_SOURCE_DIR}"
+)
+
+add_custom_target(${SUBSET_FONT_TARGET} ALL
+    DEPENDS ${FONT_SUBSET_OUTPUT}
+)
 
 add_executable(${GAME_NAME} main.cpp)
 target_link_libraries(${GAME_NAME} PRIVATE Common)
+add_dependencies(${GAME_NAME} ${SUBSET_FONT_TARGET})
 set_target_properties(${GAME_NAME} PROPERTIES
     WIN32_EXECUTABLE $<$<NOT:$<CONFIG:Debug>>:ON>
-    OUTPUT_NAME "${TRAINER_NAME}"
+    OUTPUT_NAME ${TRAINER_NAME}
 )
 
 if (WIN32)
