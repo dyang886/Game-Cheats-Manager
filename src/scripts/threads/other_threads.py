@@ -1,6 +1,3 @@
-from bs4 import BeautifulSoup
-import concurrent.futures
-import json
 import os
 import psutil
 import re
@@ -80,22 +77,20 @@ class FetchFlingSite(DownloadBaseThread):
         update_failed2 = tr("Update from FLiGN failed") + " (2/2)"
 
         self.message.emit(statusWidgetName, update_message1)
-        url = "https://archive.flingtrainer.com/"
-        page_content = self.get_webpage_content(url, "FLiNG Trainers Archive", True)
-        if not page_content:
+        url = "GCM/fling_archive.html"
+        signed_url = self.get_signed_download_url(url)
+        file_path = self.request_download(signed_url, DATABASE_PATH)
+        if not file_path:
             self.update.emit(statusWidgetName, update_failed1, "error")
             time.sleep(2)
-        else:
-            self.save_html_content(page_content, "fling_archive.html")
 
         self.update.emit(statusWidgetName, update_message2, "load")
-        url = "https://flingtrainer.com/all-trainers-a-z/"
-        page_content = self.get_webpage_content(url, "All Trainers (A-Z)", True)
-        if not page_content:
+        url = "GCM/fling_main.html"
+        signed_url = self.get_signed_download_url(url)
+        file_path = self.request_download(signed_url, DATABASE_PATH)
+        if not file_path:
             self.update.emit(statusWidgetName, update_failed2, "error")
             time.sleep(2)
-        else:
-            self.save_html_content(page_content, "fling_main.html")
 
         self.finished.emit(statusWidgetName)
 
@@ -114,34 +109,14 @@ class FetchXiaoXingSite(DownloadBaseThread):
         update_failed = tr("Update from XiaoXing failed")
 
         self.message.emit(statusWidgetName, update_message)
-        clearXiaoXingHtml = False
-        page_number = 1
-        while True:
-            url = f"https://www.xiaoxingjie.com/page/{page_number}"
-            page_content = self.get_webpage_content(url, "小幸修改器官方网站", False)
-
-            if not page_content:
-                self.update.emit(statusWidgetName, update_failed, "error")
-                time.sleep(2)
-                break
-
-            if not clearXiaoXingHtml:
-                self.save_html_content("", "xiaoxing.html")
-                clearXiaoXingHtml = True
-
-            self.save_html_content(page_content, "xiaoxing.html", False)
-            if not self.has_next_page(page_content):
-                time.sleep(2)
-                break
-
-            page_number += 1
+        url = "GCM/xiaoxing.html"
+        signed_url = self.get_signed_download_url(url)
+        file_path = self.request_download(signed_url, DATABASE_PATH)
+        if not file_path:
+            self.update.emit(statusWidgetName, update_failed, "error")
+            time.sleep(2)
 
         self.finished.emit(statusWidgetName)
-
-    def has_next_page(self, page_content):
-        soup = BeautifulSoup(page_content, 'html.parser')
-        next_page_div = soup.find('div', class_='nav-next')
-        return next_page_div is not None and next_page_div.find('a') is not None
 
 
 class FetchTrainerTranslations(DownloadBaseThread):
@@ -158,82 +133,14 @@ class FetchTrainerTranslations(DownloadBaseThread):
         fetch_error = tr("Fetch trainer translations failed")
 
         self.message.emit(statusWidgetName, fetch_message)
-        total_pages = ""
-        translations = []
-        filepath = os.path.join(DATABASE_PATH, "translations.json")
-
-        if self.is_internet_connected():
-            if os.path.exists(filepath):
-                with open(filepath, 'r', encoding='utf-8') as file:
-                    translations = json.load(file)
-
-            index_page = "https://dl.fucnm.com/datafile/xgqdetail/index.txt"
-            try:
-                total_pages_response = requests.get(index_page, headers=self.headers)
-                if total_pages_response.status_code == 200:
-                    response = total_pages_response.json()
-                    total_pages = response.get("page", "")
-                    print(f"Total trainer translations fetched: {response.get('total', 'null')}\n")
-            except Exception as e:
-                print(f"Error requesting {index_page}: {str(e)}")
-
-        if total_pages:
-            completed_pages = 0
-            error = False
-            self.update.emit(statusWidgetName, f"{fetch_message} ({completed_pages}/{total_pages})", "load")
-
-            with concurrent.futures.ThreadPoolExecutor(max_workers=5) as executor:
-                futures = [executor.submit(self.fetch_page, page) for page in range(1, total_pages + 1)]
-                for future in concurrent.futures.as_completed(futures):
-                    result = future.result()
-                    if result:
-                        for item in result:
-                            en_name = item.get("en_name")
-                            zh_name = item.get("keyw")
-                            steam_id = item.get("steam_appid")
-
-                            if en_name and zh_name and not any(t["en_US"] == en_name for t in translations):
-                                translation_entry = {
-                                    "en_US": en_name,
-                                    "zh_CN": zh_name
-                                }
-                                if steam_id:
-                                    translation_entry["steam_id"] = steam_id
-                                translations.append(translation_entry)
-                    else:
-                        error = True
-                    completed_pages += 1
-                    self.update.emit(statusWidgetName, f"{fetch_message} ({completed_pages}/{total_pages})", "load")
-
-            if error:
-                self.update.emit(statusWidgetName, fetch_error, "error")
-                time.sleep(2)
-                self.finished.emit(statusWidgetName)
-                return
-
-            translations.sort(key=lambda x: x["en_US"].lower())
-
-            with open(filepath, 'w', encoding='utf-8') as file:
-                json.dump(translations, file, ensure_ascii=False, indent=4)
-
-        else:
+        url = "GCM/translations.json"
+        signed_url = self.get_signed_download_url(url)
+        file_path = self.request_download(signed_url, DATABASE_PATH)
+        if not file_path:
             self.update.emit(statusWidgetName, fetch_error, "error")
             time.sleep(2)
 
         self.finished.emit(statusWidgetName)
-
-    def fetch_page(self, page_number):
-        trainer_detail_page = f"https://dl.fucnm.com/datafile/xgqdetail/list_{page_number}.txt"
-        try:
-            page_response = requests.get(trainer_detail_page, headers=self.headers)
-            if page_response.status_code == 200:
-                return page_response.json()
-        except Exception as e:
-            print(f"Error requesting {trainer_detail_page}: {str(e)}")
-            return None
-
-        print(f"Failed to fetch trainer detail page {page_number}")
-        return None
 
 
 class WeModCustomization(QThread):

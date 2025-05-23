@@ -72,7 +72,7 @@ class UpdateFlingTrainers(DownloadBaseThread):
                         locale.setlocale(locale.LC_TIME, 'English_United States')
                         trainerSrcDate = datetime.datetime.strptime(date_match.group().decode('utf-8'), '%b %d %Y')
 
-                        page_content = self.get_webpage_content_with_lock(f"https://flingtrainer.com/tag/{tagName}", "FLiNG Trainer")
+                        page_content = self.get_webpage_content_with_lock(f"https://flingtrainer.com/tag/{tagName}")
                         tagPage = BeautifulSoup(page_content, 'html.parser')
 
                         trainerNamesMap = {}  # trainerName: gameContentEntryOnWeb
@@ -106,12 +106,12 @@ class UpdateFlingTrainers(DownloadBaseThread):
                                         return trainerPath, update_url
         return None
 
-    def get_webpage_content_with_lock(self, url, target_text):
+    def get_webpage_content_with_lock(self, url):
         with self.browser_condition:
             self.browser_condition.wait_for(lambda: True)
 
             # Trigger the browser dialog and wait for its completion
-            content = self.get_webpage_content(url, target_text, True)
+            content = self.get_webpage_content(url)
 
             self.browser_condition.notify_all()
 

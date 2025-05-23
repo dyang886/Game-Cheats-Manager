@@ -1,10 +1,9 @@
 import concurrent.futures
 import re
 import time
-from urllib.parse import urljoin
+from urllib.parse import urljoin, urlparse
 
 from bs4 import BeautifulSoup
-import cn2an
 from fuzzywuzzy import fuzz
 
 from config import *
@@ -23,45 +22,38 @@ class DownloadDisplayThread(DownloadBaseThread):
 
         # ======================================================
         # Fling
-        if settings["flingDownloadServer"] == "intl":
-            status = self.search_from_fling_archive(keywordList)
-            if not status:
-                self.finished.emit(1)
-                return
-            status = self.search_from_fling_main(keywordList)
-            if not status:
-                self.finished.emit(1)
-                return
+        status = self.search_from_fling_archive(keywordList)
+        if not status:
+            self.finished.emit(1)
+            return
+        status = self.search_from_fling_main(keywordList)
+        if not status:
+            self.finished.emit(1)
+            return
 
-            ignored_trainers = {
-                "Dying Light The Following Enhanced Edition",
-                "Monster Hunter World",
-                "Street Fighter V",
-                "World War Z"
-            }
+        ignored_trainers = {
+            "Dying Light The Following Enhanced Edition",
+            "Monster Hunter World",
+            "Street Fighter V",
+            "World War Z"
+        }
 
-            # Filter and prioritize trainers from the main site
-            filtered_trainer_urls = {}
-            for trainer in DownloadBaseThread.trainer_urls:
-                if trainer["game_name"] in ignored_trainers:
-                    continue
+        # Filter and prioritize trainers from the main site
+        filtered_trainer_urls = {}
+        for trainer in DownloadBaseThread.trainer_urls:
+            if trainer["game_name"] in ignored_trainers:
+                continue
 
-                norm_name = self.sanitize(trainer["game_name"])
+            norm_name = self.sanitize(trainer["game_name"])
 
-                # Add trainer if not already present or replace only if from fling_main and current is from fling_archive
-                if norm_name not in filtered_trainer_urls:
-                    filtered_trainer_urls[norm_name] = trainer
-                elif trainer["origin"] == "fling_main" and filtered_trainer_urls[norm_name]["origin"] == "fling_archive":
-                    filtered_trainer_urls[norm_name] = trainer
+            # Add trainer if not already present or replace only if from fling_main and current is from fling_archive
+            if norm_name not in filtered_trainer_urls:
+                filtered_trainer_urls[norm_name] = trainer
+            elif trainer["origin"] == "fling_main" and filtered_trainer_urls[norm_name]["origin"] == "fling_archive":
+                filtered_trainer_urls[norm_name] = trainer
 
-            # Update trainer_urls with filtered and deduplicated results
-            DownloadBaseThread.trainer_urls = list(filtered_trainer_urls.values())
-
-        elif settings["flingDownloadServer"] == "china":
-            status = self.search_from_xgqdetail(self.keyword)
-            if not status:
-                self.finished.emit(1)
-                return
+        # Update trainer_urls with filtered and deduplicated results
+        DownloadBaseThread.trainer_urls = list(filtered_trainer_urls.values())
 
         # ======================================================
         # XiaoXing
@@ -96,7 +88,7 @@ class DownloadDisplayThread(DownloadBaseThread):
         self.message.emit("", "clear")
         for count, trainer in enumerate(DownloadBaseThread.trainer_urls, start=1):
             self.message.emit(f"{count}. {trainer["trainer_name"]}", None)
-            print(f"{count}. {trainer["game_name"]} | {trainer["trainer_name"]} | {trainer["url"]} | Anti-URL: {trainer.get("anti_url", "None")}")
+            print(f"{count}. {trainer["game_name"]} | {trainer["trainer_name"]} | {trainer["url"]}")
 
         self.finished.emit(0)
 
@@ -148,14 +140,13 @@ class DownloadDisplayThread(DownloadBaseThread):
             gameName = parsedTrainerName.strip()
 
             # search algorithm
-            url = "https://archive.flingtrainer.com/"
+            url = urljoin("https://archive.flingtrainer.com/", link.get("href")) if settings["flingDownloadServer"] == "official" else f"GCM/Fling Trainers/{os.path.basename(urlparse(link.get('href')).path)}"
             if self.keyword_match(keywordList, gameName):
                 DownloadBaseThread.trainer_urls.append({
                     "game_name": gameName,
                     "trainer_name": None,
                     "origin": "fling_archive",
-                    "url": urljoin(url, link.get("href")),
-                    "anti_url": None
+                    "url": url
                 })
 
         return True
@@ -175,68 +166,21 @@ class DownloadDisplayThread(DownloadBaseThread):
         for ul in mainSiteHTML.find_all('ul'):
             for li in ul.find_all('li'):
                 for link in li.find_all('a'):
-                    gameName = link.get_text().strip().rsplit(" Trainer", 1)[0]
+                    rawTrainerName = link.get_text()
+                    gameName = rawTrainerName.strip().rsplit(" Trainer", 1)[0]
                     if gameName in ["Home", "Trainers", "Log In", "All Trainers (A-Z)", "All", "Privacy Policy"]:
                         continue
 
                     # search algorithm
+                    url = link.get("href") if settings["flingDownloadServer"] == "official" else f"GCM/Fling Trainers/{self.symbol_replacement(rawTrainerName)}"
                     if gameName and self.keyword_match(keywordList, gameName):
                         DownloadBaseThread.trainer_urls.append({
                             "game_name": gameName,
                             "trainer_name": None,
                             "origin": "fling_main",
-                            "url": link.get("href"),
-                            "anti_url": None
+                            "url": url
                         })
 
-        return True
-
-    def search_from_xgqdetail(self, keyword):
-        trainer_details = self.load_json_content("translations.json")
-        if trainer_details:
-            for entry in trainer_details:
-                if "id" in entry and (keyword in entry["zh_CN"] or (len(keyword) >= 2 and keyword.lower() in entry["en_US"].lower())):
-                    full_url = ""
-                    anti_url = ""
-                    if settings["language"] == "en_US" or settings["enSearchResults"]:
-                        gameName = entry['en_US']
-                    elif settings["language"] == "zh_CN" or settings["language"] == "zh_TW":
-                        pattern = r'\s(v[\d\.v\-]+.*|Early ?Access.*)'
-                        gameName = re.sub(pattern, '', entry['title'])
-
-                    try:
-                        # Construct download url, example: https://down.fucnm.com/Story.of.Seasons.A.Wonderful.Life.v1.0.Plus.24.Trainer-FLiNG.zip
-                        base_url = "https://down.fucnm.com/"
-                        trainer_name = entry["en_US"].replace(": ", ".").replace("：", ".").replace(",", "").replace("'", "").replace("’", "").replace("?", "").replace("/", ".").replace(" - ", ".").replace(" ", ".")
-                        version = entry["version"]
-                        if self.sanitize(version) == "earlyaccess":
-                            version = "Early.Access"
-
-                        countMatch = re.search(r"(\w+?)项", entry["keyv"])
-                        if countMatch:
-                            chinese_count = countMatch.group(1)
-                            count = cn2an.cn2an(chinese_count, "smart")
-                        count = f"Plus.{count}"
-
-                        full_url = f"{base_url}{trainer_name}.{version}.{count}.Trainer-FLiNG.zip"
-
-                        if "anti_url" in entry:
-                            anti_url = entry["anti_url"]
-                    except Exception as e:
-                        self.message.emit(tr("Failed to get trainer url: ") + gameName, "failure")
-                        print(f"Constructing download url for {entry['zh_CN']} failed: {str(e)}")
-
-                    if gameName and full_url:
-                        DownloadBaseThread.trainer_urls.append({
-                            "game_name": gameName,
-                            "trainer_name": None,
-                            "origin": "fling_archive",
-                            "url": full_url,
-                            "anti_url": anti_url
-                        })
-
-        self.message.emit(tr("Search from FLiNG success!"), "success")
-        time.sleep(0.5)
         return True
 
     def search_from_xiaoxing(self, keywordList):
@@ -266,8 +210,7 @@ class DownloadDisplayThread(DownloadBaseThread):
                     "game_name": gameName,
                     "trainer_name": None,
                     "origin": "xiaoxing",
-                    "url": link.get("href"),
-                    "anti_url": None
+                    "url": link.get("href")
                 })
 
         return True

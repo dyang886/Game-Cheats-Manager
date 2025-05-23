@@ -6,8 +6,8 @@ import stat
 import subprocess
 import sys
 
-from PyQt6.QtCore import Qt, QTimer
-from PyQt6.QtGui import QAction, QColor, QFont, QFontDatabase, QIcon, QPixmap
+from PyQt6.QtCore import QTimer
+from PyQt6.QtGui import QAction, QColor, QFont, QFontDatabase, QIcon
 from PyQt6.QtWidgets import QApplication, QFileDialog, QGridLayout, QHBoxLayout, QLabel, QLineEdit, QListWidgetItem, QMainWindow, QMessageBox, QStatusBar, QVBoxLayout, QWidget, QSystemTrayIcon
 from tendo import singleton
 from PyQt6.QtSvgWidgets import QSvgWidget
@@ -524,12 +524,12 @@ class GameCheatsManager(QMainWindow):
         if type == "clear":
             self.downloadListBox.clear()
         elif type == "success":
-            # item.setForeground(QColor('green'))
-            item.setBackground(QColor(0, 255, 0, 20))
+            item.setForeground(QColor('green'))
+            # item.setBackground(QColor(0, 255, 0, 20))
             self.downloadListBox.addItem(item)
         elif type == "failure":
-            # item.setForeground(QColor('red'))
-            item.setBackground(QColor(255, 0, 0, 20))
+            item.setForeground(QColor('red'))
+            # item.setBackground(QColor(255, 0, 0, 20))
             self.downloadListBox.addItem(item)
         else:
             self.downloadListBox.addItem(item)

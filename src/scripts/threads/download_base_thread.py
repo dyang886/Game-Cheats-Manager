@@ -3,17 +3,16 @@ import os
 import re
 import string
 from urllib.parse import urlparse, unquote
-from urllib3.exceptions import InsecureRequestWarning
 import warnings
 
 import cloudscraper
 from fuzzywuzzy import process
-from PyQt6.QtCore import QEventLoop, QThread, pyqtSignal
+from PyQt6.QtCore import QThread, pyqtSignal
 import requests
+from urllib3.exceptions import InsecureRequestWarning
 import zhon
 
 from config import *
-from widgets.browser_dialog import BrowserDialog
 
 warnings.simplefilter("ignore", InsecureRequestWarning)
 
@@ -22,8 +21,6 @@ class DownloadBaseThread(QThread):
     message = pyqtSignal(str, str)
     messageBox = pyqtSignal(str, str, str)
     finished = pyqtSignal(int)
-    loadUrl = pyqtSignal(str, str)
-    downloadFile = pyqtSignal(str, str)
 
     trainer_urls = []
     headers = {
@@ -35,13 +32,8 @@ class DownloadBaseThread(QThread):
         super().__init__(parent)
         self.html_content = ""
         self.downloaded_file_path = ""
-        self.browser_dialog = BrowserDialog()
-        self.loadUrl.connect(self.browser_dialog.load_url)
-        self.browser_dialog.content_ready.connect(self.handle_content_ready)
-        self.downloadFile.connect(self.browser_dialog.handle_download)
-        self.browser_dialog.download_completed.connect(self.handle_download_completed)
 
-    def get_webpage_content(self, url, target_text, verify, use_cloudScraper=False):
+    def get_webpage_content(self, url, verify=True, use_cloudScraper=False):
         if not self.is_internet_connected():
             return ""
 
@@ -52,25 +44,16 @@ class DownloadBaseThread(QThread):
                 req.raise_for_status()
             else:
                 req = requests.get(url, headers=self.headers, verify=verify)
+                req.raise_for_status()
         except Exception as e:
             print(f"Error requesting {url}: {str(e)}")
             return ""
 
-        if req.status_code != 200:
-            self.loop = QEventLoop()
-            self.loadUrl.emit(url, target_text)
-            self.loop.exec()
-        else:
-            self.html_content = req.text
+        self.html_content = req.text
 
         return self.html_content
 
-    def handle_content_ready(self, html_content):
-        self.html_content = html_content
-        if self.loop.isRunning():
-            self.loop.quit()
-
-    def request_download(self, url, download_path, verify, use_cloudScraper=False):
+    def request_download(self, url, download_path, verify=True, use_cloudScraper=False):
         try:
             if use_cloudScraper:
                 scraper = cloudscraper.create_scraper()
@@ -78,23 +61,20 @@ class DownloadBaseThread(QThread):
                 req.raise_for_status()
             else:
                 req = requests.get(url, headers=self.headers, verify=verify)
+                req.raise_for_status()
         except Exception as e:
             print(f"Error requesting {url}: {str(e)}")
             return ""
 
-        if req.status_code != 200:
-            self.loop = QEventLoop()
-            self.downloadFile.emit(url, download_path)
-            self.loop.exec()
-        else:
-            file_path = os.path.join(download_path, self.find_download_fname(req))
-            with open(file_path, "wb") as f:
-                f.write(req.content)
-            self.downloaded_file_path = file_path
+        file_path = os.path.join(download_path, self.find_download_fname(req))
+        with open(file_path, "wb") as f:
+            f.write(req.content)
+        self.downloaded_file_path = file_path
 
         return self.downloaded_file_path
 
-    def find_download_fname(self, response):
+    @staticmethod
+    def find_download_fname(response):
         content_disposition = response.headers.get('content-disposition')
         if content_disposition:
             if "filename*=" in content_disposition:
@@ -110,12 +90,38 @@ class DownloadBaseThread(QThread):
 
         return urlparse(response.url).path.split("/")[-1]
 
-    def handle_download_completed(self, file_path):
-        self.downloaded_file_path = file_path
-        if self.loop.isRunning():
-            self.loop.quit()
+    @staticmethod
+    def get_signed_download_url(file_path_on_s3):
+        if not API_GATEWAY_ENDPOINT or not CLIENT_API_KEY:
+            print("Error: API Gateway endpoint or Client API Key is not configured.")
+            return None
 
-    def is_internet_connected(self, urls=None, timeout=5):
+        headers = {
+            'x-api-key': CLIENT_API_KEY
+        }
+        params = {
+            'filePath': file_path_on_s3
+        }
+
+        try:
+            response = requests.get(API_GATEWAY_ENDPOINT, headers=headers, params=params, timeout=15)
+            response.raise_for_status()
+
+            data = response.json()
+            signed_url = data.get('signedUrl')
+            if signed_url:
+                print(f"Successfully retrieved signed URL for {file_path_on_s3}")
+                return signed_url
+            else:
+                print(f"Error: 'signedUrl' not found in response. Response: {data}")
+                return None
+
+        except Exception as e:
+            print(f"Error retrieving signed URL: {str(e)}")
+        return None
+
+    @staticmethod
+    def is_internet_connected(urls=None, timeout=5):
         if urls is None:
             urls = [
                 "https://www.bing.com/",
@@ -134,7 +140,8 @@ class DownloadBaseThread(QThread):
                 continue
         return False
 
-    def arabic_to_roman(self, num):
+    @staticmethod
+    def arabic_to_roman(num):
         if num == 0:
             return '0'
 
@@ -158,7 +165,8 @@ class DownloadBaseThread(QThread):
         all_punctuation = string.punctuation + zhon.hanzi.punctuation
         return ''.join(char for char in text if char not in all_punctuation and not char.isspace()).lower()
 
-    def symbol_replacement(self, text):
+    @staticmethod
+    def symbol_replacement(text):
         return text.replace(': ', ' - ').replace(':', '-').replace("/", "_").replace("?", "")
 
     def find_best_trainer_match(self, target_name, target_language, threshold=85):
@@ -223,20 +231,23 @@ class DownloadBaseThread(QThread):
 
         return trainerName
 
-    def save_html_content(self, content, file_name, overwrite=True):
+    @staticmethod
+    def save_html_content(content, file_name, overwrite=True):
         html_file = os.path.join(DATABASE_PATH, file_name)
         mode = 'w' if overwrite else 'a'
         with open(html_file, mode, encoding='utf-8') as file:
             file.write(content)
 
-    def load_html_content(self, file_name):
+    @staticmethod
+    def load_html_content(file_name):
         html_file = os.path.join(DATABASE_PATH, file_name)
         if os.path.exists(html_file):
             with open(html_file, 'r', encoding='utf-8') as file:
                 return file.read()
         return ""
 
-    def load_json_content(self, file_name):
+    @staticmethod
+    def load_json_content(file_name):
         json_file = os.path.join(DATABASE_PATH, file_name)
         if os.path.exists(json_file):
             with open(json_file, 'r', encoding='utf-8') as file:

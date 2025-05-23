@@ -50,7 +50,10 @@ class TrainerManagementDialog(QDialog):
 
     @staticmethod
     def find_settings_key(value, dict):
-        return next(key for key, val in dict.items() if val == value)
+        try:
+            return next(key for key, val in dict.items() if val == value)
+        except StopIteration:
+            return next(iter(dict.values()))
 
     def show_alert(self, message, alert_type):
         alert = AlertWidget(self, message, alert_type)

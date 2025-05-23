@@ -1,13 +1,12 @@
 beautifulsoup4
 cloudscraper
-cn2an
 fuzzywuzzy
 pinyin
 polib
 psutil
 pyinstaller
 PyQt6
-PyQt6-WebEngine
+python-dotenv
 python-Levenshtein
 requests
 tendo

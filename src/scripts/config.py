@@ -1,3 +1,4 @@
+from dotenv import load_dotenv
 import gettext
 import json
 import locale
@@ -58,11 +59,12 @@ def load_settings():
         "autoUpdateTranslations": True,
 
         # Trainer management configs
-        "flingDownloadServer": "intl",
+        "flingDownloadServer": "official",
         "removeFlingBgMusic": True,
         "autoUpdateFlingData": True,
         "autoUpdateFlingTrainers": True,
         "enableXiaoXing": True,
+        "xiaoXingDownloadServer": "official",
         "autoUpdateXiaoXingData": True,
         "weModPath": wemod_install_path,
         "cePath": ce_install_path
@@ -154,6 +156,10 @@ def findCEInstallPath():
 setting_path = os.path.join(os.environ["APPDATA"], "GCM Settings")
 os.makedirs(setting_path, exist_ok=True)
 
+load_dotenv()
+API_GATEWAY_ENDPOINT = os.getenv("API_GATEWAY_SIGNED_URL_GENERATOR_ENDPOINT")
+CLIENT_API_KEY = os.getenv("CLIENT_API_KEY")
+
 SETTINGS_FILE = os.path.join(setting_path, "settings.json")
 DATABASE_PATH = os.path.join(setting_path, "db")
 os.makedirs(DATABASE_PATH, exist_ok=True)
@@ -197,7 +203,8 @@ theme_options = {
 }
 
 server_options = {
-    tr("International"): "intl",
+    tr("Official Site"): "official",
+    tr("GCM Server"): "gcm"
 }
 
 font_config = {
