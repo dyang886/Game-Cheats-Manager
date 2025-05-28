@@ -64,7 +64,6 @@ def load_settings():
         "autoUpdateFlingData": True,
         "autoUpdateFlingTrainers": True,
         "enableXiaoXing": True,
-        "xiaoXingDownloadServer": "official",
         "autoUpdateXiaoXingData": True,
         "weModPath": wemod_install_path,
         "cePath": ce_install_path

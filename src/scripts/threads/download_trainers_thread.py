@@ -4,10 +4,8 @@ import shutil
 import stat
 import subprocess
 import time
-from urllib.parse import parse_qs, urlparse
 
 from bs4 import BeautifulSoup
-import cloudscraper
 
 from config import *
 from threads.download_base_thread import DownloadBaseThread
@@ -37,16 +35,15 @@ class DownloadTrainersThread(DownloadBaseThread):
             shutil.rmtree(DOWNLOAD_TEMP_DIR)
         os.makedirs(DOWNLOAD_TEMP_DIR, exist_ok=True)
 
-        self.src_dst = []  # List content: { "src": source_path, "dst": destination_path }
+        self.src_dst = []  # List content: { "src": source_path, "dst": destination_path, "version": YYYY.MM.DD }
+        self.antiCheatDst = ""
         selected_trainer = None
-        origin = "fling"
         if not self.update:
             selected_trainer = DownloadBaseThread.trainer_urls[self.index]
-            if selected_trainer["origin"] == "xiaoxing":
-                origin = "xiaoxing"
+            origin = selected_trainer["origin"]
 
         result = True
-        if origin == "fling" or self.update:
+        if origin == "fling_main" or origin == "fling_archive" or self.update:
             result = self.download_fling(selected_trainer)
         elif origin == "xiaoxing":
             result = self.download_xiaoxing(selected_trainer)
@@ -55,11 +52,26 @@ class DownloadTrainersThread(DownloadBaseThread):
             for item in self.src_dst:
                 if os.path.exists(item["dst"]):
                     os.chmod(item["dst"], stat.S_IWRITE)
+                if os.path.splitext(item['src'])[1]:
+                    dst_dir = os.path.dirname(item["dst"])
+                    os.makedirs(dst_dir, exist_ok=True)
+                else:
+                    dst_dir = item["dst"]
                 shutil.move(item["src"], item["dst"])
+
+                if dst_dir != self.antiCheatDst:
+                    with open(os.path.join(dst_dir, "gcm_info.txt"), 'w', encoding='utf-8') as info_file:
+                        info_file.write(f"origin: {selected_trainer['origin']}\n")
+                        if selected_trainer.get('version'):
+                            info_file.write(f"version: {selected_trainer['version']}\n")
 
             rhLog = os.path.join(DOWNLOAD_TEMP_DIR, "rh.log")
             if os.path.exists(rhLog):
                 os.remove(rhLog)
+
+            if self.antiCheatDst:
+                self.messageBox.emit("info", tr("Attention"), tr("Please check folder for anti-cheat requirements!"))
+                os.startfile(self.antiCheatDst)
 
         except PermissionError as e:
             self.message.emit(tr("Trainer is currently in use, please close any programs using the file and try again."), "failure")
@@ -67,7 +79,7 @@ class DownloadTrainersThread(DownloadBaseThread):
             self.finished.emit(1)
             return
         except Exception as e:
-            self.message.emit(tr("Could not find the downloaded trainer file, please try turning your antivirus software off."), "failure")
+            self.message.emit(tr("An error occurred when moving trainer: ") + str(e), "failure")
             time.sleep(self.download_finish_delay)
             self.finished.emit(1)
             return
@@ -180,16 +192,23 @@ class DownloadTrainersThread(DownloadBaseThread):
 
             # Additional trainer file extraction for trainers from main site
             if settings["flingDownloadServer"] == "official":
-                domain = urlparse(targetUrl).netloc
-                if domain == "flingtrainer.com":
+                if selected_trainer['origin'] == "fling_main":
                     page_content = self.get_webpage_content(targetUrl)
                     trainerPage = BeautifulSoup(page_content, 'html.parser')
-                    targetObj = trainerPage.find(target="_self")
-                    if targetObj:
-                        targetUrl = targetObj.get("href")
-                    else:
-                        raise Exception(tr("Internet request failed."))
-            
+                    targetObj = trainerPage.find(lambda tag: tag.get('target') == '_self' and 'flingtrainer.com' in tag.get('href'))
+                    if not targetObj:
+                        raise Exception(tr("Failed to find trainer download link."))
+                    targetUrl = targetObj.get("href")
+                    div_entry = trainerPage.find('div', class_='entry')
+                    if div_entry:
+                        pattern = r'options.*game\s*version.*last\s*updated:\s*(\d{4}\.[0-1]?\d\.[0-3]?\d)'
+                        match = re.search(pattern, div_entry.get_text(separator=' ', strip=True), re.IGNORECASE)
+                        if match:
+                            version = match.group(1)
+                    if not version:
+                        raise Exception(tr("Failed to find trainer version."))
+                    selected_trainer["version"] = version
+
             # Download trainers from gcm server
             elif settings["flingDownloadServer"] == "gcm":
                 targetUrl = self.get_signed_download_url(targetUrl)
@@ -200,19 +219,6 @@ class DownloadTrainersThread(DownloadBaseThread):
 
         except Exception as e:
             self.message.emit(tr("An error occurred while downloading trainer: ") + str(e), "failure")
-            time.sleep(self.download_finish_delay)
-            self.finished.emit(1)
-            return False
-
-        # Ensure file is successfully downloaded
-        found_trainer = False
-        for _ in range(3):
-            if os.path.exists(trainerTemp):
-                found_trainer = True
-                break
-            time.sleep(1)
-        if not found_trainer:
-            self.message.emit(tr("Downloaded file not found."), "failure")
             time.sleep(self.download_finish_delay)
             self.finished.emit(1)
             return False
@@ -233,17 +239,20 @@ class DownloadTrainersThread(DownloadBaseThread):
         # Locate extracted .exe file
         cnt = 0
         extractedTrainerNames = []
+        extractedAntiCheatNames = []
         for filename in os.listdir(DOWNLOAD_TEMP_DIR):
             if "trainer" in filename.lower() and filename.endswith(".exe"):
                 extractedTrainerNames.append(filename)
             # Count anti-cheat files
             elif ("trainer" not in filename.lower() and filename != os.path.basename(trainerTemp)) and filename.lower() != "info.txt":
+                extractedAntiCheatNames.append(filename)
                 cnt += 1
 
         # Warn user if anti-cheat files found
         if cnt > 0 and not self.update:
-            self.messageBox.emit("info", tr("Attention"), tr("Please check folder for anti-cheat requirements!"))
-            os.startfile(DOWNLOAD_TEMP_DIR)
+            self.antiCheatDst = os.path.join(self.trainerDownloadPath, trainerName_display, "anti-cheat")
+            for antiCheatFile in extractedAntiCheatNames:
+                self.src_dst.append({"src": os.path.join(DOWNLOAD_TEMP_DIR, antiCheatFile), "dst": os.path.join(self.antiCheatDst, antiCheatFile)})
 
         # Check if extracted trainer name is None
         if not extractedTrainerNames:
@@ -261,8 +270,8 @@ class DownloadTrainersThread(DownloadBaseThread):
 
             for extractedTrainerName in extractedTrainerNames:
                 trainer_details = ""
-                if domain == "flingtrainer.com":
-                    pattern = r'trainer(.*)'
+                if selected_trainer['origin'] == "fling_main":
+                    pattern = r'trainer(.*)\.exe'
                     match = re.search(pattern, extractedTrainerName, re.IGNORECASE)
                     if match:
                         trainer_details = match.group(1)
@@ -270,26 +279,26 @@ class DownloadTrainersThread(DownloadBaseThread):
                     pattern = r"\s+Update.*|\s+v\d+.*"
                     match = re.search(pattern, extractedTrainerName)
                     if match:
-                        trainer_details = match.group().replace(" Trainer", "")
+                        trainer_details = match.group().replace(" Trainer", "").rstrip(".exe")
 
                 trainer_name = f"{trainerName_display}{trainer_details}"
 
                 source_file = os.path.join(DOWNLOAD_TEMP_DIR, extractedTrainerName)
-                destination_file = os.path.join(self.trainerDownloadPath, trainer_name)
-                self.src_dst.append({"src": source_file, "dst": destination_file})
+                destination_file = os.path.join(self.trainerDownloadPath, trainer_name, extractedTrainerName)
+                self.src_dst.insert(0, {"src": source_file, "dst": destination_file})
 
         else:
-            trainer_name = f"{trainerName_display}.exe"
             source_file = os.path.join(DOWNLOAD_TEMP_DIR, extractedTrainerNames[0])
-            destination_file = os.path.join(self.trainerDownloadPath, trainer_name)
-            self.src_dst.append({"src": source_file, "dst": destination_file})
+            destination_file = os.path.join(self.trainerDownloadPath, trainerName_display, extractedTrainerNames[0])
+            self.src_dst.insert(0, {"src": source_file, "dst": destination_file})
 
         # remove fling trainer bg music
         if settings["removeFlingBgMusic"]:
             self.message.emit(tr("Removing trainer background music..."), None)
             self.modify_fling_settings(True)
             for item in self.src_dst:
-                self.remove_bgMusic(item["src"], ["MID", "MIDI"])
+                if item["src"].lower().endswith(".exe"):
+                    self.remove_bgMusic(item["src"], ["MID", "MIDI"])
         else:
             self.modify_fling_settings(False)
 
@@ -305,37 +314,6 @@ class DownloadTrainersThread(DownloadBaseThread):
 
         return True
 
-    def get_onedrive_download_url(self, url):
-        # Construct api url from redirected OneDrive url
-        parsed_url = urlparse(url)
-        query_params = parse_qs(parsed_url.query)
-
-        authkey = query_params.get('authkey', [None])[0]
-        item_id = query_params.get('id', [None])[0]
-        cid = query_params.get('cid', [None])[0]
-
-        # Validate extracted parameters
-        if not all([authkey, item_id, cid]):
-            print("Missing required query parameters in OneDrive URL.")
-            return ""
-
-        item_id_formatted = item_id.replace('!', '%21')
-        api_url = (
-            f"https://api.onedrive.com/v1.0/drives/{cid}/items/{item_id_formatted}"
-            f"?select=id%2C%40content.downloadUrl&authkey={authkey}"
-        )
-
-        # Get download url from api url
-        scraper = cloudscraper.create_scraper()
-        req = scraper.get(api_url, headers=self.headers)
-        data = req.json()
-        download_url = data.get("@content.downloadUrl")
-        if not download_url:
-            print("OneDrive download URL not found in the API response.")
-            return ""
-
-        return download_url
-
     def download_xiaoxing(self, selected_trainer):
         # Trainer duplication check
         for trainerPath in self.trainers.keys():
@@ -345,46 +323,13 @@ class DownloadTrainersThread(DownloadBaseThread):
                 self.finished.emit(1)
                 return False
 
-        # Download trainer archive (either MediaFire or OneDrive)
-        page_content = self.get_webpage_content(selected_trainer["url"], False)
-        trainerPage = BeautifulSoup(page_content, 'html.parser')
-        mediaFireTag = trainerPage.find('a', href=lambda href: href and "www.mediafire.com" in href)
-        oneDriveTag = trainerPage.find('a', href=lambda href: href and "1drv.ms" in href)
-        extractedContentPath = os.path.join(DOWNLOAD_TEMP_DIR, "extracted")
-
-        mediaFire_failed = False
-        oneDrive_failed = False
-        trainerTemp = None
-
         self.message.emit(tr("Downloading..."), None)
-
+        extractedContentPath = os.path.join(DOWNLOAD_TEMP_DIR, "extracted")
         try:
-            # Attempt MediaFire download
-            if mediaFireTag:
-                mediaFirePage = self.get_webpage_content(mediaFireTag.get("href"), use_cloudScraper=True)
-                mediaFireHTML = BeautifulSoup(mediaFirePage, "html.parser")
-                mediaFireDownloadButton = mediaFireHTML.find(id="downloadButton")
-                if mediaFireDownloadButton:
-                    trainerTemp = self.request_download(mediaFireDownloadButton.get("href"), DOWNLOAD_TEMP_DIR, use_cloudScraper=True)
-                else:
-                    mediaFire_failed = True
-            else:
-                mediaFire_failed = True
-
-            # Attempt OneDrive download if MediaFire failed
-            if mediaFire_failed and oneDriveTag:
-                scraper = cloudscraper.create_scraper()
-                req = scraper.get(oneDriveTag.get("href"), headers=self.headers)
-                oneDriveLink = self.get_onedrive_download_url(req.url)
-                if oneDriveLink:
-                    trainerTemp = self.request_download(oneDriveLink, DOWNLOAD_TEMP_DIR, use_cloudScraper=True)
-                else:
-                    oneDrive_failed = True
-            elif not oneDriveTag:
-                oneDrive_failed = True
-
-            if mediaFire_failed and oneDrive_failed:
-                raise Exception(tr("No download link available"))
+            signed_url = self.get_signed_download_url(selected_trainer['url'])
+            trainerTemp = self.request_download(signed_url, DOWNLOAD_TEMP_DIR)
+            if not trainerTemp:
+                raise Exception(tr("Internet request failed."))
 
         except Exception as e:
             self.message.emit(tr("An error occurred while downloading trainer: ") + str(e), "failure")

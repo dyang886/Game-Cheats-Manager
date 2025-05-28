@@ -76,21 +76,43 @@ class FetchFlingSite(DownloadBaseThread):
         update_message2 = tr("Updating data from FLiNG") + " (2/2)"
         update_failed2 = tr("Update from FLiGN failed") + " (2/2)"
 
+        # Fling archive
         self.message.emit(statusWidgetName, update_message1)
-        url = "GCM/fling_archive.html"
-        signed_url = self.get_signed_download_url(url)
-        file_path = self.request_download(signed_url, DATABASE_PATH)
-        if not file_path:
-            self.update.emit(statusWidgetName, update_failed1, "error")
-            time.sleep(2)
+        if settings['flingDownloadServer'] == "official":
+            url = "https://archive.flingtrainer.com/"
+            content = self.get_webpage_content(url)
+            if not content:
+                self.update.emit(statusWidgetName, update_failed1, "error")
+                time.sleep(2)
+            else:
+                self.save_html_content(content, "fling_archive.html")
 
+        elif settings['flingDownloadServer'] == "gcm":
+            url = "GCM/fling_archive.json"
+            signed_url = self.get_signed_download_url(url)
+            file_path = self.request_download(signed_url, DATABASE_PATH)
+            if not file_path:
+                self.update.emit(statusWidgetName, update_failed1, "error")
+                time.sleep(2)
+
+        # Fling main
         self.update.emit(statusWidgetName, update_message2, "load")
-        url = "GCM/fling_main.html"
-        signed_url = self.get_signed_download_url(url)
-        file_path = self.request_download(signed_url, DATABASE_PATH)
-        if not file_path:
-            self.update.emit(statusWidgetName, update_failed2, "error")
-            time.sleep(2)
+        if settings['flingDownloadServer'] == "official":
+            url = "https://flingtrainer.com/all-trainers-a-z/"
+            content = self.get_webpage_content(url)
+            if not content:
+                self.update.emit(statusWidgetName, update_failed2, "error")
+                time.sleep(2)
+            else:
+                self.save_html_content(content, "fling_main.html")
+
+        elif settings['flingDownloadServer'] == "gcm":
+            url = "GCM/fling_main.json"
+            signed_url = self.get_signed_download_url(url)
+            file_path = self.request_download(signed_url, DATABASE_PATH)
+            if not file_path:
+                self.update.emit(statusWidgetName, update_failed2, "error")
+                time.sleep(2)
 
         self.finished.emit(statusWidgetName)
 
@@ -109,7 +131,7 @@ class FetchXiaoXingSite(DownloadBaseThread):
         update_failed = tr("Update from XiaoXing failed")
 
         self.message.emit(statusWidgetName, update_message)
-        url = "GCM/xiaoxing.html"
+        url = "GCM/xiaoxing.json"
         signed_url = self.get_signed_download_url(url)
         file_path = self.request_download(signed_url, DATABASE_PATH)
         if not file_path:
