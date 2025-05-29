@@ -12,14 +12,12 @@ from threads.download_base_thread import DownloadBaseThread
 
 
 class DownloadTrainersThread(DownloadBaseThread):
-    def __init__(self, index, trainers, trainerDownloadPath, update, trainerPath, updateUrl, parent=None):
+    def __init__(self, index, trainers, trainerDownloadPath, update_entry, parent=None):
         super().__init__(parent)
         self.index = index
         self.trainers = trainers
         self.trainerDownloadPath = trainerDownloadPath
-        self.update = update
-        self.trainerPath = trainerPath
-        self.updateUrl = updateUrl
+        self.update_entry = update_entry
         self.download_finish_delay = 0.5
         self.update_error_delay = 3
 
@@ -38,12 +36,14 @@ class DownloadTrainersThread(DownloadBaseThread):
         self.src_dst = []  # List content: { "src": source_path, "dst": destination_path, "version": YYYY.MM.DD }
         self.antiCheatDst = ""
         selected_trainer = None
-        if not self.update:
+        if not self.update_entry:
             selected_trainer = DownloadBaseThread.trainer_urls[self.index]
-            origin = selected_trainer["origin"]
+        else:
+            selected_trainer = self.update_entry
+        origin = selected_trainer["origin"]
 
         result = True
-        if origin == "fling_main" or origin == "fling_archive" or self.update:
+        if origin == "fling_main" or origin == "fling_archive":
             result = self.download_fling(selected_trainer)
         elif origin == "xiaoxing":
             result = self.download_xiaoxing(selected_trainer)
@@ -60,16 +60,21 @@ class DownloadTrainersThread(DownloadBaseThread):
                 shutil.move(item["src"], item["dst"])
 
                 if dst_dir != self.antiCheatDst:
-                    with open(os.path.join(dst_dir, "gcm_info.txt"), 'w', encoding='utf-8') as info_file:
-                        info_file.write(f"origin: {selected_trainer['origin']}\n")
-                        if selected_trainer.get('version'):
-                            info_file.write(f"version: {selected_trainer['version']}\n")
+                    info_dict = {
+                        "game_name": selected_trainer["game_name"],
+                        "origin": selected_trainer["origin"]
+                    }
+                    if selected_trainer.get("version"):
+                        info_dict["version"] = selected_trainer["version"]
+
+                    with open(os.path.join(dst_dir, "gcm_info.json"), "w", encoding="utf-8") as info_file:
+                        json.dump(info_dict, info_file, ensure_ascii=False, indent=4)
 
             rhLog = os.path.join(DOWNLOAD_TEMP_DIR, "rh.log")
             if os.path.exists(rhLog):
                 os.remove(rhLog)
 
-            if self.antiCheatDst:
+            if self.antiCheatDst and not self.update_entry:
                 self.messageBox.emit("info", tr("Attention"), tr("Please check folder for anti-cheat requirements!"))
                 os.startfile(self.antiCheatDst)
 
@@ -165,13 +170,11 @@ class DownloadTrainersThread(DownloadBaseThread):
             self.remove_bgMusic(source_exe, resource_type_list)
 
     def download_fling(self, selected_trainer):
-        if self.update:
-            self.trainerName = os.path.splitext(os.path.basename(self.trainerPath))[0]
-            self.message.emit(tr("Updating ") + self.trainerName + "...", None)
-
-        if not self.update:
+        if self.update_entry:
+            trainerName_display = selected_trainer["trainer_name"]
+            self.message.emit(tr("Updating ") + trainerName_display + "...", None)
+        else:
             trainerName_display = self.symbol_replacement(selected_trainer["trainer_name"])
-
             # Trainer duplication check
             for trainerPath in self.trainers.keys():
                 if trainerName_display == os.path.splitext(os.path.basename(trainerPath))[0]:
@@ -179,19 +182,14 @@ class DownloadTrainersThread(DownloadBaseThread):
                     time.sleep(self.download_finish_delay)
                     self.finished.emit(1)
                     return False
-        else:
-            trainerName_display = self.trainerName
 
         # Download trainer
         self.message.emit(tr("Downloading..."), None)
         try:
-            if not self.update:
-                targetUrl = selected_trainer["url"]
-            else:
-                targetUrl = self.updateUrl
+            targetUrl = selected_trainer["url"]
 
             # Additional trainer file extraction for trainers from main site
-            if settings["flingDownloadServer"] == "official":
+            if settings["flingDownloadServer"] == "official" and not self.update_entry:
                 if selected_trainer['origin'] == "fling_main":
                     page_content = self.get_webpage_content(targetUrl)
                     trainerPage = BeautifulSoup(page_content, 'html.parser')
@@ -210,7 +208,7 @@ class DownloadTrainersThread(DownloadBaseThread):
                     selected_trainer["version"] = version
 
             # Download trainers from gcm server
-            elif settings["flingDownloadServer"] == "gcm":
+            elif settings["flingDownloadServer"] == "gcm" or self.update_entry:
                 targetUrl = self.get_signed_download_url(targetUrl)
 
             trainerTemp = self.request_download(targetUrl, DOWNLOAD_TEMP_DIR)
@@ -249,7 +247,7 @@ class DownloadTrainersThread(DownloadBaseThread):
                 cnt += 1
 
         # Warn user if anti-cheat files found
-        if cnt > 0 and not self.update:
+        if cnt > 0:
             self.antiCheatDst = os.path.join(self.trainerDownloadPath, trainerName_display, "anti-cheat")
             for antiCheatFile in extractedAntiCheatNames:
                 self.src_dst.append({"src": os.path.join(DOWNLOAD_TEMP_DIR, antiCheatFile), "dst": os.path.join(self.antiCheatDst, antiCheatFile)})
@@ -264,9 +262,8 @@ class DownloadTrainersThread(DownloadBaseThread):
         # Construct destination trainer name dict (may have multiple versions of a same game)
         os.makedirs(self.trainerDownloadPath, exist_ok=True)
         if len(extractedTrainerNames) > 1:
-            if self.update:
-                match = re.search(r'^(.*?)(\s+v\d+|\s+Early Access)', extractedTrainerNames[0])
-                trainerName_display = self.symbol_replacement(self.translate_trainer(match.group(1)))
+            if self.update_entry:
+                trainerName_display = self.symbol_replacement(self.translate_trainer(selected_trainer["game_name"], selected_trainer["origin"]))
 
             for extractedTrainerName in extractedTrainerNames:
                 trainer_details = ""
@@ -303,11 +300,8 @@ class DownloadTrainersThread(DownloadBaseThread):
             self.modify_fling_settings(False)
 
         # Delete original trainer file (could not preserve original file name due to multiple versions when updating)
-        if len(extractedTrainerNames) > 1 and self.update:
-            original_trainer_name = f"{self.trainerName}.exe"
-            original_trainer_file = os.path.join(self.trainerDownloadPath, original_trainer_name)
-            os.chmod(original_trainer_file, stat.S_IWRITE)
-            os.remove(original_trainer_file)
+        if self.update_entry:
+            shutil.rmtree(selected_trainer['trainer_dir'])
 
         if os.path.exists(trainerTemp) and os.path.basename(trainerTemp) not in extractedTrainerNames:
             os.remove(trainerTemp)
@@ -315,13 +309,18 @@ class DownloadTrainersThread(DownloadBaseThread):
         return True
 
     def download_xiaoxing(self, selected_trainer):
-        # Trainer duplication check
-        for trainerPath in self.trainers.keys():
-            if self.symbol_replacement(selected_trainer["trainer_name"]) == os.path.splitext(os.path.basename(trainerPath))[0]:
-                self.message.emit(tr("Trainer already exists, aborted download."), "failure")
-                time.sleep(self.download_finish_delay)
-                self.finished.emit(1)
-                return False
+        if self.update_entry:
+            trainerName_display = selected_trainer["trainer_name"]
+            self.message.emit(tr("Updating ") + trainerName_display + "...", None)
+        else:
+            trainerName_display = self.symbol_replacement(selected_trainer["trainer_name"])
+            # Trainer duplication check
+            for trainerPath in self.trainers.keys():
+                if self.symbol_replacement(selected_trainer["trainer_name"]) == os.path.splitext(os.path.basename(trainerPath))[0]:
+                    self.message.emit(tr("Trainer already exists, aborted download."), "failure")
+                    time.sleep(self.download_finish_delay)
+                    self.finished.emit(1)
+                    return False
 
         self.message.emit(tr("Downloading..."), None)
         extractedContentPath = os.path.join(DOWNLOAD_TEMP_DIR, "extracted")
@@ -350,9 +349,11 @@ class DownloadTrainersThread(DownloadBaseThread):
             return False
 
         os.remove(trainerTemp)
+        if self.update_entry:
+            shutil.rmtree(selected_trainer['trainer_dir'])
 
         if not self.handle_xiaoxing_special_cases(selected_trainer, extractedContentPath):
-            destination_path = os.path.join(self.trainerDownloadPath, self.symbol_replacement(selected_trainer["trainer_name"]))
+            destination_path = os.path.join(self.trainerDownloadPath, trainerName_display)
             self.src_dst.append({"src": extractedContentPath, "dst": destination_path})
 
         return True

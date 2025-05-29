@@ -22,7 +22,7 @@ class DownloadBaseThread(QThread):
     messageBox = pyqtSignal(str, str, str)
     finished = pyqtSignal(int)
 
-    trainer_urls = []
+    trainer_urls = []  # [{"game_name": str, "trainer_name": str, "origin": str, "url": download url, "version": YYYY.MM.DD},]
     headers = {
         "User-Agent": "Mozilla/5.0 (Windows NT 10.0; Win64; x64) AppleWebKit/537.36 (KHTML, like Gecko) Chrome/96.0.4664.110 Safari/537.36",
         "Accept": "text/html,application/xhtml+xml,application/xml;q=0.9,image/avif,image/webp,*/*;q=0.8",
@@ -241,8 +241,8 @@ class DownloadBaseThread(QThread):
         return ""
 
     @staticmethod
-    def load_json_content(file_name):
-        json_file = os.path.join(DATABASE_PATH, file_name)
+    def load_json_content(file_name, from_database=True):
+        json_file = os.path.join(DATABASE_PATH, file_name) if from_database else file_name
         if os.path.exists(json_file):
             with open(json_file, 'r', encoding='utf-8') as file:
                 return json.load(file)

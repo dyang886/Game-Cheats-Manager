@@ -112,7 +112,7 @@ class GameCheatsManager(QMainWindow):
         dataMenu.addAction(updateTrainerSearchData)
 
         updateTrainers = QAction(tr("Update Trainers"), self)
-        updateTrainers.triggered.connect(self.update_fling_trainers)
+        updateTrainers.triggered.connect(self.update_trainers)
         dataMenu.addAction(updateTrainers)
 
         # Trainer management menu
@@ -457,10 +457,10 @@ class GameCheatsManager(QMainWindow):
             fetch_fling_site_thread.finished.connect(self.on_interval_finished)
             fetch_fling_site_thread.start()
 
-    def update_fling_trainers(self):
+    def update_trainers(self):
         if not self.currentlyUpdatingTrainers:
             self.currentlyUpdatingTrainers = True
-            trainer_update_thread = UpdateFlingTrainers(self.trainers, self)
+            trainer_update_thread = UpdateTrainers(self.trainers, self)
             trainer_update_thread.message.connect(self.on_status_load)
             trainer_update_thread.update.connect(self.on_status_update)
             trainer_update_thread.updateTrainer.connect(self.on_trainer_update)
@@ -488,16 +488,16 @@ class GameCheatsManager(QMainWindow):
         if settings["autoUpdateXiaoXingData"]:
             self.fetch_xiaoxing_data()
         if settings["autoUpdateFlingTrainers"]:
-            self.update_fling_trainers()
+            self.update_trainers()
 
     def download_trainers(self, index):
-        self.enqueue_download(index, self.trainers, self.trainerDownloadPath, False, None, None)
+        self.enqueue_download(index, self.trainers, self.trainerDownloadPath, None)
 
-    def on_trainer_update(self, trainerPath, updateUrl):
-        self.enqueue_download(None, None, self.trainerDownloadPath, True, trainerPath, updateUrl)
+    def on_trainer_update(self, update_entry):
+        self.enqueue_download(None, None, self.trainerDownloadPath, update_entry)
 
-    def enqueue_download(self, index, trainers, trainerDownloadPath, update, trainerPath, updateUrl):
-        self.downloadQueue.put((index, trainers, trainerDownloadPath, update, trainerPath, updateUrl))
+    def enqueue_download(self, index, trainers, trainerDownloadPath, update_entry):
+        self.downloadQueue.put((index, trainers, trainerDownloadPath, update_entry))
         if not self.currentlyDownloading:
             self.start_next_download()
 
@@ -509,8 +509,8 @@ class GameCheatsManager(QMainWindow):
             self.downloadable = False
             self.searchable = False
 
-            index, trainers, trainerDownloadPath, update, trainerPath, updateUrl = self.downloadQueue.get()
-            download_thread = DownloadTrainersThread(index, trainers, trainerDownloadPath, update, trainerPath, updateUrl, self)
+            index, trainers, trainerDownloadPath, update_entry = self.downloadQueue.get()
+            download_thread = DownloadTrainersThread(index, trainers, trainerDownloadPath, update_entry, self)
             download_thread.message.connect(self.on_message)
             download_thread.messageBox.connect(self.on_message_box)
             download_thread.finished.connect(self.on_download_finished)
