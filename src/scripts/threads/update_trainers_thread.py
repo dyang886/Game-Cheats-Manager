@@ -15,9 +15,10 @@ class UpdateTrainers(DownloadBaseThread):
     updateTrainer = pyqtSignal(dict)
     finished = pyqtSignal(str)
 
-    def __init__(self, trainers, parent=None):
+    def __init__(self, trainers, auto_check, parent=None):
         super().__init__(parent)
         self.trainers = trainers
+        self.auto_check = auto_check
 
     def check_trainer_update(self, trainer_path):
         """Check if a trainer needs an update and return update info if needed."""
@@ -35,10 +36,13 @@ class UpdateTrainers(DownloadBaseThread):
                 return None
 
             origin_to_file = {
-                "xiaoxing": "xiaoxing.json",
-                "fling_main": "fling_main.json",
+                "fling_main": "fling_main.json" if (self.auto_check and settings["autoUpdateFlingTrainers"]) or not self.auto_check else None,
+                "xiaoxing": "xiaoxing.json" if (self.auto_check and settings["autoUpdateXiaoXingTrainers"]) or not self.auto_check else None
             }
-            database = self.load_json_content(origin_to_file[origin])
+            origin_database = origin_to_file.get(origin)
+            if not origin_database:
+                return None
+            database = self.load_json_content(origin_database)
 
             for entry in database:
                 if entry['game_name'] == game_name:

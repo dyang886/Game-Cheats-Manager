@@ -42,7 +42,6 @@ class GameCheatsManager(QMainWindow):
         # Version and links
         self.appVersion = "2.3.0"
         self.githubLink = "https://github.com/dyang886/Game-Cheats-Manager"
-        self.updateLink = "https://api.github.com/repos/dyang886/Game-Cheats-Manager/releases/latest"
         self.bilibiliLink = "https://space.bilibili.com/256673766"
 
         # Variable management
@@ -223,7 +222,7 @@ class GameCheatsManager(QMainWindow):
 
         # Check for software update
         if settings['checkAppUpdate']:
-            self.versionFetcher = VersionFetchWorker(self.updateLink)
+            self.versionFetcher = VersionFetchWorker('GCM')
             self.versionFetcher.versionFetched.connect(lambda latest_version: self.send_notification(True, latest_version))
             self.versionFetcher.fetchFailed.connect(lambda: self.send_notification(False))
             self.versionFetcher.start()
@@ -457,10 +456,10 @@ class GameCheatsManager(QMainWindow):
             fetch_fling_site_thread.finished.connect(self.on_interval_finished)
             fetch_fling_site_thread.start()
 
-    def update_trainers(self):
+    def update_trainers(self, auto_check=False):
         if not self.currentlyUpdatingTrainers:
             self.currentlyUpdatingTrainers = True
-            trainer_update_thread = UpdateTrainers(self.trainers, self)
+            trainer_update_thread = UpdateTrainers(self.trainers, auto_check, self)
             trainer_update_thread.message.connect(self.on_status_load)
             trainer_update_thread.update.connect(self.on_status_update)
             trainer_update_thread.updateTrainer.connect(self.on_trainer_update)
@@ -487,8 +486,8 @@ class GameCheatsManager(QMainWindow):
             self.fetch_fling_data()
         if settings["autoUpdateXiaoXingData"]:
             self.fetch_xiaoxing_data()
-        if settings["autoUpdateFlingTrainers"]:
-            self.update_trainers()
+        if settings["autoUpdateFlingTrainers"] or settings["autoUpdateXiaoXingTrainers"]:
+            self.update_trainers(True)
 
     def download_trainers(self, index):
         self.enqueue_download(index, self.trainers, self.trainerDownloadPath, None)

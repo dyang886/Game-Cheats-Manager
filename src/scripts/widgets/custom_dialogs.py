@@ -289,7 +289,7 @@ class AboutDialog(QDialog):
         self.start_version_fetch()
 
     def start_version_fetch(self):
-        self.worker = VersionFetchWorker(self.parent().updateLink)
+        self.worker = VersionFetchWorker('GCM')
         self.worker.versionFetched.connect(self.update_version_labels)
         self.worker.fetchFailed.connect(self.handle_version_load_failure)
         self.worker.start()

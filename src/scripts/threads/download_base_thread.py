@@ -92,7 +92,7 @@ class DownloadBaseThread(QThread):
 
     @staticmethod
     def get_signed_download_url(file_path_on_s3):
-        if not API_GATEWAY_ENDPOINT or not CLIENT_API_KEY:
+        if not SIGNED_URL_API_GATEWAY_ENDPOINT or not CLIENT_API_KEY:
             print("Error: API Gateway endpoint or Client API Key is not configured.")
             return None
 
@@ -104,13 +104,12 @@ class DownloadBaseThread(QThread):
         }
 
         try:
-            response = requests.get(API_GATEWAY_ENDPOINT, headers=headers, params=params, timeout=15)
+            response = requests.get(SIGNED_URL_API_GATEWAY_ENDPOINT, headers=headers, params=params, timeout=15)
             response.raise_for_status()
 
             data = response.json()
             signed_url = data.get('signedUrl')
             if signed_url:
-                print(f"Successfully retrieved signed URL for {file_path_on_s3}")
                 return signed_url
             else:
                 print(f"Error: 'signedUrl' not found in response. Response: {data}")
@@ -219,7 +218,7 @@ class DownloadBaseThread(QThread):
             try:
                 prefix = "[XiaoXing]" if origin == "xiaoxing" else ""
                 best_match = self.find_best_trainer_match(trainerName, "en")
-                trainerName = f"{prefix} {best_match or trainerName} Trainer"
+                trainerName = f"{prefix} {best_match or trainerName} Trainer".strip()
             except Exception as e:
                 print(f"An error occurred while translating trainer name: {str(e)}")
 

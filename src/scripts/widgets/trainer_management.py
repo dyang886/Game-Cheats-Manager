@@ -51,6 +51,7 @@ class TrainerManagementDialog(QDialog):
         settings["autoUpdateFlingTrainers"] = self.autoUpdateFlingTrainersCheckbox.isChecked()
         settings["enableXiaoXing"] = self.enableXiaoXingCheckbox.isChecked()
         settings["autoUpdateXiaoXingData"] = self.autoUpdateXiaoXingDataCheckbox.isChecked()
+        settings["autoUpdateXiaoXingTrainers"] = self.autoUpdateXiaoXingTrainersCheckbox.isChecked()
         apply_settings(settings)
 
     @staticmethod
@@ -122,7 +123,7 @@ class TrainerManagementDialog(QDialog):
         column2.addWidget(self.autoUpdateFlingDataCheckbox)
 
         # Auto update Fling trainers
-        self.autoUpdateFlingTrainersCheckbox = QCheckBox(tr("Update trainers automatically"))
+        self.autoUpdateFlingTrainersCheckbox = QCheckBox(tr("Update FLiNG trainers automatically"))
         self.autoUpdateFlingTrainersCheckbox.setChecked(settings["autoUpdateFlingTrainers"])
         column2.addWidget(self.autoUpdateFlingTrainersCheckbox)
 
@@ -168,6 +169,11 @@ class TrainerManagementDialog(QDialog):
         self.autoUpdateXiaoXingDataCheckbox = QCheckBox(tr("Update XiaoXing data automatically"))
         self.autoUpdateXiaoXingDataCheckbox.setChecked(settings["autoUpdateXiaoXingData"])
         column2.addWidget(self.autoUpdateXiaoXingDataCheckbox)
+
+        # Auto update XiaoXing trainers
+        self.autoUpdateXiaoXingTrainersCheckbox = QCheckBox(tr("Update XiaoXing trainers automatically"))
+        self.autoUpdateXiaoXingTrainersCheckbox.setChecked(settings["autoUpdateXiaoXingTrainers"])
+        column2.addWidget(self.autoUpdateXiaoXingTrainersCheckbox)
 
         column2.addStretch(1)
         return xiaoXingTab

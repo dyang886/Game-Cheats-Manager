@@ -17,19 +17,36 @@ class VersionFetchWorker(QThread):
     versionFetched = pyqtSignal(str)
     fetchFailed = pyqtSignal()
 
-    def __init__(self, update_link, parent=None):
+    def __init__(self, app_name, parent=None):
         super().__init__(parent)
-        self.update_link = update_link
+        self.app_name = app_name
 
     def run(self):
+        if not VERSION_CHECKER_API_GATEWAY_ENDPOINT or not CLIENT_API_KEY:
+            print("Error: API Gateway endpoint or Client API Key is not configured.")
+            self.fetchFailed.emit()
+
+        headers = {
+            'x-api-key': CLIENT_API_KEY
+        }
+        params = {
+            'appName': self.app_name
+        }
+
         try:
-            response = requests.get(self.update_link)
+            response = requests.get(VERSION_CHECKER_API_GATEWAY_ENDPOINT, headers=headers, params=params, timeout=15)
             response.raise_for_status()
+
             data = response.json()
-            latest_version = data.get("tag_name", "").lstrip("v")
-            self.versionFetched.emit(latest_version)
+            latest_version = data.get('latest_version')
+            if latest_version:
+                self.versionFetched.emit(latest_version)
+            else:
+                print(f"Error: 'latest_version' not found in response. Response: {data}")
+                self.fetchFailed.emit()
+
         except Exception as e:
-            print(f"Error fetching latest version: {e}")
+            print(f"Error retrieving latest version: {str(e)}")
             self.fetchFailed.emit()
 
 

@@ -65,6 +65,7 @@ def load_settings():
         "autoUpdateFlingTrainers": True,
         "enableXiaoXing": True,
         "autoUpdateXiaoXingData": True,
+        "autoUpdateXiaoXingTrainers": True,
         "weModPath": wemod_install_path,
         "cePath": ce_install_path
     }
@@ -156,7 +157,8 @@ setting_path = os.path.join(os.environ["APPDATA"], "GCM Settings")
 os.makedirs(setting_path, exist_ok=True)
 
 load_dotenv()
-API_GATEWAY_ENDPOINT = os.getenv("API_GATEWAY_SIGNED_URL_GENERATOR_ENDPOINT")
+SIGNED_URL_API_GATEWAY_ENDPOINT = os.getenv("API_GATEWAY_SIGNED_URL_GENERATOR_ENDPOINT")
+VERSION_CHECKER_API_GATEWAY_ENDPOINT = os.getenv("API_GATEWAY_VERSION_CHECKER_ENDPOINT")
 CLIENT_API_KEY = os.getenv("CLIENT_API_KEY")
 
 SETTINGS_FILE = os.path.join(setting_path, "settings.json")
