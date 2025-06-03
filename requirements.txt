@@ -4,7 +4,7 @@ fuzzywuzzy
 pinyin
 polib
 psutil
-pyinstaller
+nuitka
 PyQt6
 python-dotenv
 python-Levenshtein

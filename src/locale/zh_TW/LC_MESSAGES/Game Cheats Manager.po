@@ -13,17 +13,17 @@ msgstr ""
 "Plural-Forms: nplurals=1; plural=0;\n"
 "X-Generator: Poedit 3.4.4\n"
 
-msgid "Couldn't find {missing_resource}. Please try reinstalling the application."
-msgstr "找不到 {missing_resource}。請嘗試重新安裝應用程式。"
-
 msgid "Black"
 msgstr "黑色"
 
 msgid "white"
 msgstr "白色"
 
-msgid "International"
-msgstr "國際"
+msgid "Official Site"
+msgstr ""
+
+msgid "GCM Server"
+msgstr ""
 
 msgid "Search for installed"
 msgstr "搜尋已安裝"
@@ -169,6 +169,9 @@ msgstr "已成功將路徑添加到 Windows Defender 白名單。"
 msgid "Failed to add paths to Windows Defender whitelist."
 msgstr "無法將路徑添加到 Windows Defender 白名單。"
 
+msgid "Failed to translate, please update translation data."
+msgstr "翻譯失敗，請更新翻譯數據。"
+
 msgid "Searching..."
 msgstr "搜尋中..."
 
@@ -184,17 +187,11 @@ msgstr "翻譯關鍵字..."
 msgid "Search from FLiNG success!"
 msgstr "風靈月影搜尋成功"
 
-msgid "Search failed, please update FLiNG data."
-msgstr "搜尋失敗，請更新風靈月影資料"
-
-msgid "Failed to get trainer url: "
-msgstr "無法取得修改器網址："
+msgid "Search failed, please update trainer search data."
+msgstr "搜索失敗，請更新修改器檢索數據。"
 
 msgid "Search from XiaoXing success!"
 msgstr "小幸搜尋成功"
-
-msgid "Search failed, please update XiaoXing data."
-msgstr "搜尋失敗，請更新小幸資料"
 
 msgid "Checking for internet connection..."
 msgstr "正在檢查網際網路連接..."
@@ -202,8 +199,14 @@ msgstr "正在檢查網際網路連接..."
 msgid "No internet connection, download failed."
 msgstr "沒有網路連接，下載失敗。"
 
-msgid "Could not find the downloaded trainer file, please try turning your antivirus software off."
-msgstr "找不到下載的修改器，請嘗試關閉防毒軟體。"
+msgid "Attention"
+msgstr "警告"
+
+msgid "Please check folder for anti-cheat requirements!"
+msgstr "請檢查資料夾以瞭解反作弊要求！"
+
+msgid "An error occurred when moving trainer: "
+msgstr "移動修改器時出錯："
 
 msgid "Download success!"
 msgstr "下載成功！"
@@ -217,14 +220,17 @@ msgstr "修改器已存在，已中止下載。"
 msgid "Downloading..."
 msgstr "下載中..."
 
+msgid "Failed to find trainer download link."
+msgstr "獲取修改器下載連結失敗。"
+
+msgid "Failed to find trainer version."
+msgstr "獲取修改器版本失敗。"
+
 msgid "Internet request failed."
 msgstr "網路請求失敗。"
 
 msgid "An error occurred while downloading trainer: "
 msgstr "下載修改器時出錯："
-
-msgid "Downloaded file not found."
-msgstr "未找到下載檔案。"
 
 msgid "Decompressing..."
 msgstr "正在解壓..."
@@ -232,17 +238,11 @@ msgstr "正在解壓..."
 msgid "An error occurred while extracting downloaded trainer: "
 msgstr "解壓下載修改器時出錯："
 
-msgid "Attention"
-msgstr "警告"
-
-msgid "Please check folder for anti-cheat requirements!"
-msgstr "請檢查資料夾以瞭解反作弊要求！"
+msgid "Could not find the downloaded trainer file, please try turning your antivirus software off."
+msgstr "找不到下載的修改器，請嘗試關閉防毒軟體。"
 
 msgid "Removing trainer background music..."
 msgstr "刪除修改器背景音樂..."
-
-msgid "No download link available"
-msgstr "無可用下載連結"
 
 msgid "Updating data from FLiNG"
 msgstr "正在更新風靈月影資料"
@@ -311,12 +311,6 @@ msgstr "正在檢查修改器更新"
 
 msgid "Check trainer updates failed"
 msgstr "檢查修改器更新失敗"
-
-msgid "Please complete any security checks"
-msgstr "請完成所有安全檢查"
-
-msgid "Unable to access webpage"
-msgstr "無法瀏覽網頁"
 
 msgid "Warning"
 msgstr "警告"
@@ -395,14 +389,17 @@ msgstr "刪除修改器背景音樂"
 msgid "Update FLiNG data automatically"
 msgstr "自動更新風靈月影資料"
 
-msgid "Update trainers automatically"
-msgstr "自動更新修改器"
+msgid "Update FLiNG trainers automatically"
+msgstr "自動更新風靈月影修改器"
 
 msgid "Enable search for XiaoXing trainers"
 msgstr "允許搜尋小幸修改器"
 
 msgid "Update XiaoXing data automatically"
 msgstr "自動更新小幸資料"
+
+msgid "Update XiaoXing trainers automatically"
+msgstr "自動更新小幸修改器"
 
 msgid "WeMod installation path:"
 msgstr "WeMod 安裝路徑："

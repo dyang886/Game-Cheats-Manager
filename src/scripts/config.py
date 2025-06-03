@@ -1,10 +1,8 @@
-from dotenv import load_dotenv
 import gettext
 import json
 import locale
 import os
 import re
-import shutil
 import sys
 import tempfile
 
@@ -12,17 +10,23 @@ import pinyin
 import polib
 import zhon.cedict as chinese_characters
 
+from secret_config import *
+
 
 # All resources in development mode are relative to `src` folder
 def resource_path(relative_path):
+    # Pyinstaller
     if hasattr(sys, "_MEIPASS"):
         full_path = os.path.join(sys._MEIPASS, relative_path)
+    # Others like Nuitka
+    elif sys.argv[0].endswith('.exe'):
+        full_path = os.path.join(os.path.dirname(sys.executable), relative_path)
+    # Development
     else:
         full_path = os.path.join(os.path.dirname(__file__), '..', relative_path)
 
     if not os.path.exists(full_path):
-        resource_name = os.path.basename(relative_path)
-        formatted_message = tr("Couldn't find {missing_resource}. Please try reinstalling the application.").format(missing_resource=resource_name)
+        formatted_message = (f"Couldn't find {full_path}. Please try reinstalling the application.")
         raise FileNotFoundError(formatted_message)
 
     return full_path
@@ -87,7 +91,7 @@ def load_settings():
 
 
 def get_translator():
-    if not hasattr(sys, 'frozen'):
+    if not sys.argv[0].endswith('.exe'):
         for root, dirs, files in os.walk(resource_path("locale/")):
             for file in files:
                 if file.endswith(".po"):
@@ -113,12 +117,6 @@ def sort_trainers_key(name):
     if is_chinese(name):
         return pinyin.get(name, format="strip", delimiter=" ")
     return name
-
-
-def ensure_trainer_details_exist():
-    dst = os.path.join(DATABASE_PATH, "translations.json")
-    if not os.path.exists(dst):
-        shutil.copyfile(resource_path("dependency/translations.json"), dst)
 
 
 def ensure_trainer_download_path_is_valid():
@@ -156,11 +154,6 @@ def findCEInstallPath():
 setting_path = os.path.join(os.environ["APPDATA"], "GCM Settings")
 os.makedirs(setting_path, exist_ok=True)
 
-load_dotenv()
-SIGNED_URL_API_GATEWAY_ENDPOINT = os.getenv("API_GATEWAY_SIGNED_URL_GENERATOR_ENDPOINT")
-VERSION_CHECKER_API_GATEWAY_ENDPOINT = os.getenv("API_GATEWAY_VERSION_CHECKER_ENDPOINT")
-CLIENT_API_KEY = os.getenv("CLIENT_API_KEY")
-
 SETTINGS_FILE = os.path.join(setting_path, "settings.json")
 DATABASE_PATH = os.path.join(setting_path, "db")
 os.makedirs(DATABASE_PATH, exist_ok=True)
@@ -173,8 +166,6 @@ ce_install_path = findCEInstallPath()
 
 settings = load_settings()
 tr = get_translator()
-
-ensure_trainer_details_exist()
 ensure_trainer_download_path_is_valid()
 
 if settings["theme"] == "black":

@@ -171,7 +171,7 @@ class DownloadBaseThread(QThread):
     def find_best_trainer_match(self, target_name, target_language, threshold=85):
         trainer_details = self.load_json_content("translations.json")
         if not trainer_details:
-            return None
+            raise ValueError("translations.json doesn't exist in the database path.")
 
         sanitized_to_original_en = {}
         sanitized_to_original_zh = {}
@@ -204,23 +204,22 @@ class DownloadBaseThread(QThread):
         return None
 
     def translate_trainer(self, trainerName, origin):
-        if settings["language"] in ["zh_CN", "zh_TW"] and not settings["enSearchResults"]:
-            # Target language is Chinese
-            try:
+        try:
+            if settings["language"] in ["zh_CN", "zh_TW"] and not settings["enSearchResults"]:
+                # Target language is Chinese
                 prefix = "[小幸]" if origin == "xiaoxing" else ""
                 best_match = self.find_best_trainer_match(trainerName, "zh")
                 trainerName = f"{prefix}《{best_match or trainerName}》修改器"
-            except Exception as e:
-                print(f"An error occurred while translating trainer name: {str(e)}")
 
-        elif settings["language"] == "en_US" or settings["enSearchResults"]:
-            # Target language is English
-            try:
+            elif settings["language"] == "en_US" or settings["enSearchResults"]:
+                # Target language is English
                 prefix = "[XiaoXing]" if origin == "xiaoxing" else ""
                 best_match = self.find_best_trainer_match(trainerName, "en")
                 trainerName = f"{prefix} {best_match or trainerName} Trainer".strip()
-            except Exception as e:
-                print(f"An error occurred while translating trainer name: {str(e)}")
+
+        except Exception as e:
+            print(f"An error occurred while translating trainer name: {str(e)}")
+            return None
 
         return trainerName
 
@@ -235,14 +234,22 @@ class DownloadBaseThread(QThread):
     def load_html_content(file_name):
         html_file = os.path.join(DATABASE_PATH, file_name)
         if os.path.exists(html_file):
-            with open(html_file, 'r', encoding='utf-8') as file:
-                return file.read()
+            try:
+                with open(html_file, 'r', encoding='utf-8') as file:
+                    return file.read()
+            except Exception as e:
+                print(f"Error loading HTML content from {html_file}: {str(e)}")
+                return ""
         return ""
 
     @staticmethod
     def load_json_content(file_name, from_database=True):
         json_file = os.path.join(DATABASE_PATH, file_name) if from_database else file_name
         if os.path.exists(json_file):
-            with open(json_file, 'r', encoding='utf-8') as file:
-                return json.load(file)
+            try:
+                with open(json_file, 'r', encoding='utf-8') as file:
+                    return json.load(file)
+            except Exception as e:
+                print(f"Error loading JSON content from {json_file}: {str(e)}")
+                return ""
         return ""

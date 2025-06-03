@@ -1,13 +1,11 @@
 __pycache__
-.env
+secret_config.py
 .venv
 .vscode
 .DS_Store
 *.mo
-build
 dist
 compile.ps1
-Game Cheats Manager.spec
 utility.py
 ResourceHacker.ini
 elevate.manifest

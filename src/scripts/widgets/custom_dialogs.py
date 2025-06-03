@@ -171,7 +171,7 @@ class SettingsDialog(QDialog):
         settings["autoUpdateTranslations"] = self.autoUpdateTranslationsCheckbox.isChecked()
         apply_settings(settings)
 
-        if getattr(sys, 'frozen', False):
+        if sys.argv[0].endswith('.exe'):
             app_name = "Game Cheats Manager"
             app_path = sys.executable
             if self.launchAppOnStarupCheckbox.isChecked():
@@ -195,7 +195,7 @@ class SettingsDialog(QDialog):
             reply = msg_box.exec()
 
             if reply == QMessageBox.StandardButton.Yes:
-                os.execl(sys.executable, sys.executable, * map(lambda arg: f'"{arg}"', sys.argv))
+                os.execl(sys.argv[0], sys.argv[0])
 
         else:
             QMessageBox.information(self, tr("Success"), tr("Settings saved."))

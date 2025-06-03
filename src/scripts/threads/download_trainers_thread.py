@@ -263,7 +263,12 @@ class DownloadTrainersThread(DownloadBaseThread):
         os.makedirs(self.trainerDownloadPath, exist_ok=True)
         if len(extractedTrainerNames) > 1:
             if self.update_entry:
-                trainerName_display = self.symbol_replacement(self.translate_trainer(selected_trainer["game_name"], selected_trainer["origin"]))
+                trainerName_trans = self.translate_trainer(selected_trainer["game_name"], selected_trainer["origin"])
+                if not trainerName_trans:
+                    self.message.emit(tr("Failed to translate, please update translation data."), "failure")
+                    self.finished.emit(1)
+                    return
+                trainerName_display = self.symbol_replacement(trainerName_trans)
 
             for extractedTrainerName in extractedTrainerNames:
                 trainer_details = ""

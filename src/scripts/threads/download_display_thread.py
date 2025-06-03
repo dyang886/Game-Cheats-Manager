@@ -1,7 +1,7 @@
 import concurrent.futures
 import re
 import time
-from urllib.parse import urljoin, urlparse
+from urllib.parse import urljoin
 
 from bs4 import BeautifulSoup
 from fuzzywuzzy import fuzz
@@ -18,6 +18,10 @@ class DownloadDisplayThread(DownloadBaseThread):
     def run(self):
         DownloadBaseThread.trainer_urls = []
         keywordList = self.translate_keyword(self.keyword)
+        if not keywordList:
+            self.message.emit(tr("Failed to translate, please update translation data."), "failure")
+            self.finished.emit(1)
+            return
         self.message.emit(tr("Searching..."), None)
 
         # ======================================================
@@ -65,6 +69,10 @@ class DownloadDisplayThread(DownloadBaseThread):
         # Update the translated names
         for future in concurrent.futures.as_completed(futures):
             trainer = futures[future]
+            if not future.result():
+                self.message.emit(tr("Failed to translate, please update translation data."), "failure")
+                self.finished.emit(1)
+                return
             trainer["trainer_name"] = future.result()
 
         if not DownloadBaseThread.trainer_urls:
@@ -97,6 +105,8 @@ class DownloadDisplayThread(DownloadBaseThread):
                 else:
                     if sanitized_keyword in self.sanitize(trainer.get("en_US", "")):
                         translations.append(trainer.get("zh_CN", ""))
+        else:
+            return []
 
         translations = list(filter(None, set(translations)))
         print("\nKeyword translations:", translations, "\n")
@@ -115,14 +125,14 @@ class DownloadDisplayThread(DownloadBaseThread):
     def search_from_fling_archive(self, keywordList):
         if settings["flingDownloadServer"] == "official":
             page_content = self.load_html_content("fling_archive.html")
-            archiveData = BeautifulSoup(page_content, 'html.parser')
+            archiveData = BeautifulSoup(page_content, 'html.parser') if page_content else None
         elif settings["flingDownloadServer"] == "gcm":
             archiveData = self.load_json_content("fling_archive.json")
 
         if archiveData:
             self.message.emit(tr("Search from FLiNG success!") + " 1/2", "success")
         else:
-            self.message.emit(tr("Search failed, please update FLiNG data."), "failure")
+            self.message.emit(tr("Search failed, please update trainer search data."), "failure")
             return False
 
         if settings["flingDownloadServer"] == "official":
@@ -170,14 +180,14 @@ class DownloadDisplayThread(DownloadBaseThread):
         # Search for results from fling main site, prioritized, will replace same trainer from archive
         if settings["flingDownloadServer"] == "official":
             page_content = self.load_html_content("fling_main.html")
-            mainSiteData = BeautifulSoup(page_content, 'html.parser')
+            mainSiteData = BeautifulSoup(page_content, 'html.parser') if page_content else None
         elif settings["flingDownloadServer"] == "gcm":
             mainSiteData = self.load_json_content("fling_main.json")
 
         if mainSiteData:
             self.message.emit(tr("Search from FLiNG success!") + " 2/2", "success")
         else:
-            self.message.emit(tr("Search failed, please update FLiNG data."), "failure")
+            self.message.emit(tr("Search failed, please update trainer search data."), "failure")
             return False
         time.sleep(0.5)
 
@@ -221,7 +231,7 @@ class DownloadDisplayThread(DownloadBaseThread):
         if xiaoXingData:
             self.message.emit(tr("Search from XiaoXing success!"), "success")
         else:
-            self.message.emit(tr("Search failed, please update XiaoXing data."), "failure")
+            self.message.emit(tr("Search failed, please update trainer search data."), "failure")
             return False
         time.sleep(0.5)
 
