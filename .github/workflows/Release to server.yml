@@ -2,7 +2,7 @@ name: Release to Server
 
 on:
   release:
-    types: [published, created]
+    types: [published, released]
 
 jobs:
   deploy-installer:
