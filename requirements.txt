@@ -1,5 +1,6 @@
 beautifulsoup4
 cloudscraper
+desktop-notifier
 fuzzywuzzy
 pinyin
 polib
@@ -8,6 +9,7 @@ nuitka
 PyQt6
 python-dotenv
 python-Levenshtein
+qasync
 requests
 tendo
 zhon

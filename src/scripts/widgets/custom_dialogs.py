@@ -173,7 +173,7 @@ class SettingsDialog(QDialog):
 
         if sys.argv[0].endswith('.exe'):
             app_name = "Game Cheats Manager"
-            app_path = sys.executable
+            app_path = sys.argv[0]
             if self.launchAppOnStarupCheckbox.isChecked():
                 self.add_or_remove_startup(app_name, app_path, True)
             else:
@@ -229,7 +229,7 @@ class AboutDialog(QDialog):
             """)
         appLayout.addWidget(logoLabel)
 
-        # App name and version
+        # App name
         appNameFont = self.font()
         appNameFont.setPointSize(18)
         appInfoLayout = QVBoxLayout()
@@ -241,27 +241,41 @@ class AboutDialog(QDialog):
         appNameLabel.setAlignment(Qt.AlignmentFlag.AlignCenter)
         appInfoLayout.addWidget(appNameLabel)
 
-        versionLayout = QVBoxLayout()
-        versionLayout.setSpacing(2)
+        # App version and update button
+        versionLayout = QHBoxLayout()
+        versionLayout.setSpacing(20)
+        versionLayout.addStretch(1)
         appInfoLayout.addLayout(versionLayout)
+
+        versionNumberLayout = QVBoxLayout()
+        versionNumberLayout.setSpacing(2)
+        versionLayout.addLayout(versionNumberLayout)
 
         currentVersionTextLabel = QLabel(tr("Current version: "))
         self.currentVersionNumberLabel = QLabel(self.parent().appVersion)
         currentVersionLayout = QHBoxLayout()
         currentVersionLayout.setSpacing(3)
-        currentVersionLayout.setAlignment(Qt.AlignmentFlag.AlignCenter)
         currentVersionLayout.addWidget(currentVersionTextLabel)
         currentVersionLayout.addWidget(self.currentVersionNumberLabel)
-        versionLayout.addLayout(currentVersionLayout)
+        versionNumberLayout.addLayout(currentVersionLayout)
 
         newestVersionTextLabel = QLabel(tr("Newest version: "))
         self.newestVersionNumberLabel = QLabel(tr("Loading..."))
         newestVersionLayout = QHBoxLayout()
         newestVersionLayout.setSpacing(3)
-        newestVersionLayout.setAlignment(Qt.AlignmentFlag.AlignCenter)
         newestVersionLayout.addWidget(newestVersionTextLabel)
         newestVersionLayout.addWidget(self.newestVersionNumberLabel)
-        versionLayout.addLayout(newestVersionLayout)
+        versionNumberLayout.addLayout(newestVersionLayout)
+
+        self.updateButton = CustomButton(tr("Update Now"))
+        self.updateButton.setStyleSheet("padding: 5;")
+        self.updateButton.setSizePolicy(QSizePolicy.Policy.Fixed, QSizePolicy.Policy.Fixed)
+        self.updateButton.setVisible(0)
+        self.updateButton.clicked.connect(lambda: self.parent().start_update(self.newestVersionNumberLabel.text()))
+        font = self.updateButton.font()
+        font.setPointSize(8)
+        versionLayout.addWidget(self.updateButton)
+        versionLayout.addStretch(1)
 
         # Links
         linksLayout = QVBoxLayout()
@@ -300,6 +314,7 @@ class AboutDialog(QDialog):
         if latest_version > current_version:
             self.currentVersionNumberLabel.setStyleSheet("color: red;")
             self.newestVersionNumberLabel.setStyleSheet("color: green;")
+            self.updateButton.setVisible(1)
 
         self.newestVersionNumberLabel.setText(latest_version)
         self.worker.quit()

@@ -73,14 +73,26 @@ msgstr "删除"
 msgid "Trainer download path:"
 msgstr "修改器下载路径："
 
+msgid "Failure"
+msgstr "失败"
+
+msgid "Failed to update application."
+msgstr "软件更新失败。"
+
 msgid "Update Available"
 msgstr "可用更新"
 
 msgid "New version found: {old_version} ➜ {new_version}"
 msgstr "发现新版本：{old_version} ➜ {new_version}"
 
-msgid "Please navigate to `Options` ➜ `About` to download the latest version."
-msgstr "请移至 `选项` ➜ `关于` 下载最新版本。"
+msgid "Would you like to update now?"
+msgstr "是否立即更新？"
+
+msgid "Yes"
+msgstr "是"
+
+msgid "No"
+msgstr "否"
 
 msgid "Update Check Failed"
 msgstr "检查更新失败"
@@ -130,9 +142,6 @@ msgstr "迁移完成！"
 msgid "Select trainers you want to import"
 msgstr "选择要导入的修改器"
 
-msgid "Failure"
-msgstr "失败"
-
 msgid "Failed to import trainer: "
 msgstr "导入修改器失败："
 
@@ -141,12 +150,6 @@ msgstr "删除原始修改器"
 
 msgid "Do you want to delete the original trainer files?"
 msgstr "是否要删除原始修改器文件？"
-
-msgid "Yes"
-msgstr "是"
-
-msgid "No"
-msgstr "否"
 
 msgid "Failed to delete original trainer: "
 msgstr "无法删除原始修改器："
@@ -367,6 +370,9 @@ msgstr "最新版本："
 
 msgid "Loading..."
 msgstr "加载中..."
+
+msgid "Update Now"
+msgstr "立即更新"
 
 msgid "Failed to load"
 msgstr "加载失败"

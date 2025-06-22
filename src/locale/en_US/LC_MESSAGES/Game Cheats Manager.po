@@ -73,14 +73,26 @@ msgstr "Delete"
 msgid "Trainer download path:"
 msgstr "Trainer download path:"
 
+msgid "Failure"
+msgstr "Failure"
+
+msgid "Failed to update application."
+msgstr "Failed to update application."
+
 msgid "Update Available"
 msgstr "Update Available"
 
 msgid "New version found: {old_version} ➜ {new_version}"
 msgstr "New version found: {old_version} ➜ {new_version}"
 
-msgid "Please navigate to `Options` ➜ `About` to download the latest version."
-msgstr "Please navigate to `Options` ➜ `About` to download the latest version."
+msgid "Would you like to update now?"
+msgstr "Would you like to update now?"
+
+msgid "Yes"
+msgstr "Yes"
+
+msgid "No"
+msgstr "No"
 
 msgid "Update Check Failed"
 msgstr "Update Check Failed"
@@ -130,9 +142,6 @@ msgstr "Migration complete!"
 msgid "Select trainers you want to import"
 msgstr "Select trainers you want to import"
 
-msgid "Failure"
-msgstr "Failure"
-
 msgid "Failed to import trainer: "
 msgstr "Failed to import trainer: "
 
@@ -141,12 +150,6 @@ msgstr "Delete original trainers"
 
 msgid "Do you want to delete the original trainer files?"
 msgstr "Do you want to delete the original trainer files?"
-
-msgid "Yes"
-msgstr "Yes"
-
-msgid "No"
-msgstr "No"
 
 msgid "Failed to delete original trainer: "
 msgstr "Failed to delete original trainer: "
@@ -367,6 +370,9 @@ msgstr "Newest version: "
 
 msgid "Loading..."
 msgstr "Loading..."
+
+msgid "Update Now"
+msgstr "Update Now"
 
 msgid "Failed to load"
 msgstr "Failed to load"

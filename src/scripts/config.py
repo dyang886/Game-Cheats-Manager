@@ -23,7 +23,10 @@ def resource_path(relative_path):
         full_path = os.path.join(os.path.dirname(sys.executable), relative_path)
     # Development
     else:
-        full_path = os.path.join(os.path.dirname(__file__), '..', relative_path)
+        if relative_path == "Updater.exe":
+            full_path = os.path.join(os.path.dirname(__file__), '../../../Updater/target/release', relative_path)
+        else:
+            full_path = os.path.join(os.path.dirname(__file__), '..', relative_path)
 
     if not os.path.exists(full_path):
         formatted_message = (f"Couldn't find {full_path}. Please try reinstalling the application.")
@@ -182,6 +185,7 @@ unzip_path = resource_path("dependency/7z/7z.exe")
 binmay_path = resource_path("dependency/binmay.exe")
 emptyMidi_path = resource_path("dependency/TrainerBGM.mid")
 elevator_path = resource_path("dependency/Elevate.exe")
+updater_path = resource_path("Updater.exe")
 
 language_options = {
     "English (US)": "en_US",
