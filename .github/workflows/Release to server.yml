@@ -2,12 +2,13 @@ name: Release to Server
 
 on:
   release:
-    types: [published, released]
+    types: [published]
 
 jobs:
   deploy-installer:
     runs-on: ubuntu-latest
     permissions:
+      id-token: write
       contents: read
 
     steps:
@@ -20,20 +21,26 @@ jobs:
           role-to-assume: ${{ secrets.AWS_IAM_ROLE_TO_ASSUME }}
           aws-region: ${{ secrets.AWS_REGION }}
 
-      - name: Get release version
+      - name: Get release version and installer name
         id: get_version
         run: |
           VERSION=$(echo "${{ github.event.release.tag_name }}" | sed 's/^v//')
           echo "version=$VERSION" >> $GITHUB_OUTPUT
-          echo "installer_name=Game Cheats Manager Setup $VERSION.exe" >> $GITHUB_OUTPUT
+          echo "local_installer_name=Game.Cheats.Manager.Setup.$VERSION.exe" >> $GITHUB_OUTPUT
+          echo "server_installer_name=Game Cheats Manager Setup $VERSION.exe" >> $GITHUB_OUTPUT
 
-      - name: Delete previous installer
+      - name: Download release asset
+        env:
+          GH_TOKEN: ${{ secrets.GITHUB_TOKEN }}
+        run: |
+          gh release download ${{ github.event.release.tag_name }} --pattern "${{ steps.get_version.outputs.local_installer_name }}"
+
+      - name: Delete previous installer from S3
         env:
           S3_BUCKET_NAME: ${{ secrets.S3_BUCKET_NAME }}
           S3_GCM_PREFIX: "GCM"
         run: |
-          aws s3 ls s3://${S3_BUCKET_NAME}/${S3_GCM_PREFIX}/ | grep "Game Cheats Manager Setup" || true
-          aws s3 rm s3://${S3_BUCKET_NAME}/${S3_GCM_PREFIX}/ --recursive --exclude "*" --include "Game Cheats Manager Setup*.exe"
+          aws s3 rm "s3://${S3_BUCKET_NAME}/${S3_GCM_PREFIX}/" --recursive --exclude "*" --include "Game Cheats Manager Setup*.exe"
           echo "Previous installers deleted from s3://${S3_BUCKET_NAME}/${S3_GCM_PREFIX}/"
 
       - name: Upload new installer to AWS S3
@@ -41,5 +48,7 @@ jobs:
           S3_BUCKET_NAME: ${{ secrets.S3_BUCKET_NAME }}
           S3_GCM_PREFIX: "GCM"
         run: |
-          aws s3 cp ./Game Cheats Manager Setup ${{ steps.get_version.outputs.version }}.exe s3://${S3_BUCKET_NAME}/${S3_GCM_PREFIX}/Game Cheats Manager Setup ${{ steps.get_version.outputs.version }}.exe
-          echo "Game Cheats Manager Setup ${{ steps.get_version.outputs.version }}.exe uploaded to s3://${S3_BUCKET_NAME}/${S3_GCM_PREFIX}/Game Cheats Manager Setup ${{ steps.get_version.outputs.version }}.exe"
+          LOCAL_INSTALLER_NAME="${{ steps.get_version.outputs.local_installer_name }}"
+          SERVER_INSTALLER_NAME="${{ steps.get_version.outputs.server_installer_name }}"
+          aws s3 cp "./${LOCAL_INSTALLER_NAME}" "s3://${S3_BUCKET_NAME}/${S3_GCM_PREFIX}/${SERVER_INSTALLER_NAME}"
+          echo "'${LOCAL_INSTALLER_NAME}' uploaded to s3://${S3_BUCKET_NAME}/${S3_GCM_PREFIX}/"
