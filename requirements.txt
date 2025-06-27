@@ -1,6 +1,7 @@
 beautifulsoup4
 cloudscraper
 desktop-notifier
+dnspython
 fuzzywuzzy
 pinyin
 polib

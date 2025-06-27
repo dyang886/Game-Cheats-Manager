@@ -364,21 +364,6 @@ class DownloadTrainersThread(DownloadBaseThread):
         return True
 
     def handle_xiaoxing_special_cases(self, selected_trainer, extractedContentPath):
-        # Specific game cases
-        folder_keywords = {
-            "轩辕剑6": "轩辕剑6",
-            "轩辕剑外传：穹之扉": "穹之扉"
-        }
-
-        if selected_trainer["game_name"] in folder_keywords.keys():
-            destination_path = os.path.join(self.trainerDownloadPath, self.symbol_replacement(selected_trainer["trainer_name"]))
-            keyword = folder_keywords.get(selected_trainer["game_name"])
-            for folder_name in os.listdir(extractedContentPath):
-                source_path = os.path.join(extractedContentPath, folder_name)
-                if os.path.isdir(source_path) and keyword in folder_name:
-                    self.src_dst.append({"src": source_path, "dst": destination_path})
-                    return True
-
         # Multiple version case (check if there are only folders and no `.exe` files)
         temp_contents = os.listdir(extractedContentPath)
         has_exe = any(file.lower().endswith(".exe") for file in temp_contents if os.path.isfile(os.path.join(extractedContentPath, file)))

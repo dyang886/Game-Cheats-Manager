@@ -44,7 +44,7 @@ class GameCheatsManager(QMainWindow):
         self.setMinimumSize(680, 520)
 
         # Version and links
-        self.appVersion = "2.3.0"
+        self.appVersion = "1.0.0"
         self.githubLink = "https://github.com/dyang886/Game-Cheats-Manager"
         self.bilibiliLink = "https://space.bilibili.com/256673766"
 
@@ -247,16 +247,20 @@ class GameCheatsManager(QMainWindow):
     def start_update(self, version):
         try:
             pid = str(os.getpid())
-            subprocess.run([updater_path, '--pid', pid, '--s3-path', f'GCM/Game Cheats Manager Setup {version}.exe'], check=True, shell=True)
+            s3_path = f'GCM/Game Cheats Manager Setup {version}.exe'
+            subprocess.Popen(
+                [updater_path, '--pid', pid, '--s3-path', s3_path, '--theme', settings["theme"], '--language', settings["language"]],
+                creationflags=subprocess.DETACHED_PROCESS | subprocess.CREATE_NEW_PROCESS_GROUP,
+                start_new_session=True
+            )
 
-        except subprocess.CalledProcessError:
+        except subprocess.SubprocessError:
             QMessageBox.critical(self, tr("Failure"), tr("Failed to update application."))
 
     async def send_notification(self, success, latest_version=0):
         notifier = DesktopNotifier(app_name="Game Cheats Manager", app_icon=Path(resource_path("assets/logo.ico")))
 
-        # if success and latest_version > self.appVersion:
-        if success:
+        if success and latest_version > self.appVersion:
             await notifier.send(
                 title=tr('Update Available'),
                 message=tr('New version found: {old_version} ➜ {new_version}').format(
@@ -280,9 +284,9 @@ class GameCheatsManager(QMainWindow):
         self.versionFetcher.quit()
 
     def init_settings(self):
-        if settings["theme"] == "black":
+        if settings["theme"] == "dark":
             style = style_sheet.black
-        elif settings["theme"] == "white":
+        elif settings["theme"] == "light":
             style = style_sheet.white
 
         style = style.format(
@@ -494,7 +498,8 @@ class GameCheatsManager(QMainWindow):
 
     def fetch_trainer_search_data(self):
         self.fetch_fling_data()
-        self.fetch_xiaoxing_data()
+        if settings["enableXiaoXing"]:
+            self.fetch_xiaoxing_data()
 
     def on_main_interval(self):
         if settings["autoUpdateTranslations"]:

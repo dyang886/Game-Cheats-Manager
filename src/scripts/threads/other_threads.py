@@ -40,8 +40,7 @@ class VersionFetchWorker(QThread):
             data = response.json()
             latest_version = data.get('latest_version')
             if latest_version:
-                # self.versionFetched.emit(latest_version)
-                self.versionFetched.emit('2.3.0')
+                self.versionFetched.emit(latest_version)
             else:
                 print(f"Error: 'latest_version' not found in response. Response: {data}")
                 self.fetchFailed.emit()

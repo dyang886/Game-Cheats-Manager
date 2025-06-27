@@ -52,3 +52,13 @@ jobs:
           SERVER_INSTALLER_NAME="${{ steps.get_version.outputs.server_installer_name }}"
           aws s3 cp "./${LOCAL_INSTALLER_NAME}" "s3://${S3_BUCKET_NAME}/${S3_GCM_PREFIX}/${SERVER_INSTALLER_NAME}"
           echo "'${LOCAL_INSTALLER_NAME}' uploaded to s3://${S3_BUCKET_NAME}/${S3_GCM_PREFIX}/"
+
+      - name: Create CloudFront Invalidation
+        env:
+          CLOUDFRONT_DISTRIBUTION_ID: ${{ secrets.CLOUDFRONT_DISTRIBUTION_ID }}
+          S3_PREFIX_FOR_INVALIDATION: "GCM"
+        run: |
+          echo "Creating invalidation for path /${S3_PREFIX_FOR_INVALIDATION}/*"
+          aws cloudfront create-invalidation \
+            --distribution-id $CLOUDFRONT_DISTRIBUTION_ID \
+            --paths "/${S3_PREFIX_FOR_INVALIDATION}/*"

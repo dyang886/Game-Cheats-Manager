@@ -13,11 +13,11 @@ msgstr ""
 "Plural-Forms: nplurals=1; plural=0;\n"
 "X-Generator: Poedit 3.4.4\n"
 
-msgid "Black"
-msgstr "Black"
+msgid "Dark"
+msgstr "Dark"
 
-msgid "white"
-msgstr "white"
+msgid "Light"
+msgstr "Light"
 
 msgid "Official Site"
 msgstr "Official Site"

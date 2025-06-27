@@ -44,6 +44,11 @@ class TrainerManagementDialog(QDialog):
         newFlingServer = server_options[self.serverCombo.currentText()]
         if oldFlingServer != newFlingServer:
             self.parent().fetch_fling_data()
+        oldEnableXiaoXing = settings["enableXiaoXing"]
+        newEnableXiaoXing = self.enableXiaoXingCheckbox.isChecked()
+        if not oldEnableXiaoXing and newEnableXiaoXing:
+            self.parent().fetch_xiaoxing_data()
+
         settings["flingDownloadServer"] = newFlingServer
         settings["removeFlingBgMusic"] = self.removeFlingBgMusicCheckbox.isChecked()
         settings["autoUpdateFlingData"] = self.autoUpdateFlingDataCheckbox.isChecked()

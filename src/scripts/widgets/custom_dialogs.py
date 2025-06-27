@@ -221,7 +221,7 @@ class AboutDialog(QDialog):
         logoLabel = QLabel()
         logoLabel.setAlignment(Qt.AlignmentFlag.AlignCenter)
         logoLabel.setPixmap(scaledLogoPixmap)
-        if settings["theme"] == "white":
+        if settings["theme"] == "light":
             logoLabel.setStyleSheet("""
                 border: 2px solid black;
                 border-radius: 20px;
