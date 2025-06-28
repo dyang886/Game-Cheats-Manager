@@ -301,8 +301,10 @@ protected:
     inline bool getModuleInfo(const wchar_t *modName, uintptr_t &modBase, size_t &modSize)
     {
         HANDLE snap = CreateToolhelp32Snapshot(TH32CS_SNAPMODULE | TH32CS_SNAPMODULE32, procId);
-        if (snap == INVALID_HANDLE_VALUE)
+        if (snap == INVALID_HANDLE_VALUE) {
+            std::cerr << "[!] Failed to create module snapshot. Error: " << GetLastError() << std::endl;
             return false;
+        }
 
         MODULEENTRY32W me;
         me.dwSize = sizeof(me);
@@ -323,7 +325,8 @@ protected:
         {
             do
             {
-                if ((!useRegex && _wcsicmp(me.szModule, modName)) || (useRegex && std::regex_match(me.szModule, std::wregex(patternStr))))
+                // std::wcout << L"Module: " << me.szModule << std::endl;
+                if ((!useRegex && _wcsicmp(me.szModule, modName) == 0) || (useRegex && std::regex_match(me.szModule, std::wregex(patternStr))))
                 {
                     modBase = (uintptr_t)me.modBaseAddr;
                     modSize = (size_t)me.modBaseSize;
@@ -342,7 +345,10 @@ protected:
         uintptr_t modBase = 0;
         size_t modSize = 0;
         if (!getModuleInfo(moduleName, modBase, modSize))
+        {
+            std::wcerr << L"[!] Could not find module: " << moduleName << std::endl;
             return 0;
+        }
 
         // First offset is relative to moduleBase
         uintptr_t currentAddr = modBase + offsets[0];

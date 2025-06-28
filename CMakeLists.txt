@@ -16,6 +16,7 @@ set(TRAINER_DIRS
     "trainers/Headbangers_Rhythm Royale Trainer"
     "trainers/Heavy Weapon Trainer"
     "trainers/Plants vs. Zombies Trainer"
+    "trainers/Wizard of Legend 2 Trainer"
 )
 
 foreach(TRAINER_DIR ${TRAINER_DIRS})

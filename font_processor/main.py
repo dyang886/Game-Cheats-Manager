@@ -1,8 +1,11 @@
 import json
 import argparse
 import os
+import re
+import tokenize
 from fontTools.ttLib import TTFont
 from fontTools.subset import Subsetter, Options
+
 
 def extract_text_from_file(file_path):
     """Extract text from a file based on its extension."""
@@ -14,8 +17,13 @@ def extract_text_from_file(file_path):
         with open(file_path, 'r', encoding='utf-8') as f:
             data = json.load(f)
             return extract_text_from_json(data)
+    elif ext == '.py':
+        return extract_strings_from_py(file_path)
+    elif ext == '.rs':
+        return extract_strings_from_rs(file_path)
     else:
         raise ValueError(f"Unsupported file type: {ext}")
+
 
 def extract_text_from_json(data):
     """Recursively extract all string values from a JSON object."""
@@ -28,6 +36,28 @@ def extract_text_from_json(data):
     else:
         return ''
 
+
+def extract_strings_from_py(file_path):
+    """Extract string literals from a Python file using tokenize."""
+    with open(file_path, 'rb') as f:
+        tokens = tokenize.tokenize(f.readline)
+        strings = [
+            token.string for token in tokens if token.type == tokenize.STRING]
+    return ''.join(strings)
+
+
+def extract_strings_from_rs(file_path):
+    """Extract string and char literals from a Rust file using regex."""
+    with open(file_path, 'r', encoding='utf-8') as f:
+        content = f.read()
+    string_pattern = r'"((?:[^"\\]|\\.)*)"'
+    char_pattern = r"'([^'\\]|\\.)'"
+    strings = re.findall(string_pattern, content)
+    chars = re.findall(char_pattern, content)
+    all_text = ''.join(strings) + ''.join(chars)
+    return all_text
+
+
 def get_unique_characters(files):
     """Get a set of unique characters from a list of files."""
     unique_chars = set()
@@ -35,6 +65,7 @@ def get_unique_characters(files):
         text = extract_text_from_file(file)
         unique_chars.update(text)
     return unique_chars
+
 
 def subset_font(font_path, characters, output_path):
     """Subset the font to include only the specified characters, optimized for size."""
@@ -48,11 +79,16 @@ def subset_font(font_path, characters, output_path):
     subsetter.subset(font)
     font.save(output_path)
 
+
 def main():
-    parser = argparse.ArgumentParser(description="Subset NotoSansSC-Regular.ttf to a minimal TTF file.")
-    parser.add_argument('files', nargs='+', help="List of .txt or .json files containing text.")
-    parser.add_argument('--font', default='NotoSansSC-Regular.ttf', help="Path to the font file.")
-    parser.add_argument('--output', default='NotoSansSC-Subset.ttf', help="Output path for the subsetted font.")
+    parser = argparse.ArgumentParser(
+        description="Subset NotoSansSC-Regular.ttf to a minimal TTF file.")
+    parser.add_argument('files', nargs='+',
+                        help="List of .txt, .json, .py, or .rs files containing text.")
+    parser.add_argument(
+        '--font', default='NotoSansSC-Regular.ttf', help="Path to the font file.")
+    parser.add_argument('--output', default='NotoSansSC-Subset.ttf',
+                        help="Output path for the subsetted font.")
     args = parser.parse_args()
 
     # Validate input files
@@ -71,6 +107,7 @@ def main():
     # Subset the font
     subset_font(args.font, unique_chars, args.output)
     print(f"Optimized subsetted font saved to {args.output}")
+
 
 if __name__ == "__main__":
     main()

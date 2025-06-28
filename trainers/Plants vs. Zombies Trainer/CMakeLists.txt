@@ -1,6 +1,7 @@
 set(GAME_NAME "Plants_vs._Zombies")
 set(TRAINER_NAME "Plants vs. Zombies Trainer")
 
+set(VENV_PYTHON "${CMAKE_SOURCE_DIR}/.venv/Scripts/python.exe")
 set(SUBSET_FONT_TARGET "${GAME_NAME}_SubsetFont")
 set(FONT_SUBSET_OUTPUT "${CMAKE_CURRENT_SOURCE_DIR}/NotoSansSC-Subset.ttf")
 set(FONT_SUBSET_SCRIPT "${CMAKE_SOURCE_DIR}/font_processor/main.py")
@@ -10,7 +11,7 @@ set(TRANSLATION_FILES "${CMAKE_CURRENT_SOURCE_DIR}/translations.json")
 # Run python script to generate the subsetted font
 add_custom_command(
     OUTPUT ${FONT_SUBSET_OUTPUT}
-    COMMAND python ${FONT_SUBSET_SCRIPT} ${TRANSLATION_FILES}
+    COMMAND ${VENV_PYTHON} ${FONT_SUBSET_SCRIPT} ${TRANSLATION_FILES}
             --font ${FONT_FILE} --output ${FONT_SUBSET_OUTPUT}
     DEPENDS ${FONT_SUBSET_SCRIPT} ${FONT_FILE} ${TRANSLATION_FILES}
     COMMENT "Subsetting NotoSansSC-Regular.ttf in ${CMAKE_CURRENT_SOURCE_DIR}"
