@@ -106,11 +106,34 @@ void toggle_callback(Fl_Widget *widget, void *data)
     {
         if (button->value())
         {
-            status = trainer->godMode(true);
+            status = trainer->godMode(1);
         }
         else
         {
-            status = trainer->godMode(false);
+            status = trainer->godMode(0);
+        }
+    }
+    else if (optionName == "SetSanity")
+    {
+        if (button->value())
+        {
+            status = trainer->setSanity(std::stof(inputValue) / 10.0f);
+        }
+        else
+        {
+            status = trainer->disableNamedHook("SetSanity_1");
+            status = trainer->disableNamedHook("SetSanity_2");
+        }
+    }
+    else if (optionName == "SetMovementSpeed")
+    {
+        if (button->value())
+        {
+            status = trainer->setMovementSpeed(std::stof(inputValue));
+        }
+        else
+        {
+            status = trainer->disableNamedHook(optionName);
         }
     }
 
@@ -507,6 +530,52 @@ int main(int argc, char **argv)
 
     god_mode_flex->end();
     options1_flex->fixed(god_mode_flex, option_h);
+
+    // ------------------------------------------------------------------
+    // set sanity (Toggle)
+    // ------------------------------------------------------------------
+    Fl_Flex *set_sanity_flex = new Fl_Flex(0, 0, 0, 0, Fl_Flex::HORIZONTAL);
+    set_sanity_flex->gap(option_gap);
+
+    Fl_Check_Button *set_sanity_check_button = new Fl_Check_Button(0, 0, 0, 0);
+    set_sanity_flex->fixed(set_sanity_check_button, button_w);
+
+    Fl_Box *set_sanity_label = new Fl_Box(0, 0, 0, 0);
+    tr(set_sanity_label, "Set Sanity");
+
+    Fl_Input *set_sanity_input = new Fl_Input(0, 0, 0, 0);
+    set_sanity_flex->fixed(set_sanity_input, input_w);
+    set_sanity_input->type(FL_INT_INPUT);
+    set_input_values(set_sanity_input, "10", "0", "10");
+
+    ToggleData *data_set_sanity = new ToggleData{&trainer, "SetSanity", set_sanity_check_button, set_sanity_input};
+    set_sanity_check_button->callback(toggle_callback, data_set_sanity);
+
+    set_sanity_flex->end();
+    options1_flex->fixed(set_sanity_flex, option_h);
+
+    // ------------------------------------------------------------------
+    // set movement speed (Toggle)
+    // ------------------------------------------------------------------
+    Fl_Flex *set_movement_speed_flex = new Fl_Flex(0, 0, 0, 0, Fl_Flex::HORIZONTAL);
+    set_movement_speed_flex->gap(option_gap);
+
+    Fl_Check_Button *set_movement_speed_check_button = new Fl_Check_Button(0, 0, 0, 0);
+    set_movement_speed_flex->fixed(set_movement_speed_check_button, button_w);
+
+    Fl_Box *set_movement_speed_label = new Fl_Box(0, 0, 0, 0);
+    tr(set_movement_speed_label, "Set Movement Speed");
+
+    Fl_Input *set_movement_speed_input = new Fl_Input(0, 0, 0, 0);
+    set_movement_speed_flex->fixed(set_movement_speed_input, input_w);
+    set_movement_speed_input->type(FL_INT_INPUT);
+    set_input_values(set_movement_speed_input, "50", "0", "999");
+
+    ToggleData *data_set_movement_speed = new ToggleData{&trainer, "SetMovementSpeed", set_movement_speed_check_button, set_movement_speed_input};
+    set_movement_speed_check_button->callback(toggle_callback, data_set_movement_speed);
+
+    set_movement_speed_flex->end();
+    options1_flex->fixed(set_movement_speed_flex, option_h);
 
     // ------------------------------------------------------------------
     // Spawn item (Apply)

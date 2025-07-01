@@ -301,7 +301,8 @@ protected:
     inline bool getModuleInfo(const wchar_t *modName, uintptr_t &modBase, size_t &modSize)
     {
         HANDLE snap = CreateToolhelp32Snapshot(TH32CS_SNAPMODULE | TH32CS_SNAPMODULE32, procId);
-        if (snap == INVALID_HANDLE_VALUE) {
+        if (snap == INVALID_HANDLE_VALUE)
+        {
             std::cerr << "[!] Failed to create module snapshot. Error: " << GetLastError() << std::endl;
             return false;
         }
@@ -368,58 +369,102 @@ protected:
         return currentAddr;
     }
 
-    // Find pattern with wildcards in the specified module
+    template <typename T>
+    bool WriteToDynamicAddress(const wchar_t *moduleName, const std::vector<unsigned int> &offsets, T value)
+    {
+        uintptr_t targetAddr = resolveModuleDynamicAddress(moduleName, offsets);
+        if (targetAddr == 0)
+        {
+            return false;
+        }
+
+        if (!WriteProcessMemory(hProcess, reinterpret_cast<LPVOID>(targetAddr), &value, sizeof(T), nullptr))
+        {
+            std::cerr << "[!] WriteProcessMemory failed at address 0x" << std::hex << targetAddr << std::dec << ". Error: " << GetLastError() << std::endl;
+            return false;
+        }
+
+        return true;
+    }
+
+    // Find pattern with wildcards
     inline uintptr_t findPatternWild(const wchar_t *moduleName, const std::vector<std::string> &pattern)
     {
-        uintptr_t base = 0;
-        size_t modSize = 0;
-        if (!getModuleInfo(moduleName, base, modSize))
-            return 0;
-
         // Parse pattern
         std::vector<PatternByte> pat;
         for (const auto &token : pattern)
         {
-            if (token == "??")
+            pat.push_back(token == "??" ? PatternByte{true, 0} : PatternByte{false, (BYTE)std::stoul(token, nullptr, 16)});
+        }
+        size_t patSize = pat.size();
+
+        if (moduleName == nullptr || wcslen(moduleName) == 0)
+        {
+            uintptr_t currentAddress = 0;
+            MEMORY_BASIC_INFORMATION mbi;
+
+            // Loop through all memory pages in the process
+            while (VirtualQueryEx(hProcess, (LPCVOID)currentAddress, &mbi, sizeof(mbi)))
             {
-                PatternByte pb{true, 0x00};
-                pat.push_back(pb);
-            }
-            else
-            {
-                unsigned int val = 0;
-                sscanf_s(token.c_str(), "%x", &val);
-                PatternByte pb{false, static_cast<BYTE>(val)};
-                pat.push_back(pb);
+                // We only care about memory that is committed and executable (where JIT code lives)
+                if (mbi.State == MEM_COMMIT && (mbi.Protect & PAGE_EXECUTE_READ || mbi.Protect & PAGE_EXECUTE_READWRITE))
+                {
+                    std::vector<BYTE> buffer(mbi.RegionSize);
+                    SIZE_T bytesRead;
+                    if (ReadProcessMemory(hProcess, mbi.BaseAddress, buffer.data(), mbi.RegionSize, &bytesRead))
+                    {
+                        for (size_t i = 0; i + patSize <= bytesRead; ++i)
+                        {
+                            bool found = true;
+                            for (size_t j = 0; j < patSize; ++j)
+                            {
+                                if (!pat[j].wildcard && pat[j].value != buffer[i + j])
+                                {
+                                    found = false;
+                                    break;
+                                }
+                            }
+                            if (found)
+                            {
+                                return (uintptr_t)mbi.BaseAddress + i;
+                            }
+                        }
+                    }
+                }
+                currentAddress = (uintptr_t)mbi.BaseAddress + mbi.RegionSize;
             }
         }
-
-        // Read module bytes
-        std::vector<BYTE> buf(modSize);
-        SIZE_T bytesRead = 0;
-        if (!ReadProcessMemory(hProcess, (LPCVOID)base, buf.data(), modSize, &bytesRead))
-            return 0;
-
-        size_t patSize = pat.size();
-        for (size_t i = 0; i + patSize <= bytesRead; i++)
+        else
         {
-            bool matched = true;
-            for (size_t j = 0; j < patSize; j++)
+            uintptr_t base = 0;
+            size_t modSize = 0;
+            if (!getModuleInfo(moduleName, base, modSize))
+                return 0;
+
+            // Read module bytes
+            std::vector<BYTE> buf(modSize);
+            SIZE_T bytesRead = 0;
+            if (!ReadProcessMemory(hProcess, (LPCVOID)base, buf.data(), modSize, &bytesRead))
+                return 0;
+
+            for (size_t i = 0; i + patSize <= bytesRead; i++)
             {
-                if (!pat[j].wildcard)
+                bool matched = true;
+                for (size_t j = 0; j < patSize; j++)
                 {
-                    if (buf[i + j] != pat[j].value)
+                    if (!pat[j].wildcard && pat[j].value != buf[i + j])
                     {
                         matched = false;
                         break;
                     }
                 }
-            }
-            if (matched)
-            {
-                return base + i;
+                if (matched)
+                {
+                    return base + i;
+                }
             }
         }
+
         return 0;
     }
 
@@ -477,7 +522,7 @@ protected:
         size_t patternOffset,
         size_t overwriteLen,
         size_t codeSize,
-        std::function<std::vector<BYTE>(uintptr_t base, uintptr_t hookAddr)> buildFunc)
+        std::function<std::vector<BYTE>(uintptr_t codeCaveAddr, uintptr_t hookAddr, const std::vector<BYTE> &originalBytes)> buildFunc)
     {
         // A) Find pattern with wildcards
         uintptr_t matchAddr = findPatternWild(moduleName, pattern);
@@ -490,8 +535,8 @@ protected:
         uintptr_t hookAddr = matchAddr + patternOffset;
 
         // B) Read original bytes
-        std::vector<BYTE> orig(overwriteLen);
-        if (!ReadProcessMemory(hProcess, (LPCVOID)hookAddr, orig.data(), overwriteLen, nullptr))
+        std::vector<BYTE> originalBytes(overwriteLen);
+        if (!ReadProcessMemory(hProcess, (LPCVOID)hookAddr, originalBytes.data(), overwriteLen, nullptr))
         {
             std::cerr << "[!] Failed to read original bytes for hook '" << name << "'.\n";
             return false;
@@ -506,8 +551,8 @@ protected:
         }
 
         // D) Build injection code
-        uintptr_t base = reinterpret_cast<uintptr_t>(nearMem);
-        std::vector<BYTE> code = buildFunc(base, hookAddr);
+        uintptr_t codeCaveAddr = reinterpret_cast<uintptr_t>(nearMem);
+        std::vector<BYTE> code = buildFunc(codeCaveAddr, hookAddr, originalBytes);
         if (code.empty())
         {
             std::cerr << "[!] buildFunc returned empty code for '" << name << "'.\n";
@@ -546,7 +591,7 @@ protected:
         hi.hookAddress = hookAddr;
         hi.overwriteLen = overwriteLen;
         hi.active = true;
-        hi.originalBytes = orig;
+        hi.originalBytes = originalBytes;
         hi.allocatedMem = nearMem;
         hi.allocSize = codeSize;
 
@@ -605,7 +650,12 @@ protected:
         {
             while (shared_pti->active)
             {
-                if (shared_pti->desiredValue.type() == typeid(int))
+                if (shared_pti->desiredValue.type() == typeid(BYTE))
+                {
+                    BYTE value = std::any_cast<BYTE>(shared_pti->desiredValue);
+                    WriteProcessMemory(hProcess, reinterpret_cast<LPVOID>(targetAddr), &value, sizeof(BYTE), nullptr);
+                }
+                else if (shared_pti->desiredValue.type() == typeid(int))
                 {
                     int value = std::any_cast<int>(shared_pti->desiredValue);
                     WriteProcessMemory(hProcess, reinterpret_cast<LPVOID>(targetAddr), &value, sizeof(int), nullptr);

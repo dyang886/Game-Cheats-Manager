@@ -67,23 +67,6 @@ public static class GCMInjection
         go.AddComponent<MainThreadDispatcher>();
     }
 
-    public static void GodMode(bool enable)
-    {
-        MainThreadDispatcher.Enqueue(() =>
-        {
-            Player player = GameManager.Instance.Player;
-            if (player != null)
-            {
-                player.IsImmuneModeEnabled = enable;
-                FieldInfo godModeField = typeof(Player).GetField("IsGodModeEnabled", BindingFlags.NonPublic | BindingFlags.Instance);
-                if (godModeField != null)
-                {
-                    godModeField.SetValue(player, enable);
-                }
-            }
-        });
-    }
-
     public static void SpawnItem(int index)
     {
         MainThreadDispatcher.Enqueue(() =>

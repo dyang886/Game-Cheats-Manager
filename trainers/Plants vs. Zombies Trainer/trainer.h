@@ -46,7 +46,7 @@ public:
         size_t codeSize = 0x600;  // Allocate sufficient space
 
         // Build the hook
-        auto buildFunc = [newVal, overwriteLen](uintptr_t base, uintptr_t hookAddr) -> std::vector<BYTE>
+        auto buildFunc = [newVal, overwriteLen](uintptr_t codeCaveAddr, uintptr_t hookAddr, const std::vector<BYTE> &originalBytes) -> std::vector<BYTE>
         {
             std::vector<BYTE> code(0x600, 0x90); // NOP padding
 
@@ -59,7 +59,7 @@ public:
             code[wPos++] = 0x8B;
             code[wPos++] = 0x15;
             {
-                uintptr_t absoluteAddr = base + 0x400;
+                uintptr_t absoluteAddr = codeCaveAddr + 0x400;
                 int32_t disp32 = static_cast<int32_t>(absoluteAddr);
                 std::memcpy(&code[wPos], &disp32, 4);
                 wPos += 4;
@@ -78,7 +78,7 @@ public:
             // jmp hookAddr + overwriteLen => E9 <rel32>
             code[wPos++] = 0xE9;
             uintptr_t retAddr = hookAddr + overwriteLen;
-            uintptr_t nextInstr = base + wPos + 4;
+            uintptr_t nextInstr = codeCaveAddr + wPos + 4;
             int32_t rel = static_cast<int32_t>(retAddr - nextInstr);
             std::memcpy(&code[wPos], &rel, 4);
             wPos += 4;
@@ -94,7 +94,8 @@ public:
             patternOffset,
             overwriteLen,
             codeSize,
-            buildFunc);
+            buildFunc
+        );
     }
 
     inline bool addSun(int newVal)
@@ -107,7 +108,7 @@ public:
         size_t codeSize = 0x600;  // Allocate sufficient space
 
         // Build the hook
-        auto buildFunc = [newVal, overwriteLen](uintptr_t base, uintptr_t hookAddr) -> std::vector<BYTE>
+        auto buildFunc = [newVal, overwriteLen](uintptr_t codeCaveAddr, uintptr_t hookAddr, const std::vector<BYTE> &originalBytes) -> std::vector<BYTE>
         {
             std::vector<BYTE> code(0x600, 0x90); // NOP padding
 
@@ -120,7 +121,7 @@ public:
             code[wPos++] = 0x8B;
             code[wPos++] = 0x0D;
             {
-                uintptr_t absoluteAddr = base + 0x400;
+                uintptr_t absoluteAddr = codeCaveAddr + 0x400;
                 int32_t disp32 = static_cast<int32_t>(absoluteAddr);
                 std::memcpy(&code[wPos], &disp32, 4);
                 wPos += 4;
@@ -137,7 +138,7 @@ public:
             // jmp hookAddr + overwriteLen => E9 <rel32>
             code[wPos++] = 0xE9;
             uintptr_t retAddr = hookAddr + overwriteLen;
-            uintptr_t nextInstr = base + wPos + 4;
+            uintptr_t nextInstr = codeCaveAddr + wPos + 4;
             int32_t rel = static_cast<int32_t>(retAddr - nextInstr);
             std::memcpy(&code[wPos], &rel, 4);
             wPos += 4;
@@ -153,6 +154,7 @@ public:
             patternOffset,
             overwriteLen,
             codeSize,
-            buildFunc);
+            buildFunc
+        );
     }
 };

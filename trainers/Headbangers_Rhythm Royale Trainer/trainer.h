@@ -33,7 +33,7 @@ public:
         size_t overwriteLen = 7;
         size_t codeSize = 0x600;
 
-        auto buildFunc = [newVal, overwriteLen](uintptr_t base, uintptr_t hookAddr) -> std::vector<BYTE>
+        auto buildFunc = [newVal, overwriteLen](uintptr_t codeCaveAddr, uintptr_t hookAddr, const std::vector<BYTE> &originalBytes) -> std::vector<BYTE>
         {
             std::vector<BYTE> code(0x600, 0x90);
 
@@ -45,8 +45,8 @@ public:
             code[wPos++] = 0x8B;
             code[wPos++] = 0x1D;
             {
-                uintptr_t intAddr = base + 0x400;
-                uintptr_t nextInstr = base + wPos + 4;
+                uintptr_t intAddr = codeCaveAddr + 0x400;
+                uintptr_t nextInstr = codeCaveAddr + wPos + 4;
                 int64_t diff = static_cast<int64_t>(intAddr) - static_cast<int64_t>(nextInstr);
                 int32_t disp32 = static_cast<int32_t>(diff);
                 std::memcpy(&code[wPos], &disp32, 4);
@@ -67,7 +67,7 @@ public:
             // jmp hookAddr + overwriteLen => E9 <rel32>
             code[wPos++] = 0xE9;
             uintptr_t retAddr = hookAddr + overwriteLen;
-            uintptr_t nextInstr = base + wPos + 4;
+            uintptr_t nextInstr = codeCaveAddr + wPos + 4;
             int32_t rel = static_cast<int32_t>(retAddr - nextInstr);
             std::memcpy(&code[wPos], &rel, 4);
             wPos += 4;
@@ -82,6 +82,7 @@ public:
             patternOffset,
             overwriteLen,
             codeSize,
-            buildFunc);
+            buildFunc
+        );
     }
 };
