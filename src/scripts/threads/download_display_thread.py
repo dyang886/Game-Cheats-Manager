@@ -14,6 +14,7 @@ class DownloadDisplayThread(DownloadBaseThread):
     def __init__(self, keyword, parent=None):
         super().__init__(parent)
         self.keyword = keyword
+        self.status_pause_time = 0.2
 
     def run(self):
         DownloadBaseThread.trainer_urls = []
@@ -129,50 +130,57 @@ class DownloadDisplayThread(DownloadBaseThread):
         elif settings["flingDownloadServer"] == "gcm":
             archiveData = self.load_json_content("fling_archive.json")
 
-        if archiveData:
-            self.message.emit(tr("Search from FLiNG success!") + " 1/2", "success")
-        else:
+        if not archiveData:
             self.message.emit(tr("Search failed, please update trainer search data."), "failure")
             return False
 
-        if settings["flingDownloadServer"] == "official":
-            for link in archiveData.find_all(target="_self"):
-                # parse trainer name
-                rawTrainerName = link.get_text()
-                parsedTrainerName = re.sub(r' v[\d.]+.*|\.\bv.*| \d+\.\d+\.\d+.*| Plus\s\d+.*|Build\s\d+.*|(\d+\.\d+-Update.*)|Update\s\d+.*|\(Update\s.*| Early Access .*|\.Early.Access.*', '', rawTrainerName).replace("_", ": ")
-                gameName = parsedTrainerName.strip()
-                ignored_trainers = {
-                    "Dying Light The Following Enhanced Edition",
-                    "Monster Hunter World",
-                    "Street Fighter V",
-                    "World War Z"
-                }
-                if gameName == "Bright.Memory.Episode.1":
-                    gameName = "Bright Memory: Episode 1"
-                if gameName in ignored_trainers:
-                    continue
-                url = urljoin("https://archive.flingtrainer.com/", link.get("href"))
+        try:
+            if settings["flingDownloadServer"] == "official":
+                for link in archiveData.find_all(target="_self"):
+                    # parse trainer name
+                    rawTrainerName = link.get_text()
+                    parsedTrainerName = re.sub(r' v[\d.]+.*|\.\bv.*| \d+\.\d+\.\d+.*| Plus\s\d+.*|Build\s\d+.*|(\d+\.\d+-Update.*)|Update\s\d+.*|\(Update\s.*| Early Access .*|\.Early.Access.*', '', rawTrainerName).replace("_", ": ")
+                    gameName = parsedTrainerName.strip()
+                    ignored_trainers = {
+                        "Dying Light The Following Enhanced Edition",
+                        "Monster Hunter World",
+                        "Street Fighter V",
+                        "World War Z"
+                    }
+                    if gameName == "Bright.Memory.Episode.1":
+                        gameName = "Bright Memory: Episode 1"
+                    if gameName in ignored_trainers:
+                        continue
+                    url = urljoin("https://archive.flingtrainer.com/", link.get("href"))
 
-                if self.keyword_match(keywordList, gameName):
-                    DownloadBaseThread.trainer_urls.append({
-                        "game_name": gameName,
-                        "trainer_name": None,
-                        "origin": "fling_archive",
-                        "url": url
-                    })
+                    if self.keyword_match(keywordList, gameName):
+                        DownloadBaseThread.trainer_urls.append({
+                            "game_name": gameName,
+                            "trainer_name": None,
+                            "origin": "fling_archive",
+                            "url": url
+                        })
 
-        elif settings["flingDownloadServer"] == "gcm":
-            for trainer in archiveData:
-                gameName = trainer['game_name']
-                url = trainer['gcm_url']
+            elif settings["flingDownloadServer"] == "gcm":
+                for trainer in archiveData:
+                    gameName = trainer['game_name']
+                    url = trainer['gcm_url']
 
-                if self.keyword_match(keywordList, gameName):
-                    DownloadBaseThread.trainer_urls.append({
-                        "game_name": gameName,
-                        "trainer_name": None,
-                        "origin": "fling_archive",
-                        "url": url
-                    })
+                    if self.keyword_match(keywordList, gameName):
+                        DownloadBaseThread.trainer_urls.append({
+                            "game_name": gameName,
+                            "trainer_name": None,
+                            "origin": "fling_archive",
+                            "url": url
+                        })
+
+        except Exception as e:
+            print(f"Error processing FLiNG archive data: {e}")
+            self.message.emit(tr("Search failed, please update trainer search data."), "failure")
+            return False
+
+        self.message.emit(tr("Search from FLiNG success!") + " 1/2", "success")
+        time.sleep(self.status_pause_time)
 
         return True
 
@@ -184,69 +192,81 @@ class DownloadDisplayThread(DownloadBaseThread):
         elif settings["flingDownloadServer"] == "gcm":
             mainSiteData = self.load_json_content("fling_main.json")
 
-        if mainSiteData:
-            self.message.emit(tr("Search from FLiNG success!") + " 2/2", "success")
-        else:
+        if not mainSiteData:
             self.message.emit(tr("Search failed, please update trainer search data."), "failure")
             return False
-        time.sleep(0.5)
 
-        if settings["flingDownloadServer"] == "official":
-            for letter_section in mainSiteData.find_all(class_='letter-section'):
-                for ul in letter_section.find_all('ul'):
-                    for li in ul.find_all('li'):
-                        for link in li.find_all('a'):
-                            rawTrainerName = link.get_text().strip()
-                            gameName = rawTrainerName.rsplit(" Trainer", 1)[0]
-                            url = link.get("href")
+        try:
+            if settings["flingDownloadServer"] == "official":
+                for letter_section in mainSiteData.find_all(class_='letter-section'):
+                    for ul in letter_section.find_all('ul'):
+                        for li in ul.find_all('li'):
+                            for link in li.find_all('a'):
+                                rawTrainerName = link.get_text().strip()
+                                gameName = rawTrainerName.rsplit(" Trainer", 1)[0]
+                                url = link.get("href")
 
-                            if gameName and self.keyword_match(keywordList, gameName):
-                                DownloadBaseThread.trainer_urls.append({
-                                    "game_name": gameName,
-                                    "trainer_name": None,
-                                    "origin": "fling_main",
-                                    "url": url
-                                })
+                                if gameName and self.keyword_match(keywordList, gameName):
+                                    DownloadBaseThread.trainer_urls.append({
+                                        "game_name": gameName,
+                                        "trainer_name": None,
+                                        "origin": "fling_main",
+                                        "url": url
+                                    })
 
-        elif settings["flingDownloadServer"] == "gcm":
-            for trainer in mainSiteData:
-                gameName = trainer['game_name']
-                url = trainer['gcm_url']
-                version = trainer['version']
+            elif settings["flingDownloadServer"] == "gcm":
+                for trainer in mainSiteData:
+                    gameName = trainer['game_name']
+                    url = trainer['gcm_url']
+                    version = trainer['version']
 
-                if self.keyword_match(keywordList, gameName):
-                    DownloadBaseThread.trainer_urls.append({
-                        "game_name": gameName,
-                        "trainer_name": None,
-                        "origin": "fling_main",
-                        "url": url,
-                        "version": version
-                    })
+                    if self.keyword_match(keywordList, gameName):
+                        DownloadBaseThread.trainer_urls.append({
+                            "game_name": gameName,
+                            "trainer_name": None,
+                            "origin": "fling_main",
+                            "url": url,
+                            "version": version
+                        })
+
+        except Exception as e:
+            print(f"Error processing FLiNG main site data: {e}")
+            self.message.emit(tr("Search failed, please update trainer search data."), "failure")
+            return False
+
+        self.message.emit(tr("Search from FLiNG success!") + " 2/2", "success")
+        time.sleep(self.status_pause_time)
 
         return True
 
     def search_from_xiaoxing(self, keywordList):
         xiaoXingData = self.load_json_content("xiaoxing.json")
 
-        if xiaoXingData:
-            self.message.emit(tr("Search from XiaoXing success!"), "success")
-        else:
+        if not xiaoXingData:
             self.message.emit(tr("Search failed, please update trainer search data."), "failure")
             return False
-        time.sleep(0.5)
 
-        for trainer in xiaoXingData:
-            gameName = trainer['game_name']
-            url = trainer['gcm_url']
-            version = trainer['version']
+        try:
+            for trainer in xiaoXingData:
+                gameName = trainer['game_name']
+                url = trainer['gcm_url']
+                version = trainer['version']
 
-            if gameName and self.keyword_match(keywordList, gameName):
-                DownloadBaseThread.trainer_urls.append({
-                    "game_name": gameName,
-                    "trainer_name": None,
-                    "origin": "xiaoxing",
-                    "url": url,
-                    "version": version
-                })
+                if gameName and self.keyword_match(keywordList, gameName):
+                    DownloadBaseThread.trainer_urls.append({
+                        "game_name": gameName,
+                        "trainer_name": None,
+                        "origin": "xiaoxing",
+                        "url": url,
+                        "version": version
+                    })
+
+        except Exception as e:
+            print(f"Error processing XiaoXing data: {e}")
+            self.message.emit(tr("Search failed, please update trainer search data."), "failure")
+            return False
+
+        self.message.emit(tr("Search from XiaoXing success!"), "success")
+        time.sleep(self.status_pause_time)
 
         return True

@@ -80,8 +80,7 @@ def load_settings():
     try:
         with open(SETTINGS_FILE, "r") as f:
             settings = json.load(f)
-            if settings["theme"] not in ["dark", "light"]:
-                settings["theme"] = "dark"
+
     except Exception as e:
         print("Error loading settings json" + str(e))
         settings = default_settings
@@ -171,23 +170,6 @@ ce_install_path = findCEInstallPath()
 
 settings = load_settings()
 tr = get_translator()
-ensure_trainer_download_path_is_valid()
-
-if settings["theme"] == "dark":
-    dropDownArrow_path = resource_path("assets/dropdown-white.png").replace("\\", "/")
-elif settings["theme"] == "light":
-    dropDownArrow_path = resource_path("assets/dropdown-black.png").replace("\\", "/")
-checkMark_path = resource_path("assets/check-mark.png").replace("\\", "/")
-upArrow_path = resource_path("assets/up.png").replace("\\", "/")
-downArrow_path = resource_path("assets/down.png").replace("\\", "/")
-leftArrow_path = resource_path("assets/left.png").replace("\\", "/")
-rightArrow_path = resource_path("assets/right.png").replace("\\", "/")
-resourceHacker_path = resource_path("dependency/ResourceHacker.exe")
-unzip_path = resource_path("dependency/7z/7z.exe")
-binmay_path = resource_path("dependency/binmay.exe")
-emptyMidi_path = resource_path("dependency/TrainerBGM.mid")
-elevator_path = resource_path("dependency/Elevate.exe")
-updater_path = resource_path("Updater.exe")
 
 language_options = {
     "English (US)": "en_US",
@@ -210,3 +192,27 @@ font_config = {
     "zh_CN": resource_path("assets/NotoSansSC-Regular.ttf"),
     "zh_TW": resource_path("assets/NotoSansTC-Regular.ttf")
 }
+
+ensure_trainer_download_path_is_valid()
+if settings["theme"] not in theme_options.values():
+    settings["theme"] = "dark"
+    apply_settings(settings)
+if settings["flingDownloadServer"] not in server_options.values():
+    settings["flingDownloadServer"] = "official"
+    apply_settings(settings)
+
+if settings["theme"] == "dark":
+    dropDownArrow_path = resource_path("assets/dropdown-white.png").replace("\\", "/")
+elif settings["theme"] == "light":
+    dropDownArrow_path = resource_path("assets/dropdown-black.png").replace("\\", "/")
+checkMark_path = resource_path("assets/check-mark.png").replace("\\", "/")
+upArrow_path = resource_path("assets/up.png").replace("\\", "/")
+downArrow_path = resource_path("assets/down.png").replace("\\", "/")
+leftArrow_path = resource_path("assets/left.png").replace("\\", "/")
+rightArrow_path = resource_path("assets/right.png").replace("\\", "/")
+resourceHacker_path = resource_path("dependency/ResourceHacker.exe")
+unzip_path = resource_path("dependency/7z/7z.exe")
+binmay_path = resource_path("dependency/binmay.exe")
+emptyMidi_path = resource_path("dependency/TrainerBGM.mid")
+elevator_path = resource_path("dependency/Elevate.exe")
+updater_path = resource_path("Updater.exe")
