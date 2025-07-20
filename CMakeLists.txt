@@ -13,6 +13,7 @@ add_subdirectory(common)
 set(TRAINER_DIRS
     "trainers/Arrow a Row Trainer"
     "trainers/DREDGE Trainer"
+    "trainers/Feeding Frenzy 2_Shipwreck Showdown Trainer"
     "trainers/Headbangers_Rhythm Royale Trainer"
     "trainers/Heavy Weapon Trainer"
     "trainers/Plants vs. Zombies Trainer"

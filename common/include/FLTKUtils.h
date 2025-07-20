@@ -16,7 +16,7 @@ using json = nlohmann::json;
 // {{}}_flex->fixed({{}}_check_button, button_w);
 
 // Fl_Box *{{}}_label = new Fl_Box(0, 0, 0, 0);
-// {{}}_label->tooltip("Label");
+// tr({{}}_label, "Label");
 
 // Fl_Input *{{}}_input = new Fl_Input(0, 0, 0, 0);
 // {{}}_flex->fixed({{}}_input, input_w);
@@ -37,10 +37,10 @@ using json = nlohmann::json;
 
 // Fl_Button *{{}}_apply_button = new Fl_Button(0, 0, 0, 0);
 // {{}}_flex->fixed({{}}_apply_button, button_w);
-// {{}}_apply_button->tooltip("Apply");
+// tr({{}}_apply_button, "Apply");
 
 // Fl_Box *{{}}_label = new Fl_Box(0, 0, 0, 0);
-// {{}}_label->tooltip("Label");
+// tr({{}}_label, "Label");
 
 // Fl_Input *{{}}_input = new Fl_Input(0, 0, 0, 0);
 // {{}}_flex->fixed({{}}_input, input_w);
