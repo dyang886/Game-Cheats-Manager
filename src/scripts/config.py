@@ -1,3 +1,4 @@
+import ctypes
 import gettext
 import json
 import locale
@@ -29,8 +30,12 @@ def resource_path(relative_path):
             full_path = os.path.join(os.path.dirname(__file__), '..', relative_path)
 
     if not os.path.exists(full_path):
-        formatted_message = (f"Couldn't find {full_path}. Please try reinstalling the application.")
-        raise FileNotFoundError(formatted_message)
+        formatted_message = (
+            f"Couldn't find {os.path.basename(full_path)}. Please try reinstalling the application.\n"
+            f"无法找到 {os.path.basename(full_path)}. 请尝试重新安装应用程序。"
+        )
+        ctypes.windll.user32.MessageBoxW(0, formatted_message, "Failure", 0x10)
+        sys.exit(1)
 
     return full_path
 

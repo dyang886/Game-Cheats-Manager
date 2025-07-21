@@ -5,7 +5,6 @@ fuzzywuzzy
 pinyin
 polib
 psutil
-nuitka
 PyQt6
 python-dotenv
 python-Levenshtein
