@@ -8,7 +8,7 @@ English | [简体中文](./README_CN.md) | [繁體中文](./README_TW.md)
     <img src="src/assets/logo.png" alt="Game Cheats Manager logo" width="250" />
 </div>
 
-Game Cheats Manager is a one-stop solution for gamers to manage their trainers efficiently. It allows users to browse, download, and manage all their trainers from one convenient location. Each trainer, typically a standalone executable, can be launched or deleted directly through the app, simplifying your gaming experience by keeping everything organized and accessible.
+Game Cheats Manager is a one-stop solution for gamers to manage their trainers for single-player games efficiently. It allows users to browse, download, and manage all their trainers from one convenient location. Each trainer, typically a standalone executable, can be launched or deleted directly through the app, simplifying your gaming experience by keeping everything organized and accessible.
 
 ## Usage
 
