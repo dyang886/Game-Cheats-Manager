@@ -173,8 +173,15 @@ class DownloadBaseThread(QThread):
         if not trainer_details:
             raise ValueError("translations.json doesn't exist in the database path.")
 
-        sanitized_to_original_en = {}
-        sanitized_to_original_zh = {}
+        # Ignore cases where input trainer name and target language are the same
+        if is_chinese(target_name) and target_language == 'zh':
+            return None
+        elif not is_chinese(target_name) and target_language == 'en':
+            return None
+
+        # Handle cases where input trainer name and target language are different
+        sanitized_to_original_en = {}  # Key: sanitized English, Value: Chinese
+        sanitized_to_original_zh = {}  # Key: sanitized Chinese, Value: English
         for trainer in trainer_details:
             if 'en_US' in trainer and 'zh_CN' in trainer:
                 sanitized_en = self.sanitize(trainer['en_US'])
@@ -192,14 +199,6 @@ class DownloadBaseThread(QThread):
         best_match, score = process.extractOne(sanitized_target, sanitized_to_original.keys())
         if score >= threshold:
             return sanitized_to_original[best_match]
-
-        # Ignore cases where input trainer name and target language are the same language
-        if is_chinese(target_name) and target_language == 'zh':
-            pass
-        elif not is_chinese(target_name) and target_language == 'en':
-            pass
-        else:
-            print(f"No matchings found for {target_name}")
 
         return None
 

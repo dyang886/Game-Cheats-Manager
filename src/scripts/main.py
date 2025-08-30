@@ -417,6 +417,9 @@ class GameCheatsManager(QMainWindow):
                     self.show_cheats()
                 except PermissionError as e:
                     QMessageBox.critical(self, tr("Error"), tr("Trainer is currently in use, please close any programs using the file and try again."))
+                except Exception as e:
+                    QMessageBox.critical(self, tr("Error"), tr("Failed to delete {trainer_name}:").format(trainer_name=trainerName) + f"\n{str(e)}")
+                    self.show_cheats()
 
     def findWidgetInStatusBar(self, statusbar, widgetName):
         for widget in statusbar.children():
@@ -455,7 +458,7 @@ class GameCheatsManager(QMainWindow):
         self.searchable = False
 
         display_thread = DownloadDisplayThread(keyword, self)
-        display_thread.message.connect(self.on_message)
+        display_thread.message.connect(self.on_message, Qt.ConnectionType.BlockingQueuedConnection)
         display_thread.finished.connect(self.on_display_finished)
         display_thread.start()
 
@@ -473,7 +476,7 @@ class GameCheatsManager(QMainWindow):
             self.currentlyUpdatingFling = True
             fetch_fling_site_thread = FetchFlingSite(self)
             fetch_fling_site_thread.message.connect(self.on_status_load)
-            fetch_fling_site_thread.update.connect(self.on_status_update)
+            fetch_fling_site_thread.update.connect(self.on_status_update, Qt.ConnectionType.BlockingQueuedConnection)
             fetch_fling_site_thread.finished.connect(self.on_interval_finished)
             fetch_fling_site_thread.start()
 
@@ -532,7 +535,7 @@ class GameCheatsManager(QMainWindow):
 
             index, trainers, trainerDownloadPath, update_entry = self.downloadQueue.get()
             download_thread = DownloadTrainersThread(index, trainers, trainerDownloadPath, update_entry, self)
-            download_thread.message.connect(self.on_message)
+            download_thread.message.connect(self.on_message, Qt.ConnectionType.BlockingQueuedConnection)
             download_thread.messageBox.connect(self.on_message_box)
             download_thread.finished.connect(self.on_download_finished)
             download_thread.start()

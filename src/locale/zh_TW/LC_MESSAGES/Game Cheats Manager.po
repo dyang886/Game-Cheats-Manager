@@ -118,6 +118,9 @@ msgstr "錯誤"
 msgid "Trainer is currently in use, please close any programs using the file and try again."
 msgstr "修改器目前正在使用中，請關閉使用該檔案的所有程式，然後重試。"
 
+msgid "Failed to delete {trainer_name}:"
+msgstr "刪除 {trainer_name} 失敗："
+
 msgid "Change trainer download path"
 msgstr "更改修改器下載路徑"
 
@@ -187,11 +190,11 @@ msgstr "找不到結果。"
 msgid "Translating keywords..."
 msgstr "翻譯關鍵字..."
 
-msgid "Search from FLiNG success!"
-msgstr "風靈月影搜尋成功"
-
 msgid "Search failed, please update trainer search data."
 msgstr "搜索失敗，請更新修改器檢索數據。"
+
+msgid "Search from FLiNG success!"
+msgstr "風靈月影搜尋成功"
 
 msgid "Search from XiaoXing success!"
 msgstr "小幸搜尋成功"
@@ -329,7 +332,7 @@ msgstr ""
 "如果您是透過非官方購買方式獲得本軟體，請立即檢舉賣家。\n"
 "以下為官方連結。"
 
-msgid "Bilibili author homepage:"
+msgid "Bilibili:"
 msgstr "B站作者首頁:"
 
 msgid "Don't show again"

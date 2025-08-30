@@ -42,7 +42,7 @@ class CopyRightWarning(QDialog):
         layout.addLayout(linksLayout)
 
         githubUrl = self.parent().githubLink
-        githubText = f'GitHub: <a href="{githubUrl}" style="text-decoration: none;">{githubUrl}</a>'
+        githubText = f'GitHub: <a href="{githubUrl}" style="text-decoration: none; color: #305CDE;">{githubUrl}</a>'
         githubLabel = QLabel(githubText)
         githubLabel.setAlignment(Qt.AlignmentFlag.AlignCenter)
         githubLabel.setTextFormat(Qt.TextFormat.RichText)
@@ -50,8 +50,8 @@ class CopyRightWarning(QDialog):
         linksLayout.addWidget(githubLabel)
 
         bilibiliUrl = self.parent().bilibiliLink
-        text = tr("Bilibili author homepage:")
-        bilibiliText = f'{text} <a href="{bilibiliUrl}" style="text-decoration: none;">{bilibiliUrl}</a>'
+        text = tr("Bilibili:")
+        bilibiliText = f'{text} <a href="{bilibiliUrl}" style="text-decoration: none; color: #305CDE;">{bilibiliUrl}</a>'
         bilibiliLabel = QLabel(bilibiliText)
         bilibiliLabel.setAlignment(Qt.AlignmentFlag.AlignCenter)
         bilibiliLabel.setTextFormat(Qt.TextFormat.RichText)
@@ -283,7 +283,7 @@ class AboutDialog(QDialog):
         aboutLayout.addLayout(linksLayout)
 
         githubUrl = self.parent().githubLink
-        githubText = f'GitHub: <a href="{githubUrl}" style="text-decoration: none;">{githubUrl}</a>'
+        githubText = f'GitHub: <a href="{githubUrl}" style="text-decoration: none; color: #305CDE;">{githubUrl}</a>'
         githubLabel = QLabel(githubText)
         githubLabel.setAlignment(Qt.AlignmentFlag.AlignCenter)
         githubLabel.setTextFormat(Qt.TextFormat.RichText)
@@ -291,8 +291,8 @@ class AboutDialog(QDialog):
         linksLayout.addWidget(githubLabel)
 
         bilibiliUrl = self.parent().bilibiliLink
-        text = tr("Bilibili author homepage:")
-        bilibiliText = f'{text} <a href="{bilibiliUrl}" style="text-decoration: none;">{bilibiliUrl}</a>'
+        text = tr("Bilibili:")
+        bilibiliText = f'{text} <a href="{bilibiliUrl}" style="text-decoration: none; color: #305CDE;">{bilibiliUrl}</a>'
         bilibiliLabel = QLabel(bilibiliText)
         bilibiliLabel.setAlignment(Qt.AlignmentFlag.AlignCenter)
         bilibiliLabel.setTextFormat(Qt.TextFormat.RichText)

@@ -440,7 +440,7 @@ class TrainerManagementDialog(QDialog):
         self.weModResetButton.setDisabled(True)
 
         self.apply_thread = WeModCustomization(self.weModVersions, weModInstallPath, selectedWeModVersion, self)
-        self.apply_thread.message.connect(self.show_alert)
+        self.apply_thread.message.connect(self.show_alert, Qt.ConnectionType.BlockingQueuedConnection)
         self.apply_thread.finished.connect(self.on_finished)
         self.apply_thread.start()
 

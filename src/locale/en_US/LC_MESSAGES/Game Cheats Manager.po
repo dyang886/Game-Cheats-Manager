@@ -118,6 +118,9 @@ msgstr "Error"
 msgid "Trainer is currently in use, please close any programs using the file and try again."
 msgstr "Trainer is currently in use, please close any programs using the file and try again."
 
+msgid "Failed to delete {trainer_name}:"
+msgstr "Failed to delete {trainer_name}:"
+
 msgid "Change trainer download path"
 msgstr "Change trainer download path"
 
@@ -187,11 +190,11 @@ msgstr "No results found."
 msgid "Translating keywords..."
 msgstr "Translating keywords..."
 
-msgid "Search from FLiNG success!"
-msgstr "Search from FLiNG success!"
-
 msgid "Search failed, please update trainer search data."
 msgstr "Search failed, please update trainer search data."
+
+msgid "Search from FLiNG success!"
+msgstr "Search from FLiNG success!"
 
 msgid "Search from XiaoXing success!"
 msgstr "Search from XiaoXing success!"
@@ -329,8 +332,8 @@ msgstr ""
 "If you have paid for this software unofficially, please report the seller immediately.\n"
 "Below are official links."
 
-msgid "Bilibili author homepage:"
-msgstr "Bilibili author homepage:"
+msgid "Bilibili:"
+msgstr "Bilibili:"
 
 msgid "Don't show again"
 msgstr "Don't show again"
