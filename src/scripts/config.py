@@ -48,6 +48,7 @@ def apply_settings(settings):
 def load_settings():
     locale.setlocale(locale.LC_ALL, '')
     system_locale = locale.getlocale()[0]
+    # print(f"System locale: {system_locale}")
     locale_mapping = {
         "English_United States": "en_US",
         "Chinese (Simplified)_China": "zh_CN",
@@ -56,7 +57,14 @@ def load_settings():
         "Chinese (Simplified)_Singapore": "zh_CN",
         "Chinese (Traditional)_Hong Kong SAR": "zh_TW",
         "Chinese (Traditional)_Macao SAR": "zh_TW",
-        "Chinese (Traditional)_Taiwan": "zh_TW"
+        "Chinese (Traditional)_Taiwan": "zh_TW",
+        "German_Austria": "de_DE",
+        "German_Belgium": "de_DE",
+        "de_DE": "de_DE",
+        "German_Italy": "de_DE",
+        "German_Liechtenstein": "de_DE",
+        "German_Luxembourg": "de_DE",
+        "German_Switzerland": "de_DE"
     }
     app_locale = locale_mapping.get(system_locale, 'en_US')
 
@@ -179,7 +187,8 @@ tr = get_translator()
 language_options = {
     "English (US)": "en_US",
     "简体中文": "zh_CN",
-    "繁體中文": "zh_TW"
+    "繁體中文": "zh_TW",
+    "Deutsch": "de_DE"
 }
 
 theme_options = {
@@ -195,7 +204,8 @@ server_options = {
 font_config = {
     "en_US": resource_path("assets/NotoSans-Regular.ttf"),
     "zh_CN": resource_path("assets/NotoSansSC-Regular.ttf"),
-    "zh_TW": resource_path("assets/NotoSansTC-Regular.ttf")
+    "zh_TW": resource_path("assets/NotoSansTC-Regular.ttf"),
+    "de_DE": resource_path("assets/NotoSans-Regular.ttf")
 }
 
 ensure_trainer_download_path_is_valid()

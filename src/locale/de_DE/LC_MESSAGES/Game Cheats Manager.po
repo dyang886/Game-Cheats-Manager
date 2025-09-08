@@ -1,0 +1,456 @@
+#
+msgid ""
+msgstr ""
+"Project-Id-Version: Game Cheats Manager\n"
+"POT-Creation-Date: \n"
+"PO-Revision-Date: \n"
+"Last-Translator: \n"
+"Language-Team: \n"
+"Language: de_DE\n"
+"MIME-Version: 1.0\n"
+"Content-Type: text/plain; charset=UTF-8\n"
+"Content-Transfer-Encoding: 8bit\n"
+"Plural-Forms: nplurals=1; plural=0;\n"
+"X-Generator: Poedit 3.7\n"
+
+msgid "Dark"
+msgstr "Dunkel"
+
+msgid "Light"
+msgstr "Hell"
+
+msgid "Official Site"
+msgstr "Offizielle Seite"
+
+msgid "GCM Server"
+msgstr "GCM-Server"
+
+msgid "Search for installed"
+msgstr "Installierte suchen"
+
+msgid "Search to download"
+msgstr "Zum Herunterladen suchen"
+
+msgid "Options"
+msgstr "Optionen"
+
+msgid "Settings"
+msgstr "Einstellungen"
+
+msgid "Import Trainers"
+msgstr "Trainer importieren"
+
+msgid "Open Trainer Download Path"
+msgstr "Trainer-Download-Pfad öffnen"
+
+msgid "Add Paths to Whitelist"
+msgstr "Pfade zur Whitelist hinzufügen"
+
+msgid "About"
+msgstr "Über"
+
+msgid "Data Update"
+msgstr "Daten-Update"
+
+msgid "Update Translation Data"
+msgstr "Übersetzungsdaten aktualisieren"
+
+msgid "Update Trainer Search Data"
+msgstr "Trainer-Suchdaten aktualisieren"
+
+msgid "Update Trainers"
+msgstr "Trainer aktualisieren"
+
+msgid "Trainer Management"
+msgstr "Trainer-Verwaltung"
+
+msgid "Launch"
+msgstr "Starten"
+
+msgid "Delete"
+msgstr "Löschen"
+
+msgid "Trainer download path:"
+msgstr "Trainer-Download-Pfad:"
+
+msgid "Failure"
+msgstr "Fehler"
+
+msgid "Failed to update application."
+msgstr "Anwendung konnte nicht aktualisiert werden."
+
+msgid "Update Available"
+msgstr "Update verfügbar"
+
+msgid "New version found: {old_version} ➜ {new_version}"
+msgstr "Neue Version gefunden: {old_version} ➜ {new_version}"
+
+msgid "Would you like to update now?"
+msgstr "Möchtest du jetzt aktualisieren?"
+
+msgid "Yes"
+msgstr "Ja"
+
+msgid "No"
+msgstr "Nein"
+
+msgid "Update Check Failed"
+msgstr "Update-Prüfung fehlgeschlagen"
+
+msgid "Failed to check for software update. You can navigate to `Options` ➜ `About` to check for updates manually."
+msgstr "Die Suche nach einem Software-Update ist fehlgeschlagen. Du kannst unter `Optionen` ➜ `Über` manuell nach Updates suchen."
+
+msgid "Delete trainer"
+msgstr "Trainer löschen"
+
+msgid "Are you sure you want to delete "
+msgstr "Bist du sicher, dass du löschen möchtest? "
+
+msgid "Confirm"
+msgstr "Bestätigen"
+
+msgid "Cancel"
+msgstr "Abbrechen"
+
+msgid "Error"
+msgstr "Fehler"
+
+msgid "Trainer is currently in use, please close any programs using the file and try again."
+msgstr "Der Trainer wird gerade verwendet. Bitte schließe alle Programme, die auf die Datei zugreifen, und versuche es erneut."
+
+msgid "Change trainer download path"
+msgstr "Trainer-Download-Pfad ändern"
+
+msgid "Please choose a new path."
+msgstr "Bitte wähle einen neuen Pfad."
+
+msgid "Failed to change trainer download path."
+msgstr "Der Trainer-Download-Pfad konnte nicht geändert werden."
+
+msgid "Migrating existing trainers..."
+msgstr "Vorhandene Trainer werden migriert..."
+
+msgid "No path selected."
+msgstr "Kein Pfad ausgewählt."
+
+msgid "Error migrating trainers: "
+msgstr "Fehler beim Migrieren der Trainer: "
+
+msgid "Migration complete!"
+msgstr "Migration abgeschlossen!"
+
+msgid "Select trainers you want to import"
+msgstr "Wähle die Trainer aus, die du importieren möchtest"
+
+msgid "Failed to import trainer: "
+msgstr "Trainer konnte nicht importiert werden: "
+
+msgid "Delete original trainers"
+msgstr "Ursprüngliche Trainer löschen"
+
+msgid "Do you want to delete the original trainer files?"
+msgstr "Möchtest du die ursprünglichen Trainer-Dateien löschen?"
+
+msgid "Failed to delete original trainer: "
+msgstr "Ursprünglicher Trainer konnte nicht gelöscht werden: "
+
+msgid "Administrator Access Required"
+msgstr "Administratorrechte erforderlich"
+
+msgid "To proceed with adding the trainer download paths to the Windows Defender whitelist, administrator rights are needed. A User Account Control (UAC) prompt will appear for permission."
+msgstr "Um die Trainer-Download-Pfade zur Windows-Defender-Whitelist hinzuzufügen, werden Administratorrechte benötigt. Es erscheint eine Benutzerkontensteuerung (UAC), um die Berechtigung zu bestätigen."
+
+msgid "Would you like to continue?"
+msgstr "Möchtest du fortfahren?"
+
+msgid "Success"
+msgstr "Erfolg"
+
+msgid "Successfully added paths to Windows Defender whitelist."
+msgstr "Pfade wurden erfolgreich zur Windows-Defender-Whitelist hinzugefügt."
+
+msgid "Failed to add paths to Windows Defender whitelist."
+msgstr "Pfade konnten nicht zur Windows-Defender-Whitelist hinzugefügt werden."
+
+msgid "Failed to translate, please update translation data."
+msgstr "Übersetzung fehlgeschlagen, bitte aktualisiere die Übersetzungsdaten."
+
+msgid "Searching..."
+msgstr "Suche läuft..."
+
+msgid "Translating search results..."
+msgstr "Suchergebnisse werden übersetzt..."
+
+msgid "No results found."
+msgstr "Keine Ergebnisse gefunden."
+
+msgid "Translating keywords..."
+msgstr "Schlüsselwörter werden übersetzt..."
+
+msgid "Search from FLiNG success!"
+msgstr "Suche von FLiNG erfolgreich!"
+
+msgid "Search failed, please update trainer search data."
+msgstr "Suche fehlgeschlagen, bitte aktualisiere die Trainer-Suchdaten."
+
+msgid "Search from XiaoXing success!"
+msgstr "Suche von XiaoXing erfolgreich!"
+
+msgid "Checking for internet connection..."
+msgstr "Internetverbindung wird geprüft..."
+
+msgid "No internet connection, download failed."
+msgstr "Keine Internetverbindung, Download fehlgeschlagen."
+
+msgid "Attention"
+msgstr "Achtung"
+
+msgid "Please check folder for anti-cheat requirements!"
+msgstr "Bitte prüfe den Ordner auf Anti-Cheat-Anforderungen!"
+
+msgid "An error occurred when moving trainer: "
+msgstr "Ein Fehler ist beim Verschieben des Trainers aufgetreten: "
+
+msgid "Download success!"
+msgstr "Download erfolgreich!"
+
+msgid "Updating "
+msgstr "Aktualisiere "
+
+msgid "Trainer already exists, aborted download."
+msgstr "Trainer existiert bereits, Download abgebrochen."
+
+msgid "Downloading..."
+msgstr "Lädt herunter..."
+
+msgid "Failed to find trainer download link."
+msgstr "Trainer-Download-Link konnte nicht gefunden werden."
+
+msgid "Failed to find trainer version."
+msgstr "Trainer-Version konnte nicht gefunden werden."
+
+msgid "Internet request failed."
+msgstr "Internet-Anfrage fehlgeschlagen."
+
+msgid "An error occurred while downloading trainer: "
+msgstr "Ein Fehler ist beim Herunterladen des Trainers aufgetreten: "
+
+msgid "Decompressing..."
+msgstr "Entpacke..."
+
+msgid "An error occurred while extracting downloaded trainer: "
+msgstr "Ein Fehler ist beim Entpacken des heruntergeladenen Trainers aufgetreten: "
+
+msgid "Could not find the downloaded trainer file, please try turning your antivirus software off."
+msgstr "Die heruntergeladene Trainer-Datei konnte nicht gefunden werden. Versuche, deine Antivirus-Software auszuschalten."
+
+msgid "Removing trainer background music..."
+msgstr "Hintergrundmusik des Trainers wird entfernt..."
+
+msgid "Updating data from FLiNG"
+msgstr "Daten von FLiNG werden aktualisiert"
+
+msgid "Update from FLiGN failed"
+msgstr "Update von FLiGN fehlgeschlagen"
+
+msgid "Updating data from XiaoXing"
+msgstr "Daten von XiaoXing werden aktualisiert"
+
+msgid "Update from XiaoXing failed"
+msgstr "Update von XiaoXing fehlgeschlagen"
+
+msgid "Fetching trainer translations"
+msgstr "Trainer-Übersetzungen werden abgerufen"
+
+msgid "Fetch trainer translations failed"
+msgstr "Abruf der Trainer-Übersetzungen fehlgeschlagen"
+
+msgid ""
+"WeMod is currently running,\n"
+"please close the application first"
+msgstr ""
+"WeMod läuft gerade,\n"
+"bitte schließe die Anwendung zuerst"
+
+msgid "Failed to extract file:"
+msgstr "Datei konnte nicht extrahiert werden:"
+
+msgid "Failed to patch file:"
+msgstr "Datei konnte nicht gepatcht werden:"
+
+msgid "WeMod Pro activated"
+msgstr "WeMod Pro aktiviert"
+
+msgid "Failed to activate WeMod Pro"
+msgstr "WeMod Pro konnte nicht aktiviert werden"
+
+msgid "WeMod Pro disabled"
+msgstr "WeMod Pro deaktiviert"
+
+msgid "WeMod auto update disabled"
+msgstr "WeMod Auto-Update deaktiviert"
+
+msgid "WeMod auto update enabled"
+msgstr "WeMod Auto-Update aktiviert"
+
+msgid ""
+"Failed to enable WeMod auto update,\n"
+"please try reinstalling WeMod"
+msgstr ""
+"WeMod Auto-Update konnte nicht aktiviert werden,\n"
+"bitte versuche WeMod neu zu installieren"
+
+msgid "Failed to process WeMod update file:"
+msgstr "WeMod Update-Datei konnte nicht verarbeitet werden:"
+
+msgid "Deleted WeMod version: "
+msgstr "WeMod-Version gelöscht: "
+
+msgid "Failed to delete WeMod version: "
+msgstr "WeMod-Version konnte nicht gelöscht werden: "
+
+msgid "Checking for trainer updates"
+msgstr "Suche nach Trainer-Updates"
+
+msgid "Check trainer updates failed"
+msgstr "Prüfung auf Trainer-Updates fehlgeschlagen"
+
+msgid "Warning"
+msgstr "Warnung"
+
+msgid ""
+"This software is open source and provided free of charge.\n"
+"Resale is strictly prohibited, and developers reserve the right to pursue legal responsibility against the violators.\n"
+"If you have paid for this software unofficially, please report the seller immediately.\n"
+"Below are official links."
+msgstr ""
+"Diese Software ist quelloffen (Open Source) und wird kostenlos zur Verfügung gestellt.\n"
+"Der Weiterverkauf ist strengstens untersagt, und die Entwickler behalten sich das Recht vor, rechtliche Schritte gegen Zuwiderhandelnde einzuleiten.\n"
+"Wenn du diese Software inoffiziell bezahlt hast, melde den Verkäufer bitte umgehend.\n"
+"Unten findest du die offiziellen Links."
+
+msgid "Bilibili author homepage:"
+msgstr "Bilibili-Homepage des Autors:"
+
+msgid "Don't show again"
+msgstr "Nicht mehr anzeigen"
+
+msgid "Theme:"
+msgstr "Design:"
+
+msgid "Language:"
+msgstr "Sprache:"
+
+msgid "Launch app on system startup"
+msgstr "App beim Systemstart ausführen"
+
+msgid "Check for software update at startup"
+msgstr "Beim Start nach Software-Updates suchen"
+
+msgid "Always show search results in English"
+msgstr "Suchergebnisse immer auf Englisch anzeigen"
+
+msgid "Update trainer translations automatically"
+msgstr "Trainer-Übersetzungen automatisch aktualisieren"
+
+msgid "Apply"
+msgstr "Anwenden"
+
+msgid "Do you want to restart the application now to apply theme or language settings?"
+msgstr "Möchtest du die Anwendung jetzt neu starten, um die Design- oder Spracheinstellungen anzuwenden?"
+
+msgid "Settings saved."
+msgstr "Einstellungen gespeichert."
+
+msgid "Current version: "
+msgstr "Aktuelle Version: "
+
+msgid "Newest version: "
+msgstr "Neueste Version: "
+
+msgid "Loading..."
+msgstr "Lädt..."
+
+msgid "Update Now"
+msgstr "Jetzt aktualisieren"
+
+msgid "Failed to load"
+msgstr "Laden fehlgeschlagen"
+
+msgid "FLiNG"
+msgstr "FLiNG"
+
+msgid "XiaoXing"
+msgstr "XiaoXing"
+
+msgid "Official Website: "
+msgstr "Offizielle Website: "
+
+msgid "Download Server:"
+msgstr "Download-Server:"
+
+msgid "Remove trainer background music"
+msgstr "Trainer-Hintergrundmusik entfernen"
+
+msgid "Update FLiNG data automatically"
+msgstr "FLiNG-Daten automatisch aktualisieren"
+
+msgid "Update FLiNG trainers automatically"
+msgstr "FLiNG-Trainer automatisch aktualisieren"
+
+msgid "Enable search for XiaoXing trainers"
+msgstr "Suche nach XiaoXing-Trainern aktivieren"
+
+msgid "Update XiaoXing data automatically"
+msgstr "XiaoXing-Daten automatisch aktualisieren"
+
+msgid "Update XiaoXing trainers automatically"
+msgstr "XiaoXing-Trainer automatisch aktualisieren"
+
+msgid "WeMod installation path:"
+msgstr "WeMod-Installationspfad:"
+
+msgid "Reset to default"
+msgstr "Auf Standard zurücksetzen"
+
+msgid "Installed WeMod Versions:"
+msgstr "Installierte WeMod-Versionen:"
+
+msgid "Activate WeMod Pro"
+msgstr "WeMod Pro aktivieren"
+
+msgid "Disable WeMod Auto Update"
+msgstr "WeMod Auto-Update deaktivieren"
+
+msgid "Delete All Other WeMod Versions"
+msgstr "Alle anderen WeMod-Versionen löschen"
+
+msgid "Cheat Engine installation path:"
+msgstr "Cheat Engine-Installationspfad:"
+
+msgid "Add Simplified Chinese"
+msgstr "Vereinfachtes Chinesisch hinzufügen"
+
+msgid "Select WeMod installation path"
+msgstr "WeMod-Installationspfad auswählen"
+
+msgid "Select Cheat Engine installation path"
+msgstr "Cheat Engine-Installationspfad auswählen"
+
+msgid "Cheat Engine is installed"
+msgstr "Cheat Engine ist installiert"
+
+msgid "Cheat Engine not installed"
+msgstr "Cheat Engine ist nicht installiert"
+
+msgid "WeMod not installed"
+msgstr "WeMod ist nicht installiert"
+
+msgid "To proceed with adding translation files, administrator rights are needed. A User Account Control (UAC) prompt will appear for permission."
+msgstr "Um die Übersetzungsdateien hinzuzufügen, werden Administratorrechte benötigt. Es erscheint eine Benutzerkontensteuerung (UAC), um die Berechtigung zu bestätigen."
+
+msgid "Successfully added translation files"
+msgstr "Übersetzungsdateien wurden erfolgreich hinzugefügt"
+
+msgid "Failed to add translation files"
+msgstr "Übersetzungsdateien konnten nicht hinzugefügt werden"
