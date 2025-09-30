@@ -44,7 +44,7 @@ class GameCheatsManager(QMainWindow):
         self.setMinimumSize(680, 520)
 
         # Version and links
-        self.appVersion = "2.3.2"
+        self.appVersion = "2.3.3"
         self.githubLink = "https://github.com/dyang886/Game-Cheats-Manager"
         self.bilibiliLink = "https://space.bilibili.com/256673766"
 

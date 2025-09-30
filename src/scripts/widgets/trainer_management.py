@@ -1,3 +1,4 @@
+from packaging import version
 import subprocess
 import re
 
@@ -412,9 +413,9 @@ class TrainerManagementDialog(QDialog):
 
         for item in os.listdir(weModPath):
             if os.path.isdir(os.path.join(weModPath, item)):
-                match = re.match(r'app-(\d+\.\d+\.\d+)', item)
+                match = re.match(r'app-(\d+\.\d+\.\d+.*)', item)
                 if match:
-                    version_info = match.group(1)  # for instance: 9.3.0
+                    version_info = match.group(1)  # for instance: 9.3.0, 11.5.0-beta00
                     self.weModVersions.append(version_info)
 
         if not self.weModVersions:
@@ -423,7 +424,7 @@ class TrainerManagementDialog(QDialog):
             self.weModApplyButton.setDisabled(True)
             return
 
-        self.weModVersions.sort(key=lambda v: tuple(map(int, v.split('.'))), reverse=True)
+        self.weModVersions.sort(key=version.parse, reverse=True)
         self.versionCombo.clear()
         self.versionCombo.addItems(self.weModVersions)
         self.weModApplyButton.setEnabled(True)

@@ -213,18 +213,23 @@ class WeModCustomization(QThread):
         if self.parent().weModProCheckbox.isChecked():
             patch_success = True
 
-            # 1. Remove asar integrity check
-            shutil.copyfile(weModExe, weModExe_bak)
-            self.replace_hex_in_file(weModExe_bak, weModExe, '00001101', '00000101')
-            os.remove(weModExe_bak)
+            try:
+                # 1. Remove asar integrity check
+                shutil.copyfile(weModExe, weModExe_bak)
+                self.replace_hex_in_file(weModExe_bak, weModExe, '00001101', '00000101')
+                os.remove(weModExe_bak)
 
-            # 2. Patch app.asar
-            os.makedirs(WEMOD_TEMP_DIR, exist_ok=True)
-            if os.path.exists(asar_bak):
-                if os.path.exists(asar):
-                    os.remove(asar)
-                os.rename(asar_bak, asar)
-            shutil.copyfile(asar, asar_copy)
+                # 2. Patch app.asar
+                os.makedirs(WEMOD_TEMP_DIR, exist_ok=True)
+                if os.path.exists(asar_bak):
+                    if os.path.exists(asar):
+                        os.remove(asar)
+                    os.rename(asar_bak, asar)
+                shutil.copyfile(asar, asar_copy)
+            except Exception as e:
+                self.message.emit(tr("Failed to patch file:") + f"{str(e)}", "error")
+                self.finished.emit()
+                return
 
             # Extract app.asar file
             try:
@@ -334,28 +339,33 @@ class WeModCustomization(QThread):
         # Mapping of patterns to files where they were found: {pattern key: file path}
         lines = {key: None for key in patterns}
 
-        # Check files for matching patterns
-        for pattern in patterns:
-            for filename in os.listdir(WEMOD_TEMP_DIR):
-                if filename.endswith('.js'):
-                    file_path = os.path.join(WEMOD_TEMP_DIR, filename)
-                    try:
-                        with open(file_path, 'r', encoding='utf-8') as file:
-                            content = file.read()
-                            if re.search(pattern, content):
-                                print(f"Pattern {pattern} found in file {file_path}")
-                                lines[pattern] = file_path
-                                break
-                    except UnicodeDecodeError:
-                        continue
+        try:
+            # Check files for matching patterns
+            for pattern in patterns:
+                for filename in os.listdir(WEMOD_TEMP_DIR):
+                    if filename.endswith('.js'):
+                        file_path = os.path.join(WEMOD_TEMP_DIR, filename)
+                        try:
+                            with open(file_path, 'r', encoding='utf-8') as file:
+                                content = file.read()
+                                if re.search(pattern, content):
+                                    print(f"Pattern {pattern} found in file {file_path}")
+                                    lines[pattern] = file_path
+                                    break
+                        except UnicodeDecodeError:
+                            continue
 
-        # Process each file with matched patterns
-        if all(lines.values()):
-            print("js file patched using yearly_active_sub method")
-            for pattern, file_path in lines.items():
-                self.apply_patch(file_path, pattern, patterns[pattern])
-        else:
-            print("Not all 4 patterns found for yearly_active_sub patch")
+            # Process each file with matched patterns
+            if all(lines.values()):
+                print("js file patched using yearly_active_sub method")
+                for pattern, file_path in lines.items():
+                    self.apply_patch(file_path, pattern, patterns[pattern])
+            else:
+                print("Not all 4 patterns found for yearly_active_sub patch")
+                return False
+
+        except Exception as e:
+            print(f"Error during yearly_active_sub patching: {str(e)}")
             return False
 
         return True
@@ -375,20 +385,25 @@ class WeModCustomization(QThread):
             'return t}return await e.text()}'
         )
 
-        # Search for the original line in JS files
-        js_files = [f for f in os.listdir(WEMOD_TEMP_DIR) if f.endswith(".js")]
-        for js_file in js_files:
-            file_path = os.path.join(WEMOD_TEMP_DIR, js_file)
-            try:
-                with open(file_path, "r", encoding="utf-8") as file:
-                    content = file.read()
+        try:
+            # Search for the original line in JS files
+            js_files = [f for f in os.listdir(WEMOD_TEMP_DIR) if f.endswith(".js")]
+            for js_file in js_files:
+                file_path = os.path.join(WEMOD_TEMP_DIR, js_file)
+                try:
+                    with open(file_path, "r", encoding="utf-8") as file:
+                        content = file.read()
 
-                if pattern in content:
-                    self.apply_patch(file_path, re.escape(pattern), replacement)
-                    print(f"js file patched using gifted_sub method: {file_path}")
-                    return True
-            except UnicodeDecodeError:
-                pass
+                    if pattern in content:
+                        self.apply_patch(file_path, re.escape(pattern), replacement)
+                        print(f"js file patched using gifted_sub method: {file_path}")
+                        return True
+                except UnicodeDecodeError:
+                    pass
+
+        except Exception as e:
+            print(f"Error during gifted_sub patching: {str(e)}")
+            return False
 
         print("Pattern not found for gifted_sub patch")
         return False
