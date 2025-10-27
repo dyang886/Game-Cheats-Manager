@@ -503,6 +503,66 @@ protected:
     }
 
     /***********************************************************************
+     * createBytePatch
+     * - name: Unique string name, e.g., "NoCooldownPatch"
+     * - pattern: AOB to search for
+     * - patchOffset: Offset from the start of the pattern to begin patching
+     * - newBytes: The vector of bytes to write
+     * This function is for simple, in-place memory patches (like JNE -> JE).
+     * It stores the original bytes and is automatically reversible
+     * by the existing 'disableNamedHook' function.
+     ***********************************************************************/
+    inline bool createBytePatch(
+        const wchar_t *moduleName,
+        const std::string &name,
+        const std::vector<std::string> &pattern,
+        size_t patchOffset,
+        const std::vector<BYTE> &newBytes)
+    {
+        // 1. Find pattern
+        uintptr_t matchAddr = findPatternWild(moduleName, pattern);
+        if (!matchAddr)
+        {
+            std::cerr << "[!] Could not find pattern for byte patch '" << name << "'.\n";
+            return false;
+        }
+
+        uintptr_t patchAddr = matchAddr + patchOffset;
+        size_t overwriteLen = newBytes.size();
+
+        // 2. Read original bytes
+        std::vector<BYTE> originalBytes(overwriteLen);
+        if (!ReadProcessMemory(hProcess, (LPCVOID)patchAddr, originalBytes.data(), overwriteLen, nullptr))
+        {
+            std::cerr << "[!] Failed to read original bytes for patch '" << name << "'.\n";
+            return false;
+        }
+
+        // 3. Write new bytes
+        if (!WriteProcessMemory(hProcess, (LPVOID)patchAddr, newBytes.data(), overwriteLen, nullptr))
+        {
+            std::cerr << "[!] WriteProcessMemory failed for patch '" << name << "'.\n";
+            return false;
+        }
+        FlushInstructionCache(hProcess, (LPCVOID)patchAddr, overwriteLen);
+
+        // 4. Store HookInfo
+        HookInfo hi;
+        hi.hookName = name;
+        hi.hookAddress = patchAddr;
+        hi.overwriteLen = overwriteLen;
+        hi.active = true;
+        hi.originalBytes = originalBytes;
+        hi.allocatedMem = nullptr;
+        hi.allocSize = 0;
+
+        hooks[name] = hi;
+
+        std::cout << "[+] Byte patch '" << name << "' created at " << std::hex << patchAddr << std::dec << std::endl;
+        return true;
+    }
+
+    /***********************************************************************
      * createNamedHook
      *    - name: Unique string name, e.g., "ArrowFrequency"
      *    - pattern: e.g., {"0F", "28", "CE", "F3", "0F", "11", "73", "4C", ...}

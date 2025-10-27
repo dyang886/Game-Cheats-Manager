@@ -1,0 +1,34 @@
+{
+    "en_US": {
+        "English": "English",
+        "Please run the game first.": "Please run the game first.",
+        "Failed to activate.": "Failed to activate.",
+        "Failed to activate/deactivate.": "Failed to activate/deactivate.",
+        "Process Name:": "Process Name:",
+        "Process ID:": "Process ID:",
+        "Plants vs. Zombies: Replanted Trainer": "Plants vs. Zombies: Replanted Trainer",
+        "No Plant Cooldown": "No Plant Cooldown",
+        "No Plant Cost": "No Plant Cost",
+        "Set Coins": "Set Coins",
+        "Set Sun": "Set Sun",
+        "Set Fertilizer and Bug Spray": "Set Fertilizer and Bug Spray",
+        "Set Chocolate": "Set Chocolate",
+        "Set Tree Food": "Set Tree Food"
+    },
+    "zh_CN": {
+        "简体中文": "简体中文",
+        "Please run the game first.": "请先运行游戏。",
+        "Failed to activate.": "激活失败。",
+        "Failed to activate/deactivate.": "激活/停用失败。",
+        "Process Name:": "进程名称：",
+        "Process ID:": "进程 ID:",
+        "Plants vs. Zombies: Replanted Trainer": "植物大战僵尸：重植版修改器",
+        "No Plant Cooldown": "植物无冷却",
+        "No Plant Cost": "植物 0 阳光",
+        "Set Coins": "设置金币",
+        "Set Sun": "设置阳光",
+        "Set Fertilizer and Bug Spray": "设置肥料和杀虫剂",
+        "Set Chocolate": "设置巧克力",
+        "Set Tree Food": "设置树肥"
+    }
+}

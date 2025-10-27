@@ -30,7 +30,7 @@ public:
         return createPointerToggle(moduleName, "SetChocolate", offsets, newVal);
     }
 
-    inline bool setTreeFood(int newVal)
+    inline bool addTreeFood(int newVal)
     {
         std::vector<unsigned int> offsets = {0x0032E77C, 0x10, 0x28, 0x0, 0x4, 0x4, 0x18, 0x28C};
         return createPointerToggle(moduleName, "SetTreeFood", offsets, newVal);
@@ -94,8 +94,7 @@ public:
             patternOffset,
             overwriteLen,
             codeSize,
-            buildFunc
-        );
+            buildFunc);
     }
 
     inline bool addSun(int newVal)
@@ -154,7 +153,6 @@ public:
             patternOffset,
             overwriteLen,
             codeSize,
-            buildFunc
-        );
+            buildFunc);
     }
 };

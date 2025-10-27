@@ -64,48 +64,59 @@ void toggle_callback(Fl_Widget *widget, void *data)
     }
 
     // Apply the value using the Trainer class
-    if (optionName == "AddCoin")
+    if (optionName == "NoPlantCooldown")
     {
         if (button->value())
         {
-            status = trainer->addCoin(std::stoi(inputValue) / 10);
+            status = trainer->noPlantCooldown();
         }
         else
         {
             status = trainer->disableNamedHook(optionName);
         }
     }
-    else if (optionName == "AddSun")
+    if (optionName == "NoPlantCost")
     {
         if (button->value())
         {
-            status = trainer->addSun(std::stoi(inputValue));
+            status = trainer->noPlantCost();
+        }
+        else
+        {
+            status = trainer->disableNamedHook("NoPlantCost1") && trainer->disableNamedHook("NoPlantCost2") && trainer->disableNamedHook("NoPlantCost3");
+        }
+    }
+    else if (optionName == "SetCoin")
+    {
+        if (button->value())
+        {
+            status = trainer->setCoin(std::stoi(inputValue) / 10);
         }
         else
         {
             status = trainer->disableNamedHook(optionName);
         }
     }
-    else if (optionName == "SetFertilizer")
+    else if (optionName == "SetSun")
     {
         if (button->value())
         {
-            status = trainer->setFertilizer(std::stoi(inputValue) + 1000);
+            status = trainer->setSun(std::stoi(inputValue));
         }
         else
         {
-            status = trainer->disableNamedPointerToggle(optionName);
+            status = trainer->disableNamedHook("SetSunInc") && trainer->disableNamedHook("SetSunDec");
         }
     }
-    else if (optionName == "SetBugSpray")
+    else if (optionName == "SetFertilizerAndBugSpray")
     {
         if (button->value())
         {
-            status = trainer->setBugSpray(std::stoi(inputValue) + 1000);
+            status = trainer->setFertilizerAndBugSpray(std::stoi(inputValue) + 1000);
         }
         else
         {
-            status = trainer->disableNamedPointerToggle(optionName);
+            status = trainer->disableNamedHook("SetFertilizerAndBugSprayInc") && trainer->disableNamedHook("SetFertilizerDec") && trainer->disableNamedHook("SetBugSprayDec");
         }
     }
     else if (optionName == "SetChocolate")
@@ -116,18 +127,18 @@ void toggle_callback(Fl_Widget *widget, void *data)
         }
         else
         {
-            status = trainer->disableNamedPointerToggle(optionName);
+            status = trainer->disableNamedHook("SetChocolateInc") && trainer->disableNamedHook("SetChocolateDec");
         }
     }
     else if (optionName == "SetTreeFood")
     {
         if (button->value())
         {
-            status = trainer->addTreeFood(std::stoi(inputValue) + 1000);
+            status = trainer->setTreeFood(std::stoi(inputValue) + 1000);
         }
         else
         {
-            status = trainer->disableNamedPointerToggle(optionName);
+            status = trainer->disableNamedHook("TreeFoodInc") && trainer->disableNamedHook("TreeFoodDec");
         }
     }
 
@@ -137,7 +148,8 @@ void toggle_callback(Fl_Widget *widget, void *data)
         fl_alert(t("Failed to activate/deactivate."));
         button->value(0);
     }
-    button->value() ? input->readonly(1) : input->readonly(0);
+    if (input)
+        button->value() ? input->readonly(1) : input->readonly(0);
 }
 
 static void main_window_close_callback(Fl_Widget *w, void *)
@@ -169,7 +181,7 @@ int main(int argc, char **argv)
     window->color(FL_FREE_COLOR);
     window->icon((char *)LoadIconA(GetModuleHandle(NULL), "APP_ICON"));
     window->callback(main_window_close_callback);
-    tr(window, "Plants vs. Zombies Trainer");
+    tr(window, "Plants vs. Zombies: Replanted Trainer");
 
     // Setup fonts
     DWORD font_mem_size = 0;
@@ -261,7 +273,43 @@ int main(int argc, char **argv)
     Fl_Box *spacerTop = new Fl_Box(0, 0, 0, 0);
 
     // ------------------------------------------------------------------
-    // Option 1: Add coin (Toggle)
+    // no_cooldown (Toggle)
+    // ------------------------------------------------------------------
+    Fl_Flex *no_cooldown_flex = new Fl_Flex(0, 0, 0, 0, Fl_Flex::HORIZONTAL);
+    no_cooldown_flex->gap(option_gap);
+
+    Fl_Check_Button *no_cooldown_check_button = new Fl_Check_Button(0, 0, 0, 0);
+    no_cooldown_flex->fixed(no_cooldown_check_button, button_w);
+
+    Fl_Box *no_cooldown_label = new Fl_Box(0, 0, 0, 0);
+    tr(no_cooldown_label, "No Plant Cooldown");
+
+    ToggleData *data_no_cooldown = new ToggleData{&trainer, "NoPlantCooldown", no_cooldown_check_button, nullptr};
+    no_cooldown_check_button->callback(toggle_callback, data_no_cooldown);
+
+    no_cooldown_flex->end();
+    options1_flex->fixed(no_cooldown_flex, option_h);
+
+    // ------------------------------------------------------------------
+    // no_plant_cost (Toggle)
+    // ------------------------------------------------------------------
+    Fl_Flex *no_plant_cost_flex = new Fl_Flex(0, 0, 0, 0, Fl_Flex::HORIZONTAL);
+    no_plant_cost_flex->gap(option_gap);
+
+    Fl_Check_Button *no_plant_cost_check_button = new Fl_Check_Button(0, 0, 0, 0);
+    no_plant_cost_flex->fixed(no_plant_cost_check_button, button_w);
+
+    Fl_Box *no_plant_cost_label = new Fl_Box(0, 0, 0, 0);
+    tr(no_plant_cost_label, "No Plant Cost");
+
+    ToggleData *data_no_plant_cost = new ToggleData{&trainer, "NoPlantCost", no_plant_cost_check_button, nullptr};
+    no_plant_cost_check_button->callback(toggle_callback, data_no_plant_cost);
+
+    no_plant_cost_flex->end();
+    options1_flex->fixed(no_plant_cost_flex, option_h);
+
+    // ------------------------------------------------------------------
+    // Option 1: Set coin (Toggle)
     // ------------------------------------------------------------------
     Fl_Flex *coin_flex = new Fl_Flex(0, 0, 0, 0, Fl_Flex::HORIZONTAL);
     coin_flex->gap(option_gap);
@@ -270,21 +318,21 @@ int main(int argc, char **argv)
     coin_flex->fixed(coin_check_button, button_w);
 
     Fl_Box *coin_label = new Fl_Box(0, 0, 0, 0);
-    tr(coin_label, "Add Coins");
+    tr(coin_label, "Set Coins");
 
     Fl_Input *coin_input = new Fl_Input(0, 0, 0, 0);
     coin_flex->fixed(coin_input, input_w);
     coin_input->type(FL_INT_INPUT);
-    set_input_values(coin_input, "9999", "-999999", "999999");
+    set_input_values(coin_input, "9999999", "0", "999999990");
 
-    ToggleData *td_coin = new ToggleData{&trainer, "AddCoin", coin_check_button, coin_input};
+    ToggleData *td_coin = new ToggleData{&trainer, "SetCoin", coin_check_button, coin_input};
     coin_check_button->callback(toggle_callback, td_coin);
 
     coin_flex->end();
     options1_flex->fixed(coin_flex, option_h);
 
     // ------------------------------------------------------------------
-    // Option 2: Add sun (Toggle)
+    // Option 2: Set sun (Toggle)
     // ------------------------------------------------------------------
     Fl_Flex *sun_flex = new Fl_Flex(0, 0, 0, 0, Fl_Flex::HORIZONTAL);
     sun_flex->gap(option_gap);
@@ -293,14 +341,14 @@ int main(int argc, char **argv)
     sun_flex->fixed(sun_check_button, button_w);
 
     Fl_Box *sun_label = new Fl_Box(0, 0, 0, 0);
-    tr(sun_label, "Add Sun");
+    tr(sun_label, "Set Sun");
 
     Fl_Input *sun_input = new Fl_Input(0, 0, 0, 0);
     sun_flex->fixed(sun_input, input_w);
     sun_input->type(FL_INT_INPUT);
-    set_input_values(sun_input, "999", "-9990", "9990");
+    set_input_values(sun_input, "999", "0", "9990");
 
-    ToggleData *td_sun = new ToggleData{&trainer, "AddSun", sun_check_button, sun_input};
+    ToggleData *td_sun = new ToggleData{&trainer, "SetSun", sun_check_button, sun_input};
     sun_check_button->callback(toggle_callback, td_sun);
 
     sun_flex->end();
@@ -316,44 +364,21 @@ int main(int argc, char **argv)
     fertilizer_flex->fixed(fertilizer_check_button, button_w);
 
     Fl_Box *fertilizer_label = new Fl_Box(0, 0, 0, 0);
-    tr(fertilizer_label, "Set Fertilizer");
+    tr(fertilizer_label, "Set Fertilizer and Bug Spray");
 
     Fl_Input *fertilizer_input = new Fl_Input(0, 0, 0, 0);
     fertilizer_flex->fixed(fertilizer_input, input_w);
     fertilizer_input->type(FL_INT_INPUT);
     set_input_values(fertilizer_input, "99", "0", "999999999");
 
-    ToggleData *td_fertilizer = new ToggleData{&trainer, "SetFertilizer", fertilizer_check_button, fertilizer_input};
+    ToggleData *td_fertilizer = new ToggleData{&trainer, "SetFertilizerAndBugSpray", fertilizer_check_button, fertilizer_input};
     fertilizer_check_button->callback(toggle_callback, td_fertilizer);
 
     fertilizer_flex->end();
     options1_flex->fixed(fertilizer_flex, option_h);
 
     // ------------------------------------------------------------------
-    // Option 4: Set bug_spray (Toggle)
-    // ------------------------------------------------------------------
-    Fl_Flex *bug_spray_flex = new Fl_Flex(0, 0, 0, 0, Fl_Flex::HORIZONTAL);
-    bug_spray_flex->gap(option_gap);
-
-    Fl_Check_Button *bug_spray_check_button = new Fl_Check_Button(0, 0, 0, 0);
-    bug_spray_flex->fixed(bug_spray_check_button, button_w);
-
-    Fl_Box *bug_spray_label = new Fl_Box(0, 0, 0, 0);
-    tr(bug_spray_label, "Set Bug Spray");
-
-    Fl_Input *bug_spray_input = new Fl_Input(0, 0, 0, 0);
-    bug_spray_flex->fixed(bug_spray_input, input_w);
-    bug_spray_input->type(FL_INT_INPUT);
-    set_input_values(bug_spray_input, "99", "0", "999999999");
-
-    ToggleData *td_bug_spray = new ToggleData{&trainer, "SetBugSpray", bug_spray_check_button, bug_spray_input};
-    bug_spray_check_button->callback(toggle_callback, td_bug_spray);
-
-    bug_spray_flex->end();
-    options1_flex->fixed(bug_spray_flex, option_h);
-
-    // ------------------------------------------------------------------
-    // Option 5: Set chocolate (Toggle)
+    // Option 4: Set chocolate (Toggle)
     // ------------------------------------------------------------------
     Fl_Flex *chocolate_flex = new Fl_Flex(0, 0, 0, 0, Fl_Flex::HORIZONTAL);
     chocolate_flex->gap(option_gap);
@@ -376,7 +401,7 @@ int main(int argc, char **argv)
     options1_flex->fixed(chocolate_flex, option_h);
 
     // ------------------------------------------------------------------
-    // Option 6: Set tree_food (Toggle)
+    // Option 5: Set tree_food (Toggle)
     // ------------------------------------------------------------------
     Fl_Flex *tree_food_flex = new Fl_Flex(0, 0, 0, 0, Fl_Flex::HORIZONTAL);
     tree_food_flex->gap(option_gap);
