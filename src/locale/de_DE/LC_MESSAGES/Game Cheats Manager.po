@@ -118,6 +118,9 @@ msgstr "Fehler"
 msgid "Trainer is currently in use, please close any programs using the file and try again."
 msgstr "Der Trainer wird gerade verwendet. Bitte schließe alle Programme, die auf die Datei zugreifen, und versuche es erneut."
 
+msgid "Failed to delete {trainer_name}:"
+msgstr "Konnte {trainer_name} nicht löschen:"
+
 msgid "Change trainer download path"
 msgstr "Trainer-Download-Pfad ändern"
 
@@ -187,11 +190,11 @@ msgstr "Keine Ergebnisse gefunden."
 msgid "Translating keywords..."
 msgstr "Schlüsselwörter werden übersetzt..."
 
-msgid "Search from FLiNG success!"
-msgstr "Suche von FLiNG erfolgreich!"
-
 msgid "Search failed, please update trainer search data."
 msgstr "Suche fehlgeschlagen, bitte aktualisiere die Trainer-Suchdaten."
+
+msgid "Search from FLiNG success!"
+msgstr "Suche von FLiNG erfolgreich!"
 
 msgid "Search from XiaoXing success!"
 msgstr "Suche von XiaoXing erfolgreich!"
@@ -247,6 +250,9 @@ msgstr "Die heruntergeladene Trainer-Datei konnte nicht gefunden werden. Versuch
 msgid "Removing trainer background music..."
 msgstr "Hintergrundmusik des Trainers wird entfernt..."
 
+msgid "Patching..."
+msgstr "Patchen..."
+
 msgid "Updating data from FLiNG"
 msgstr "Daten von FLiNG werden aktualisiert"
 
@@ -272,11 +278,11 @@ msgstr ""
 "WeMod läuft gerade,\n"
 "bitte schließe die Anwendung zuerst"
 
-msgid "Failed to extract file:"
-msgstr "Datei konnte nicht extrahiert werden:"
-
 msgid "Failed to patch file:"
 msgstr "Datei konnte nicht gepatcht werden:"
+
+msgid "Failed to extract file:"
+msgstr "Datei konnte nicht extrahiert werden:"
 
 msgid "WeMod Pro activated"
 msgstr "WeMod Pro aktiviert"
@@ -329,8 +335,8 @@ msgstr ""
 "Wenn du diese Software inoffiziell bezahlt hast, melde den Verkäufer bitte umgehend.\n"
 "Unten findest du die offiziellen Links."
 
-msgid "Bilibili author homepage:"
-msgstr "Bilibili-Homepage des Autors:"
+msgid "Bilibili:"
+msgstr "Bilibili:"
 
 msgid "Don't show again"
 msgstr "Nicht mehr anzeigen"
@@ -400,6 +406,9 @@ msgstr "FLiNG-Trainer automatisch aktualisieren"
 
 msgid "Enable search for XiaoXing trainers"
 msgstr "Suche nach XiaoXing-Trainern aktivieren"
+
+msgid "Unlock all functions"
+msgstr "Alle Funktionen freischalten"
 
 msgid "Update XiaoXing data automatically"
 msgstr "XiaoXing-Daten automatisch aktualisieren"

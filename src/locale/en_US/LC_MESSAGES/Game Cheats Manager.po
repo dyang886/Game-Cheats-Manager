@@ -250,6 +250,9 @@ msgstr "Could not find the downloaded trainer file, please try turning your anti
 msgid "Removing trainer background music..."
 msgstr "Removing trainer background music..."
 
+msgid "Patching..."
+msgstr "Patching..."
+
 msgid "Updating data from FLiNG"
 msgstr "Updating data from FLiNG"
 
@@ -275,11 +278,11 @@ msgstr ""
 "WeMod is currently running,\n"
 "please close the application first"
 
-msgid "Failed to extract file:"
-msgstr "Failed to extract file:"
-
 msgid "Failed to patch file:"
 msgstr "Failed to patch file:"
+
+msgid "Failed to extract file:"
+msgstr "Failed to extract file:"
 
 msgid "WeMod Pro activated"
 msgstr "WeMod Pro activated"
@@ -403,6 +406,9 @@ msgstr "Update FLiNG trainers automatically"
 
 msgid "Enable search for XiaoXing trainers"
 msgstr "Enable search for XiaoXing trainers"
+
+msgid "Unlock all functions"
+msgstr "Unlock all functions"
 
 msgid "Update XiaoXing data automatically"
 msgstr "Update XiaoXing data automatically"

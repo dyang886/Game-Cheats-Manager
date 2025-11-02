@@ -361,10 +361,14 @@ class DownloadTrainersThread(DownloadBaseThread):
             destination_path = os.path.join(self.trainerDownloadPath, trainerName_display)
             self.src_dst.append({"src": extractedContentPath, "dst": destination_path})
 
+        if settings["unlockXiaoXing"]:
+            self.unlock_xiaoxing(selected_trainer)
+
         return True
 
     def handle_xiaoxing_special_cases(self, selected_trainer, extractedContentPath):
         # Multiple version case (check if there are only folders and no `.exe` files)
+        # Cases: ['Baldur's Gate 3']
         temp_contents = os.listdir(extractedContentPath)
         has_exe = any(file.lower().endswith(".exe") for file in temp_contents if os.path.isfile(os.path.join(extractedContentPath, file)))
         only_folders = all(os.path.isdir(os.path.join(extractedContentPath, item)) for item in temp_contents)
@@ -377,6 +381,7 @@ class DownloadTrainersThread(DownloadBaseThread):
             return True
 
         # Double extraction case (check if there is no `.exe` and a `.rar` file exists)
+        # Cases: ['Sword and Fairy 6']
         rar_file = next(
             (file for file in temp_contents if file.lower().endswith(".rar") and os.path.isfile(os.path.join(extractedContentPath, file))),
             None
@@ -397,3 +402,81 @@ class DownloadTrainersThread(DownloadBaseThread):
             return True
 
         return False
+    
+    def process_pattern_to_hex_and_mask(self, pattern_str):
+        hex_bytes = []
+        mask_bytes = []
+        for i in range(0, len(pattern_str), 2):
+            byte = pattern_str[i:i+2]
+            if byte == '??':
+                hex_bytes.append('00')
+                mask_bytes.append('00')
+            else:
+                hex_bytes.append(byte)
+                mask_bytes.append('ff')
+        return " ".join(hex_bytes), " ".join(mask_bytes)
+
+    def unlock_xiaoxing(self, selected_trainer):
+        exe_exclusions = ["flashplayer_22.0.0.210_ax_debug.exe"]
+        game_name = selected_trainer['game_name']
+        patches_to_apply = []
+
+        if game_name in ["Cyberpunk 2077", "Final Fantasy XV", "Ho Tu Lo Shu The Books of Dragon", "Xuan-Yuan Sword VII"]:
+            patches_to_apply = [
+                {'search': "E8????????833D????????000F84????????BA2E040000", 'replace': "??????????90909090909090909090909090??????????"},
+                {'search': "8D4A??E8????????833D????????000F84????????", 'replace': "????????????????90909090909090909090909090"}
+            ]
+        elif game_name in ["GuLong", "Palworld", "Baldur's Gate 3", "Starfield", "Hogwarts Legacy", "Sword and Fairy 7", "Path Of Wuxia", "Elden Ring",
+                           "Fate Seeker II", "Final Fantasy VII Remake Intergrade", "GuJian3"]:
+            patches_to_apply = [
+                {'search': "8B??E8??????00833D??????00000F84????0000", 'replace': "8B??E8??????00833D??????0000909090909090"},
+                {'search': "833D??????00000F84????????833D????????000F84????????", 'replace': "833D??????0000909090909090833D????????00909090909090"}
+            ]
+        else:
+            return
+
+        self.message.emit(tr("Patching..."), None)
+        for item in self.src_dst:
+            source_dir = item["src"]
+            temp_contents = os.listdir(source_dir)
+
+            exe_file = next((file for file in temp_contents if os.path.isfile(os.path.join(source_dir, file)) and file.lower().endswith(".exe") and file not in exe_exclusions), None)
+
+            if exe_file:
+                original_file = os.path.join(source_dir, exe_file)
+                input_file = f"{original_file}.patch_in"
+                output_file = f"{original_file}.patch_out"
+                backup_file = f"{original_file}.bak"
+                
+                shutil.copyfile(original_file, backup_file)
+                shutil.copyfile(original_file, input_file)
+                
+                patch_success = True
+                for i, patch in enumerate(patches_to_apply):
+                    print(f"Applying patch {i + 1}/{len(patches_to_apply)} for: {game_name}")
+
+                    search_hex, search_mask = self.process_pattern_to_hex_and_mask(patch['search'])
+                    replace_hex, replace_mask = self.process_pattern_to_hex_and_mask(patch['replace'])
+
+                    try:
+                        command = [binmay_path, '-i', input_file, '-o', output_file, '-s', search_hex, '-S', search_mask, '-r', replace_hex, '-R', replace_mask]
+                        subprocess.run(command, check=True, capture_output=True, text=True, creationflags=subprocess.CREATE_NO_WINDOW)
+                        
+                        # The output of this patch becomes the input for the next
+                        os.remove(input_file)
+                        os.rename(output_file, input_file)
+
+                    except Exception as e:
+                        print(f"An error occurred during XiaoXing patching: {e}")
+                        shutil.copyfile(backup_file, original_file)
+                        patch_success = False
+                        break
+                
+                # Cleanup temporary files
+                if os.path.exists(input_file):
+                    if patch_success:
+                        os.remove(original_file)
+                        os.rename(input_file, original_file)
+                        print(f"Successfully applied all patches to: {exe_file}\n")
+                    else:
+                        os.remove(input_file)

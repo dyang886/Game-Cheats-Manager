@@ -30,6 +30,7 @@ class TrainerManagementDialog(QDialog):
         mainLayout.addWidget(self.tabWidget)
 
         # Add tabs
+        self.tabWidget.addTab(self.createGCMTab(), "GCM")
         self.tabWidget.addTab(self.createFlingTab(), tr("FLiNG"))
         self.tabWidget.addTab(self.createXiaoXingTab(), tr("XiaoXing"))
         self.tabWidget.addTab(self.createWemodTab(), "WeMod")
@@ -55,6 +56,7 @@ class TrainerManagementDialog(QDialog):
         settings["autoUpdateFlingData"] = self.autoUpdateFlingDataCheckbox.isChecked()
         settings["autoUpdateFlingTrainers"] = self.autoUpdateFlingTrainersCheckbox.isChecked()
         settings["enableXiaoXing"] = self.enableXiaoXingCheckbox.isChecked()
+        settings["unlockXiaoXing"] = self.unlockXiaoXingCheckbox.isChecked()
         settings["autoUpdateXiaoXingData"] = self.autoUpdateXiaoXingDataCheckbox.isChecked()
         settings["autoUpdateXiaoXingTrainers"] = self.autoUpdateXiaoXingTrainersCheckbox.isChecked()
         apply_settings(settings)
@@ -75,6 +77,46 @@ class TrainerManagementDialog(QDialog):
         super().moveEvent(event)
         for alert in self.active_alerts:
             alert.move_to_top_right()
+
+    def createGCMTab(self):
+        gcmTab = QWidget()
+        layout = QVBoxLayout()
+        layout.setContentsMargins(0, 15, 0, 0)
+        gcmTab.setLayout(layout)
+
+        columns = QHBoxLayout()
+        columns.setContentsMargins(30, 20, 30, 20)
+        columns.setSpacing(40)
+        layout.addLayout(columns)
+
+        column1 = QVBoxLayout()
+        columns.addLayout(column1, stretch=0)
+
+        logoPixmap = QPixmap(resource_path("assets/logo_trainer.png"))
+        scaledLogoPixmap = logoPixmap.scaled(130, 130, Qt.AspectRatioMode.KeepAspectRatio, Qt.TransformationMode.SmoothTransformation)
+        logoLabel = QLabel()
+        logoLabel.setAlignment(Qt.AlignmentFlag.AlignCenter)
+        logoLabel.setPixmap(scaledLogoPixmap)
+        column1.addWidget(logoLabel)
+
+        column2 = QVBoxLayout()
+        column2.setSpacing(15)
+        column2.addStretch(1)
+        columns.addLayout(column2, stretch=1)
+        columns.setAlignment(column2, Qt.AlignmentFlag.AlignHCenter)
+
+        # Auto update GCM data
+        self.autoUpdateGCMDataCheckbox = QCheckBox(tr("Update GCM data automatically"))
+        self.autoUpdateGCMDataCheckbox.setChecked(settings["autoUpdateGCMData"])
+        column2.addWidget(self.autoUpdateGCMDataCheckbox)
+
+        # Auto update GCM trainers
+        self.autoUpdateGCMTrainersCheckbox = QCheckBox(tr("Update GCM trainers automatically"))
+        self.autoUpdateGCMTrainersCheckbox.setChecked(settings["autoUpdateGCMTrainers"])
+        column2.addWidget(self.autoUpdateGCMTrainersCheckbox)
+
+        column2.addStretch(1)
+        return gcmTab
 
     def createFlingTab(self):
         flingTab = QWidget()
@@ -169,6 +211,11 @@ class TrainerManagementDialog(QDialog):
         self.enableXiaoXingCheckbox = QCheckBox(tr("Enable search for XiaoXing trainers"))
         self.enableXiaoXingCheckbox.setChecked(settings["enableXiaoXing"])
         column2.addWidget(self.enableXiaoXingCheckbox)
+
+        # Unlock paid functions
+        self.unlockXiaoXingCheckbox = QCheckBox(tr("Unlock all functions"))
+        self.unlockXiaoXingCheckbox.setChecked(settings["unlockXiaoXing"])
+        column2.addWidget(self.unlockXiaoXingCheckbox)
 
         # Auto update XiaoXing data
         self.autoUpdateXiaoXingDataCheckbox = QCheckBox(tr("Update XiaoXing data automatically"))

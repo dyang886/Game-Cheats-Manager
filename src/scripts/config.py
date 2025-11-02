@@ -41,7 +41,7 @@ def resource_path(relative_path):
 
 
 def apply_settings(settings):
-    with open(SETTINGS_FILE, "w") as f:
+    with open(SETTINGS_FILE, "w", encoding="utf-8") as f:
         json.dump(settings, f, indent=4)
 
 
@@ -79,11 +79,14 @@ def load_settings():
         "autoUpdateTranslations": True,
 
         # Trainer management configs
+        "autoUpdateGCMData": True,
+        "autoUpdateGCMTrainers": True,
         "flingDownloadServer": "official",
         "removeFlingBgMusic": True,
         "autoUpdateFlingData": True,
         "autoUpdateFlingTrainers": True,
         "enableXiaoXing": True,
+        "unlockXiaoXing": False,
         "autoUpdateXiaoXingData": True,
         "autoUpdateXiaoXingTrainers": True,
         "weModPath": wemod_install_path,
@@ -91,9 +94,8 @@ def load_settings():
     }
 
     try:
-        with open(SETTINGS_FILE, "r") as f:
+        with open(SETTINGS_FILE, "r", encoding="utf-8") as f:
             settings = json.load(f)
-
     except Exception as e:
         print("Error loading settings json" + str(e))
         settings = default_settings
@@ -101,7 +103,7 @@ def load_settings():
     for key, value in default_settings.items():
         settings.setdefault(key, value)
 
-    with open(SETTINGS_FILE, "w") as f:
+    with open(SETTINGS_FILE, "w", encoding="utf-8") as f:
         json.dump(settings, f, indent=4)
 
     return settings

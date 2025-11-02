@@ -250,6 +250,9 @@ msgstr "找不到下載的修改器，請嘗試關閉防毒軟體。"
 msgid "Removing trainer background music..."
 msgstr "刪除修改器背景音樂..."
 
+msgid "Patching..."
+msgstr "修補中..."
+
 msgid "Updating data from FLiNG"
 msgstr "正在更新風靈月影資料"
 
@@ -275,11 +278,11 @@ msgstr ""
 "WeMod 正在執行中，\n"
 "請先關閉該應用程式"
 
-msgid "Failed to extract file:"
-msgstr "提取文件失敗："
-
 msgid "Failed to patch file:"
 msgstr "修補文件失敗："
+
+msgid "Failed to extract file:"
+msgstr "提取文件失敗："
 
 msgid "WeMod Pro activated"
 msgstr "WeMod 專業版已啟用"
@@ -403,6 +406,9 @@ msgstr "自動更新風靈月影修改器"
 
 msgid "Enable search for XiaoXing trainers"
 msgstr "允許搜尋小幸修改器"
+
+msgid "Unlock all functions"
+msgstr "解鎖所有功能"
 
 msgid "Update XiaoXing data automatically"
 msgstr "自動更新小幸資料"
