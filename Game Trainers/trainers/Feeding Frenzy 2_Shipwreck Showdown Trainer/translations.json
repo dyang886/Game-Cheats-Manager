@@ -1,0 +1,26 @@
+{
+    "en_US": {
+        "English": "English",
+        "Please run the game first.": "Please run the game first.",
+        "Failed to activate.": "Failed to activate.",
+        "Failed to activate/deactivate.": "Failed to activate/deactivate.",
+        "Process Name:": "Process Name:",
+        "Process ID:": "Process ID:",
+        "Apply": "Apply",
+        "Feeding Frenzy 2: Shipwreck Showdown Trainer": "Feeding Frenzy 2: Shipwreck Showdown Trainer",
+        "Set Lives": "Set Lives",
+        "Set Growth": "Set Growth"
+    },
+    "zh_CN": {
+        "简体中文": "简体中文",
+        "Please run the game first.": "请先运行游戏。",
+        "Failed to activate.": "激活失败。",
+        "Failed to activate/deactivate.": "激活/停用失败。",
+        "Process Name:": "进程名称：",
+        "Process ID:": "进程 ID:",
+        "Apply": "应用",
+        "Feeding Frenzy 2: Shipwreck Showdown Trainer": "吞食鱼2：海滩危机修改器",
+        "Set Lives": "设置生命值",
+        "Set Growth": "设置成长值"
+    }
+}

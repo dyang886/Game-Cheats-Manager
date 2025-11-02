@@ -1,0 +1,32 @@
+{
+    "en_US": {
+        "English": "English",
+        "Please run the game first.": "Please run the game first.",
+        "Failed to activate.": "Failed to activate.",
+        "Failed to activate/deactivate.": "Failed to activate/deactivate.",
+        "Process Name:": "Process Name:",
+        "Process ID:": "Process ID:",
+        "Plants vs. Zombies: GOTY Edition Trainer": "Plants vs. Zombies: GOTY Edition Trainer",
+        "Add Coins": "Add Coins",
+        "Add Sun": "Add Sun",
+        "Set Fertilizer": "Set Fertilizer",
+        "Set Bug Spray": "Set Bug Spray",
+        "Set Chocolate": "Set Chocolate",
+        "Set Tree Food": "Set Tree Food"
+    },
+    "zh_CN": {
+        "简体中文": "简体中文",
+        "Please run the game first.": "请先运行游戏。",
+        "Failed to activate.": "激活失败。",
+        "Failed to activate/deactivate.": "激活/停用失败。",
+        "Process Name:": "进程名称：",
+        "Process ID:": "进程 ID:",
+        "Plants vs. Zombies: GOTY Edition Trainer": "植物大战僵尸：年度版修改器",
+        "Add Coins": "添加金币",
+        "Add Sun": "添加阳光",
+        "Set Fertilizer": "设置肥料",
+        "Set Bug Spray": "设置杀虫剂",
+        "Set Chocolate": "设置巧克力",
+        "Set Tree Food": "设置树肥"
+    }
+}

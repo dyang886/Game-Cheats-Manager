@@ -1,0 +1,2 @@
+All FLTK header files are in the FL subdirectory of the fltk.framework.
+Image header files are located in "fltk.framework/Headers/FL/images/".

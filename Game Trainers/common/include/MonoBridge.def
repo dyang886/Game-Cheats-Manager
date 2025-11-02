@@ -1,0 +1,6 @@
+LIBRARY MonoBridge
+EXPORTS
+    GetFunctionPointersThread
+    LoadAssemblyThread
+    InvokeMethodThread
+    SendData

@@ -1,0 +1,34 @@
+{
+    "en_US": {
+        "English": "English",
+        "Please run the game first.": "Please run the game first.",
+        "Failed to activate.": "Failed to activate.",
+        "Failed to activate/deactivate.": "Failed to activate/deactivate.",
+        "Process Name:": "Process Name:",
+        "Process ID:": "Process ID:",
+        "Apply": "Apply",
+        "Wizard of Legend 2 Trainer": "Wizard of Legend 2 Trainer",
+        "Set Health": "Set Health",
+        "Set Max Health": "Set Max Health",
+        "Set Movement Speed": "Set Movement Speed",
+        "Set Coins": "Set Coins",
+        "Set Gems": "Set Gems",
+        "Set Arcane Chromo": "Set Arcane Chromo"
+    },
+    "zh_CN": {
+        "简体中文": "简体中文",
+        "Please run the game first.": "请先运行游戏。",
+        "Failed to activate.": "激活失败。",
+        "Failed to activate/deactivate.": "激活/停用失败。",
+        "Process Name:": "进程名称：",
+        "Process ID:": "进程 ID:",
+        "Apply": "应用",
+        "Wizard of Legend 2 Trainer": "传说法师2修改器",
+        "Set Health": "设置生命值",
+        "Set Max Health": "设置最大生命值",
+        "Set Movement Speed": "设置移动速度",
+        "Set Coins": "设置金币",
+        "Set Gems": "设置宝石",
+        "Set Arcane Chromo": "设置奥术色素"
+    }
+}

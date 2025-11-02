@@ -1,0 +1,26 @@
+{
+    "en_US": {
+        "English": "English",
+        "Please run the game first.": "Please run the game first.",
+        "Failed to activate.": "Failed to activate.",
+        "Failed to activate/deactivate.": "Failed to activate/deactivate.",
+        "Process Name:": "Process Name:",
+        "Process ID:": "Process ID:",
+        "Headbangers: Rhythm Royale Trainer": "Headbangers: Rhythm Royale Trainer",
+        "Set Bread": "Set Bread",
+        "Set Season Pass XP": "Set Season Pass XP",
+        "Set Number of Wins": "Set Number of Wins"
+    },
+    "zh_CN": {
+        "简体中文": "简体中文",
+        "Please run the game first.": "请先运行游戏。",
+        "Failed to activate.": "激活失败。",
+        "Failed to activate/deactivate.": "激活/停用失败。",
+        "Process Name:": "进程名称：",
+        "Process ID:": "进程 ID:",
+        "Headbangers: Rhythm Royale Trainer": "节奏天鸽修改器",
+        "Set Bread": "设置面包",
+        "Set Season Pass XP": "设置赛季通行证经验",
+        "Set Number of Wins": "设置胜场数"
+    }
+}
