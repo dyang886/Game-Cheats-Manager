@@ -18,6 +18,7 @@ if(CMAKE_SIZEOF_VOID_P EQUAL 8)
         "${FLTK_LIB_DIR}/fltk_z.lib"
     )
     set(MONO_BRIDGE_DEST_DIR "${CMAKE_CURRENT_SOURCE_DIR}/libs/x64")
+    set(IL2CPP_BRIDGE_DEST_DIR "${CMAKE_CURRENT_SOURCE_DIR}/libs/x64")
 else()
     # 32-bit architecture
     set(FLTK_LIB_DIR "${CMAKE_CURRENT_SOURCE_DIR}/libs/x86")
@@ -29,6 +30,7 @@ else()
         "${FLTK_LIB_DIR}/fltk_z.lib"
     )
     set(MONO_BRIDGE_DEST_DIR "${CMAKE_CURRENT_SOURCE_DIR}/libs/x86")
+    set(IL2CPP_BRIDGE_DEST_DIR "${CMAKE_CURRENT_SOURCE_DIR}/libs/x86")
 endif()
 
 # Link FLTK and Windows libraries to Common
@@ -60,4 +62,21 @@ add_custom_command(TARGET MonoBridge POST_BUILD
         "$<TARGET_FILE:MonoBridge>"
         "${MONO_BRIDGE_DEST_DIR}/MonoBridge.dll"
     COMMENT "Moving MonoBridge.dll to ${MONO_BRIDGE_DEST_DIR}"
+)
+
+# Il2CppBridge
+add_library(Il2CppBridge SHARED
+    "${CMAKE_CURRENT_SOURCE_DIR}/include/Il2CppBridge.cpp"
+    "${CMAKE_CURRENT_SOURCE_DIR}/include/Il2CppBridge.def"
+)
+set_target_properties(Il2CppBridge PROPERTIES
+    OUTPUT_NAME "Il2CppBridge"
+)
+target_link_libraries(Il2CppBridge PRIVATE Common)
+add_compile_definitions(Il2CppBridge PRIVATE UNICODE _UNICODE)
+add_custom_command(TARGET Il2CppBridge POST_BUILD
+    COMMAND ${CMAKE_COMMAND} -E copy_if_different
+        "$<TARGET_FILE:Il2CppBridge>"
+        "${IL2CPP_BRIDGE_DEST_DIR}/Il2CppBridge.dll"
+    COMMENT "Moving Il2CppBridge.dll to ${IL2CPP_BRIDGE_DEST_DIR}"
 )

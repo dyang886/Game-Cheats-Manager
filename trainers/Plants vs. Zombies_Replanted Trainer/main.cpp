@@ -31,6 +31,11 @@ void apply_callback(Fl_Widget *widget, void *data)
         inputValue = input->value();
     }
 
+    if (optionName == "AddPlantToGarden")
+    {
+        status = trainer->addPlantToGarden(std::stoi(inputValue));
+    }
+
     // Finalize
     if (!status)
     {
@@ -86,6 +91,17 @@ void toggle_callback(Fl_Widget *widget, void *data)
             status = trainer->disableNamedHook("NoPlantCost1") && trainer->disableNamedHook("NoPlantCost2") && trainer->disableNamedHook("NoPlantCost3");
         }
     }
+    else if (optionName == "AddSun")
+    {
+        if (button->value())
+        {
+            status = trainer->addSun(std::stoi(inputValue));
+        }
+        else
+        {
+            status = trainer->disableNamedHook(optionName);
+        }
+    }
     else if (optionName == "SetCoin")
     {
         if (button->value())
@@ -95,17 +111,6 @@ void toggle_callback(Fl_Widget *widget, void *data)
         else
         {
             status = trainer->disableNamedHook(optionName);
-        }
-    }
-    else if (optionName == "SetSun")
-    {
-        if (button->value())
-        {
-            status = trainer->setSun(std::stoi(inputValue));
-        }
-        else
-        {
-            status = trainer->disableNamedHook("SetSunInc") && trainer->disableNamedHook("SetSunDec");
         }
     }
     else if (optionName == "SetFertilizerAndBugSpray")
@@ -309,7 +314,30 @@ int main(int argc, char **argv)
     options1_flex->fixed(no_plant_cost_flex, option_h);
 
     // ------------------------------------------------------------------
-    // Option 1: Set coin (Toggle)
+    // Add sun (Toggle)
+    // ------------------------------------------------------------------
+    Fl_Flex *sun_flex = new Fl_Flex(0, 0, 0, 0, Fl_Flex::HORIZONTAL);
+    sun_flex->gap(option_gap);
+
+    Fl_Check_Button *sun_check_button = new Fl_Check_Button(0, 0, 0, 0);
+    sun_flex->fixed(sun_check_button, button_w);
+
+    Fl_Box *sun_label = new Fl_Box(0, 0, 0, 0);
+    tr(sun_label, "Add Sun");
+
+    Fl_Input *sun_input = new Fl_Input(0, 0, 0, 0);
+    sun_flex->fixed(sun_input, input_w);
+    sun_input->type(FL_INT_INPUT);
+    set_input_values(sun_input, "999", "0", "9990");
+
+    ToggleData *td_sun = new ToggleData{&trainer, "AddSun", sun_check_button, sun_input};
+    sun_check_button->callback(toggle_callback, td_sun);
+
+    sun_flex->end();
+    options1_flex->fixed(sun_flex, option_h);
+
+    // ------------------------------------------------------------------
+    // Set coin (Toggle)
     // ------------------------------------------------------------------
     Fl_Flex *coin_flex = new Fl_Flex(0, 0, 0, 0, Fl_Flex::HORIZONTAL);
     coin_flex->gap(option_gap);
@@ -332,30 +360,7 @@ int main(int argc, char **argv)
     options1_flex->fixed(coin_flex, option_h);
 
     // ------------------------------------------------------------------
-    // Option 2: Set sun (Toggle)
-    // ------------------------------------------------------------------
-    Fl_Flex *sun_flex = new Fl_Flex(0, 0, 0, 0, Fl_Flex::HORIZONTAL);
-    sun_flex->gap(option_gap);
-
-    Fl_Check_Button *sun_check_button = new Fl_Check_Button(0, 0, 0, 0);
-    sun_flex->fixed(sun_check_button, button_w);
-
-    Fl_Box *sun_label = new Fl_Box(0, 0, 0, 0);
-    tr(sun_label, "Set Sun");
-
-    Fl_Input *sun_input = new Fl_Input(0, 0, 0, 0);
-    sun_flex->fixed(sun_input, input_w);
-    sun_input->type(FL_INT_INPUT);
-    set_input_values(sun_input, "999", "0", "9990");
-
-    ToggleData *td_sun = new ToggleData{&trainer, "SetSun", sun_check_button, sun_input};
-    sun_check_button->callback(toggle_callback, td_sun);
-
-    sun_flex->end();
-    options1_flex->fixed(sun_flex, option_h);
-
-    // ------------------------------------------------------------------
-    // Option 3: Set fertilizer (Toggle)
+    // Set fertilizer (Toggle)
     // ------------------------------------------------------------------
     Fl_Flex *fertilizer_flex = new Fl_Flex(0, 0, 0, 0, Fl_Flex::HORIZONTAL);
     fertilizer_flex->gap(option_gap);
@@ -378,7 +383,7 @@ int main(int argc, char **argv)
     options1_flex->fixed(fertilizer_flex, option_h);
 
     // ------------------------------------------------------------------
-    // Option 4: Set chocolate (Toggle)
+    // Set chocolate (Toggle)
     // ------------------------------------------------------------------
     Fl_Flex *chocolate_flex = new Fl_Flex(0, 0, 0, 0, Fl_Flex::HORIZONTAL);
     chocolate_flex->gap(option_gap);
@@ -401,7 +406,7 @@ int main(int argc, char **argv)
     options1_flex->fixed(chocolate_flex, option_h);
 
     // ------------------------------------------------------------------
-    // Option 5: Set tree_food (Toggle)
+    // Set tree_food (Toggle)
     // ------------------------------------------------------------------
     Fl_Flex *tree_food_flex = new Fl_Flex(0, 0, 0, 0, Fl_Flex::HORIZONTAL);
     tree_food_flex->gap(option_gap);
@@ -422,6 +427,30 @@ int main(int argc, char **argv)
 
     tree_food_flex->end();
     options1_flex->fixed(tree_food_flex, option_h);
+
+    // ------------------------------------------------------------------
+    // add_plant (Apply)
+    // ------------------------------------------------------------------
+    Fl_Flex *add_plant_flex = new Fl_Flex(0, 0, 0, 0, Fl_Flex::HORIZONTAL);
+    add_plant_flex->gap(option_gap);
+
+    Fl_Button *add_plant_apply_button = new Fl_Button(0, 0, 0, 0);
+    add_plant_flex->fixed(add_plant_apply_button, button_w);
+    tr(add_plant_apply_button, "Apply");
+
+    Fl_Box *add_plant_label = new Fl_Box(0, 0, 0, 0);
+    tr(add_plant_label, "Add Plant to Garden");
+
+    Fl_Input *add_plant_input = new Fl_Input(0, 0, 0, 0);
+    add_plant_flex->fixed(add_plant_input, input_w);
+    add_plant_input->type(FL_INT_INPUT);
+    set_input_values(add_plant_input, "1", "0", "99");
+
+    ApplyData *data_add_plant = new ApplyData{&trainer, "AddPlantToGarden", add_plant_apply_button, add_plant_input};
+    add_plant_apply_button->callback(apply_callback, data_add_plant);
+
+    add_plant_flex->end();
+    options1_flex->fixed(add_plant_flex, option_h);
 
     Fl_Box *spacerBottom = new Fl_Box(0, 0, 0, 0);
     options1_flex->end();

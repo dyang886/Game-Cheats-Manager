@@ -1,0 +1,5 @@
+LIBRARY Il2CppBridge
+EXPORTS
+    Bridge_GetFunctionPointers
+    Bridge_Initialize
+    Bridge_InvokeMethod

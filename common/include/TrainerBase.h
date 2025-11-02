@@ -394,7 +394,7 @@ protected:
         std::vector<PatternByte> pat;
         for (const auto &token : pattern)
         {
-            pat.push_back(token == "??" ? PatternByte{true, 0} : PatternByte{false, (BYTE)std::stoul(token, nullptr, 16)});
+            pat.push_back((token == "??" || token == "?") ? PatternByte{true, 0} : PatternByte{false, (BYTE)std::stoul(token, nullptr, 16)});
         }
         size_t patSize = pat.size();
 

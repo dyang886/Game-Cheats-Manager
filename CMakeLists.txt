@@ -16,7 +16,7 @@ set(TRAINER_DIRS
     "trainers/Feeding Frenzy 2_Shipwreck Showdown Trainer"
     "trainers/Headbangers_Rhythm Royale Trainer"
     "trainers/Heavy Weapon Trainer"
-    "trainers/Plants vs. Zombies Trainer"
+    "trainers/Plants vs. Zombies_GOTY Edition Trainer"
     "trainers/Plants vs. Zombies_Replanted Trainer"
     "trainers/Wizard of Legend 2 Trainer"
 )

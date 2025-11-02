@@ -23,7 +23,7 @@ add_custom_target(${SUBSET_FONT_TARGET} ALL
 
 add_executable(${GAME_NAME} main.cpp)
 target_link_libraries(${GAME_NAME} PRIVATE Common)
-add_dependencies(${GAME_NAME} ${SUBSET_FONT_TARGET})
+add_dependencies(${GAME_NAME} ${SUBSET_FONT_TARGET} Il2CppBridge)
 set_target_properties(${GAME_NAME} PROPERTIES
     WIN32_EXECUTABLE $<$<NOT:$<CONFIG:Debug>>:ON>
     OUTPUT_NAME ${TRAINER_NAME}

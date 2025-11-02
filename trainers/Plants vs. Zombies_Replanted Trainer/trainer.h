@@ -1,12 +1,12 @@
 // trainer.h
 #pragma once
 
-#include "TrainerBase.h"
+#include "Il2CppBase.h"
 
-class Trainer : public TrainerBase
+class Trainer : public Il2CppBase
 {
 public:
-    Trainer() : TrainerBase(L"Replanted.exe") {} // x64
+    Trainer() : Il2CppBase(L"Replanted.exe") {} // x64
     ~Trainer() override = default;
 
     // Constants
@@ -18,7 +18,7 @@ public:
         size_t patchOffset = 1;
 
         // JNE -> JE
-        const std::vector<BYTE> newBytes = { 0x84 };
+        const std::vector<BYTE> newBytes = {0x84};
 
         return createBytePatch(moduleName, "NoPlantCooldown", pat, patchOffset, newBytes);
     }
@@ -28,9 +28,9 @@ public:
         bool hook1_success = false;
         {
             // Changes 'jle' (7E) to 'jmp' (EB) to make the cost check always pass.
-            const std::vector<std::string> pat = {"7E", "43", "48", "8B", "87", "08", "03", "00", "00"};
+            const std::vector<std::string> pat = {"7E", "??", "48", "??", "??", "??", "??", "??", "??", "48", "??", "??", "0F", "??", "??", "??", "??", "??", "4C", "??", "??", "??", "4D", "??", "??", "0F", "??", "??", "??", "??", "??", "48", "??", "??", "??", "??", "??", "??", "B9", "??", "??", "??", "??", "41", "??", "??", "??", "??", "??"};
             size_t patchOffset = 0;
-            const std::vector<BYTE> newBytes = { 0xEB }; // EB = jmp
+            const std::vector<BYTE> newBytes = {0xEB}; // EB = jmp
 
             hook1_success = createBytePatch(moduleName, "NoPlantCost1", pat, patchOffset, newBytes);
         }
@@ -38,10 +38,9 @@ public:
         bool hook2_success = false;
         {
             // Changes 'setle al' (0F 9E C0) to 'mov al, 1; nop' (B0 01 90).
-            // This forces the "can afford" check to always return 'true'.
-            const std::vector<std::string> pat = {"0F", "9E", "C0", "48", "83", "C4", "20", "5F", "C3", "E8", "C8"};
+            const std::vector<std::string> pat = {"0F", "??", "??", "48", "??", "??", "??", "5F", "C3", "E8", "??", "??", "??", "??", "??", "??", "??", "??", "??", "??", "??", "??", "48", "??", "??", "??", "??", "57", "48", "??", "??", "??", "80", "??", "??", "??", "??", "??", "??", "8B", "??"};
             size_t patchOffset = 0;
-            const std::vector<BYTE> newBytes = { 0xB0, 0x01, 0x90 }; // mov al, 1; nop
+            const std::vector<BYTE> newBytes = {0xB0, 0x01, 0x90}; // mov al, 1; nop
 
             hook2_success = createBytePatch(moduleName, "NoPlantCost2", pat, patchOffset, newBytes);
         }
@@ -50,14 +49,60 @@ public:
         {
             // Changes 'sub [rax+10],r13d' (44 29 68 10) to 'nop's.
             // This prevents the sun cost from being subtracted from your total.
-            const std::vector<std::string> pat = {"44", "29", "68", "10", "44", "8B", "84", "24", "E0", "00", "00", "00"};
+            const std::vector<std::string> pat = {"44", "??", "??", "??", "44", "??", "??", "??", "??", "??", "??", "??", "41", "??", "??", "??", "??", "??", "41", "??", "??", "48", "??", "??", "??", "??"};
             size_t patchOffset = 0;
-            const std::vector<BYTE> newBytes = { 0x90, 0x90, 0x90, 0x90 }; // 4 NOPs
+            const std::vector<BYTE> newBytes = {0x90, 0x90, 0x90, 0x90}; // 4 NOPs
 
             hook3_success = createBytePatch(moduleName, "NoPlantCost3", pat, patchOffset, newBytes);
         }
 
         return hook1_success && hook2_success && hook3_success;
+    }
+
+    inline bool addSun(int newVal)
+    {
+        // Target instruction bytes: 01 70 10 48 8B 8B E0 01 00 00
+        const std::vector<std::string> pat = {"01", "70", "10", "48", "8B", "8B", "E0", "01", "00", "00"};
+        size_t patternOffset = 0;
+        size_t overwriteLen = 10; // 3 bytes (add) + 7 bytes (mov)
+        size_t codeSize = 0x100;
+
+        auto buildFunc = [newVal, overwriteLen, codeSize](uintptr_t codeCaveAddr, uintptr_t hookAddr, const std::vector<BYTE> &originalBytes) -> std::vector<BYTE>
+        {
+            const size_t dataOffset = 0x80;
+            std::vector<BYTE> code(codeSize, 0x90);
+
+            // --- DATA SECTION ---
+            // We need to store our newVal in the data section to be loaded
+            std::memcpy(&code[dataOffset], &newVal, sizeof(int));
+            uintptr_t dataAbsoluteAddr = codeCaveAddr + dataOffset;
+
+            // --- CODE SECTION ---
+            size_t wPos = 0;
+
+            // 1. mov esi, [rip + rel32] => 8B 35 <rel32>
+            code[wPos++] = 0x8B;
+            code[wPos++] = 0x35;
+            int32_t rel32 = static_cast<int32_t>(dataAbsoluteAddr - (codeCaveAddr + wPos + 4));
+            std::memcpy(&code[wPos], &rel32, 4);
+            wPos += 4;
+
+            // 2. Copy all original instructions
+            std::memcpy(&code[wPos], originalBytes.data(), originalBytes.size());
+            wPos += originalBytes.size();
+
+            // 3. jmp <rel32>
+            code[wPos++] = 0xE9;
+            uintptr_t returnAddr = hookAddr + overwriteLen;
+            uintptr_t nextInstrAddr = codeCaveAddr + wPos + 4;
+            int32_t relativeJump = static_cast<int32_t>(returnAddr - nextInstrAddr);
+            std::memcpy(&code[wPos], &relativeJump, 4);
+            wPos += 4;
+
+            return code;
+        };
+
+        return createNamedHook(nullptr, "AddSun", pat, patternOffset, overwriteLen, codeSize, buildFunc);
     }
 
     inline bool setFertilizerAndBugSpray(int newVal)
@@ -394,90 +439,36 @@ public:
         return createNamedHook(nullptr, "SetCoin", pat, patternOffset, overwriteLen, codeSize, buildFunc);
     }
 
-    inline bool setSun(int newVal)
+    bool addPlantToGarden(int plantID)
     {
-        bool hook1_success = false;
+        if (!initializeDllInjection())
         {
-            // Hook 1: Replaces 'add [rax+10], esi'
-            const std::vector<std::string> pat = {"01", "70", "10", "48", "8B", "8B", "E0", "01", "00", "00"};
-            size_t patternOffset = 0;
-            size_t overwriteLen = 10; // 3 bytes (add) + 7 bytes (mov)
-            size_t codeSize = 0x100;
-
-            auto buildFunc = [newVal, overwriteLen, codeSize](uintptr_t codeCaveAddr, uintptr_t hookAddr, const std::vector<BYTE> &originalBytes) -> std::vector<BYTE>
-            {
-                // No data section needed
-                std::vector<BYTE> code(codeSize, 0x90);
-                size_t wPos = 0;
-
-                // --- CODE SECTION ---
-                // 1. mov dword ptr [rax+10], newVal => C7 40 10 <imm32>
-                code[wPos++] = 0xC7;
-                code[wPos++] = 0x40;
-                code[wPos++] = 0x10;
-
-                // 2. Copy newVal (our 4-byte immediate value)
-                std::memcpy(&code[wPos], &newVal, 4);
-                wPos += 4;
-
-                // 3. Copy the second original instruction (mov rcx,[rbx+...])
-                std::memcpy(&code[wPos], &originalBytes[3], 7);
-                wPos += 7;
-
-                // 4. jmp <rel32>
-                code[wPos++] = 0xE9;
-                uintptr_t returnAddr = hookAddr + overwriteLen;
-                uintptr_t nextInstrAddr = codeCaveAddr + wPos + 4;
-                int32_t relativeJump = static_cast<int32_t>(returnAddr - nextInstrAddr);
-                std::memcpy(&code[wPos], &relativeJump, 4);
-                wPos += 4;
-
-                return code;
-            };
-            hook1_success = createNamedHook(nullptr, "SetSunInc", pat, patternOffset, overwriteLen, codeSize, buildFunc);
+            std::cerr << "[!] Failed to initialize IL2CPP bridge." << std::endl;
+            return false;
         }
 
-        bool hook2_success = false;
+        // We are passing one int argument
+        std::vector<Param> args = {plantID};
+
+        // invokeMethod is inherited from Il2IppBase
+        void *result = invokeMethod(
+            "Assembly-CSharp.dll",     // imageName
+            "Reloaded.Gameplay",       // namespaceName
+            "ZenGarden",               // className
+            "AttemptNewPlantUserdata", // methodName
+            args                       // params
+        );
+
+        // For IL2CPP, bools are returned as non-zero (true) or zero (false)
+        if (result == nullptr)
         {
-            // Hook 2: Replaces 'sub [rax+10], r13d'
-            const std::vector<std::string> pat = {"44", "29", "68", "10", "44", "8B", "84", "24", "E0", "00", "00", "00"};
-            size_t patternOffset = 0;
-            size_t overwriteLen = 12; // 4 bytes (sub) + 8 bytes (mov)
-            size_t codeSize = 0x100;
-
-            auto buildFunc = [newVal, overwriteLen, codeSize](uintptr_t codeCaveAddr, uintptr_t hookAddr, const std::vector<BYTE> &originalBytes) -> std::vector<BYTE>
-            {
-                // No data section needed
-                std::vector<BYTE> code(codeSize, 0x90);
-                size_t wPos = 0;
-
-                // --- CODE SECTION ---
-                // 1. mov dword ptr [rax+10], newVal => C7 40 10 <imm32>
-                code[wPos++] = 0xC7;
-                code[wPos++] = 0x40;
-                code[wPos++] = 0x10;
-
-                // 2. Copy newVal (our 4-byte immediate value)
-                std::memcpy(&code[wPos], &newVal, 4);
-                wPos += 4;
-
-                // 3. Copy the second original instruction (mov r8d,[rsp+...])
-                std::memcpy(&code[wPos], &originalBytes[4], 8);
-                wPos += 8;
-
-                // 4. jmp <rel32>
-                code[wPos++] = 0xE9;
-                uintptr_t returnAddr = hookAddr + overwriteLen;
-                uintptr_t nextInstrAddr = codeCaveAddr + wPos + 4;
-                int32_t relativeJump = static_cast<int32_t>(returnAddr - nextInstrAddr);
-                std::memcpy(&code[wPos], &relativeJump, 4);
-                wPos += 4;
-
-                return code;
-            };
-            hook2_success = createNamedHook(nullptr, "SetSunDec", pat, patternOffset, overwriteLen, codeSize, buildFunc);
+            std::cout << "[-] addPlantToGarden failed (returned false)." << std::endl;
+            return false;
         }
-
-        return hook1_success && hook2_success;
+        else
+        {
+            std::cout << "[+] addPlantToGarden success." << std::endl;
+            return true;
+        }
     }
 };
