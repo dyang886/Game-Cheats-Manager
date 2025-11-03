@@ -199,6 +199,9 @@ msgstr "风灵月影搜索成功"
 msgid "Search from XiaoXing success!"
 msgstr "小幸搜索成功"
 
+msgid "Search from GCM success!"
+msgstr "GCM 搜索成功"
+
 msgid "Checking for internet connection..."
 msgstr "检查互联网连接中..."
 
@@ -252,6 +255,12 @@ msgstr "删除修改器背景音乐中..."
 
 msgid "Patching..."
 msgstr "修补中..."
+
+msgid "Updating data from GCM"
+msgstr "正在更新 GCM 数据"
+
+msgid "Update from GCM failed"
+msgstr "更新 GCM 数据失败"
 
 msgid "Updating data from FLiNG"
 msgstr "正在更新风灵月影数据"
@@ -356,6 +365,9 @@ msgstr "软件启动时检查更新"
 msgid "Always show search results in English"
 msgstr "始终以英文显示搜索结果"
 
+msgid "Sort search results by origin"
+msgstr "按修改器来源排序"
+
 msgid "Update trainer translations automatically"
 msgstr "自动更新修改器翻译数据"
 
@@ -388,6 +400,15 @@ msgstr "风灵月影"
 
 msgid "XiaoXing"
 msgstr "小幸"
+
+msgid "Enable search for GCM and Other trainers"
+msgstr "允许搜索 GCM 及其他修改器"
+
+msgid "Update GCM data automatically"
+msgstr "自动更新 GCM 数据"
+
+msgid "Update GCM and Other trainers automatically"
+msgstr "自动更新 GCM 及其他修改器"
 
 msgid "Official Website: "
 msgstr "官方网站："

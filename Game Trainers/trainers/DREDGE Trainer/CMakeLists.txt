@@ -10,8 +10,8 @@ set(CSHARP_TEMP_OUTPUT "${CSHARP_TEMP_DIR}/GCMInjection.dll")
 set(VENV_PYTHON "${CMAKE_SOURCE_DIR}/.venv/Scripts/python.exe")
 set(SUBSET_FONT_TARGET "${GAME_NAME}_SubsetFont")
 set(FONT_SUBSET_OUTPUT "${CMAKE_CURRENT_SOURCE_DIR}/NotoSansSC-Subset.ttf")
-set(FONT_SUBSET_SCRIPT "${CMAKE_SOURCE_DIR}/font_processor/main.py")
-set(FONT_FILE "${CMAKE_SOURCE_DIR}/font_processor/NotoSansSC-Regular.ttf")
+set(FONT_SUBSET_SCRIPT "${CMAKE_SOURCE_DIR}/scripts/font_processor.py")
+set(FONT_FILE "${CMAKE_SOURCE_DIR}/scripts/NotoSansSC-Regular.ttf")
 set(TRANSLATION_FILES 
     "${CMAKE_CURRENT_SOURCE_DIR}/translations.json"
     "${CMAKE_CURRENT_SOURCE_DIR}/translation_extra.txt"
@@ -70,7 +70,7 @@ endif()
 
 # Move trainer executable to build/bin/ and embed manifest
 add_custom_command(TARGET ${GAME_NAME} POST_BUILD
-    COMMAND ${CMAKE_COMMAND} -E copy_if_different "$<TARGET_FILE:${GAME_NAME}>" "${CMAKE_BINARY_DIR}/bin/${TRAINER_NAME}.exe"
-    COMMAND "mt.exe" -manifest "${CMAKE_SOURCE_DIR}/common/assets/elevate.xml" "-outputresource:${CMAKE_BINARY_DIR}/bin/${TRAINER_NAME}.exe;1"
-    COMMENT "Moving ${TRAINER_NAME}.exe to ${CMAKE_BINARY_DIR}/bin and embedding manifest"
+    COMMAND ${CMAKE_COMMAND} -E copy_if_different "$<TARGET_FILE:${GAME_NAME}>" "${CMAKE_BINARY_DIR}/bin/${TRAINER_NAME}/${TRAINER_NAME}.exe"
+    COMMAND "mt.exe" -manifest "${CMAKE_SOURCE_DIR}/common/assets/elevate.xml" "-outputresource:${CMAKE_BINARY_DIR}/bin/${TRAINER_NAME}/${TRAINER_NAME}.exe;1"
+    COMMENT "Moving ${TRAINER_NAME}.exe to ${CMAKE_BINARY_DIR}/bin/${TRAINER_NAME} and embedding manifest"
 )

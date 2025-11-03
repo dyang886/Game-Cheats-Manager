@@ -126,6 +126,11 @@ class SettingsDialog(QDialog):
         self.alwaysEnCheckbox.setChecked(settings["enSearchResults"])
         settingsWidgetsLayout.addWidget(self.alwaysEnCheckbox)
 
+        # Sort by origin
+        self.sortByOriginCheckbox = QCheckBox(tr("Sort search results by origin"))
+        self.sortByOriginCheckbox.setChecked(settings["sortByOrigin"])
+        settingsWidgetsLayout.addWidget(self.sortByOriginCheckbox)
+
         # Auto update translation json
         self.autoUpdateTranslationsCheckbox = QCheckBox(tr("Update trainer translations automatically"))
         self.autoUpdateTranslationsCheckbox.setChecked(settings["autoUpdateTranslations"])
@@ -162,10 +167,12 @@ class SettingsDialog(QDialog):
     def apply_settings_page(self):
         original_theme = settings["theme"]
         original_language = settings["language"]
+        original_sortByOrigin = settings["sortByOrigin"]
 
         settings["theme"] = theme_options[self.themeCombo.currentText()]
         settings["language"] = language_options[self.languageCombo.currentText()]
         settings["enSearchResults"] = self.alwaysEnCheckbox.isChecked()
+        settings["sortByOrigin"] = self.sortByOriginCheckbox.isChecked()
         settings["checkAppUpdate"] = self.checkAppUpdateCheckbox.isChecked()
         settings["launchAppOnStartup"] = self.launchAppOnStarupCheckbox.isChecked()
         settings["autoUpdateTranslations"] = self.autoUpdateTranslationsCheckbox.isChecked()
@@ -178,6 +185,9 @@ class SettingsDialog(QDialog):
                 self.add_or_remove_startup(app_name, app_path, True)
             else:
                 self.add_or_remove_startup(app_name, app_path, False)
+        
+        if original_sortByOrigin != settings["sortByOrigin"]:
+            self.parent().show_cheats()
 
         if original_theme != settings["theme"] or original_language != settings["language"]:
             msg_box = QMessageBox(

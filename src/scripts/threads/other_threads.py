@@ -78,6 +78,30 @@ class PathChangeThread(QThread):
             self.error.emit(str(e))
 
 
+class FetchGCMSite(DownloadBaseThread):
+    message = pyqtSignal(str, str)
+    update = pyqtSignal(str, str, str)
+    finished = pyqtSignal(str)
+
+    def __init__(self, parent=None):
+        super().__init__(parent)
+
+    def run(self):
+        statusWidgetName = "gcm"
+        update_message = tr("Updating data from GCM")
+        update_failed = tr("Update from GCM failed")
+
+        self.message.emit(statusWidgetName, update_message)
+        url = "GCM/Data/gcm_trainers.json"
+        signed_url = self.get_signed_download_url(url)
+        file_path = self.request_download(signed_url, DATABASE_PATH)
+        if not file_path:
+            self.update.emit(statusWidgetName, update_failed, "error")
+            time.sleep(2)
+
+        self.finished.emit(statusWidgetName)
+
+
 class FetchFlingSite(DownloadBaseThread):
     message = pyqtSignal(str, str)
     update = pyqtSignal(str, str, str)

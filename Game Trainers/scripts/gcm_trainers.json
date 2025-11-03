@@ -1,0 +1,56 @@
+[
+    {
+        "game_name": "Arrow A Row",
+        "origin": "gcm",
+        "gcm_url": "GCM/GCM Trainers/Arrow A Row Trainer.exe",
+        "version": "2025.11.2"
+    },
+    {
+        "game_name": "Core Keeper",
+        "origin": "other",
+        "gcm_url": "GCM/GCM Trainers/Core Keeper Trainer.zip",
+        "version": "2025.8.3"
+    },
+    {
+        "game_name": "DREDGE",
+        "origin": "gcm",
+        "gcm_url": "GCM/GCM Trainers/DREDGE Trainer.exe",
+        "version": "2025.11.2"
+    },
+    {
+        "game_name": "Feeding Frenzy 2: Shipwreck Showdown",
+        "origin": "gcm",
+        "gcm_url": "GCM/GCM Trainers/Feeding Frenzy 2_Shipwreck Showdown Trainer.exe",
+        "version": "2025.11.2"
+    },
+    {
+        "game_name": "Headbangers: Rhythm Royale",
+        "origin": "gcm",
+        "gcm_url": "GCM/GCM Trainers/Headbangers_Rhythm Royale Trainer.exe",
+        "version": "2025.11.2"
+    },
+    {
+        "game_name": "Heavy Weapon",
+        "origin": "gcm",
+        "gcm_url": "GCM/GCM Trainers/Heavy Weapon Trainer.exe",
+        "version": "2025.11.2"
+    },
+    {
+        "game_name": "Plants vs. Zombies: GOTY Edition",
+        "origin": "gcm",
+        "gcm_url": "GCM/GCM Trainers/Plants vs. Zombies_GOTY Edition Trainer.exe",
+        "version": "2025.11.2"
+    },
+    {
+        "game_name": "Plants vs. Zombies: Replanted",
+        "origin": "gcm",
+        "gcm_url": "GCM/GCM Trainers/Plants vs. Zombies_Replanted Trainer.exe",
+        "version": ""
+    },
+    {
+        "game_name": "Wizard of Legend 2",
+        "origin": "gcm",
+        "gcm_url": "GCM/GCM Trainers/Wizard of Legend 2 Trainer.exe",
+        "version": "2025.11.2"
+    }
+]

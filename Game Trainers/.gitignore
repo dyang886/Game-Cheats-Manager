@@ -3,3 +3,7 @@ build/
 bin/
 obj/
 .venv/
+*.sln
+upload_trainers.py
+MonoBridge.dll
+Il2CppBridge.dll

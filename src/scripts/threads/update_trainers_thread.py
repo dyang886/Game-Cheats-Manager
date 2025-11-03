@@ -36,6 +36,8 @@ class UpdateTrainers(DownloadBaseThread):
                 return None
 
             origin_to_file = {
+                "gcm": "gcm_trainers.json" if (self.auto_check and settings["autoUpdateGCMTrainers"]) or not self.auto_check else None,
+                "other": "gcm_trainers.json" if (self.auto_check and settings["autoUpdateGCMTrainers"]) or not self.auto_check else None,
                 "fling_main": "fling_main.json" if (self.auto_check and settings["autoUpdateFlingTrainers"]) or not self.auto_check else None,
                 "xiaoxing": "xiaoxing.json" if (self.auto_check and settings["autoUpdateXiaoXingTrainers"]) or not self.auto_check else None
             }

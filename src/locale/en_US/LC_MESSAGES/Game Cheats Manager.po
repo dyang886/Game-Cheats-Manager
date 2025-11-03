@@ -199,6 +199,9 @@ msgstr "Search from FLiNG success!"
 msgid "Search from XiaoXing success!"
 msgstr "Search from XiaoXing success!"
 
+msgid "Search from GCM success!"
+msgstr "Search from GCM success!"
+
 msgid "Checking for internet connection..."
 msgstr "Checking for internet connection..."
 
@@ -252,6 +255,12 @@ msgstr "Removing trainer background music..."
 
 msgid "Patching..."
 msgstr "Patching..."
+
+msgid "Updating data from GCM"
+msgstr "Updating data from GCM"
+
+msgid "Update from GCM failed"
+msgstr "Update from GCM failed"
 
 msgid "Updating data from FLiNG"
 msgstr "Updating data from FLiNG"
@@ -356,6 +365,9 @@ msgstr "Check for software update at startup"
 msgid "Always show search results in English"
 msgstr "Always show search results in English"
 
+msgid "Sort search results by origin"
+msgstr "Sort search results by origin"
+
 msgid "Update trainer translations automatically"
 msgstr "Update trainer translations automatically"
 
@@ -388,6 +400,15 @@ msgstr "FLiNG"
 
 msgid "XiaoXing"
 msgstr "XiaoXing"
+
+msgid "Enable search for GCM and Other trainers"
+msgstr "Enable search for GCM and Other trainers"
+
+msgid "Update GCM data automatically"
+msgstr "Update GCM data automatically"
+
+msgid "Update GCM and Other trainers automatically"
+msgstr "Update GCM and Other trainers automatically"
 
 msgid "Official Website: "
 msgstr "Official Website: "

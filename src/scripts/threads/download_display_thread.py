@@ -57,6 +57,14 @@ class DownloadDisplayThread(DownloadBaseThread):
             if not status:
                 self.finished.emit(1)
                 return
+        
+        # ======================================================
+        # GCM
+        if settings["enableGCM"]:
+            status = self.search_from_gcm(keywordList)
+            if not status:
+                self.finished.emit(1)
+                return
 
         # ======================================================
         # General
@@ -82,7 +90,8 @@ class DownloadDisplayThread(DownloadBaseThread):
             return
 
         # Sort based on translated names
-        DownloadBaseThread.trainer_urls.sort(key=lambda trainer: sort_trainers_key(trainer["trainer_name"]))
+        sort_key_func = sort_trainers_key if settings["sortByOrigin"] else sort_trainers_key_ignore_prefix
+        DownloadBaseThread.trainer_urls.sort(key=lambda trainer: sort_key_func(trainer["trainer_name"]))
 
         self.message.emit("", "clear")
         for count, trainer in enumerate(DownloadBaseThread.trainer_urls, start=1):
@@ -267,6 +276,39 @@ class DownloadDisplayThread(DownloadBaseThread):
             return False
 
         self.message.emit(tr("Search from XiaoXing success!"), "success")
+        time.sleep(self.status_pause_time)
+
+        return True
+    
+    def search_from_gcm(self, keywordList):
+        GCMData = self.load_json_content("gcm_trainers.json")
+
+        if not GCMData:
+            self.message.emit(tr("Search failed, please update trainer search data."), "failure")
+            return False
+
+        try:
+            for trainer in GCMData:
+                gameName = trainer['game_name']
+                url = trainer['gcm_url']
+                version = trainer['version']
+                origin = trainer['origin']
+
+                if gameName and self.keyword_match(keywordList, gameName):
+                    DownloadBaseThread.trainer_urls.append({
+                        "game_name": gameName,
+                        "trainer_name": None,
+                        "origin": origin,  # could be "gcm" or "other"
+                        "url": url,
+                        "version": version
+                    })
+
+        except Exception as e:
+            print(f"Error processing GCM data: {e}")
+            self.message.emit(tr("Search failed, please update trainer search data."), "failure")
+            return False
+
+        self.message.emit(tr("Search from GCM success!"), "success")
         time.sleep(self.status_pause_time)
 
         return True

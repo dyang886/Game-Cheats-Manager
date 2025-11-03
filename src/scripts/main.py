@@ -44,7 +44,7 @@ class GameCheatsManager(QMainWindow):
         self.setMinimumSize(680, 520)
 
         # Version and links
-        self.appVersion = "2.4.0-beta"
+        self.appVersion = "2.4.0"
         self.githubLink = "https://github.com/dyang886/Game-Cheats-Manager"
         self.bilibiliLink = "https://space.bilibili.com/256673766"
 
@@ -59,6 +59,7 @@ class GameCheatsManager(QMainWindow):
         self.downloadQueue = Queue()
         self.currentlyDownloading = False
         self.currentlyUpdatingTrainers = False
+        self.currentlyUpdatingGCM = False
         self.currentlyUpdatingFling = False
         self.currentlyUpdatingXiaoXing = False
         self.currentlyUpdatingTrans = False
@@ -345,9 +346,10 @@ class GameCheatsManager(QMainWindow):
     def show_cheats(self):
         self.flingListBox.clear()
         self.trainers = {}
+        sort_key_func = sort_trainers_key if settings["sortByOrigin"] else sort_trainers_key_ignore_prefix
         entries = sorted(
             os.scandir(self.trainerDownloadPath),
-            key=lambda dirent: sort_trainers_key(dirent.name)
+            key=lambda dirent: sort_key_func(dirent.name)
         )
 
         for trainer in entries:
@@ -430,7 +432,8 @@ class GameCheatsManager(QMainWindow):
     def change_path(self):
         self.downloadListBox.clear()
         self.disable_all_widgets()
-        folder = QFileDialog.getExistingDirectory(self, tr("Change trainer download path"))
+        initialPath = self.downloadPathEntry.text() or os.path.expanduser("~")
+        folder = QFileDialog.getExistingDirectory(self, tr("Change trainer download path"), initialPath)
 
         if folder:
             changedPath = os.path.normpath(os.path.join(folder, "GCM Trainers"))
@@ -471,6 +474,15 @@ class GameCheatsManager(QMainWindow):
             fetch_trainer_details_thread.finished.connect(self.on_interval_finished)
             fetch_trainer_details_thread.start()
 
+    def fetch_gcm_data(self):
+        if not self.currentlyUpdatingGCM:
+            self.currentlyUpdatingGCM = True
+            fetch_gcm_site_thread = FetchGCMSite(self)
+            fetch_gcm_site_thread.message.connect(self.on_status_load)
+            fetch_gcm_site_thread.update.connect(self.on_status_update)
+            fetch_gcm_site_thread.finished.connect(self.on_interval_finished)
+            fetch_gcm_site_thread.start()
+
     def fetch_fling_data(self):
         if not self.currentlyUpdatingFling:
             self.currentlyUpdatingFling = True
@@ -479,6 +491,15 @@ class GameCheatsManager(QMainWindow):
             fetch_fling_site_thread.update.connect(self.on_status_update, Qt.ConnectionType.BlockingQueuedConnection)
             fetch_fling_site_thread.finished.connect(self.on_interval_finished)
             fetch_fling_site_thread.start()
+
+    def fetch_xiaoxing_data(self):
+        if not self.currentlyUpdatingXiaoXing:
+            self.currentlyUpdatingXiaoXing = True
+            fetch_xiaoxing_site_thread = FetchXiaoXingSite(self)
+            fetch_xiaoxing_site_thread.message.connect(self.on_status_load)
+            fetch_xiaoxing_site_thread.update.connect(self.on_status_update)
+            fetch_xiaoxing_site_thread.finished.connect(self.on_interval_finished)
+            fetch_xiaoxing_site_thread.start()
 
     def update_trainers(self, auto_check=False):
         if not self.currentlyUpdatingTrainers:
@@ -490,28 +511,23 @@ class GameCheatsManager(QMainWindow):
             trainer_update_thread.finished.connect(self.on_interval_finished)
             trainer_update_thread.start()
 
-    def fetch_xiaoxing_data(self):
-        if not self.currentlyUpdatingXiaoXing:
-            self.currentlyUpdatingXiaoXing = True
-            fetch_xiaoxing_site_thread = FetchXiaoXingSite(self)
-            fetch_xiaoxing_site_thread.message.connect(self.on_status_load)
-            fetch_xiaoxing_site_thread.update.connect(self.on_status_update)
-            fetch_xiaoxing_site_thread.finished.connect(self.on_interval_finished)
-            fetch_xiaoxing_site_thread.start()
-
     def fetch_trainer_search_data(self):
         self.fetch_fling_data()
         if settings["enableXiaoXing"]:
             self.fetch_xiaoxing_data()
+        if settings["enableGCM"]:
+            self.fetch_gcm_data()
 
     def on_main_interval(self):
         if settings["autoUpdateTranslations"]:
             self.fetch_trainer_translations()
+        if settings["autoUpdateGCMData"]:
+            self.fetch_gcm_data()
         if settings["autoUpdateFlingData"]:
             self.fetch_fling_data()
         if settings["autoUpdateXiaoXingData"]:
             self.fetch_xiaoxing_data()
-        if settings["autoUpdateFlingTrainers"] or settings["autoUpdateXiaoXingTrainers"]:
+        if settings["autoUpdateGCMTrainers"] or settings["autoUpdateFlingTrainers"] or settings["autoUpdateXiaoXingTrainers"]:
             self.update_trainers(True)
 
     def download_trainers(self, index):
@@ -610,7 +626,9 @@ class GameCheatsManager(QMainWindow):
         if target:
             target.deleteLater()
 
-        if widgetName == "fling":
+        if widgetName == "gcm":
+            self.currentlyUpdatingGCM = False
+        elif widgetName == "fling":
             self.currentlyUpdatingFling = False
         elif widgetName == "xiaoxing":
             self.currentlyUpdatingXiaoXing = False

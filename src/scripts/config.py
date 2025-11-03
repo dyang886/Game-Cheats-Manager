@@ -73,12 +73,14 @@ def load_settings():
         "language": app_locale,
         "theme": "dark",
         "enSearchResults": False,
+        "sortByOrigin": True,
         "checkAppUpdate": True,
         "launchAppOnStartup": False,
         "showWarning": True,
         "autoUpdateTranslations": True,
 
         # Trainer management configs
+        "enableGCM": True,
         "autoUpdateGCMData": True,
         "autoUpdateGCMTrainers": True,
         "flingDownloadServer": "official",
@@ -136,6 +138,15 @@ def sort_trainers_key(name):
     if is_chinese(name):
         return pinyin.get(name, format="strip", delimiter=" ")
     return name
+
+
+def sort_trainers_key_ignore_prefix(name):
+    prefix_regex = re.compile(r"^\[.*?\]\s*")
+    real_name = prefix_regex.sub("", name)
+
+    if is_chinese(real_name):
+        return pinyin.get(real_name, format="strip", delimiter=" ")
+    return real_name
 
 
 def ensure_trainer_download_path_is_valid():

@@ -47,6 +47,8 @@ class DownloadTrainersThread(DownloadBaseThread):
             result = self.download_fling(selected_trainer)
         elif origin == "xiaoxing":
             result = self.download_xiaoxing(selected_trainer)
+        elif origin == "gcm" or origin == "other":
+            result = self.download_gcm(selected_trainer)
 
         try:
             for item in self.src_dst:
@@ -402,7 +404,7 @@ class DownloadTrainersThread(DownloadBaseThread):
             return True
 
         return False
-    
+
     def process_pattern_to_hex_and_mask(self, pattern_str):
         hex_bytes = []
         mask_bytes = []
@@ -447,10 +449,10 @@ class DownloadTrainersThread(DownloadBaseThread):
                 input_file = f"{original_file}.patch_in"
                 output_file = f"{original_file}.patch_out"
                 backup_file = f"{original_file}.bak"
-                
+
                 shutil.copyfile(original_file, backup_file)
                 shutil.copyfile(original_file, input_file)
-                
+
                 patch_success = True
                 for i, patch in enumerate(patches_to_apply):
                     print(f"Applying patch {i + 1}/{len(patches_to_apply)} for: {game_name}")
@@ -461,7 +463,7 @@ class DownloadTrainersThread(DownloadBaseThread):
                     try:
                         command = [binmay_path, '-i', input_file, '-o', output_file, '-s', search_hex, '-S', search_mask, '-r', replace_hex, '-R', replace_mask]
                         subprocess.run(command, check=True, capture_output=True, text=True, creationflags=subprocess.CREATE_NO_WINDOW)
-                        
+
                         # The output of this patch becomes the input for the next
                         os.remove(input_file)
                         os.rename(output_file, input_file)
@@ -471,7 +473,7 @@ class DownloadTrainersThread(DownloadBaseThread):
                         shutil.copyfile(backup_file, original_file)
                         patch_success = False
                         break
-                
+
                 # Cleanup temporary files
                 if os.path.exists(input_file):
                     if patch_success:
@@ -480,3 +482,56 @@ class DownloadTrainersThread(DownloadBaseThread):
                         print(f"Successfully applied all patches to: {exe_file}\n")
                     else:
                         os.remove(input_file)
+
+    def download_gcm(self, selected_trainer):
+        if self.update_entry:
+            trainerName_display = selected_trainer["trainer_name"]
+            self.message.emit(tr("Updating ") + trainerName_display + "...", None)
+        else:
+            trainerName_display = self.symbol_replacement(selected_trainer["trainer_name"])
+            # Trainer duplication check
+            for trainerPath in self.trainers.keys():
+                if self.symbol_replacement(selected_trainer["trainer_name"]) == os.path.splitext(os.path.basename(trainerPath))[0]:
+                    self.message.emit(tr("Trainer already exists, aborted download."), "failure")
+                    time.sleep(self.download_finish_delay)
+                    self.finished.emit(1)
+                    return False
+
+        self.message.emit(tr("Downloading..."), None)
+        extractedContentPath = os.path.join(DOWNLOAD_TEMP_DIR, "extracted")
+        try:
+            signed_url = self.get_signed_download_url(selected_trainer['url'])
+            trainerTemp = self.request_download(signed_url, DOWNLOAD_TEMP_DIR)
+            if not trainerTemp:
+                raise Exception(tr("Internet request failed."))
+
+        except Exception as e:
+            self.message.emit(tr("An error occurred while downloading trainer: ") + str(e), "failure")
+            time.sleep(self.download_finish_delay)
+            self.finished.emit(1)
+            return False
+
+        # Extract compressed file if not single exe
+        extracted = False
+        if os.path.splitext(trainerTemp)[1] in [".zip", ".rar"]:
+            extracted = True
+            self.message.emit(tr("Decompressing..."), None)
+            try:
+                command = [unzip_path, "x", "-y", trainerTemp, f"-o{extractedContentPath}"]
+                subprocess.run(command, check=True, creationflags=subprocess.CREATE_NO_WINDOW)
+
+            except Exception as e:
+                self.message.emit(tr("An error occurred while extracting downloaded trainer: ") + str(e), "failure")
+                time.sleep(self.download_finish_delay)
+                self.finished.emit(1)
+                return False
+
+            os.remove(trainerTemp)
+
+        if self.update_entry:
+            shutil.rmtree(selected_trainer['trainer_dir'])
+
+        destination_path = os.path.join(self.trainerDownloadPath, trainerName_display)
+        self.src_dst.append({"src": extractedContentPath if extracted else trainerTemp, "dst": destination_path if extracted else os.path.join(destination_path, os.path.basename(trainerTemp))})
+
+        return True

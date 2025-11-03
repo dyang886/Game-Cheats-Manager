@@ -51,6 +51,9 @@ class TrainerManagementDialog(QDialog):
         if not oldEnableXiaoXing and newEnableXiaoXing:
             self.parent().fetch_xiaoxing_data()
 
+        settings["enableGCM"] = self.enableGCMCheckbox.isChecked()
+        settings["autoUpdateGCMData"] = self.autoUpdateGCMDataCheckbox.isChecked()
+        settings["autoUpdateGCMTrainers"] = self.autoUpdateGCMTrainersCheckbox.isChecked()
         settings["flingDownloadServer"] = newFlingServer
         settings["removeFlingBgMusic"] = self.removeFlingBgMusicCheckbox.isChecked()
         settings["autoUpdateFlingData"] = self.autoUpdateFlingDataCheckbox.isChecked()
@@ -105,13 +108,18 @@ class TrainerManagementDialog(QDialog):
         columns.addLayout(column2, stretch=1)
         columns.setAlignment(column2, Qt.AlignmentFlag.AlignHCenter)
 
+        # Enable GCM and Other trainer
+        self.enableGCMCheckbox = QCheckBox(tr("Enable search for GCM and Other trainers"))
+        self.enableGCMCheckbox.setChecked(settings["enableGCM"])
+        column2.addWidget(self.enableGCMCheckbox)
+
         # Auto update GCM data
         self.autoUpdateGCMDataCheckbox = QCheckBox(tr("Update GCM data automatically"))
         self.autoUpdateGCMDataCheckbox.setChecked(settings["autoUpdateGCMData"])
         column2.addWidget(self.autoUpdateGCMDataCheckbox)
 
         # Auto update GCM trainers
-        self.autoUpdateGCMTrainersCheckbox = QCheckBox(tr("Update GCM trainers automatically"))
+        self.autoUpdateGCMTrainersCheckbox = QCheckBox(tr("Update GCM and Other trainers automatically"))
         self.autoUpdateGCMTrainersCheckbox.setChecked(settings["autoUpdateGCMTrainers"])
         column2.addWidget(self.autoUpdateGCMTrainersCheckbox)
 

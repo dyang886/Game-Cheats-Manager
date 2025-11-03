@@ -203,17 +203,34 @@ class DownloadBaseThread(QThread):
         return None
 
     def translate_trainer(self, trainerName, origin):
+        PREFIX_MAP = {
+            "zh": {
+                "xiaoxing": "[小幸]",
+                "gcm": "[GCM]",
+                "other": "[其他]"
+            },
+            "en": {
+                "xiaoxing": "[XiaoXing]",
+                "gcm": "[GCM]",
+                "other": "[Other]"
+            }
+        }
+
         try:
             if settings["language"] in ["zh_CN", "zh_TW"] and not settings["enSearchResults"]:
                 # Target language is Chinese
-                prefix = "[小幸]" if origin == "xiaoxing" else ""
-                best_match = self.find_best_trainer_match(trainerName, "zh")
+                lang_key = "zh"
+                lang_map = PREFIX_MAP[lang_key]
+                prefix = lang_map.get(origin, "")
+                best_match = self.find_best_trainer_match(trainerName, lang_key)
                 trainerName = f"{prefix}《{best_match or trainerName}》修改器"
 
-            elif settings["language"] == "en_US" or settings["enSearchResults"]:
+            else:
                 # Target language is English
-                prefix = "[XiaoXing]" if origin == "xiaoxing" else ""
-                best_match = self.find_best_trainer_match(trainerName, "en")
+                lang_key = "en"
+                lang_map = PREFIX_MAP[lang_key]
+                prefix = lang_map.get(origin, "")
+                best_match = self.find_best_trainer_match(trainerName, lang_key)
                 trainerName = f"{prefix} {best_match or trainerName} Trainer".strip()
 
         except Exception as e:
