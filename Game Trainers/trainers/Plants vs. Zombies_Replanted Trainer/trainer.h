@@ -3,6 +3,12 @@
 
 #include "Il2CppBase.h"
 
+struct PlantArgs
+{
+    int plantID;
+    int direction; // 0 = Right, 1 = Left
+};
+
 class Trainer : public Il2CppBase
 {
 public:
@@ -441,34 +447,11 @@ public:
 
     bool addPlantToGarden(int plantID)
     {
-        if (!initializeDllInjection())
+        if (initializeDllInjection())
         {
-            std::cerr << "[!] Failed to initialize IL2CPP bridge." << std::endl;
-            return false;
+            PlantArgs args = {plantID, 0};
+            return invokeMethod<PlantArgs>("AddPlantToGarden", args);
         }
-
-        // We are passing one int argument
-        std::vector<Param> args = {plantID};
-
-        // invokeMethod is inherited from Il2IppBase
-        void *result = invokeMethod(
-            "Assembly-CSharp.dll",     // imageName
-            "Reloaded.Gameplay",       // namespaceName
-            "ZenGarden",               // className
-            "AttemptNewPlantUserdata", // methodName
-            args                       // params
-        );
-
-        // For IL2CPP, bools are returned as non-zero (true) or zero (false)
-        if (result == nullptr)
-        {
-            std::cout << "[-] addPlantToGarden failed (returned false)." << std::endl;
-            return false;
-        }
-        else
-        {
-            std::cout << "[+] addPlantToGarden success." << std::endl;
-            return true;
-        }
+        return false;
     }
 };

@@ -6,4 +6,5 @@ obj/
 *.sln
 upload_trainers.py
 MonoBridge.dll
-Il2CppBridge.dll
+GCMInjection.dll
+IL2CPP.dll

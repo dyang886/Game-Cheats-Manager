@@ -158,6 +158,13 @@ def ensure_trainer_download_path_is_valid():
         os.makedirs(settings["downloadPath"], exist_ok=True)
 
 
+def findWeModInstallPath():
+    install_path = os.path.join(os.environ["LOCALAPPDATA"], "WeMod")
+    if os.path.exists(install_path):
+        return install_path
+    return os.path.join(os.environ["LOCALAPPDATA"], "Wand")
+
+
 def findCEInstallPath():
     base_path = r'C:\Program Files'
     latest_version = []
@@ -191,7 +198,7 @@ DOWNLOAD_TEMP_DIR = os.path.join(tempfile.gettempdir(), "GameCheatsManagerTemp",
 VERSION_TEMP_DIR = os.path.join(tempfile.gettempdir(), "GameCheatsManagerTemp", "version")
 WEMOD_TEMP_DIR = os.path.join(tempfile.gettempdir(), "GameCheatsManagerTemp", "wemod")
 
-wemod_install_path = os.path.join(os.environ["LOCALAPPDATA"], "WeMod")
+wemod_install_path = findWeModInstallPath()
 ce_install_path = findCEInstallPath()
 
 settings = load_settings()

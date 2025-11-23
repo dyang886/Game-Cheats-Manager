@@ -223,11 +223,19 @@ class WeModCustomization(QThread):
         asar = os.path.join(self.selectedWeModPath, "resources", "app.asar")
         asar_copy = os.path.join(WEMOD_TEMP_DIR, "app.asar")
         asar_bak = os.path.join(self.selectedWeModPath, "resources", "app.asar.bak")
-        weModExe = os.path.join(self.selectedWeModPath, "WeMod.exe")
-        weModExe_bak = os.path.join(self.selectedWeModPath, "WeMod.exe.bak")
+
+        weModExe_WeMod = os.path.join(self.selectedWeModPath, "WeMod.exe")  # ->  WeMod.exe latest is 11.6.0
+        weModExe_Wand = os.path.join(self.selectedWeModPath, "Wand.exe")  # ->  Wand.exe newest is 12.0.3
+        if os.path.exists(weModExe_Wand):
+            weModExeName = "Wand.exe"
+            weModExe = weModExe_Wand
+        else:
+            weModExeName = "WeMod.exe"
+            weModExe = weModExe_WeMod
+        weModExe_bak = os.path.join(self.selectedWeModPath, f"{weModExeName}.bak")
 
         # Terminate if WeMod is running
-        if self.is_program_running("WeMod.exe"):
+        if self.is_program_running(weModExeName):
             self.message.emit(tr("WeMod is currently running,\nplease close the application first"), "error")
             self.finished.emit()
             return
