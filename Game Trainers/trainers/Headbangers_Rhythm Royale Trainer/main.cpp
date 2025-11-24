@@ -148,6 +148,8 @@ int main(int argc, char **argv)
 
     int left_margin = 20;
     int button_w = 50;
+    int toggle_w = 16;
+    int toggle_spacer_w = 24;
     int input_w = 200;
     int option_gap = 10;
     int option_h = static_cast<int>(font_size * 1.5);
@@ -233,8 +235,11 @@ int main(int argc, char **argv)
     Fl_Flex *bread_flex = new Fl_Flex(0, 0, 0, 0, Fl_Flex::HORIZONTAL);
     bread_flex->gap(option_gap);
 
+    Fl_Box *bread_toggle_spacer = new Fl_Box(0, 0, 0, 0);
+    bread_flex->fixed(bread_toggle_spacer, toggle_spacer_w);
+
     Fl_Check_Button *bread_check_button = new Fl_Check_Button(0, 0, 0, 0);
-    bread_flex->fixed(bread_check_button, button_w);
+    bread_flex->fixed(bread_check_button, toggle_w);
 
     Fl_Box *bread_label = new Fl_Box(0, 0, 0, 0);
     tr(bread_label, "Set Bread");
@@ -256,8 +261,11 @@ int main(int argc, char **argv)
     Fl_Flex *exp_flex = new Fl_Flex(0, 0, 0, 0, Fl_Flex::HORIZONTAL);
     exp_flex->gap(option_gap);
 
+    Fl_Box *exp_toggle_spacer = new Fl_Box(0, 0, 0, 0);
+    exp_flex->fixed(exp_toggle_spacer, toggle_spacer_w);
+
     Fl_Check_Button *exp_check_button = new Fl_Check_Button(0, 0, 0, 0);
-    exp_flex->fixed(exp_check_button, button_w);
+    exp_flex->fixed(exp_check_button, toggle_w);
 
     Fl_Box *exp_label = new Fl_Box(0, 0, 0, 0);
     tr(exp_label, "Set Season Pass XP");
@@ -279,8 +287,11 @@ int main(int argc, char **argv)
     Fl_Flex *wins_flex = new Fl_Flex(0, 0, 0, 0, Fl_Flex::HORIZONTAL);
     wins_flex->gap(option_gap);
 
+    Fl_Box *wins_toggle_spacer = new Fl_Box(0, 0, 0, 0);
+    wins_flex->fixed(wins_toggle_spacer, toggle_spacer_w);
+
     Fl_Check_Button *wins_check_button = new Fl_Check_Button(0, 0, 0, 0);
-    wins_flex->fixed(wins_check_button, button_w);
+    wins_flex->fixed(wins_check_button, toggle_w);
 
     Fl_Box *wins_label = new Fl_Box(0, 0, 0, 0);
     tr(wins_label, "Set Number of Wins");

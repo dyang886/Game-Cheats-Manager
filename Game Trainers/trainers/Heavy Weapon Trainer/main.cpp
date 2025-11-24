@@ -219,6 +219,8 @@ int main(int argc, char **argv)
 
     int left_margin = 20;
     int button_w = 50;
+    int toggle_w = 16;
+    int toggle_spacer_w = 24;
     int input_w = 200;
     int option_gap = 10;
     int option_h = static_cast<int>(font_size * 1.5);
@@ -304,8 +306,11 @@ int main(int argc, char **argv)
     Fl_Flex *life_flex = new Fl_Flex(0, 0, 0, 0, Fl_Flex::HORIZONTAL);
     life_flex->gap(option_gap);
 
+    Fl_Box *life_toggle_spacer = new Fl_Box(0, 0, 0, 0);
+    life_flex->fixed(life_toggle_spacer, toggle_spacer_w);
+
     Fl_Check_Button *life_check_button = new Fl_Check_Button(0, 0, 0, 0);
-    life_flex->fixed(life_check_button, button_w);
+    life_flex->fixed(life_check_button, toggle_w);
 
     Fl_Box *life_label = new Fl_Box(0, 0, 0, 0);
     tr(life_label, "Set Life Count");
@@ -327,8 +332,11 @@ int main(int argc, char **argv)
     Fl_Flex *shield_flex = new Fl_Flex(0, 0, 0, 0, Fl_Flex::HORIZONTAL);
     shield_flex->gap(option_gap);
 
+    Fl_Box *shield_toggle_spacer = new Fl_Box(0, 0, 0, 0);
+    shield_flex->fixed(shield_toggle_spacer, toggle_spacer_w);
+
     Fl_Check_Button *shield_check_button = new Fl_Check_Button(0, 0, 0, 0);
-    shield_flex->fixed(shield_check_button, button_w);
+    shield_flex->fixed(shield_check_button, toggle_w);
 
     Fl_Box *shield_label = new Fl_Box(0, 0, 0, 0);
     tr(shield_label, "Set Shield Level");
@@ -350,8 +358,11 @@ int main(int argc, char **argv)
     Fl_Flex *nuke_flex = new Fl_Flex(0, 0, 0, 0, Fl_Flex::HORIZONTAL);
     nuke_flex->gap(option_gap);
 
+    Fl_Box *nuke_toggle_spacer = new Fl_Box(0, 0, 0, 0);
+    nuke_flex->fixed(nuke_toggle_spacer, toggle_spacer_w);
+
     Fl_Check_Button *nuke_check_button = new Fl_Check_Button(0, 0, 0, 0);
-    nuke_flex->fixed(nuke_check_button, button_w);
+    nuke_flex->fixed(nuke_check_button, toggle_w);
 
     Fl_Box *nuke_label = new Fl_Box(0, 0, 0, 0);
     tr(nuke_label, "Set Nuke Amount");
@@ -373,8 +384,11 @@ int main(int argc, char **argv)
     Fl_Flex *defense_orbs_flex = new Fl_Flex(0, 0, 0, 0, Fl_Flex::HORIZONTAL);
     defense_orbs_flex->gap(option_gap);
 
+    Fl_Box *defense_orbs_toggle_spacer = new Fl_Box(0, 0, 0, 0);
+    defense_orbs_flex->fixed(defense_orbs_toggle_spacer, toggle_spacer_w);
+
     Fl_Check_Button *defense_orbs_check_button = new Fl_Check_Button(0, 0, 0, 0);
-    defense_orbs_flex->fixed(defense_orbs_check_button, button_w);
+    defense_orbs_flex->fixed(defense_orbs_check_button, toggle_w);
 
     Fl_Box *defense_orbs_label = new Fl_Box(0, 0, 0, 0);
     tr(defense_orbs_label, "Set Defense Orbs Level");
@@ -396,8 +410,11 @@ int main(int argc, char **argv)
     Fl_Flex *homing_missile_flex = new Fl_Flex(0, 0, 0, 0, Fl_Flex::HORIZONTAL);
     homing_missile_flex->gap(option_gap);
 
+    Fl_Box *homing_missile_toggle_spacer = new Fl_Box(0, 0, 0, 0);
+    homing_missile_flex->fixed(homing_missile_toggle_spacer, toggle_spacer_w);
+
     Fl_Check_Button *homing_missile_check_button = new Fl_Check_Button(0, 0, 0, 0);
-    homing_missile_flex->fixed(homing_missile_check_button, button_w);
+    homing_missile_flex->fixed(homing_missile_check_button, toggle_w);
 
     Fl_Box *homing_missile_label = new Fl_Box(0, 0, 0, 0);
     tr(homing_missile_label, "Set Homing Missile Level");
@@ -419,8 +436,11 @@ int main(int argc, char **argv)
     Fl_Flex *laser_flex = new Fl_Flex(0, 0, 0, 0, Fl_Flex::HORIZONTAL);
     laser_flex->gap(option_gap);
 
+    Fl_Box *laser_toggle_spacer = new Fl_Box(0, 0, 0, 0);
+    laser_flex->fixed(laser_toggle_spacer, toggle_spacer_w);
+
     Fl_Check_Button *laser_check_button = new Fl_Check_Button(0, 0, 0, 0);
-    laser_flex->fixed(laser_check_button, button_w);
+    laser_flex->fixed(laser_check_button, toggle_w);
 
     Fl_Box *laser_label = new Fl_Box(0, 0, 0, 0);
     tr(laser_label, "Set Laser Level");
@@ -442,8 +462,11 @@ int main(int argc, char **argv)
     Fl_Flex *rockets_flex = new Fl_Flex(0, 0, 0, 0, Fl_Flex::HORIZONTAL);
     rockets_flex->gap(option_gap);
 
+    Fl_Box *rockets_toggle_spacer = new Fl_Box(0, 0, 0, 0);
+    rockets_flex->fixed(rockets_toggle_spacer, toggle_spacer_w);
+
     Fl_Check_Button *rockets_check_button = new Fl_Check_Button(0, 0, 0, 0);
-    rockets_flex->fixed(rockets_check_button, button_w);
+    rockets_flex->fixed(rockets_check_button, toggle_w);
 
     Fl_Box *rockets_label = new Fl_Box(0, 0, 0, 0);
     tr(rockets_label, "Set Rockets Level");
@@ -465,8 +488,11 @@ int main(int argc, char **argv)
     Fl_Flex *flak_cannon_flex = new Fl_Flex(0, 0, 0, 0, Fl_Flex::HORIZONTAL);
     flak_cannon_flex->gap(option_gap);
 
+    Fl_Box *flak_cannon_toggle_spacer = new Fl_Box(0, 0, 0, 0);
+    flak_cannon_flex->fixed(flak_cannon_toggle_spacer, toggle_spacer_w);
+
     Fl_Check_Button *flak_cannon_check_button = new Fl_Check_Button(0, 0, 0, 0);
-    flak_cannon_flex->fixed(flak_cannon_check_button, button_w);
+    flak_cannon_flex->fixed(flak_cannon_check_button, toggle_w);
 
     Fl_Box *flak_cannon_label = new Fl_Box(0, 0, 0, 0);
     tr(flak_cannon_label, "Set Flak Cannon Level");
@@ -488,8 +514,11 @@ int main(int argc, char **argv)
     Fl_Flex *thunder_strike_flex = new Fl_Flex(0, 0, 0, 0, Fl_Flex::HORIZONTAL);
     thunder_strike_flex->gap(option_gap);
 
+    Fl_Box *thunder_strike_toggle_spacer = new Fl_Box(0, 0, 0, 0);
+    thunder_strike_flex->fixed(thunder_strike_toggle_spacer, toggle_spacer_w);
+
     Fl_Check_Button *thunder_strike_check_button = new Fl_Check_Button(0, 0, 0, 0);
-    thunder_strike_flex->fixed(thunder_strike_check_button, button_w);
+    thunder_strike_flex->fixed(thunder_strike_check_button, toggle_w);
 
     Fl_Box *thunder_strike_label = new Fl_Box(0, 0, 0, 0);
     tr(thunder_strike_label, "Set Thunder Strike Level");

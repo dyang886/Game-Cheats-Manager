@@ -185,6 +185,8 @@ int main(int argc, char **argv)
 
     int left_margin = 20;
     int button_w = 50;
+    int toggle_w = 16;
+    int toggle_spacer_w = 24;
     int input_w = 200;
     int option_gap = 10;
     int option_h = static_cast<int>(font_size * 1.5);
@@ -270,8 +272,11 @@ int main(int argc, char **argv)
     Fl_Flex *health_flex = new Fl_Flex(0, 0, 0, 0, Fl_Flex::HORIZONTAL);
     health_flex->gap(option_gap);
 
+    Fl_Box *health_toggle_spacer = new Fl_Box(0, 0, 0, 0);
+    health_flex->fixed(health_toggle_spacer, toggle_spacer_w);
+
     Fl_Check_Button *health_check_button = new Fl_Check_Button(0, 0, 0, 0);
-    health_flex->fixed(health_check_button, button_w);
+    health_flex->fixed(health_check_button, toggle_w);
 
     Fl_Box *health_label = new Fl_Box(0, 0, 0, 0);
     tr(health_label, "Set Health");
@@ -293,8 +298,11 @@ int main(int argc, char **argv)
     Fl_Flex *max_health_flex = new Fl_Flex(0, 0, 0, 0, Fl_Flex::HORIZONTAL);
     max_health_flex->gap(option_gap);
 
+    Fl_Box *max_health_toggle_spacer = new Fl_Box(0, 0, 0, 0);
+    max_health_flex->fixed(max_health_toggle_spacer, toggle_spacer_w);
+
     Fl_Check_Button *max_health_check_button = new Fl_Check_Button(0, 0, 0, 0);
-    max_health_flex->fixed(max_health_check_button, button_w);
+    max_health_flex->fixed(max_health_check_button, toggle_w);
 
     Fl_Box *max_health_label = new Fl_Box(0, 0, 0, 0);
     tr(max_health_label, "Set Max Health");
@@ -316,8 +324,11 @@ int main(int argc, char **argv)
     Fl_Flex *speed_flex = new Fl_Flex(0, 0, 0, 0, Fl_Flex::HORIZONTAL);
     speed_flex->gap(option_gap);
 
+    Fl_Box *speed_toggle_spacer = new Fl_Box(0, 0, 0, 0);
+    speed_flex->fixed(speed_toggle_spacer, toggle_spacer_w);
+
     Fl_Check_Button *speed_check_button = new Fl_Check_Button(0, 0, 0, 0);
-    speed_flex->fixed(speed_check_button, button_w);
+    speed_flex->fixed(speed_check_button, toggle_w);
 
     Fl_Box *speed_label = new Fl_Box(0, 0, 0, 0);
     tr(speed_label, "Set Movement Speed");
@@ -339,8 +350,11 @@ int main(int argc, char **argv)
     Fl_Flex *coins_flex = new Fl_Flex(0, 0, 0, 0, Fl_Flex::HORIZONTAL);
     coins_flex->gap(option_gap);
 
+    Fl_Box *coins_toggle_spacer = new Fl_Box(0, 0, 0, 0);
+    coins_flex->fixed(coins_toggle_spacer, toggle_spacer_w);
+
     Fl_Check_Button *coins_check_button = new Fl_Check_Button(0, 0, 0, 0);
-    coins_flex->fixed(coins_check_button, button_w);
+    coins_flex->fixed(coins_check_button, toggle_w);
 
     Fl_Box *coins_label = new Fl_Box(0, 0, 0, 0);
     tr(coins_label, "Set Coins");
@@ -362,8 +376,11 @@ int main(int argc, char **argv)
     Fl_Flex *gems_flex = new Fl_Flex(0, 0, 0, 0, Fl_Flex::HORIZONTAL);
     gems_flex->gap(option_gap);
 
+    Fl_Box *gems_toggle_spacer = new Fl_Box(0, 0, 0, 0);
+    gems_flex->fixed(gems_toggle_spacer, toggle_spacer_w);
+
     Fl_Check_Button *gems_check_button = new Fl_Check_Button(0, 0, 0, 0);
-    gems_flex->fixed(gems_check_button, button_w);
+    gems_flex->fixed(gems_check_button, toggle_w);
 
     Fl_Box *gems_label = new Fl_Box(0, 0, 0, 0);
     tr(gems_label, "Set Gems");
@@ -385,8 +402,11 @@ int main(int argc, char **argv)
     Fl_Flex *arcane_chromo_flex = new Fl_Flex(0, 0, 0, 0, Fl_Flex::HORIZONTAL);
     arcane_chromo_flex->gap(option_gap);
 
+    Fl_Box *arcane_chromo_toggle_spacer = new Fl_Box(0, 0, 0, 0);
+    arcane_chromo_flex->fixed(arcane_chromo_toggle_spacer, toggle_spacer_w);
+
     Fl_Check_Button *arcane_chromo_check_button = new Fl_Check_Button(0, 0, 0, 0);
-    arcane_chromo_flex->fixed(arcane_chromo_check_button, button_w);
+    arcane_chromo_flex->fixed(arcane_chromo_check_button, toggle_w);
 
     Fl_Box *arcane_chromo_label = new Fl_Box(0, 0, 0, 0);
     tr(arcane_chromo_label, "Set Arcane Chromo");

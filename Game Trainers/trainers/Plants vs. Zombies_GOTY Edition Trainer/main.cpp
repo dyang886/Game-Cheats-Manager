@@ -181,6 +181,8 @@ int main(int argc, char **argv)
 
     int left_margin = 20;
     int button_w = 50;
+    int toggle_w = 16;
+    int toggle_spacer_w = 24;
     int input_w = 200;
     int option_gap = 10;
     int option_h = static_cast<int>(font_size * 1.5);
@@ -266,8 +268,11 @@ int main(int argc, char **argv)
     Fl_Flex *coin_flex = new Fl_Flex(0, 0, 0, 0, Fl_Flex::HORIZONTAL);
     coin_flex->gap(option_gap);
 
+    Fl_Box *coin_toggle_spacer = new Fl_Box(0, 0, 0, 0);
+    coin_flex->fixed(coin_toggle_spacer, toggle_spacer_w);
+
     Fl_Check_Button *coin_check_button = new Fl_Check_Button(0, 0, 0, 0);
-    coin_flex->fixed(coin_check_button, button_w);
+    coin_flex->fixed(coin_check_button, toggle_w);
 
     Fl_Box *coin_label = new Fl_Box(0, 0, 0, 0);
     tr(coin_label, "Add Coins");
@@ -289,8 +294,11 @@ int main(int argc, char **argv)
     Fl_Flex *sun_flex = new Fl_Flex(0, 0, 0, 0, Fl_Flex::HORIZONTAL);
     sun_flex->gap(option_gap);
 
+    Fl_Box *sun_toggle_spacer = new Fl_Box(0, 0, 0, 0);
+    sun_flex->fixed(sun_toggle_spacer, toggle_spacer_w);
+
     Fl_Check_Button *sun_check_button = new Fl_Check_Button(0, 0, 0, 0);
-    sun_flex->fixed(sun_check_button, button_w);
+    sun_flex->fixed(sun_check_button, toggle_w);
 
     Fl_Box *sun_label = new Fl_Box(0, 0, 0, 0);
     tr(sun_label, "Add Sun");
@@ -312,8 +320,11 @@ int main(int argc, char **argv)
     Fl_Flex *fertilizer_flex = new Fl_Flex(0, 0, 0, 0, Fl_Flex::HORIZONTAL);
     fertilizer_flex->gap(option_gap);
 
+    Fl_Box *fertilizer_toggle_spacer = new Fl_Box(0, 0, 0, 0);
+    fertilizer_flex->fixed(fertilizer_toggle_spacer, toggle_spacer_w);
+
     Fl_Check_Button *fertilizer_check_button = new Fl_Check_Button(0, 0, 0, 0);
-    fertilizer_flex->fixed(fertilizer_check_button, button_w);
+    fertilizer_flex->fixed(fertilizer_check_button, toggle_w);
 
     Fl_Box *fertilizer_label = new Fl_Box(0, 0, 0, 0);
     tr(fertilizer_label, "Set Fertilizer");
@@ -335,8 +346,11 @@ int main(int argc, char **argv)
     Fl_Flex *bug_spray_flex = new Fl_Flex(0, 0, 0, 0, Fl_Flex::HORIZONTAL);
     bug_spray_flex->gap(option_gap);
 
+    Fl_Box *bug_spray_toggle_spacer = new Fl_Box(0, 0, 0, 0);
+    bug_spray_flex->fixed(bug_spray_toggle_spacer, toggle_spacer_w);
+
     Fl_Check_Button *bug_spray_check_button = new Fl_Check_Button(0, 0, 0, 0);
-    bug_spray_flex->fixed(bug_spray_check_button, button_w);
+    bug_spray_flex->fixed(bug_spray_check_button, toggle_w);
 
     Fl_Box *bug_spray_label = new Fl_Box(0, 0, 0, 0);
     tr(bug_spray_label, "Set Bug Spray");
@@ -358,8 +372,11 @@ int main(int argc, char **argv)
     Fl_Flex *chocolate_flex = new Fl_Flex(0, 0, 0, 0, Fl_Flex::HORIZONTAL);
     chocolate_flex->gap(option_gap);
 
+    Fl_Box *chocolate_toggle_spacer = new Fl_Box(0, 0, 0, 0);
+    chocolate_flex->fixed(chocolate_toggle_spacer, toggle_spacer_w);
+
     Fl_Check_Button *chocolate_check_button = new Fl_Check_Button(0, 0, 0, 0);
-    chocolate_flex->fixed(chocolate_check_button, button_w);
+    chocolate_flex->fixed(chocolate_check_button, toggle_w);
 
     Fl_Box *chocolate_label = new Fl_Box(0, 0, 0, 0);
     tr(chocolate_label, "Set Chocolate");
@@ -381,8 +398,11 @@ int main(int argc, char **argv)
     Fl_Flex *tree_food_flex = new Fl_Flex(0, 0, 0, 0, Fl_Flex::HORIZONTAL);
     tree_food_flex->gap(option_gap);
 
+    Fl_Box *tree_food_toggle_spacer = new Fl_Box(0, 0, 0, 0);
+    tree_food_flex->fixed(tree_food_toggle_spacer, toggle_spacer_w);
+
     Fl_Check_Button *tree_food_check_button = new Fl_Check_Button(0, 0, 0, 0);
-    tree_food_flex->fixed(tree_food_check_button, button_w);
+    tree_food_flex->fixed(tree_food_check_button, toggle_w);
 
     Fl_Box *tree_food_label = new Fl_Box(0, 0, 0, 0);
     tr(tree_food_label, "Set Tree Food");

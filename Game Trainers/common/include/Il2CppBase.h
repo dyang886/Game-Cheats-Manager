@@ -12,6 +12,12 @@ public:
     uintptr_t remoteModuleBase = 0;
     uintptr_t localModuleBase = 0;
 
+    // Response communication with injected DLL
+    HANDLE hResponseMapFile = NULL;
+    LPVOID responseBuffer = nullptr;
+    HANDLE hResponseEvent = NULL;
+    const size_t responseBufferSize = 1024 * 1024;
+
     const char *DLL_RESOURCE_NAME = "IL2CPP_DLL";
 
     Il2CppBase(const std::wstring &processIdentifier, bool useWindowTitle = false)
@@ -24,7 +30,7 @@ public:
         unloadDll();
     }
 
-    // Extract DLL from resources to a temp file with fixed name
+    // Extract DLL from resources to a temp file with unique name per trainer
     std::string extractDllFromResource()
     {
         HMODULE hModule = GetModuleHandle(nullptr);
@@ -55,7 +61,10 @@ public:
 
         char dllPath[MAX_PATH];
         strcpy_s(dllPath, MAX_PATH, tempPath);
-        strcat_s(dllPath, MAX_PATH, "IL2CPP.dll");
+        // Create unique filename with current process ID to avoid conflicts between trainer instances
+        char uniqueName[64];
+        snprintf(uniqueName, sizeof(uniqueName), "IL2CPP_%lu.dll", GetCurrentProcessId());
+        strcat_s(dllPath, MAX_PATH, uniqueName);
 
         HANDLE hFile = CreateFileA(dllPath, GENERIC_WRITE, 0, nullptr, CREATE_ALWAYS, FILE_ATTRIBUTE_NORMAL, nullptr);
         if (hFile == INVALID_HANDLE_VALUE)
@@ -215,6 +224,49 @@ public:
         std::cout << "[+] DLL injected successfully.\n";
         std::cout << "[+] Remote base: 0x" << std::hex << remoteModuleBase << std::dec << "\n";
 
+        // 9. Initialize response communication channel
+        if (!initializeResponseChannel())
+        {
+            std::cerr << "[!] Failed to initialize response communication channel.\n";
+            return false;
+        }
+
+        return true;
+    }
+
+    /** Initialize shared memory and event for receiving responses from injected DLL */
+    bool initializeResponseChannel()
+    {
+        std::string responseSharedMemName = "IL2CppResponseSharedMemory_" + std::to_string(procId);
+        hResponseMapFile = CreateFileMappingA(INVALID_HANDLE_VALUE, NULL, PAGE_READWRITE, 0, responseBufferSize, responseSharedMemName.c_str());
+        if (hResponseMapFile == NULL)
+        {
+            std::cerr << "[!] Failed to create response file mapping: " << GetLastError() << "\n";
+            return false;
+        }
+
+        responseBuffer = MapViewOfFile(hResponseMapFile, FILE_MAP_ALL_ACCESS, 0, 0, 0);
+        if (responseBuffer == NULL)
+        {
+            std::cerr << "[!] Failed to map response buffer: " << GetLastError() << "\n";
+            CloseHandle(hResponseMapFile);
+            hResponseMapFile = NULL;
+            return false;
+        }
+
+        std::string eventName = "IL2CppResponseEvent_" + std::to_string(procId);
+        hResponseEvent = CreateEventA(NULL, FALSE, FALSE, eventName.c_str());
+        if (hResponseEvent == NULL)
+        {
+            std::cerr << "[!] Failed to create response event: " << GetLastError() << "\n";
+            UnmapViewOfFile(responseBuffer);
+            CloseHandle(hResponseMapFile);
+            hResponseMapFile = NULL;
+            responseBuffer = NULL;
+            return false;
+        }
+
+        std::cout << "[+] Response communication channel initialized.\n";
         return true;
     }
 
@@ -320,5 +372,80 @@ public:
 
         std::cout << "[+] Function invoked successfully.\n";
         return exitCode == 1;
+    }
+
+    /** Invoke an exported function and wait for a string response from the DLL */
+    std::string invokeMethodReturn(const char *functionName)
+    {
+        if (!hInjectedDll)
+        {
+            std::cerr << "[!] DLL not injected.\n";
+            return "";
+        }
+
+        if (!hResponseEvent)
+        {
+            std::cerr << "[!] Response channel not initialized.\n";
+            return "";
+        }
+
+        // Get function address from locally loaded DLL
+        FARPROC localFunc = GetProcAddress(hInjectedDll, functionName);
+        if (!localFunc)
+        {
+            std::cerr << "[!] Function '" << functionName << "' not found.\n";
+            return "";
+        }
+
+        // Calculate offset from local DLL base
+        uintptr_t offset = reinterpret_cast<uintptr_t>(localFunc) - localModuleBase;
+
+        // Calculate remote function address
+        uintptr_t remoteFuncAddr = remoteModuleBase + offset;
+
+        // Create remote thread to execute function (no arguments needed for response functions)
+        HANDLE hThread = CreateRemoteThread(
+            hProcess,
+            nullptr,
+            0,
+            (LPTHREAD_START_ROUTINE)remoteFuncAddr,
+            nullptr,
+            0,
+            nullptr);
+
+        if (!hThread)
+        {
+            std::cerr << "[!] Failed to create remote thread.\n";
+            return "";
+        }
+
+        // Wait for thread execution
+        WaitForSingleObject(hThread, INFINITE);
+        CloseHandle(hThread);
+
+        // Wait for the response event with a timeout
+        DWORD waitResult = WaitForSingleObject(hResponseEvent, 5000); // 5 seconds timeout
+        if (waitResult == WAIT_TIMEOUT)
+        {
+            std::cerr << "[!] Response timeout after 5 seconds.\n";
+            return "";
+        }
+        else if (waitResult == WAIT_FAILED)
+        {
+            std::cerr << "[!] WaitForSingleObject failed: " << GetLastError() << "\n";
+            return "";
+        }
+
+        // Read the response from shared memory
+        size_t length = *reinterpret_cast<size_t *>(responseBuffer);
+        if (length >= responseBufferSize - sizeof(size_t))
+        {
+            std::cerr << "[!] Response length exceeds buffer size.\n";
+            return "";
+        }
+
+        char *msgPtr = static_cast<char *>(responseBuffer) + sizeof(size_t);
+        std::string response(msgPtr, length);
+        return response;
     }
 };

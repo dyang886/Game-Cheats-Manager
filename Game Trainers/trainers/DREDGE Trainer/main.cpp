@@ -334,6 +334,12 @@ void info_callback(Fl_Widget *widget, void *data)
     Trainer *trainer = info_data->trainer;
     Fl_Input *input = info_data->input;
 
+    if (!trainer->isProcessRunning())
+    {
+        fl_alert(t("Please run the game first."));
+        return;
+    }
+
     if (info_window && info_window->shown())
     {
         info_window->show();
@@ -431,6 +437,8 @@ int main(int argc, char **argv)
 
     int left_margin = 20;
     int button_w = 50;
+    int toggle_w = 16;
+    int toggle_spacer_w = 24;
     int input_w = 200;
     int option_gap = 10;
     int option_h = static_cast<int>(font_size * 1.5);
@@ -518,8 +526,11 @@ int main(int argc, char **argv)
     Fl_Flex *god_mode_flex = new Fl_Flex(0, 0, 0, 0, Fl_Flex::HORIZONTAL);
     god_mode_flex->gap(option_gap);
 
+    Fl_Box *god_mode_toggle_spacer = new Fl_Box(0, 0, 0, 0);
+    god_mode_flex->fixed(god_mode_toggle_spacer, toggle_spacer_w);
+
     Fl_Check_Button *god_mode_check_button = new Fl_Check_Button(0, 0, 0, 0);
-    god_mode_flex->fixed(god_mode_check_button, button_w);
+    god_mode_flex->fixed(god_mode_check_button, toggle_w);
 
     Fl_Box *god_mode_label = new Fl_Box(0, 0, 0, 0);
     tr(god_mode_label, "God Mode");
@@ -536,8 +547,11 @@ int main(int argc, char **argv)
     Fl_Flex *set_sanity_flex = new Fl_Flex(0, 0, 0, 0, Fl_Flex::HORIZONTAL);
     set_sanity_flex->gap(option_gap);
 
+    Fl_Box *set_sanity_toggle_spacer = new Fl_Box(0, 0, 0, 0);
+    set_sanity_flex->fixed(set_sanity_toggle_spacer, toggle_spacer_w);
+
     Fl_Check_Button *set_sanity_check_button = new Fl_Check_Button(0, 0, 0, 0);
-    set_sanity_flex->fixed(set_sanity_check_button, button_w);
+    set_sanity_flex->fixed(set_sanity_check_button, toggle_w);
 
     Fl_Box *set_sanity_label = new Fl_Box(0, 0, 0, 0);
     tr(set_sanity_label, "Set Sanity");
@@ -559,8 +573,11 @@ int main(int argc, char **argv)
     Fl_Flex *set_movement_speed_flex = new Fl_Flex(0, 0, 0, 0, Fl_Flex::HORIZONTAL);
     set_movement_speed_flex->gap(option_gap);
 
+    Fl_Box *set_movement_speed_toggle_spacer = new Fl_Box(0, 0, 0, 0);
+    set_movement_speed_flex->fixed(set_movement_speed_toggle_spacer, toggle_spacer_w);
+
     Fl_Check_Button *set_movement_speed_check_button = new Fl_Check_Button(0, 0, 0, 0);
-    set_movement_speed_flex->fixed(set_movement_speed_check_button, button_w);
+    set_movement_speed_flex->fixed(set_movement_speed_check_button, toggle_w);
 
     Fl_Box *set_movement_speed_label = new Fl_Box(0, 0, 0, 0);
     tr(set_movement_speed_label, "Set Movement Speed");
@@ -700,8 +717,11 @@ int main(int argc, char **argv)
     Fl_Flex *freeze_time_flex = new Fl_Flex(0, 0, 0, 0, Fl_Flex::HORIZONTAL);
     freeze_time_flex->gap(option_gap);
 
+    Fl_Box *freeze_time_toggle_spacer = new Fl_Box(0, 0, 0, 0);
+    freeze_time_flex->fixed(freeze_time_toggle_spacer, toggle_spacer_w);
+
     Fl_Check_Button *freeze_time_check_button = new Fl_Check_Button(0, 0, 0, 0);
-    freeze_time_flex->fixed(freeze_time_check_button, button_w);
+    freeze_time_flex->fixed(freeze_time_check_button, toggle_w);
 
     Fl_Box *freeze_time_label = new Fl_Box(0, 0, 0, 0);
     tr(freeze_time_label, "Freeze Time");

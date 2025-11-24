@@ -445,11 +445,20 @@ public:
         return createNamedHook(nullptr, "SetCoin", pat, patternOffset, overwriteLen, codeSize, buildFunc);
     }
 
-    bool addPlantToGarden(int plantID)
+    std::string getPlantList()
     {
         if (initializeDllInjection())
         {
-            PlantArgs args = {plantID, 0};
+            return invokeMethodReturn("GetPlantList");
+        }
+        return "";
+    }
+
+    bool addPlantToGarden(int plantID, int direction = 0)
+    {
+        if (initializeDllInjection())
+        {
+            PlantArgs args = {plantID, direction};
             return invokeMethod<PlantArgs>("AddPlantToGarden", args);
         }
         return false;

@@ -249,6 +249,8 @@ int main(int argc, char **argv)
 
     int left_margin = 20;
     int button_w = 50;
+    int toggle_w = 16;
+    int toggle_spacer_w = 24;
     int input_w = 200;
     int option_gap = 10;
     int option_h = static_cast<int>(font_size * 1.5);
@@ -334,8 +336,11 @@ int main(int argc, char **argv)
     Fl_Flex *coin_flex = new Fl_Flex(0, 0, 0, 0, Fl_Flex::HORIZONTAL);
     coin_flex->gap(option_gap);
 
+    Fl_Box *coin_toggle_spacer = new Fl_Box(0, 0, 0, 0);
+    coin_flex->fixed(coin_toggle_spacer, toggle_spacer_w);
+
     Fl_Check_Button *coin_check_button = new Fl_Check_Button(0, 0, 0, 0);
-    coin_flex->fixed(coin_check_button, button_w);
+    coin_flex->fixed(coin_check_button, toggle_w);
 
     Fl_Box *coin_label = new Fl_Box(0, 0, 0, 0);
     tr(coin_label, "Set Coins");
@@ -357,8 +362,11 @@ int main(int argc, char **argv)
     Fl_Flex *health_flex = new Fl_Flex(0, 0, 0, 0, Fl_Flex::HORIZONTAL);
     health_flex->gap(option_gap);
 
+    Fl_Box *health_toggle_spacer = new Fl_Box(0, 0, 0, 0);
+    health_flex->fixed(health_toggle_spacer, toggle_spacer_w);
+
     Fl_Check_Button *health_check_button = new Fl_Check_Button(0, 0, 0, 0);
-    health_flex->fixed(health_check_button, button_w);
+    health_flex->fixed(health_check_button, toggle_w);
 
     Fl_Box *health_label = new Fl_Box(0, 0, 0, 0);
     tr(health_label, "Set Health");
@@ -380,8 +388,11 @@ int main(int argc, char **argv)
     Fl_Flex *horizontal_speed_flex = new Fl_Flex(0, 0, 0, 0, Fl_Flex::HORIZONTAL);
     horizontal_speed_flex->gap(option_gap);
 
+    Fl_Box *horizontal_speed_toggle_spacer = new Fl_Box(0, 0, 0, 0);
+    horizontal_speed_flex->fixed(horizontal_speed_toggle_spacer, toggle_spacer_w);
+
     Fl_Check_Button *horizontal_speed_check_button = new Fl_Check_Button(0, 0, 0, 0);
-    horizontal_speed_flex->fixed(horizontal_speed_check_button, button_w);
+    horizontal_speed_flex->fixed(horizontal_speed_check_button, toggle_w);
 
     Fl_Box *horizontal_speed_label = new Fl_Box(0, 0, 0, 0);
     tr(horizontal_speed_label, "Set Horizontal Speed");
@@ -403,8 +414,11 @@ int main(int argc, char **argv)
     Fl_Flex *arrow_damage_flex = new Fl_Flex(0, 0, 0, 0, Fl_Flex::HORIZONTAL);
     arrow_damage_flex->gap(option_gap);
 
+    Fl_Box *arrow_damage_toggle_spacer = new Fl_Box(0, 0, 0, 0);
+    arrow_damage_flex->fixed(arrow_damage_toggle_spacer, toggle_spacer_w);
+
     Fl_Check_Button *arrow_damage_check_button = new Fl_Check_Button(0, 0, 0, 0);
-    arrow_damage_flex->fixed(arrow_damage_check_button, button_w);
+    arrow_damage_flex->fixed(arrow_damage_check_button, toggle_w);
 
     Fl_Box *arrow_damage_label = new Fl_Box(0, 0, 0, 0);
     tr(arrow_damage_label, "Set Arrow Damage");
@@ -426,8 +440,11 @@ int main(int argc, char **argv)
     Fl_Flex *arrow_frequency_flex = new Fl_Flex(0, 0, 0, 0, Fl_Flex::HORIZONTAL);
     arrow_frequency_flex->gap(option_gap);
 
+    Fl_Box *arrow_frequency_toggle_spacer = new Fl_Box(0, 0, 0, 0);
+    arrow_frequency_flex->fixed(arrow_frequency_toggle_spacer, toggle_spacer_w);
+
     Fl_Check_Button *arrow_frequency_check_button = new Fl_Check_Button(0, 0, 0, 0);
-    arrow_frequency_flex->fixed(arrow_frequency_check_button, button_w);
+    arrow_frequency_flex->fixed(arrow_frequency_check_button, toggle_w);
 
     Fl_Box *arrow_frequency_label = new Fl_Box(0, 0, 0, 0);
     tr(arrow_frequency_label, "Set Arrow Frequency");
@@ -449,8 +466,11 @@ int main(int argc, char **argv)
     Fl_Flex *arrow_speed_flex = new Fl_Flex(0, 0, 0, 0, Fl_Flex::HORIZONTAL);
     arrow_speed_flex->gap(option_gap);
 
+    Fl_Box *arrow_speed_toggle_spacer = new Fl_Box(0, 0, 0, 0);
+    arrow_speed_flex->fixed(arrow_speed_toggle_spacer, toggle_spacer_w);
+
     Fl_Check_Button *arrow_speed_check_button = new Fl_Check_Button(0, 0, 0, 0);
-    arrow_speed_flex->fixed(arrow_speed_check_button, button_w);
+    arrow_speed_flex->fixed(arrow_speed_check_button, toggle_w);
 
     Fl_Box *arrow_speed_label = new Fl_Box(0, 0, 0, 0);
     tr(arrow_speed_label, "Set Arrow Speed");
@@ -472,8 +492,11 @@ int main(int argc, char **argv)
     Fl_Flex *arrow_distance_flex = new Fl_Flex(0, 0, 0, 0, Fl_Flex::HORIZONTAL);
     arrow_distance_flex->gap(option_gap);
 
+    Fl_Box *arrow_distance_toggle_spacer = new Fl_Box(0, 0, 0, 0);
+    arrow_distance_flex->fixed(arrow_distance_toggle_spacer, toggle_spacer_w);
+
     Fl_Check_Button *arrow_distance_check_button = new Fl_Check_Button(0, 0, 0, 0);
-    arrow_distance_flex->fixed(arrow_distance_check_button, button_w);
+    arrow_distance_flex->fixed(arrow_distance_check_button, toggle_w);
 
     Fl_Box *arrow_distance_label = new Fl_Box(0, 0, 0, 0);
     tr(arrow_distance_label, "Set Arrow Distance");
@@ -495,8 +518,11 @@ int main(int argc, char **argv)
     Fl_Flex *arrow_count_flex = new Fl_Flex(0, 0, 0, 0, Fl_Flex::HORIZONTAL);
     arrow_count_flex->gap(option_gap);
 
+    Fl_Box *arrow_count_toggle_spacer = new Fl_Box(0, 0, 0, 0);
+    arrow_count_flex->fixed(arrow_count_toggle_spacer, toggle_spacer_w);
+
     Fl_Check_Button *arrow_count_check_button = new Fl_Check_Button(0, 0, 0, 0);
-    arrow_count_flex->fixed(arrow_count_check_button, button_w);
+    arrow_count_flex->fixed(arrow_count_check_button, toggle_w);
 
     Fl_Box *arrow_count_label = new Fl_Box(0, 0, 0, 0);
     tr(arrow_count_label, "Set Arrow Count");
@@ -518,8 +544,11 @@ int main(int argc, char **argv)
     Fl_Flex *sword_damage_flex = new Fl_Flex(0, 0, 0, 0, Fl_Flex::HORIZONTAL);
     sword_damage_flex->gap(option_gap);
 
+    Fl_Box *sword_damage_toggle_spacer = new Fl_Box(0, 0, 0, 0);
+    sword_damage_flex->fixed(sword_damage_toggle_spacer, toggle_spacer_w);
+
     Fl_Check_Button *sword_damage_check_button = new Fl_Check_Button(0, 0, 0, 0);
-    sword_damage_flex->fixed(sword_damage_check_button, button_w);
+    sword_damage_flex->fixed(sword_damage_check_button, toggle_w);
 
     Fl_Box *sword_damage_label = new Fl_Box(0, 0, 0, 0);
     tr(sword_damage_label, "Set Sword Damage");
@@ -541,8 +570,11 @@ int main(int argc, char **argv)
     Fl_Flex *sword_cool_down_flex = new Fl_Flex(0, 0, 0, 0, Fl_Flex::HORIZONTAL);
     sword_cool_down_flex->gap(option_gap);
 
+    Fl_Box *sword_cool_down_toggle_spacer = new Fl_Box(0, 0, 0, 0);
+    sword_cool_down_flex->fixed(sword_cool_down_toggle_spacer, toggle_spacer_w);
+
     Fl_Check_Button *sword_cool_down_check_button = new Fl_Check_Button(0, 0, 0, 0);
-    sword_cool_down_flex->fixed(sword_cool_down_check_button, button_w);
+    sword_cool_down_flex->fixed(sword_cool_down_check_button, toggle_w);
 
     Fl_Box *sword_cool_down_label = new Fl_Box(0, 0, 0, 0);
     tr(sword_cool_down_label, "Set Sword Cooldown");
@@ -564,8 +596,11 @@ int main(int argc, char **argv)
     Fl_Flex *sword_speed_flex = new Fl_Flex(0, 0, 0, 0, Fl_Flex::HORIZONTAL);
     sword_speed_flex->gap(option_gap);
 
+    Fl_Box *sword_speed_toggle_spacer = new Fl_Box(0, 0, 0, 0);
+    sword_speed_flex->fixed(sword_speed_toggle_spacer, toggle_spacer_w);
+
     Fl_Check_Button *sword_speed_check_button = new Fl_Check_Button(0, 0, 0, 0);
-    sword_speed_flex->fixed(sword_speed_check_button, button_w);
+    sword_speed_flex->fixed(sword_speed_check_button, toggle_w);
 
     Fl_Box *sword_speed_label = new Fl_Box(0, 0, 0, 0);
     tr(sword_speed_label, "Set Sword Speed");
@@ -587,8 +622,11 @@ int main(int argc, char **argv)
     Fl_Flex *sword_distance_flex = new Fl_Flex(0, 0, 0, 0, Fl_Flex::HORIZONTAL);
     sword_distance_flex->gap(option_gap);
 
+    Fl_Box *sword_distance_toggle_spacer = new Fl_Box(0, 0, 0, 0);
+    sword_distance_flex->fixed(sword_distance_toggle_spacer, toggle_spacer_w);
+
     Fl_Check_Button *sword_distance_check_button = new Fl_Check_Button(0, 0, 0, 0);
-    sword_distance_flex->fixed(sword_distance_check_button, button_w);
+    sword_distance_flex->fixed(sword_distance_check_button, toggle_w);
 
     Fl_Box *sword_distance_label = new Fl_Box(0, 0, 0, 0);
     tr(sword_distance_label, "Set Sword Distance");

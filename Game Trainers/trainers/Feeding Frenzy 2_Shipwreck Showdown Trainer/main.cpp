@@ -134,6 +134,8 @@ int main(int argc, char **argv)
 
     int left_margin = 20;
     int button_w = 50;
+    int toggle_w = 16;
+    int toggle_spacer_w = 24;
     int input_w = 200;
     int option_gap = 10;
     int option_h = static_cast<int>(font_size * 1.5);
@@ -219,8 +221,11 @@ int main(int argc, char **argv)
     Fl_Flex *lives_flex = new Fl_Flex(0, 0, 0, 0, Fl_Flex::HORIZONTAL);
     lives_flex->gap(option_gap);
 
+    Fl_Box *lives_toggle_spacer = new Fl_Box(0, 0, 0, 0);
+    lives_flex->fixed(lives_toggle_spacer, toggle_spacer_w);
+
     Fl_Check_Button *lives_check_button = new Fl_Check_Button(0, 0, 0, 0);
-    lives_flex->fixed(lives_check_button, button_w);
+    lives_flex->fixed(lives_check_button, toggle_w);
 
     Fl_Box *lives_label = new Fl_Box(0, 0, 0, 0);
     tr(lives_label, "Set Lives");

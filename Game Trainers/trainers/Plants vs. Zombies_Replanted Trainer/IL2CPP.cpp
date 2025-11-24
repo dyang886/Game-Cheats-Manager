@@ -2,6 +2,7 @@
 #pragma warning(disable : 4996)
 
 #include <iostream>
+#include <sstream>
 #include "il2cpp/il2cpp.h"
 
 using namespace IL2CPP;
@@ -13,6 +14,7 @@ const char *GAME_NAMESPACE = "Reloaded.Gameplay";
 const char *BOARD_CLASS = "Board";
 const char *ZENGARDEN_CLASS = "ZenGarden";
 const char *USERPROFILE_CLASS = "UserProfile";
+const char *SEEDTYPE_ENUM = "SeedType";
 
 // Methods
 const char *UPDATE_METHOD = "UpdateGame";
@@ -187,22 +189,115 @@ bool InitializeIL2CPP()
     return true;
 }
 
-/** Verify all required hooks and methods are ready */
-bool ValidateIL2CPP()
+/** Send a string response back to the trainer through shared memory */
+extern "C" __declspec(dllexport) void SendResponse(const char *message)
 {
-    if (!update_hook || !AttemptNewPlantUserdata)
+    if (!message)
+        return;
+
+    DWORD procId = GetCurrentProcessId();
+    char mappingName[256];
+    char eventName[256];
+
+    snprintf(mappingName, sizeof(mappingName), "IL2CppResponseSharedMemory_%lu", procId);
+    snprintf(eventName, sizeof(eventName), "IL2CppResponseEvent_%lu", procId);
+
+    // Open the shared memory file mapping created by trainer
+    HANDLE hMapFile = OpenFileMappingA(FILE_MAP_ALL_ACCESS, FALSE, mappingName);
+    if (!hMapFile)
     {
-        std::cout << "[!] Hooks or functions not initialized properly.\n";
-        return false;
+        std::cerr << "[!] Failed to open shared memory: " << mappingName << "\n";
+        return;
     }
-    return true;
+
+    // Map the file view
+    LPVOID pBuf = MapViewOfFile(hMapFile, FILE_MAP_ALL_ACCESS, 0, 0, 1024 * 1024);
+    if (!pBuf)
+    {
+        std::cerr << "[!] Failed to map view of file.\n";
+        CloseHandle(hMapFile);
+        return;
+    }
+
+    // Write the response: [length][data...]
+    size_t msgLen = strlen(message);
+    if (msgLen > 1024 * 1024 - sizeof(size_t))
+    {
+        std::cerr << "[!] Message too large for response buffer.\n";
+        UnmapViewOfFile(pBuf);
+        CloseHandle(hMapFile);
+        return;
+    }
+
+    memcpy(pBuf, &msgLen, sizeof(size_t));
+    memcpy(static_cast<char *>(pBuf) + sizeof(size_t), message, msgLen);
+
+    // Open the event and signal it
+    HANDLE hEvent = OpenEventA(EVENT_MODIFY_STATE, FALSE, eventName);
+    if (hEvent)
+    {
+        SetEvent(hEvent);
+        CloseHandle(hEvent);
+        std::cout << "[+] Response sent: " << message << "\n";
+    }
+    else
+    {
+        std::cerr << "[!] Failed to open response event: " << eventName << "\n";
+    }
+
+    // Cleanup
+    UnmapViewOfFile(pBuf);
+    CloseHandle(hMapFile);
+}
+
+/** Test function that returns a random string response */
+extern "C" __declspec(dllexport) void GetPlantList()
+{
+    if (!InitializeIL2CPP())
+        return;
+
+    std::stringstream ss;
+
+    auto assembly = IL2CPP::Assembly(GAME_ASSEMBLY);
+    auto ns = assembly->Namespace(GAME_NAMESPACE);
+    auto enumClass = ns->Class(SEEDTYPE_ENUM);
+
+    if (enumClass)
+    {
+        void *iter = nullptr;
+        FieldInfo *field = nullptr;
+
+        while ((field = IL2CPP::API::il2cpp_class_get_fields(enumClass, &iter)))
+        {
+            const char *fieldName = IL2CPP::API::il2cpp_field_get_name(field);
+
+            // Skip internal value field
+            if (strcmp(fieldName, "value__") == 0)
+                continue;
+
+            int32_t value = 0;
+            IL2CPP::API::il2cpp_field_static_get_value(field, &value);
+
+            // 'NumSeedTypes' is 53. Plants are 0-52 (40+ are not plantable). Zombies are 60+.
+            if (value >= 0 && value <= 39)
+            {
+                ss << value << ">" << fieldName << "\n";
+            }
+        }
+    }
+    else
+    {
+        ss << "";
+    }
+
+    SendResponse(ss.str().c_str());
 }
 
 /** Exported function called by trainer to queue a plant addition */
 extern "C" __declspec(dllexport) DWORD WINAPI AddPlantToGarden(LPVOID lpParam)
 {
     PlantArgs *args = (PlantArgs *)lpParam;
-    if (!args || !InitializeIL2CPP() || !ValidateIL2CPP())
+    if (!args || !InitializeIL2CPP())
         return 0;
 
     g_PlantCommand.plantID = args->plantID;

@@ -12,8 +12,11 @@ using json = nlohmann::json;
 // Fl_Flex *{{}}_flex = new Fl_Flex(0, 0, 0, 0, Fl_Flex::HORIZONTAL);
 // {{}}_flex->gap(option_gap);
 
+// Fl_Box *{{}}_toggle_spacer = new Fl_Box(0, 0, 0, 0);
+// {{}}_flex->fixed({{}}_toggle_spacer, toggle_spacer_w);
+
 // Fl_Check_Button *{{}}_check_button = new Fl_Check_Button(0, 0, 0, 0);
-// {{}}_flex->fixed({{}}_check_button, button_w);
+// {{}}_flex->fixed({{}}_check_button, toggle_w);
 
 // Fl_Box *{{}}_label = new Fl_Box(0, 0, 0, 0);
 // tr({{}}_label, "Label");

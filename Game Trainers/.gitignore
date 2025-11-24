@@ -4,6 +4,7 @@ bin/
 obj/
 .venv/
 *.sln
+*.ps1
 upload_trainers.py
 MonoBridge.dll
 GCMInjection.dll
