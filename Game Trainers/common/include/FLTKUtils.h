@@ -1,67 +1,30 @@
 #include <nlohmann/json.hpp>
 #include <fstream>
 #include <shlobj.h>
+#include <FL/Fl_Table.H>
 
 using json = nlohmann::json;
 
-// Individual option template:
-
-// // ------------------------------------------------------------------
-// // {{}} (Toggle)
-// // ------------------------------------------------------------------
-// Fl_Flex *{{}}_flex = new Fl_Flex(0, 0, 0, 0, Fl_Flex::HORIZONTAL);
-// {{}}_flex->gap(option_gap);
-
-// Fl_Box *{{}}_toggle_spacer = new Fl_Box(0, 0, 0, 0);
-// {{}}_flex->fixed({{}}_toggle_spacer, toggle_spacer_w);
-
-// Fl_Check_Button *{{}}_check_button = new Fl_Check_Button(0, 0, 0, 0);
-// {{}}_flex->fixed({{}}_check_button, toggle_w);
-
-// Fl_Box *{{}}_label = new Fl_Box(0, 0, 0, 0);
-// tr({{}}_label, "Label");
-
-// Fl_Input *{{}}_input = new Fl_Input(0, 0, 0, 0);
-// {{}}_flex->fixed({{}}_input, input_w);
-// {{}}_input->type(FL_INT_INPUT);
-// set_input_values({{}}_input, "default", "minimum", "maximum");
-
-// ToggleData *data_{{}} = new ToggleData{&trainer, "OptionName", {{}}_check_button, {{}}_input};
-// {{}}_check_button->callback(toggle_callback, data_{{}});
-
-// {{}}_flex->end();
-// options1_flex->fixed({{}}_flex, option_h);
-
-// // ------------------------------------------------------------------
-// // {{}} (Apply)
-// // ------------------------------------------------------------------
-// Fl_Flex *{{}}_flex = new Fl_Flex(0, 0, 0, 0, Fl_Flex::HORIZONTAL);
-// {{}}_flex->gap(option_gap);
-
-// Fl_Button *{{}}_apply_button = new Fl_Button(0, 0, 0, 0);
-// {{}}_flex->fixed({{}}_apply_button, button_w);
-// tr({{}}_apply_button, "Apply");
-
-// Fl_Box *{{}}_label = new Fl_Box(0, 0, 0, 0);
-// tr({{}}_label, "Label");
-
-// Fl_Input *{{}}_input = new Fl_Input(0, 0, 0, 0);
-// {{}}_flex->fixed({{}}_input, input_w);
-// {{}}_input->type(FL_INT_INPUT);
-// set_input_values({{}}_input, "default", "minimum", "maximum");
-
-// ApplyData *data_{{}} = new ApplyData{&trainer, "OptionName", {{}}_apply_button, {{}}_input};
-// {{}}_apply_button->callback(apply_callback, data_{{}});
-
-// {{}}_flex->end();
-// options1_flex->fixed({{}}_flex, option_h);
-
-int font_size = 15;
+// Globals
+constexpr int font_size = 15;
 static HANDLE font_handle = nullptr;
 std::unordered_map<std::string, std::unordered_map<std::string, std::string>> translations;
 std::vector<std::pair<Fl_Widget *, std::string>> translatable_widgets;
 std::string language = "en_US";
 std::string settings_path = "";
+
+// UI Layout Constants
+constexpr int UI_LEFT_MARGIN = 20;
+constexpr int UI_BUTTON_WIDTH = 50;
+constexpr int UI_TOGGLE_WIDTH = 16;
+constexpr int UI_TOGGLE_SPACER_WIDTH = 24;
+constexpr int UI_INPUT_WIDTH = 200;
+constexpr int UI_OPTION_GAP = 10;
+constexpr int UI_OPTION_HEIGHT = static_cast<int>(font_size * 1.5);
+
+// ===========================================================================
+// Data Structures
+// ===========================================================================
 
 struct TimeoutData
 {
@@ -93,6 +56,21 @@ struct ToggleData
     Fl_Check_Button *button;
     Fl_Input *input;
 };
+
+// Structure to hold callback data for info buttons
+struct InfoCallbackData
+{
+    Trainer *trainer;
+    Fl_Input **input_ptr;
+    std::string windowTitleKey;
+    Fl_Window **windowInstance;
+    std::vector<std::string> columnTitles;
+    std::string (Trainer::*dataRetriever)();
+};
+
+// ===========================================================================
+// Resource Management Functions
+// ===========================================================================
 
 const unsigned char *load_resource(const char *resource_name, DWORD &size)
 {
@@ -421,4 +399,441 @@ void check_process_status(void *data)
     }
 
     Fl::repeat_timeout(1.0, check_process_status, data);
+}
+
+// ===========================================================================
+// Info Table and Callbacks
+// ===========================================================================
+
+// Displayed by pressing info button
+class ItemTable : public Fl_Table
+{
+private:
+    std::vector<std::vector<std::string>> items;
+    int selected_row = -1;
+    Fl_Input *input;
+    std::vector<std::string> columnTitles;
+
+protected:
+    void draw_cell(TableContext context, int row, int col, int x, int y, int w, int h) override
+    {
+        switch (context)
+        {
+        case CONTEXT_STARTPAGE:
+            fl_font(FL_FREE_FONT, font_size);
+            return;
+        case CONTEXT_COL_HEADER:
+            fl_push_clip(x, y, w, h);
+            fl_color(FL_FREE_COLOR);
+            fl_rectf(x, y, w, h);
+            fl_color(FL_WHITE);
+            if (col >= 0 && col < (int)columnTitles.size())
+            {
+                fl_draw(t(columnTitles[col]), x + 4, y, w, h, FL_ALIGN_LEFT);
+            }
+            fl_pop_clip();
+            return;
+        case CONTEXT_CELL:
+            fl_push_clip(x, y, w, h);
+            fl_color(row == selected_row ? fl_lighter(FL_FREE_COLOR) : FL_FREE_COLOR);
+            fl_rectf(x, y, w, h);
+            fl_color(FL_WHITE);
+            if (row < (int)items.size() && col < (int)items[row].size())
+            {
+                fl_draw(items[row][col].c_str(), x + 4, y, w, h, FL_ALIGN_LEFT);
+            }
+            fl_pop_clip();
+            return;
+        default:
+            return;
+        }
+    }
+
+    bool find_cell_at(int mouse_x, int mouse_y, int &row, int &col)
+    {
+        int table_x = x();
+        int table_y = y();
+        int table_w = w() - scrollbar_size();
+        int table_h = h() - scrollbar_size();
+
+        int mx = mouse_x - table_x;
+        int my = mouse_y - table_y;
+
+        int scroll_y = vscrollbar->value();
+        int adjusted_my = my + scroll_y;
+
+        if (mx < 0 || mx >= table_w)
+            return false;
+
+        int y_offset = col_header_height();
+        row = -1;
+        for (int r = 0; r < rows(); r++)
+        {
+            int rh = row_height(r);
+            if (adjusted_my >= y_offset && adjusted_my < y_offset + rh)
+            {
+                row = r;
+                break;
+            }
+            y_offset += rh;
+        }
+        if (row < 0 || row >= (int)items.size())
+            return false;
+
+        int x_offset = 0;
+        col = -1;
+        for (int c = 0; c < cols(); c++)
+        {
+            int cw = col_width(c);
+            if (mx >= x_offset && mx < x_offset + cw)
+            {
+                col = c;
+                break;
+            }
+            x_offset += cw;
+        }
+        if (col < 0 || col >= cols())
+            return false;
+
+        return true;
+    }
+
+    int handle(int event) override
+    {
+        int ret = Fl_Table::handle(event);
+        int row, col;
+
+        if (event == FL_PUSH && Fl::event_button() == FL_LEFT_MOUSE)
+        {
+            if (find_cell_at(Fl::event_x(), Fl::event_y(), row, col))
+            {
+                selected_row = row;
+                if (input && row < (int)items.size() && !items[row].empty())
+                {
+                    input->value(items[row][0].c_str());
+                }
+                redraw();
+                return 1;
+            }
+            else
+            {
+                selected_row = -1;
+                redraw();
+                return 1;
+            }
+        }
+        else if (event == FL_RELEASE && Fl::event_button() == FL_LEFT_MOUSE && Fl::event_clicks() > 0)
+        {
+            if (find_cell_at(Fl::event_x(), Fl::event_y(), row, col))
+            {
+                selected_row = row;
+                if (input && row < (int)items.size() && !items[row].empty())
+                {
+                    input->value(items[row][0].c_str());
+                }
+                Fl_Window *win = dynamic_cast<Fl_Window *>(parent()->top_window());
+                if (win)
+                {
+                    win->hide();
+                }
+                redraw();
+                return 1;
+            }
+        }
+        return ret;
+    }
+
+public:
+    ItemTable(int x, int y, int w, int h, Fl_Input *inp, const std::vector<std::string> &titles, const char *l = 0) : Fl_Table(x, y, w, h, l), input(inp), columnTitles(titles)
+    {
+        int scrollbarSize = 16;
+        int numCols = titles.size();
+        cols(numCols);
+        col_header(1);
+
+        // Set column widths: first column (ID) is narrower, remaining columns share the rest
+        int availableWidth = w - scrollbarSize;
+        int idColWidth = 100;
+        int otherColsWidth = (availableWidth - idColWidth) / (numCols - 1);
+
+        col_width(0, idColWidth);
+        for (int i = 1; i < numCols; i++)
+        {
+            col_width(i, otherColsWidth);
+        }
+
+        row_header(0);
+        box(FL_NO_BOX);
+        scrollbar_size(scrollbarSize);
+        end();
+    }
+
+    void setItems(const std::vector<std::vector<std::string>> &item_list)
+    {
+        items = item_list;
+        rows(item_list.size());
+        selected_row = -1;
+        redraw();
+    }
+};
+
+void toggle_callback(Fl_Widget *widget, void *data);
+void apply_callback(Fl_Widget *widget, void *data);
+void info_callback(Fl_Widget *widget, void *data)
+{
+    InfoCallbackData *info_data = static_cast<InfoCallbackData *>(data);
+    if (!info_data || !info_data->trainer || info_data->columnTitles.empty() || !info_data->windowInstance)
+        return;
+
+    Trainer *trainer = info_data->trainer;
+    Fl_Input *input = info_data->input_ptr ? *info_data->input_ptr : nullptr;
+    const std::vector<std::string> &columnTitles = info_data->columnTitles;
+    const std::string &windowTitleKey = info_data->windowTitleKey;
+    Fl_Window *&list_window = *info_data->windowInstance;
+
+    if (!trainer->isProcessRunning())
+    {
+        fl_alert(t("Please run the game first."));
+        return;
+    }
+
+    // Call the member function pointer to get the list data
+    std::string itemListData = (trainer->*info_data->dataRetriever)();
+
+    if (list_window && list_window->shown())
+    {
+        list_window->show();
+        return;
+    }
+
+    Fl_Window *trainer_window = widget->window();
+    int trainer_x = trainer_window->x();
+    int trainer_y = trainer_window->y();
+    int trainer_w = trainer_window->w();
+    int trainer_h = trainer_window->h();
+
+    int list_w = 350;
+    int list_h = 500;
+    int list_x = trainer_x + (trainer_w - list_w) / 2;
+    int list_y = trainer_y + (trainer_h - list_h) / 2;
+
+    list_window = new Fl_Window(list_x, list_y, list_w, list_h, t(windowTitleKey.c_str()));
+    list_window->icon((char *)LoadIconA(GetModuleHandle(NULL), "APP_ICON"));
+
+    std::vector<std::vector<std::string>> items;
+    int numCols = columnTitles.size();
+    std::istringstream iss(itemListData);
+    std::string line;
+
+    while (std::getline(iss, line))
+    {
+        line.erase(std::remove(line.begin(), line.end(), '\r'), line.end());
+
+        // Parse columns separated by '>'
+        std::vector<std::string> rowData;
+        std::istringstream lineStream(line);
+        std::string column;
+
+        while (std::getline(lineStream, column, '>'))
+        {
+            const char *translatedText = t(column);
+            std::string displayText = (translatedText && *translatedText) ? std::string(translatedText) : column;
+            rowData.push_back(displayText);
+        }
+
+        if ((int)rowData.size() >= numCols)
+        {
+            rowData.resize(numCols);
+            items.push_back(rowData);
+        }
+    }
+
+    ItemTable *table = new ItemTable(0, 0, list_w, list_h, input, columnTitles);
+    table->setItems(items);
+    table->color(FL_FREE_COLOR);
+
+    list_window->end();
+    list_window->show();
+}
+
+// ===========================================================================
+// Widget Placement Helper Functions
+// ===========================================================================
+
+Fl_Button *create_info_button(
+    Trainer *trainer,
+    Fl_Input **input_field_ptr,
+    const std::vector<std::string> &info_columns,
+    const std::string &info_window_key,
+    Fl_Window **info_window_instance,
+    std::string (Trainer::*info_data_retriever)(),
+    Fl_PNG_Image *info_img)
+{
+    Fl_Button *info_button = new Fl_Button(0, 0, 0, 0);
+    info_button->box(FL_NO_BOX);
+    info_button->image(info_img);
+
+    InfoCallbackData *info_data = new InfoCallbackData{trainer, input_field_ptr, info_window_key, info_window_instance, info_columns, info_data_retriever};
+    info_button->callback(info_callback, info_data);
+
+    return info_button;
+}
+
+Fl_Check_Button *place_toggle_widget(
+    Fl_Flex *parent_flex,
+    Trainer *trainer,
+    const std::string &optionName,
+    const std::string &labelKey,
+    Fl_Input **out_input = nullptr,
+    const char *input_default = nullptr,
+    const char *input_min = nullptr,
+    const char *input_max = nullptr,
+    int input_type = FL_INT_INPUT,
+    Fl_Button *info_button = nullptr)
+{
+    Fl_Flex *toggle_flex = new Fl_Flex(0, 0, 0, 0, Fl_Flex::HORIZONTAL);
+    toggle_flex->gap(UI_OPTION_GAP);
+
+    Fl_Box *toggle_spacer = new Fl_Box(0, 0, 0, 0);
+    toggle_flex->fixed(toggle_spacer, UI_TOGGLE_SPACER_WIDTH);
+
+    Fl_Check_Button *check_button = new Fl_Check_Button(0, 0, 0, 0);
+    toggle_flex->fixed(check_button, UI_TOGGLE_WIDTH);
+
+    Fl_Box *label = new Fl_Box(0, 0, 0, 0);
+    tr(label, labelKey);
+
+    Fl_Input *input = nullptr;
+    if (input_default && input_min && input_max)
+    {
+        input = new Fl_Input(0, 0, 0, 0);
+        toggle_flex->fixed(input, UI_INPUT_WIDTH);
+        input->type(input_type);
+        set_input_values(input, input_default, input_min, input_max);
+        if (out_input)
+            *out_input = input;
+    }
+
+    // Optional info button
+    if (info_button)
+    {
+        toggle_flex->fixed(info_button, 20);
+        toggle_flex->add(info_button);
+    }
+
+    ToggleData *toggle_data = new ToggleData{trainer, optionName, check_button, input};
+    check_button->callback(toggle_callback, toggle_data);
+
+    toggle_flex->end();
+    parent_flex->fixed(toggle_flex, UI_OPTION_HEIGHT);
+
+    return check_button;
+}
+
+Fl_Button *place_apply_widget(
+    Fl_Flex *parent_flex,
+    Trainer *trainer,
+    const std::string &optionName,
+    const std::string &labelKey,
+    Fl_Input **out_input = nullptr,
+    const char *input_default = nullptr,
+    const char *input_min = nullptr,
+    const char *input_max = nullptr,
+    int input_type = FL_INT_INPUT,
+    Fl_Button *info_button = nullptr)
+{
+    Fl_Flex *apply_flex = new Fl_Flex(0, 0, 0, 0, Fl_Flex::HORIZONTAL);
+    apply_flex->gap(UI_OPTION_GAP);
+
+    Fl_Button *apply_button = new Fl_Button(0, 0, 0, 0);
+    apply_flex->fixed(apply_button, UI_BUTTON_WIDTH);
+    tr(apply_button, "Apply");
+
+    Fl_Box *label = new Fl_Box(0, 0, 0, 0);
+    tr(label, labelKey);
+
+    Fl_Input *input = nullptr;
+    if (input_default && input_min && input_max)
+    {
+        input = new Fl_Input(0, 0, 0, 0);
+        apply_flex->fixed(input, UI_INPUT_WIDTH);
+        input->type(input_type);
+        set_input_values(input, input_default, input_min, input_max);
+        if (out_input)
+            *out_input = input;
+    }
+
+    // Optional info button
+    if (info_button)
+    {
+        apply_flex->fixed(info_button, 20);
+        apply_flex->add(info_button);
+    }
+
+    ApplyData *apply_data = new ApplyData{trainer, optionName, apply_button, input};
+    apply_button->callback(apply_callback, apply_data);
+
+    apply_flex->end();
+    parent_flex->fixed(apply_flex, UI_OPTION_HEIGHT);
+
+    return apply_button;
+}
+
+Fl_Widget *place_indented_input_widget(
+    Fl_Flex *parent_flex,
+    const std::string &labelKey,
+    Fl_Input **out_input,
+    const char *input_default,
+    const char *input_min,
+    const char *input_max,
+    int input_type = FL_INT_INPUT)
+{
+    Fl_Flex *input_flex = new Fl_Flex(0, 0, 0, 0, Fl_Flex::HORIZONTAL);
+    input_flex->gap(UI_OPTION_GAP);
+
+    Fl_Box *indent_spacer = new Fl_Box(0, 0, 0, 0);
+    input_flex->fixed(indent_spacer, UI_BUTTON_WIDTH);
+
+    Fl_Input *input = new Fl_Input(0, 0, 0, 0);
+    input_flex->fixed(input, UI_BUTTON_WIDTH);
+    input->type(input_type);
+    set_input_values(input, input_default, input_min, input_max);
+    *out_input = input;
+
+    Fl_Box *label = new Fl_Box(0, 0, 0, 0);
+    tr(label, labelKey);
+
+    input_flex->end();
+    parent_flex->fixed(input_flex, UI_OPTION_HEIGHT);
+
+    return input;
+}
+
+Fl_Check_Button *place_indented_toggle_widget(
+    Fl_Flex *parent_flex,
+    const std::string &labelKey,
+    Fl_Check_Button **out_check_button = nullptr)
+{
+    Fl_Flex *toggle_flex = new Fl_Flex(0, 0, 0, 0, Fl_Flex::HORIZONTAL);
+    toggle_flex->gap(UI_OPTION_GAP);
+
+    Fl_Box *indent_spacer = new Fl_Box(0, 0, 0, 0);
+    toggle_flex->fixed(indent_spacer, UI_BUTTON_WIDTH);
+
+    Fl_Box *toggle_spacer = new Fl_Box(0, 0, 0, 0);
+    toggle_flex->fixed(toggle_spacer, UI_TOGGLE_SPACER_WIDTH);
+
+    Fl_Check_Button *check_button = new Fl_Check_Button(0, 0, 0, 0);
+    toggle_flex->fixed(check_button, UI_TOGGLE_WIDTH);
+
+    Fl_Box *label = new Fl_Box(0, 0, 0, 0);
+    tr(label, labelKey);
+
+    toggle_flex->end();
+    parent_flex->fixed(toggle_flex, UI_OPTION_HEIGHT);
+
+    if (out_check_button)
+        *out_check_button = check_button;
+
+    return check_button;
 }

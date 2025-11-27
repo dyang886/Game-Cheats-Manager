@@ -23,7 +23,6 @@ void apply_callback(Fl_Widget *widget, void *data)
     Fl_Button *button = applyData->button;
     Fl_Input *input = applyData->input;
 
-    // Check if the game process is running
     if (!trainer->isProcessRunning())
     {
         fl_alert(t("Please run the game first."));
@@ -94,13 +93,11 @@ void toggle_callback(Fl_Widget *widget, void *data)
         return;
     }
 
-    // Retrieve input values if available
     std::string inputValue = "0";
     bool status = true;
     if (input && input->value())
         inputValue = input->value();
 
-    // Apply the value using the Trainer class
     if (optionName == "NoPlantCooldown")
     {
         if (button->value())
@@ -162,265 +159,6 @@ void toggle_callback(Fl_Widget *widget, void *data)
         button->value() ? input->readonly(1) : input->readonly(0);
 }
 
-struct InfoCallbackData
-{
-    Trainer *trainer;
-    Fl_Input *input;
-    const char *windowTitleKey;              // Key for window title translation
-    Fl_Window **windowInstance;              // Pointer to window instance (for reuse management)
-    std::vector<std::string> columnTitles;   // Column headers
-    std::string (Trainer::*dataRetriever)(); // Pointer to Trainer member function that returns std::string
-};
-
-class ItemTable : public Fl_Table
-{
-private:
-    std::vector<std::vector<std::string>> items;
-    int selected_row = -1;
-    Fl_Input *input;
-    std::vector<std::string> columnTitles;
-
-protected:
-    void draw_cell(TableContext context, int row, int col, int x, int y, int w, int h) override
-    {
-        switch (context)
-        {
-        case CONTEXT_STARTPAGE:
-            fl_font(FL_FREE_FONT, font_size);
-            return;
-        case CONTEXT_COL_HEADER:
-            fl_push_clip(x, y, w, h);
-            fl_color(FL_FREE_COLOR);
-            fl_rectf(x, y, w, h);
-            fl_color(FL_WHITE);
-            if (col >= 0 && col < (int)columnTitles.size())
-            {
-                fl_draw(t(columnTitles[col]), x + 4, y, w, h, FL_ALIGN_LEFT);
-            }
-            fl_pop_clip();
-            return;
-        case CONTEXT_CELL:
-            fl_push_clip(x, y, w, h);
-            fl_color(row == selected_row ? fl_lighter(FL_FREE_COLOR) : FL_FREE_COLOR);
-            fl_rectf(x, y, w, h);
-            fl_color(FL_WHITE);
-            if (row < (int)items.size() && col < (int)items[row].size())
-            {
-                fl_draw(items[row][col].c_str(), x + 4, y, w, h, FL_ALIGN_LEFT);
-            }
-            fl_pop_clip();
-            return;
-        default:
-            return;
-        }
-    }
-
-    bool find_cell_at(int mouse_x, int mouse_y, int &row, int &col)
-    {
-        int table_x = x();
-        int table_y = y();
-        int table_w = w() - scrollbar_size();
-        int table_h = h() - scrollbar_size();
-
-        int mx = mouse_x - table_x;
-        int my = mouse_y - table_y;
-
-        int scroll_y = vscrollbar->value();
-        int adjusted_my = my + scroll_y;
-
-        if (mx < 0 || mx >= table_w)
-            return false;
-
-        int y_offset = col_header_height();
-        row = -1;
-        for (int r = 0; r < rows(); r++)
-        {
-            int rh = row_height(r);
-            if (adjusted_my >= y_offset && adjusted_my < y_offset + rh)
-            {
-                row = r;
-                break;
-            }
-            y_offset += rh;
-        }
-        if (row < 0 || row >= (int)items.size())
-            return false;
-
-        int x_offset = 0;
-        col = -1;
-        for (int c = 0; c < cols(); c++)
-        {
-            int cw = col_width(c);
-            if (mx >= x_offset && mx < x_offset + cw)
-            {
-                col = c;
-                break;
-            }
-            x_offset += cw;
-        }
-        if (col < 0 || col >= cols())
-            return false;
-
-        return true;
-    }
-
-    int handle(int event) override
-    {
-        int ret = Fl_Table::handle(event);
-        int row, col;
-
-        if (event == FL_PUSH && Fl::event_button() == FL_LEFT_MOUSE)
-        {
-            if (find_cell_at(Fl::event_x(), Fl::event_y(), row, col))
-            {
-                selected_row = row;
-                if (input && row < (int)items.size() && !items[row].empty())
-                {
-                    input->value(items[row][0].c_str());
-                }
-                redraw();
-                return 1;
-            }
-            else
-            {
-                selected_row = -1;
-                redraw();
-                return 1;
-            }
-        }
-        else if (event == FL_RELEASE && Fl::event_button() == FL_LEFT_MOUSE && Fl::event_clicks() > 0)
-        {
-            if (find_cell_at(Fl::event_x(), Fl::event_y(), row, col))
-            {
-                selected_row = row;
-                if (input && row < (int)items.size() && !items[row].empty())
-                {
-                    input->value(items[row][0].c_str());
-                }
-                Fl_Window *win = dynamic_cast<Fl_Window *>(parent()->top_window());
-                if (win)
-                {
-                    win->hide();
-                }
-                redraw();
-                return 1;
-            }
-        }
-        return ret;
-    }
-
-public:
-    ItemTable(int x, int y, int w, int h, Fl_Input *inp, const std::vector<std::string> &titles, const char *l = 0) : Fl_Table(x, y, w, h, l), input(inp), columnTitles(titles)
-    {
-        int scrollbarSize = 16;
-        int numCols = titles.size();
-        cols(numCols);
-        col_header(1);
-
-        // Set column widths: first column (ID) is narrower, remaining columns share the rest
-        int availableWidth = w - scrollbarSize;
-        int idColWidth = 100;
-        int otherColsWidth = (availableWidth - idColWidth) / (numCols - 1);
-
-        col_width(0, idColWidth);
-        for (int i = 1; i < numCols; i++)
-        {
-            col_width(i, otherColsWidth);
-        }
-
-        row_header(0);
-        box(FL_NO_BOX);
-        scrollbar_size(scrollbarSize);
-        end();
-    }
-
-    void setItems(const std::vector<std::vector<std::string>> &item_list)
-    {
-        items = item_list;
-        rows(item_list.size());
-        selected_row = -1;
-        redraw();
-    }
-};
-
-// Callback function for info buttons
-void info_callback(Fl_Widget *widget, void *data)
-{
-    InfoCallbackData *info_data = static_cast<InfoCallbackData *>(data);
-    if (!info_data || !info_data->trainer || info_data->columnTitles.empty() || !info_data->windowInstance)
-        return;
-
-    Trainer *trainer = info_data->trainer;
-    Fl_Input *input = info_data->input;
-    const std::vector<std::string> &columnTitles = info_data->columnTitles;
-    const char *windowTitleKey = info_data->windowTitleKey;
-    Fl_Window *&list_window = *info_data->windowInstance;
-
-    if (!trainer->isProcessRunning())
-    {
-        fl_alert(t("Please run the game first."));
-        return;
-    }
-
-    // Call the member function pointer to get the list data
-    std::string itemListData = (trainer->*info_data->dataRetriever)();
-
-    if (list_window && list_window->shown())
-    {
-        list_window->show();
-        return;
-    }
-
-    Fl_Window *trainer_window = widget->window();
-    int trainer_x = trainer_window->x();
-    int trainer_y = trainer_window->y();
-    int trainer_w = trainer_window->w();
-    int trainer_h = trainer_window->h();
-
-    int list_w = 350;
-    int list_h = 500;
-    int list_x = trainer_x + (trainer_w - list_w) / 2;
-    int list_y = trainer_y + (trainer_h - list_h) / 2;
-
-    list_window = new Fl_Window(list_x, list_y, list_w, list_h, t(windowTitleKey));
-    list_window->icon((char *)LoadIconA(GetModuleHandle(NULL), "APP_ICON"));
-
-    std::vector<std::vector<std::string>> items;
-    int numCols = columnTitles.size();
-    std::istringstream iss(itemListData);
-    std::string line;
-
-    while (std::getline(iss, line))
-    {
-        line.erase(std::remove(line.begin(), line.end(), '\r'), line.end());
-
-        // Parse columns separated by '>'
-        std::vector<std::string> rowData;
-        std::istringstream lineStream(line);
-        std::string column;
-
-        while (std::getline(lineStream, column, '>'))
-        {
-            const char *translatedText = t(column);
-            std::string displayText = (translatedText && *translatedText) ? std::string(translatedText) : column;
-            rowData.push_back(displayText);
-        }
-
-        if ((int)rowData.size() >= numCols)
-        {
-            rowData.resize(numCols);
-            items.push_back(rowData);
-        }
-    }
-
-    ItemTable *table = new ItemTable(0, 0, list_w, list_h, input, columnTitles);
-    table->setItems(items);
-    table->color(FL_FREE_COLOR);
-
-    list_window->end();
-    list_window->show();
-}
-
 static void main_window_close_callback(Fl_Widget *w, void *)
 {
     if (plant_list_window)
@@ -470,14 +208,6 @@ int main(int argc, char **argv)
     Fl::set_font(FL_FREE_FONT, "Noto Sans SC");
     fl_font(FL_FREE_FONT, font_size);
 
-    int left_margin = 20;
-    int button_w = 50;
-    int toggle_w = 16;
-    int toggle_spacer_w = 24;
-    int input_w = 200;
-    int option_gap = 10;
-    int option_h = static_cast<int>(font_size * 1.5);
-
     DWORD info_img_size = 0;
     const unsigned char *info_img_data = load_resource("INFO_IMG", info_img_size);
     Fl_PNG_Image *info_img = new Fl_PNG_Image(nullptr, info_img_data, (int)info_img_size);
@@ -524,14 +254,14 @@ int main(int argc, char **argv)
     img_box->image(game_img);
 
     // Process Information
-    Fl_Box *process_name = new Fl_Box(left_margin, lang_flex_height + imageSize.second + 10, imageSize.first, font_size);
+    Fl_Box *process_name = new Fl_Box(UI_LEFT_MARGIN, lang_flex_height + imageSize.second + 10, imageSize.first, font_size);
     process_name->align(FL_ALIGN_TOP_LEFT | FL_ALIGN_INSIDE);
     tr(process_name, "Process Name:");
 
-    Fl_Box *process_exe = new Fl_Box(left_margin, lang_flex_height + imageSize.second + font_size + 20, imageSize.first, font_size);
+    Fl_Box *process_exe = new Fl_Box(UI_LEFT_MARGIN, lang_flex_height + imageSize.second + font_size + 20, imageSize.first, font_size);
     process_exe->align(FL_ALIGN_TOP_LEFT | FL_ALIGN_INSIDE);
 
-    Fl_Flex *process_id_flex = new Fl_Flex(left_margin, lang_flex_height + imageSize.second + font_size + 55, imageSize.first, font_size, Fl_Flex::HORIZONTAL);
+    Fl_Flex *process_id_flex = new Fl_Flex(UI_LEFT_MARGIN, lang_flex_height + imageSize.second + font_size + 55, imageSize.first, font_size, Fl_Flex::HORIZONTAL);
     process_id_flex->gap(5);
 
     Fl_Box *process_id_label = new Fl_Box(0, 0, 0, 0);
@@ -549,352 +279,48 @@ int main(int argc, char **argv)
     // ------------------------------------------------------------------
     // Option column 1
     // ------------------------------------------------------------------
-    int col1_x = imageSize.first + left_margin;
+    int col1_x = imageSize.first + UI_LEFT_MARGIN;
     int col1_y = lang_flex_height;
-    int col1_w = window->w() - (imageSize.first + left_margin);
+    int col1_w = window->w() - (imageSize.first + UI_LEFT_MARGIN);
     int col1_h = window->h() - 30;
     Fl_Flex *options1_flex = new Fl_Flex(col1_x, col1_y, col1_w, col1_h, Fl_Flex::VERTICAL);
     options1_flex->margin(50, 20, 20, 20);
     options1_flex->gap(10);
     Fl_Box *spacerTop = new Fl_Box(0, 0, 0, 0);
 
-    // ------------------------------------------------------------------
-    // no_cooldown (Toggle)
-    // ------------------------------------------------------------------
-    Fl_Flex *no_cooldown_flex = new Fl_Flex(0, 0, 0, 0, Fl_Flex::HORIZONTAL);
-    no_cooldown_flex->gap(option_gap);
+    // Widget Placements
+    place_toggle_widget(options1_flex, &trainer, "NoPlantCooldown", "No Plant Cooldown");
 
-    Fl_Box *no_cooldown_toggle_spacer = new Fl_Box(0, 0, 0, 0);
-    no_cooldown_flex->fixed(no_cooldown_toggle_spacer, toggle_spacer_w);
+    place_toggle_widget(options1_flex, &trainer, "NoPlantCost", "No Plant Cost");
 
-    Fl_Check_Button *no_cooldown_check_button = new Fl_Check_Button(0, 0, 0, 0);
-    no_cooldown_flex->fixed(no_cooldown_check_button, toggle_w);
+    place_toggle_widget(options1_flex, &trainer, "AddSun", "Add Sun", nullptr, "999", "0", "9990");
 
-    Fl_Box *no_cooldown_label = new Fl_Box(0, 0, 0, 0);
-    tr(no_cooldown_label, "No Plant Cooldown");
+    place_toggle_widget(options1_flex, &trainer, "SetCoin", "Set Coins", nullptr, "9999999", "0", "999999990");
 
-    ToggleData *data_no_cooldown = new ToggleData{&trainer, "NoPlantCooldown", no_cooldown_check_button, nullptr};
-    no_cooldown_check_button->callback(toggle_callback, data_no_cooldown);
+    place_toggle_widget(options1_flex, &trainer, "SetFertilizerAndBugSpray", "Set Fertilizer and Bug Spray", nullptr, "99", "0", "999999999");
 
-    no_cooldown_flex->end();
-    options1_flex->fixed(no_cooldown_flex, option_h);
+    place_toggle_widget(options1_flex, &trainer, "SetChocolate", "Set Chocolate", nullptr, "99", "0", "999999999");
 
-    // ------------------------------------------------------------------
-    // no_plant_cost (Toggle)
-    // ------------------------------------------------------------------
-    Fl_Flex *no_plant_cost_flex = new Fl_Flex(0, 0, 0, 0, Fl_Flex::HORIZONTAL);
-    no_plant_cost_flex->gap(option_gap);
+    place_toggle_widget(options1_flex, &trainer, "SetTreeFood", "Set Tree Food", nullptr, "99", "0", "999999999");
 
-    Fl_Box *no_plant_cost_toggle_spacer = new Fl_Box(0, 0, 0, 0);
-    no_plant_cost_flex->fixed(no_plant_cost_toggle_spacer, toggle_spacer_w);
-
-    Fl_Check_Button *no_plant_cost_check_button = new Fl_Check_Button(0, 0, 0, 0);
-    no_plant_cost_flex->fixed(no_plant_cost_check_button, toggle_w);
-
-    Fl_Box *no_plant_cost_label = new Fl_Box(0, 0, 0, 0);
-    tr(no_plant_cost_label, "No Plant Cost");
-
-    ToggleData *data_no_plant_cost = new ToggleData{&trainer, "NoPlantCost", no_plant_cost_check_button, nullptr};
-    no_plant_cost_check_button->callback(toggle_callback, data_no_plant_cost);
-
-    no_plant_cost_flex->end();
-    options1_flex->fixed(no_plant_cost_flex, option_h);
-
-    // ------------------------------------------------------------------
-    // Add sun (Toggle)
-    // ------------------------------------------------------------------
-    Fl_Flex *sun_flex = new Fl_Flex(0, 0, 0, 0, Fl_Flex::HORIZONTAL);
-    sun_flex->gap(option_gap);
-
-    Fl_Box *sun_toggle_spacer = new Fl_Box(0, 0, 0, 0);
-    sun_flex->fixed(sun_toggle_spacer, toggle_spacer_w);
-
-    Fl_Check_Button *sun_check_button = new Fl_Check_Button(0, 0, 0, 0);
-    sun_flex->fixed(sun_check_button, toggle_w);
-
-    Fl_Box *sun_label = new Fl_Box(0, 0, 0, 0);
-    tr(sun_label, "Add Sun");
-
-    Fl_Input *sun_input = new Fl_Input(0, 0, 0, 0);
-    sun_flex->fixed(sun_input, input_w);
-    sun_input->type(FL_INT_INPUT);
-    set_input_values(sun_input, "999", "0", "9990");
-
-    ToggleData *td_sun = new ToggleData{&trainer, "AddSun", sun_check_button, sun_input};
-    sun_check_button->callback(toggle_callback, td_sun);
-
-    sun_flex->end();
-    options1_flex->fixed(sun_flex, option_h);
-
-    // ------------------------------------------------------------------
-    // Set coin (Toggle)
-    // ------------------------------------------------------------------
-    Fl_Flex *coin_flex = new Fl_Flex(0, 0, 0, 0, Fl_Flex::HORIZONTAL);
-    coin_flex->gap(option_gap);
-
-    Fl_Box *coin_toggle_spacer = new Fl_Box(0, 0, 0, 0);
-    coin_flex->fixed(coin_toggle_spacer, toggle_spacer_w);
-
-    Fl_Check_Button *coin_check_button = new Fl_Check_Button(0, 0, 0, 0);
-    coin_flex->fixed(coin_check_button, toggle_w);
-
-    Fl_Box *coin_label = new Fl_Box(0, 0, 0, 0);
-    tr(coin_label, "Set Coins");
-
-    Fl_Input *coin_input = new Fl_Input(0, 0, 0, 0);
-    coin_flex->fixed(coin_input, input_w);
-    coin_input->type(FL_INT_INPUT);
-    set_input_values(coin_input, "9999999", "0", "999999990");
-
-    ToggleData *td_coin = new ToggleData{&trainer, "SetCoin", coin_check_button, coin_input};
-    coin_check_button->callback(toggle_callback, td_coin);
-
-    coin_flex->end();
-    options1_flex->fixed(coin_flex, option_h);
-
-    // ------------------------------------------------------------------
-    // Set fertilizer and bug spray (Toggle)
-    // ------------------------------------------------------------------
-    Fl_Flex *fertilizer_flex = new Fl_Flex(0, 0, 0, 0, Fl_Flex::HORIZONTAL);
-    fertilizer_flex->gap(option_gap);
-
-    Fl_Box *fertilizer_toggle_spacer = new Fl_Box(0, 0, 0, 0);
-    fertilizer_flex->fixed(fertilizer_toggle_spacer, toggle_spacer_w);
-
-    Fl_Check_Button *fertilizer_check_button = new Fl_Check_Button(0, 0, 0, 0);
-    fertilizer_flex->fixed(fertilizer_check_button, toggle_w);
-
-    Fl_Box *fertilizer_label = new Fl_Box(0, 0, 0, 0);
-    tr(fertilizer_label, "Set Fertilizer and Bug Spray");
-
-    Fl_Input *fertilizer_input = new Fl_Input(0, 0, 0, 0);
-    fertilizer_flex->fixed(fertilizer_input, input_w);
-    fertilizer_input->type(FL_INT_INPUT);
-    set_input_values(fertilizer_input, "99", "0", "999999999");
-
-    ToggleData *td_fertilizer = new ToggleData{&trainer, "SetFertilizerAndBugSpray", fertilizer_check_button, fertilizer_input};
-    fertilizer_check_button->callback(toggle_callback, td_fertilizer);
-
-    fertilizer_flex->end();
-    options1_flex->fixed(fertilizer_flex, option_h);
-
-    // ------------------------------------------------------------------
-    // Set chocolate (Toggle)
-    // ------------------------------------------------------------------
-    Fl_Flex *chocolate_flex = new Fl_Flex(0, 0, 0, 0, Fl_Flex::HORIZONTAL);
-    chocolate_flex->gap(option_gap);
-
-    Fl_Box *chocolate_toggle_spacer = new Fl_Box(0, 0, 0, 0);
-    chocolate_flex->fixed(chocolate_toggle_spacer, toggle_spacer_w);
-
-    Fl_Check_Button *chocolate_check_button = new Fl_Check_Button(0, 0, 0, 0);
-    chocolate_flex->fixed(chocolate_check_button, toggle_w);
-
-    Fl_Box *chocolate_label = new Fl_Box(0, 0, 0, 0);
-    tr(chocolate_label, "Set Chocolate");
-
-    Fl_Input *chocolate_input = new Fl_Input(0, 0, 0, 0);
-    chocolate_flex->fixed(chocolate_input, input_w);
-    chocolate_input->type(FL_INT_INPUT);
-    set_input_values(chocolate_input, "99", "0", "999999999");
-
-    ToggleData *td_chocolate = new ToggleData{&trainer, "SetChocolate", chocolate_check_button, chocolate_input};
-    chocolate_check_button->callback(toggle_callback, td_chocolate);
-
-    chocolate_flex->end();
-    options1_flex->fixed(chocolate_flex, option_h);
-
-    // ------------------------------------------------------------------
-    // Set tree_food (Toggle)
-    // ------------------------------------------------------------------
-    Fl_Flex *tree_food_flex = new Fl_Flex(0, 0, 0, 0, Fl_Flex::HORIZONTAL);
-    tree_food_flex->gap(option_gap);
-
-    Fl_Box *tree_food_toggle_spacer = new Fl_Box(0, 0, 0, 0);
-    tree_food_flex->fixed(tree_food_toggle_spacer, toggle_spacer_w);
-
-    Fl_Check_Button *tree_food_check_button = new Fl_Check_Button(0, 0, 0, 0);
-    tree_food_flex->fixed(tree_food_check_button, toggle_w);
-
-    Fl_Box *tree_food_label = new Fl_Box(0, 0, 0, 0);
-    tr(tree_food_label, "Set Tree Food");
-
-    Fl_Input *tree_food_input = new Fl_Input(0, 0, 0, 0);
-    tree_food_flex->fixed(tree_food_input, input_w);
-    tree_food_input->type(FL_INT_INPUT);
-    set_input_values(tree_food_input, "99", "0", "999999999");
-
-    ToggleData *td_tree_food = new ToggleData{&trainer, "SetTreeFood", tree_food_check_button, tree_food_input};
-    tree_food_check_button->callback(toggle_callback, td_tree_food);
-
-    tree_food_flex->end();
-    options1_flex->fixed(tree_food_flex, option_h);
-
-    // ------------------------------------------------------------------
-    // add_plant (Apply)
-    // ------------------------------------------------------------------
-    Fl_Flex *add_plant_flex = new Fl_Flex(0, 0, 0, 0, Fl_Flex::HORIZONTAL);
-    add_plant_flex->gap(option_gap);
-
-    Fl_Button *add_plant_apply_button = new Fl_Button(0, 0, 0, 0);
-    add_plant_flex->fixed(add_plant_apply_button, button_w);
-    tr(add_plant_apply_button, "Apply");
-
-    Fl_Box *add_plant_label = new Fl_Box(0, 0, 0, 0);
-    tr(add_plant_label, "Add Plant to Garden");
-
-    Fl_Input *add_plant_input = new Fl_Input(0, 0, 0, 0);
-    add_plant_flex->fixed(add_plant_input, input_w);
-    add_plant_input->type(FL_INT_INPUT);
-    set_input_values(add_plant_input, "0", "0", "39");
-
-    // Info button
-    Fl_Button *plant_info_icon = new Fl_Button(0, 0, 0, 0);
-    add_plant_flex->fixed(plant_info_icon, 20);
-    add_plant_flex->add(plant_info_icon);
-    plant_info_icon->box(FL_NO_BOX);
-    plant_info_icon->image(info_img);
+    Fl_Input *add_plant_input = nullptr;
     std::vector<std::string> plant_columns = {"Plant ID", "Plant Name"};
-    InfoCallbackData *plant_info_data = new InfoCallbackData{&trainer, add_plant_input, "Plant List", &plant_list_window, plant_columns, &Trainer::getPlantList};
-    plant_info_icon->callback(info_callback, plant_info_data);
+    Fl_Button *plant_info = create_info_button(&trainer, &add_plant_input, plant_columns, "Plant List", &plant_list_window, &Trainer::getPlantList, info_img);
+    place_apply_widget(options1_flex, &trainer, "AddPlantToGarden", "Add Plant to Garden", &add_plant_input, "0", "0", "39", FL_INT_INPUT, plant_info);
+    place_indented_toggle_widget(options1_flex, "Facing Left", &g_direction_check_button);
 
-    ApplyData *data_add_plant = new ApplyData{&trainer, "AddPlantToGarden", add_plant_apply_button, add_plant_input};
-    add_plant_apply_button->callback(apply_callback, data_add_plant);
-
-    add_plant_flex->end();
-    options1_flex->fixed(add_plant_flex, option_h);
-
-    // sub-control - facing direction (Toggle)
-    Fl_Flex *direction_flex = new Fl_Flex(0, 0, 0, 0, Fl_Flex::HORIZONTAL);
-    direction_flex->gap(option_gap);
-
-    Fl_Box *direction_indent_spacer = new Fl_Box(0, 0, 0, 0);
-    direction_flex->fixed(direction_indent_spacer, button_w);
-
-    Fl_Box *direction_toggle_spacer = new Fl_Box(0, 0, 0, 0);
-    direction_flex->fixed(direction_toggle_spacer, toggle_spacer_w);
-
-    Fl_Check_Button *direction_check_button = new Fl_Check_Button(0, 0, 0, 0);
-    direction_flex->fixed(direction_check_button, toggle_w);
-    g_direction_check_button = direction_check_button; // Store globally for add_plant callback
-
-    Fl_Box *direction_label = new Fl_Box(0, 0, 0, 0);
-    tr(direction_label, "Facing Left");
-
-    direction_flex->end();
-    options1_flex->fixed(direction_flex, option_h);
-
-    // ------------------------------------------------------------------
-    // spawn_zombie (Apply)
-    // ------------------------------------------------------------------
-    Fl_Flex *spawn_zombie_flex = new Fl_Flex(0, 0, 0, 0, Fl_Flex::HORIZONTAL);
-    spawn_zombie_flex->gap(option_gap);
-
-    Fl_Button *spawn_zombie_apply_button = new Fl_Button(0, 0, 0, 0);
-    spawn_zombie_flex->fixed(spawn_zombie_apply_button, button_w);
-    tr(spawn_zombie_apply_button, "Apply");
-
-    Fl_Box *spawn_zombie_label = new Fl_Box(0, 0, 0, 0);
-    tr(spawn_zombie_label, "Spawn Zombie");
-
-    Fl_Input *spawn_zombie_input = new Fl_Input(0, 0, 0, 0);
-    spawn_zombie_flex->fixed(spawn_zombie_input, input_w);
-    spawn_zombie_input->type(FL_INT_INPUT);
-    set_input_values(spawn_zombie_input, "0", "0", "99");
-
-    // Info button
-    Fl_Button *spawn_zombie_info_icon = new Fl_Button(0, 0, 0, 0);
-    spawn_zombie_flex->fixed(spawn_zombie_info_icon, 20);
-    spawn_zombie_flex->add(spawn_zombie_info_icon);
-    spawn_zombie_info_icon->box(FL_NO_BOX);
-    spawn_zombie_info_icon->image(info_img);
+    Fl_Input *spawn_zombie_input = nullptr;
     std::vector<std::string> zombie_columns = {"Zombie ID", "Zombie Name"};
-    InfoCallbackData *spawn_zombie_info_data = new InfoCallbackData{&trainer, spawn_zombie_input, "Zombie List", &zombie_list_window, zombie_columns, &Trainer::getZombieList};
-    spawn_zombie_info_icon->callback(info_callback, spawn_zombie_info_data);
+    Fl_Button *zombie_info = create_info_button(&trainer, &spawn_zombie_input, zombie_columns, "Zombie List", &zombie_list_window, &Trainer::getZombieList, info_img);
+    place_apply_widget(options1_flex, &trainer, "SpawnZombie", "Spawn Zombie", &spawn_zombie_input, "0", "0", "99", FL_INT_INPUT, zombie_info);
+    place_indented_input_widget(options1_flex, "Which Row", &g_spawn_row_input, "1", "1", "6");
+    place_indented_toggle_widget(options1_flex, "Spawn in Every Row", &g_spawn_every_row_check_button);
 
-    ApplyData *data_spawn_zombie = new ApplyData{&trainer, "SpawnZombie", spawn_zombie_apply_button, spawn_zombie_input};
-    spawn_zombie_apply_button->callback(apply_callback, data_spawn_zombie);
+    place_apply_widget(options1_flex, &trainer, "FullScreenJalapeno", "Full Screen Jalapeno");
 
-    spawn_zombie_flex->end();
-    options1_flex->fixed(spawn_zombie_flex, option_h);
+    place_apply_widget(options1_flex, &trainer, "InstantCompleteLevel", "Instant Complete Level");
 
-    // sub-control - row number (Input)
-    Fl_Flex *spawn_row_flex = new Fl_Flex(0, 0, 0, 0, Fl_Flex::HORIZONTAL);
-    spawn_row_flex->gap(option_gap);
-
-    Fl_Box *spawn_row_indent_spacer = new Fl_Box(0, 0, 0, 0);
-    spawn_row_flex->fixed(spawn_row_indent_spacer, button_w);
-
-    Fl_Input *spawn_row_input = new Fl_Input(0, 0, 0, 0);
-    spawn_row_flex->fixed(spawn_row_input, button_w);
-    spawn_row_input->type(FL_INT_INPUT);
-    set_input_values(spawn_row_input, "1", "1", "6");
-    g_spawn_row_input = spawn_row_input;
-
-    Fl_Box *spawn_row_label = new Fl_Box(0, 0, 0, 0);
-    tr(spawn_row_label, "Which Row");
-
-    spawn_row_flex->end();
-    options1_flex->fixed(spawn_row_flex, option_h);
-
-    // sub-control - spawn on every row (Toggle)
-    Fl_Flex *spawn_every_row_flex = new Fl_Flex(0, 0, 0, 0, Fl_Flex::HORIZONTAL);
-    spawn_every_row_flex->gap(option_gap);
-
-    Fl_Box *spawn_every_row_indent_spacer = new Fl_Box(0, 0, 0, 0);
-    spawn_every_row_flex->fixed(spawn_every_row_indent_spacer, button_w);
-
-    Fl_Box *spawn_every_row_toggle_spacer = new Fl_Box(0, 0, 0, 0);
-    spawn_every_row_flex->fixed(spawn_every_row_toggle_spacer, toggle_spacer_w);
-
-    Fl_Check_Button *spawn_every_row_check_button = new Fl_Check_Button(0, 0, 0, 0);
-    spawn_every_row_flex->fixed(spawn_every_row_check_button, toggle_w);
-    g_spawn_every_row_check_button = spawn_every_row_check_button;
-
-    Fl_Box *spawn_every_row_label = new Fl_Box(0, 0, 0, 0);
-    tr(spawn_every_row_label, "Spawn in Every Row");
-
-    spawn_every_row_flex->end();
-    options1_flex->fixed(spawn_every_row_flex, option_h);
-
-    // ------------------------------------------------------------------
-    // full_screen_jalapeno (Apply)
-    // ------------------------------------------------------------------
-    Fl_Flex *full_screen_jalapeno_flex = new Fl_Flex(0, 0, 0, 0, Fl_Flex::HORIZONTAL);
-    full_screen_jalapeno_flex->gap(option_gap);
-
-    Fl_Button *full_screen_jalapeno_apply_button = new Fl_Button(0, 0, 0, 0);
-    full_screen_jalapeno_flex->fixed(full_screen_jalapeno_apply_button, button_w);
-    tr(full_screen_jalapeno_apply_button, "Apply");
-
-    Fl_Box *full_screen_jalapeno_label = new Fl_Box(0, 0, 0, 0);
-    tr(full_screen_jalapeno_label, "Full Screen Jalapeno");
-
-    ApplyData *data_full_screen_jalapeno = new ApplyData{&trainer, "FullScreenJalapeno", full_screen_jalapeno_apply_button, nullptr};
-    full_screen_jalapeno_apply_button->callback(apply_callback, data_full_screen_jalapeno);
-
-    full_screen_jalapeno_flex->end();
-    options1_flex->fixed(full_screen_jalapeno_flex, option_h);
-
-    // ------------------------------------------------------------------
-    // instant_complete_level (Apply)
-    // ------------------------------------------------------------------
-    Fl_Flex *instant_complete_flex = new Fl_Flex(0, 0, 0, 0, Fl_Flex::HORIZONTAL);
-    instant_complete_flex->gap(option_gap);
-
-    Fl_Button *instant_complete_apply_button = new Fl_Button(0, 0, 0, 0);
-    instant_complete_flex->fixed(instant_complete_apply_button, button_w);
-    tr(instant_complete_apply_button, "Apply");
-
-    Fl_Box *instant_complete_label = new Fl_Box(0, 0, 0, 0);
-    tr(instant_complete_label, "Instant Complete Level");
-
-    ApplyData *data_instant_complete = new ApplyData{&trainer, "InstantCompleteLevel", instant_complete_apply_button, nullptr};
-    instant_complete_apply_button->callback(apply_callback, data_instant_complete);
-
-    instant_complete_flex->end();
-    options1_flex->fixed(instant_complete_flex, option_h);
-
+    // End of Option Column 1
     Fl_Box *spacerBottom = new Fl_Box(0, 0, 0, 0);
     options1_flex->end();
     change_language(language, window);

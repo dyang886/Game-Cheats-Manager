@@ -9,3 +9,4 @@ upload_trainers.py
 MonoBridge.dll
 GCMInjection.dll
 IL2CPP.dll
+trainers/**/*.ttf

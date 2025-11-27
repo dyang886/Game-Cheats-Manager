@@ -146,13 +146,13 @@ void toggle_callback(Fl_Widget *widget, void *data)
         button->value() ? input->readonly(1) : input->readonly(0);
 }
 
-struct InfoCallbackData
+struct InfoCallbackDataOld
 {
     Trainer *trainer;
     Fl_Input *input;
 };
 
-class ItemTable : public Fl_Table
+class ItemTableOld : public Fl_Table
 {
 private:
     std::vector<std::pair<int, std::string>> items;
@@ -306,7 +306,7 @@ protected:
     }
 
 public:
-    ItemTable(int x, int y, int w, int h, Fl_Input *inp, const char *l = 0) : Fl_Table(x, y, w, h, l), input(inp)
+    ItemTableOld(int x, int y, int w, int h, Fl_Input *inp, const char *l = 0) : Fl_Table(x, y, w, h, l), input(inp)
     {
         int scrollbarSize = 16;
         cols(2);
@@ -328,9 +328,9 @@ public:
     }
 };
 
-void info_callback(Fl_Widget *widget, void *data)
+void info_callback_old(Fl_Widget *widget, void *data)
 {
-    InfoCallbackData *info_data = static_cast<InfoCallbackData *>(data);
+    InfoCallbackDataOld *info_data = static_cast<InfoCallbackDataOld *>(data);
     Trainer *trainer = info_data->trainer;
     Fl_Input *input = info_data->input;
 
@@ -383,7 +383,7 @@ void info_callback(Fl_Widget *widget, void *data)
         }
     }
 
-    ItemTable *table = new ItemTable(0, 0, info_w, info_h, input);
+    ItemTableOld *table = new ItemTableOld(0, 0, info_w, info_h, input);
     table->setItems(items);
     table->color(FL_FREE_COLOR);
 
@@ -621,8 +621,8 @@ int main(int argc, char **argv)
     spawn_item_flex->add(info_icon);
     info_icon->box(FL_NO_BOX);
     info_icon->image(info_img);
-    InfoCallbackData *info_data = new InfoCallbackData{&trainer, spawn_item_input};
-    info_icon->callback(info_callback, info_data);
+    InfoCallbackDataOld *info_data = new InfoCallbackDataOld{&trainer, spawn_item_input};
+    info_icon->callback(info_callback_old, info_data);
 
     ApplyData *ad_spawn_item = new ApplyData{&trainer, "SpawnItem", spawn_item_apply_button, spawn_item_input};
     spawn_item_apply_button->callback(apply_callback, ad_spawn_item);

@@ -78,23 +78,28 @@ bool g_JalapenoCommand = false;
 HOOK *update_hook = nullptr;
 bool g_IsInitialized = false;
 
-/** Enhances the last added plant with age and direction settings */
 void HandlePlantSpawn(void *boardInstance)
 {
     auto assembly = IL2CPP::Assembly(GAME_ASSEMBLY);
     auto ns = assembly->Namespace(GAME_NAMESPACE);
+
     auto zenClass = ns->Class(ZENGARDEN_CLASS);
-
+    if (!zenClass)
+        return;
     auto method = zenClass->Method(GIVE_PLANT_METHOD, 1);
+    if (!method)
+        return;
     AttemptNewPlantUserdata_t AttemptNewPlantUserdata = method->FindFunction<AttemptNewPlantUserdata_t>();
-
+    if (!AttemptNewPlantUserdata)
+        return;
     auto placeMethod = zenClass->Method(PLACE_PLANT_METHOD, 1);
+    if (!placeMethod)
+        return;
     PlacePottedPlant_t PlacePottedPlant = placeMethod->FindFunction<PlacePottedPlant_t>();
-
-    if (!AttemptNewPlantUserdata(g_PlantCommand.plantID) || !PlacePottedPlant)
+    if (!PlacePottedPlant)
         return;
 
-    if (!boardInstance)
+    if (!AttemptNewPlantUserdata(g_PlantCommand.plantID))
         return;
 
     OBJECT *board = (OBJECT *)boardInstance;
@@ -132,136 +137,95 @@ void HandlePlantSpawn(void *boardInstance)
                             SetPlantAge(newPlantData, 3);
                         }
                         newPlantData->SetValue(FACING_FIELD, &g_PlantCommand.direction);
-                    }
-
-                    if (PlacePottedPlant)
                         PlacePottedPlant(zenGarden, newPlantIndex);
+                        std::cout << "[+] Plant added to Zen Garden: ID=" << g_PlantCommand.plantID << " Direction=" << g_PlantCommand.direction << "\n";
+                    }
                 }
             }
         }
     }
 }
 
-/** Handle instant level completion */
 void HandleInstantWin(void *boardInstance)
 {
     OBJECT *board = (OBJECT *)boardInstance;
-    if (!board)
+    auto assembly = IL2CPP::Assembly(GAME_ASSEMBLY);
+    auto ns = assembly->Namespace(GAME_NAMESPACE);
+    auto boardClass = ns->Class(BOARD_CLASS);
+
+    auto completeField = boardClass->Field(LEVEL_COMPLETE_FIELD);
+    if (!completeField)
         return;
 
-    auto assembly = IL2CPP::Assembly(GAME_ASSEMBLY);
-    if (assembly)
-    {
-        auto ns = assembly->Namespace(GAME_NAMESPACE);
-        auto boardClass = ns->Class(BOARD_CLASS);
-        if (boardClass)
-        {
-            auto completeField = boardClass->Field(LEVEL_COMPLETE_FIELD);
-            if (completeField)
-            {
-                bool won = true;
-                completeField->SetValue(board, &won);
-                std::cout << "[+] Level Complete set to TRUE\n";
-            }
-            else
-            {
-                std::cout << "[!] Failed to find field: " << LEVEL_COMPLETE_FIELD << "\n";
-            }
-        }
-    }
+    bool won = true;
+    completeField->SetValue(board, &won);
+    std::cout << "[+] Level Complete set to TRUE\n";
 }
 
-/** Handle zombie spawning */
 void HandleZombieSpawn(void *boardInstance)
 {
-    if (!boardInstance)
+    auto assembly = IL2CPP::Assembly(GAME_ASSEMBLY);
+    auto ns = assembly->Namespace(GAME_NAMESPACE);
+    auto boardClass = ns->Class(BOARD_CLASS);
+
+    auto addZombieMethod = boardClass->Method(ADD_ZOMBIE_ROW_METHOD, 4);
+    if (!addZombieMethod)
+        return;
+    auto AddZombieInRow = addZombieMethod->FindFunction<AddZombieInRow_t>();
+    if (!AddZombieInRow)
         return;
 
-    auto assembly = IL2CPP::Assembly(GAME_ASSEMBLY);
-    if (assembly)
+    int zombieType = g_ZombieCommand.type;
+    int row = g_ZombieCommand.row;
+    bool isEveryRow = g_ZombieCommand.isEveryRow;
+    int fromWave = 0;
+    bool shakeBrush = true;
+
+    if (isEveryRow)
     {
-        auto ns = assembly->Namespace(GAME_NAMESPACE);
-        auto boardClass = ns->Class(BOARD_CLASS);
-
-        // AddZombieInRow takes 4 arguments in C# (Type, Row, FromWave, ShakeBrush)
-        auto addZombieMethod = boardClass->Method(ADD_ZOMBIE_ROW_METHOD, 4);
-
-        if (addZombieMethod)
+        auto getRowsMethod = boardClass->Method(GET_NUM_ROWS_METHOD, 0);
+        if (!getRowsMethod)
+            return;
+        auto GetNumRows = getRowsMethod->FindFunction<GetNumRows_t>();
+        if (!GetNumRows)
+            return;
+        for (int r = 0; r < GetNumRows(boardInstance); r++)
         {
-            auto AddZombieInRow = addZombieMethod->FindFunction<AddZombieInRow_t>();
-            if (AddZombieInRow)
-            {
-                int zombieType = g_ZombieCommand.type;
-                int row = g_ZombieCommand.row;
-                bool isEveryRow = g_ZombieCommand.isEveryRow;
-                int fromWave = 0;
-                bool shakeBrush = true;
-
-                if (isEveryRow)
-                {
-                    auto getRowsMethod = boardClass->Method(GET_NUM_ROWS_METHOD, 0);
-                    auto GetNumRows = getRowsMethod->FindFunction<GetNumRows_t>();
-                    for (int r = 0; r < GetNumRows(boardInstance); r++)
-                    {
-                        AddZombieInRow(boardInstance, zombieType, r, fromWave, shakeBrush);
-                        std::cout << "[+] Zombie Spawned: ID=" << zombieType << " Row=" << r << "\n";
-                    }
-                }
-                else
-                {
-                    AddZombieInRow(boardInstance, zombieType, row, fromWave, shakeBrush);
-                    std::cout << "[+] Zombie Spawned: ID=" << zombieType << " Row=" << row << "\n";
-                }
-            }
-            else
-            {
-                std::cout << "[!] Failed to find function pointer for: " << ADD_ZOMBIE_ROW_METHOD << "\n";
-            }
+            AddZombieInRow(boardInstance, zombieType, r, fromWave, shakeBrush);
+            std::cout << "[+] Zombie Spawned: ID=" << zombieType << " Row=" << r << "\n";
         }
-        else
-        {
-            std::cout << "[!] Failed to find method: " << ADD_ZOMBIE_ROW_METHOD << "\n";
-        }
+    }
+    else
+    {
+        AddZombieInRow(boardInstance, zombieType, row, fromWave, shakeBrush);
+        std::cout << "[+] Zombie Spawned: ID=" << zombieType << " Row=" << row << "\n";
     }
 }
 
-/** Handle full screen jalapeno planting */
 void HandleFullScreenJalapeno(void *boardInstance)
 {
     auto assembly = IL2CPP::Assembly(GAME_ASSEMBLY);
-    if (assembly)
+    auto ns = assembly->Namespace(GAME_NAMESPACE);
+    auto boardClass = ns->Class(BOARD_CLASS);
+
+    auto newPlantMethod = boardClass->Method(NEW_PLANT_METHOD, 4);
+    if (!newPlantMethod)
+        return;
+    auto NewPlant = newPlantMethod->FindFunction<NewPlant_t>();
+    if (!NewPlant)
+        return;
+
+    int jalapenoType = 20;
+    int imitaterType = -1;
+
+    for (int x = 0; x < 9; x++)
     {
-        auto ns = assembly->Namespace(GAME_NAMESPACE);
-        auto boardClass = ns->Class(BOARD_CLASS);
-        auto newPlantMethod = boardClass->Method(NEW_PLANT_METHOD, 4);
-
-        if (newPlantMethod)
+        for (int y = 0; y < 6; y++)
         {
-            auto NewPlant = newPlantMethod->FindFunction<NewPlant_t>();
-            if (NewPlant)
-            {
-                int jalapenoType = 20;
-                int imitaterType = -1;
-
-                for (int x = 0; x < 9; x++)
-                {
-                    for (int y = 0; y < 6; y++)
-                    {
-                        NewPlant(boardInstance, x, y, jalapenoType, imitaterType);
-                    }
-                }
-                std::cout << "[+] Full screen Jalapeno triggered.\n";
-            }
-            else
-            {
-                std::cout << "[!] Failed to find NewPlant function pointer.\n";
-            }
-        }
-        else
-        {
-            std::cout << "[!] Failed to find method: " << NEW_PLANT_METHOD << "\n";
+            NewPlant(boardInstance, x, y, jalapenoType, imitaterType);
         }
     }
+    std::cout << "[+] Full screen Jalapeno triggered.\n";
 }
 
 /** Main game thread hook - processes command queue */
@@ -320,12 +284,20 @@ bool InitializeIL2CPP()
     }
 
     auto ns = assembly->Namespace(GAME_NAMESPACE);
-    auto boardClass = ns->Class(BOARD_CLASS);
-    if (boardClass)
+    if (!ns)
     {
-        auto updateMethod = boardClass->Method(UPDATE_METHOD, 0);
+        std::cout << "[!] Failed to find namespace: " << GAME_NAMESPACE << "\n";
+        return false;
+    }
+
+    auto updateClass = ns->Class(BOARD_CLASS);
+    if (updateClass)
+    {
+        auto updateMethod = updateClass->Method(UPDATE_METHOD, 0);
         if (updateMethod)
+        {
             update_hook = updateMethod->Hook<UpdateGame_t>(memory, Detour_UpdateGame);
+        }
         else
         {
             std::cout << "[!] Failed to find method for update hook: " << UPDATE_METHOD << "\n";
@@ -404,7 +376,6 @@ extern "C" __declspec(dllexport) void SendResponse(const char *message)
     CloseHandle(hMapFile);
 }
 
-/** Test function that returns a random string response */
 extern "C" __declspec(dllexport) void GetPlantList()
 {
     if (!InitializeIL2CPP())
@@ -447,7 +418,6 @@ extern "C" __declspec(dllexport) void GetPlantList()
     SendResponse(ss.str().c_str());
 }
 
-/** Exported: Returns a list of all Zombie IDs and Names */
 extern "C" __declspec(dllexport) void GetZombieList()
 {
     if (!InitializeIL2CPP())
@@ -490,7 +460,6 @@ extern "C" __declspec(dllexport) void GetZombieList()
     SendResponse(ss.str().c_str());
 }
 
-/** Exported: Instantly complete the current level */
 extern "C" __declspec(dllexport) DWORD WINAPI InstantCompleteLevel(LPVOID lpParam)
 {
     if (!InitializeIL2CPP())
@@ -501,7 +470,6 @@ extern "C" __declspec(dllexport) DWORD WINAPI InstantCompleteLevel(LPVOID lpPara
     return 1;
 }
 
-/** Exported: Spawn a specific zombie on a specific row */
 extern "C" __declspec(dllexport) DWORD WINAPI SpawnZombie(LPVOID lpParam)
 {
     SpawnZombieArgs *args = (SpawnZombieArgs *)lpParam;
@@ -517,7 +485,6 @@ extern "C" __declspec(dllexport) DWORD WINAPI SpawnZombie(LPVOID lpParam)
     return 1;
 }
 
-/** Exported: Plant Jalapenos on every tile */
 extern "C" __declspec(dllexport) DWORD WINAPI FullScreenJalapeno(LPVOID lpParam)
 {
     if (!InitializeIL2CPP())
@@ -528,7 +495,6 @@ extern "C" __declspec(dllexport) DWORD WINAPI FullScreenJalapeno(LPVOID lpParam)
     return 1;
 }
 
-/** Exported function called by trainer to queue a plant addition */
 extern "C" __declspec(dllexport) DWORD WINAPI AddPlantToGarden(LPVOID lpParam)
 {
     PlantArgs *args = (PlantArgs *)lpParam;
@@ -543,11 +509,9 @@ extern "C" __declspec(dllexport) DWORD WINAPI AddPlantToGarden(LPVOID lpParam)
     return 1;
 }
 
-/** DLL initialization on load - minimal setup only */
 DWORD WINAPI mainThread(HMODULE hModule)
 {
 #ifdef _DEBUG
-    // Only allocate console in debug builds
     AllocConsole();
     freopen_s((FILE **)(stdout), "CONOUT$", "w", stdout);
 #endif
