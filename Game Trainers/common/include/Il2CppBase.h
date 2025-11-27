@@ -285,6 +285,13 @@ public:
             DeleteFileA(injectedDllPath.c_str());
     }
 
+    /** Calls an exported function in the injected DLL with no arguments */
+    bool invokeMethod(const char *functionName)
+    {
+        char dummy = 0;
+        return invokeMethod<char>(functionName, dummy);
+    }
+
     /** Calls an exported function in the injected DLL with the given arguments */
     template <typename T>
     bool invokeMethod(const char *functionName, T args)

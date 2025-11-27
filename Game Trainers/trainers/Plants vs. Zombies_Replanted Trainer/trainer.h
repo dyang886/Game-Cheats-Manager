@@ -3,12 +3,6 @@
 
 #include "Il2CppBase.h"
 
-struct PlantArgs
-{
-    int plantID;
-    int direction; // 0 = Right, 1 = Left
-};
-
 class Trainer : public Il2CppBase
 {
 public:
@@ -458,8 +452,56 @@ public:
     {
         if (initializeDllInjection())
         {
+            struct PlantArgs
+            {
+                int plantID;
+                int direction; // 0 = Right, 1 = Left
+            };
             PlantArgs args = {plantID, direction};
             return invokeMethod<PlantArgs>("AddPlantToGarden", args);
+        }
+        return false;
+    }
+
+    bool instantCompleteLevel()
+    {
+        if (initializeDllInjection())
+        {
+            return invokeMethod("InstantCompleteLevel");
+        }
+        return false;
+    }
+
+    std::string getZombieList()
+    {
+        if (initializeDllInjection())
+        {
+            return invokeMethodReturn("GetZombieList");
+        }
+        return "";
+    }
+
+    bool spawnZombie(int zombieType, int row, bool isEveryRow = false)
+    {
+        if (initializeDllInjection())
+        {
+            struct ZombieArgs
+            {
+                int type;
+                int row;
+                bool isEveryRow;
+            };
+            ZombieArgs args = {zombieType, row, isEveryRow};
+            return invokeMethod<ZombieArgs>("SpawnZombie", args);
+        }
+        return false;
+    }
+
+    bool fullScreenJalapeno()
+    {
+        if (initializeDllInjection())
+        {
+            return invokeMethod("FullScreenJalapeno");
         }
         return false;
     }

@@ -9,7 +9,10 @@
 #include "FLTKUtils.h"
 
 static Fl_Window *plant_list_window = nullptr;
+static Fl_Window *zombie_list_window = nullptr;
 static Fl_Check_Button *g_direction_check_button = nullptr;
+static Fl_Input *g_spawn_row_input = nullptr;
+static Fl_Check_Button *g_spawn_every_row_check_button = nullptr;
 
 // Callback function for apply button
 void apply_callback(Fl_Widget *widget, void *data)
@@ -31,18 +34,41 @@ void apply_callback(Fl_Widget *widget, void *data)
 
     if (optionName == "AddPlantToGarden")
     {
-        // Get plant ID from input
         int plantID = 0;
         int direction = 0;
 
         if (input && input->value())
             plantID = std::stoi(input->value());
 
-        // Get direction from the global direction toggle (0=Right, 1=Left)
         if (g_direction_check_button)
             direction = g_direction_check_button->value() ? 1 : 0;
 
         status = trainer->addPlantToGarden(plantID, direction);
+    }
+    else if (optionName == "InstantCompleteLevel")
+    {
+        status = trainer->instantCompleteLevel();
+    }
+    else if (optionName == "SpawnZombie")
+    {
+        int zombieType = 0;
+        int row = 0;
+        bool isEveryRow = false;
+
+        if (input && input->value())
+            zombieType = std::stoi(input->value());
+
+        if (g_spawn_row_input && g_spawn_row_input->value())
+            row = std::stoi(g_spawn_row_input->value()) - 1;
+
+        if (g_spawn_every_row_check_button)
+            isEveryRow = g_spawn_every_row_check_button->value() != 0;
+
+        status = trainer->spawnZombie(zombieType, row, isEveryRow);
+    }
+    else if (optionName == "FullScreenJalapeno")
+    {
+        status = trainer->fullScreenJalapeno();
     }
 
     // Finalize
@@ -140,14 +166,19 @@ struct InfoCallbackData
 {
     Trainer *trainer;
     Fl_Input *input;
+    const char *windowTitleKey;              // Key for window title translation
+    Fl_Window **windowInstance;              // Pointer to window instance (for reuse management)
+    std::vector<std::string> columnTitles;   // Column headers
+    std::string (Trainer::*dataRetriever)(); // Pointer to Trainer member function that returns std::string
 };
 
 class ItemTable : public Fl_Table
 {
 private:
-    std::vector<std::pair<int, std::string>> items;
+    std::vector<std::vector<std::string>> items;
     int selected_row = -1;
     Fl_Input *input;
+    std::vector<std::string> columnTitles;
 
 protected:
     void draw_cell(TableContext context, int row, int col, int x, int y, int w, int h) override
@@ -162,10 +193,10 @@ protected:
             fl_color(FL_FREE_COLOR);
             fl_rectf(x, y, w, h);
             fl_color(FL_WHITE);
-            if (col == 0)
-                fl_draw(t("Plant ID"), x + 4, y, w, h, FL_ALIGN_LEFT);
-            else
-                fl_draw(t("Plant Name"), x + 4, y, w, h, FL_ALIGN_LEFT);
+            if (col >= 0 && col < (int)columnTitles.size())
+            {
+                fl_draw(t(columnTitles[col]), x + 4, y, w, h, FL_ALIGN_LEFT);
+            }
             fl_pop_clip();
             return;
         case CONTEXT_CELL:
@@ -173,16 +204,9 @@ protected:
             fl_color(row == selected_row ? fl_lighter(FL_FREE_COLOR) : FL_FREE_COLOR);
             fl_rectf(x, y, w, h);
             fl_color(FL_WHITE);
-            if (row < (int)items.size())
+            if (row < (int)items.size() && col < (int)items[row].size())
             {
-                if (col == 0)
-                {
-                    fl_draw(std::to_string(items[row].first).c_str(), x + 4, y, w, h, FL_ALIGN_LEFT);
-                }
-                else
-                {
-                    fl_draw(items[row].second.c_str(), x + 4, y, w, h, FL_ALIGN_LEFT);
-                }
+                fl_draw(items[row][col].c_str(), x + 4, y, w, h, FL_ALIGN_LEFT);
             }
             fl_pop_clip();
             return;
@@ -250,9 +274,9 @@ protected:
             if (find_cell_at(Fl::event_x(), Fl::event_y(), row, col))
             {
                 selected_row = row;
-                if (input)
+                if (input && row < (int)items.size() && !items[row].empty())
                 {
-                    input->value(std::to_string(items[row].first).c_str());
+                    input->value(items[row][0].c_str());
                 }
                 redraw();
                 return 1;
@@ -269,9 +293,9 @@ protected:
             if (find_cell_at(Fl::event_x(), Fl::event_y(), row, col))
             {
                 selected_row = row;
-                if (input)
+                if (input && row < (int)items.size() && !items[row].empty())
                 {
-                    input->value(std::to_string(items[row].first).c_str());
+                    input->value(items[row][0].c_str());
                 }
                 Fl_Window *win = dynamic_cast<Fl_Window *>(parent()->top_window());
                 if (win)
@@ -286,20 +310,31 @@ protected:
     }
 
 public:
-    ItemTable(int x, int y, int w, int h, Fl_Input *inp, const char *l = 0) : Fl_Table(x, y, w, h, l), input(inp)
+    ItemTable(int x, int y, int w, int h, Fl_Input *inp, const std::vector<std::string> &titles, const char *l = 0) : Fl_Table(x, y, w, h, l), input(inp), columnTitles(titles)
     {
         int scrollbarSize = 16;
-        cols(2);
+        int numCols = titles.size();
+        cols(numCols);
         col_header(1);
-        col_width(0, 60);
-        col_width(1, w - 60 - scrollbarSize);
+
+        // Set column widths: first column (ID) is narrower, remaining columns share the rest
+        int availableWidth = w - scrollbarSize;
+        int idColWidth = 100;
+        int otherColsWidth = (availableWidth - idColWidth) / (numCols - 1);
+
+        col_width(0, idColWidth);
+        for (int i = 1; i < numCols; i++)
+        {
+            col_width(i, otherColsWidth);
+        }
+
         row_header(0);
         box(FL_NO_BOX);
         scrollbar_size(scrollbarSize);
         end();
     }
 
-    void setItems(const std::vector<std::pair<int, std::string>> &item_list)
+    void setItems(const std::vector<std::vector<std::string>> &item_list)
     {
         items = item_list;
         rows(item_list.size());
@@ -308,11 +343,18 @@ public:
     }
 };
 
-void plant_list_callback(Fl_Widget *widget, void *data)
+// Callback function for info buttons
+void info_callback(Fl_Widget *widget, void *data)
 {
     InfoCallbackData *info_data = static_cast<InfoCallbackData *>(data);
+    if (!info_data || !info_data->trainer || info_data->columnTitles.empty() || !info_data->windowInstance)
+        return;
+
     Trainer *trainer = info_data->trainer;
     Fl_Input *input = info_data->input;
+    const std::vector<std::string> &columnTitles = info_data->columnTitles;
+    const char *windowTitleKey = info_data->windowTitleKey;
+    Fl_Window *&list_window = *info_data->windowInstance;
 
     if (!trainer->isProcessRunning())
     {
@@ -320,9 +362,12 @@ void plant_list_callback(Fl_Widget *widget, void *data)
         return;
     }
 
-    if (plant_list_window && plant_list_window->shown())
+    // Call the member function pointer to get the list data
+    std::string itemListData = (trainer->*info_data->dataRetriever)();
+
+    if (list_window && list_window->shown())
     {
-        plant_list_window->show();
+        list_window->show();
         return;
     }
 
@@ -332,45 +377,48 @@ void plant_list_callback(Fl_Widget *widget, void *data)
     int trainer_w = trainer_window->w();
     int trainer_h = trainer_window->h();
 
-    int plant_w = 350;
-    int plant_h = 500;
-    int plant_x = trainer_x + (trainer_w - plant_w) / 2;
-    int plant_y = trainer_y + (trainer_h - plant_h) / 2;
+    int list_w = 350;
+    int list_h = 500;
+    int list_x = trainer_x + (trainer_w - list_w) / 2;
+    int list_y = trainer_y + (trainer_h - list_h) / 2;
 
-    plant_list_window = new Fl_Window(plant_x, plant_y, plant_w, plant_h, t("Plant List"));
-    plant_list_window->icon((char *)LoadIconA(GetModuleHandle(NULL), "APP_ICON"));
+    list_window = new Fl_Window(list_x, list_y, list_w, list_h, t(windowTitleKey));
+    list_window->icon((char *)LoadIconA(GetModuleHandle(NULL), "APP_ICON"));
 
-    std::string plantList = trainer->getPlantList();
-    std::vector<std::pair<int, std::string>> plants;
-    std::istringstream iss(plantList);
+    std::vector<std::vector<std::string>> items;
+    int numCols = columnTitles.size();
+    std::istringstream iss(itemListData);
     std::string line;
+
     while (std::getline(iss, line))
     {
         line.erase(std::remove(line.begin(), line.end(), '\r'), line.end());
-        size_t pos = line.find('>');
-        if (pos != std::string::npos)
+
+        // Parse columns separated by '>'
+        std::vector<std::string> rowData;
+        std::istringstream lineStream(line);
+        std::string column;
+
+        while (std::getline(lineStream, column, '>'))
         {
-            try
-            {
-                int id = std::stoi(line.substr(0, pos));
-                std::string englishName = line.substr(pos + 1);
-                // Translate plant name using the translation system
-                const char *translatedName = t(englishName);
-                plants.emplace_back(id, translatedName);
-            }
-            catch (...)
-            {
-                // Skip malformed lines
-            }
+            const char *translatedText = t(column);
+            std::string displayText = (translatedText && *translatedText) ? std::string(translatedText) : column;
+            rowData.push_back(displayText);
+        }
+
+        if ((int)rowData.size() >= numCols)
+        {
+            rowData.resize(numCols);
+            items.push_back(rowData);
         }
     }
 
-    ItemTable *table = new ItemTable(0, 0, plant_w, plant_h, input);
-    table->setItems(plants);
+    ItemTable *table = new ItemTable(0, 0, list_w, list_h, input, columnTitles);
+    table->setItems(items);
     table->color(FL_FREE_COLOR);
 
-    plant_list_window->end();
-    plant_list_window->show();
+    list_window->end();
+    list_window->show();
 }
 
 static void main_window_close_callback(Fl_Widget *w, void *)
@@ -379,6 +427,11 @@ static void main_window_close_callback(Fl_Widget *w, void *)
     {
         Fl::delete_widget(plant_list_window);
         plant_list_window = nullptr;
+    }
+    if (zombie_list_window)
+    {
+        Fl::delete_widget(zombie_list_window);
+        zombie_list_window = nullptr;
     }
     RemoveFontMemResourceEx(font_handle);
     Fl::delete_widget(w);
@@ -424,6 +477,11 @@ int main(int argc, char **argv)
     int input_w = 200;
     int option_gap = 10;
     int option_h = static_cast<int>(font_size * 1.5);
+
+    DWORD info_img_size = 0;
+    const unsigned char *info_img_data = load_resource("INFO_IMG", info_img_size);
+    Fl_PNG_Image *info_img = new Fl_PNG_Image(nullptr, info_img_data, (int)info_img_size);
+    info_img->scale(20, 20, 1, 0);
 
     // ------------------------------------------------------------------
     // Top Row: Language Selection
@@ -690,18 +748,15 @@ int main(int argc, char **argv)
     add_plant_input->type(FL_INT_INPUT);
     set_input_values(add_plant_input, "0", "0", "39");
 
-    DWORD plant_info_img_size = 0;
-    const unsigned char *plant_info_img_data = load_resource("INFO_IMG", plant_info_img_size);
-    Fl_PNG_Image *plant_info_img = new Fl_PNG_Image(nullptr, plant_info_img_data, (int)plant_info_img_size);
-    plant_info_img->scale(20, 20, 1, 0);
-
+    // Info button
     Fl_Button *plant_info_icon = new Fl_Button(0, 0, 0, 0);
     add_plant_flex->fixed(plant_info_icon, 20);
     add_plant_flex->add(plant_info_icon);
     plant_info_icon->box(FL_NO_BOX);
-    plant_info_icon->image(plant_info_img);
-    InfoCallbackData *plant_info_data = new InfoCallbackData{&trainer, add_plant_input};
-    plant_info_icon->callback(plant_list_callback, plant_info_data);
+    plant_info_icon->image(info_img);
+    std::vector<std::string> plant_columns = {"Plant ID", "Plant Name"};
+    InfoCallbackData *plant_info_data = new InfoCallbackData{&trainer, add_plant_input, "Plant List", &plant_list_window, plant_columns, &Trainer::getPlantList};
+    plant_info_icon->callback(info_callback, plant_info_data);
 
     ApplyData *data_add_plant = new ApplyData{&trainer, "AddPlantToGarden", add_plant_apply_button, add_plant_input};
     add_plant_apply_button->callback(apply_callback, data_add_plant);
@@ -709,9 +764,7 @@ int main(int argc, char **argv)
     add_plant_flex->end();
     options1_flex->fixed(add_plant_flex, option_h);
 
-    // ------------------------------------------------------------------
-    // Facing direction (Toggle)
-    // ------------------------------------------------------------------
+    // sub-control - facing direction (Toggle)
     Fl_Flex *direction_flex = new Fl_Flex(0, 0, 0, 0, Fl_Flex::HORIZONTAL);
     direction_flex->gap(option_gap);
 
@@ -730,6 +783,117 @@ int main(int argc, char **argv)
 
     direction_flex->end();
     options1_flex->fixed(direction_flex, option_h);
+
+    // ------------------------------------------------------------------
+    // spawn_zombie (Apply)
+    // ------------------------------------------------------------------
+    Fl_Flex *spawn_zombie_flex = new Fl_Flex(0, 0, 0, 0, Fl_Flex::HORIZONTAL);
+    spawn_zombie_flex->gap(option_gap);
+
+    Fl_Button *spawn_zombie_apply_button = new Fl_Button(0, 0, 0, 0);
+    spawn_zombie_flex->fixed(spawn_zombie_apply_button, button_w);
+    tr(spawn_zombie_apply_button, "Apply");
+
+    Fl_Box *spawn_zombie_label = new Fl_Box(0, 0, 0, 0);
+    tr(spawn_zombie_label, "Spawn Zombie");
+
+    Fl_Input *spawn_zombie_input = new Fl_Input(0, 0, 0, 0);
+    spawn_zombie_flex->fixed(spawn_zombie_input, input_w);
+    spawn_zombie_input->type(FL_INT_INPUT);
+    set_input_values(spawn_zombie_input, "0", "0", "99");
+
+    // Info button
+    Fl_Button *spawn_zombie_info_icon = new Fl_Button(0, 0, 0, 0);
+    spawn_zombie_flex->fixed(spawn_zombie_info_icon, 20);
+    spawn_zombie_flex->add(spawn_zombie_info_icon);
+    spawn_zombie_info_icon->box(FL_NO_BOX);
+    spawn_zombie_info_icon->image(info_img);
+    std::vector<std::string> zombie_columns = {"Zombie ID", "Zombie Name"};
+    InfoCallbackData *spawn_zombie_info_data = new InfoCallbackData{&trainer, spawn_zombie_input, "Zombie List", &zombie_list_window, zombie_columns, &Trainer::getZombieList};
+    spawn_zombie_info_icon->callback(info_callback, spawn_zombie_info_data);
+
+    ApplyData *data_spawn_zombie = new ApplyData{&trainer, "SpawnZombie", spawn_zombie_apply_button, spawn_zombie_input};
+    spawn_zombie_apply_button->callback(apply_callback, data_spawn_zombie);
+
+    spawn_zombie_flex->end();
+    options1_flex->fixed(spawn_zombie_flex, option_h);
+
+    // sub-control - row number (Input)
+    Fl_Flex *spawn_row_flex = new Fl_Flex(0, 0, 0, 0, Fl_Flex::HORIZONTAL);
+    spawn_row_flex->gap(option_gap);
+
+    Fl_Box *spawn_row_indent_spacer = new Fl_Box(0, 0, 0, 0);
+    spawn_row_flex->fixed(spawn_row_indent_spacer, button_w);
+
+    Fl_Input *spawn_row_input = new Fl_Input(0, 0, 0, 0);
+    spawn_row_flex->fixed(spawn_row_input, button_w);
+    spawn_row_input->type(FL_INT_INPUT);
+    set_input_values(spawn_row_input, "1", "1", "6");
+    g_spawn_row_input = spawn_row_input;
+
+    Fl_Box *spawn_row_label = new Fl_Box(0, 0, 0, 0);
+    tr(spawn_row_label, "Which Row");
+
+    spawn_row_flex->end();
+    options1_flex->fixed(spawn_row_flex, option_h);
+
+    // sub-control - spawn on every row (Toggle)
+    Fl_Flex *spawn_every_row_flex = new Fl_Flex(0, 0, 0, 0, Fl_Flex::HORIZONTAL);
+    spawn_every_row_flex->gap(option_gap);
+
+    Fl_Box *spawn_every_row_indent_spacer = new Fl_Box(0, 0, 0, 0);
+    spawn_every_row_flex->fixed(spawn_every_row_indent_spacer, button_w);
+
+    Fl_Box *spawn_every_row_toggle_spacer = new Fl_Box(0, 0, 0, 0);
+    spawn_every_row_flex->fixed(spawn_every_row_toggle_spacer, toggle_spacer_w);
+
+    Fl_Check_Button *spawn_every_row_check_button = new Fl_Check_Button(0, 0, 0, 0);
+    spawn_every_row_flex->fixed(spawn_every_row_check_button, toggle_w);
+    g_spawn_every_row_check_button = spawn_every_row_check_button;
+
+    Fl_Box *spawn_every_row_label = new Fl_Box(0, 0, 0, 0);
+    tr(spawn_every_row_label, "Spawn in Every Row");
+
+    spawn_every_row_flex->end();
+    options1_flex->fixed(spawn_every_row_flex, option_h);
+
+    // ------------------------------------------------------------------
+    // full_screen_jalapeno (Apply)
+    // ------------------------------------------------------------------
+    Fl_Flex *full_screen_jalapeno_flex = new Fl_Flex(0, 0, 0, 0, Fl_Flex::HORIZONTAL);
+    full_screen_jalapeno_flex->gap(option_gap);
+
+    Fl_Button *full_screen_jalapeno_apply_button = new Fl_Button(0, 0, 0, 0);
+    full_screen_jalapeno_flex->fixed(full_screen_jalapeno_apply_button, button_w);
+    tr(full_screen_jalapeno_apply_button, "Apply");
+
+    Fl_Box *full_screen_jalapeno_label = new Fl_Box(0, 0, 0, 0);
+    tr(full_screen_jalapeno_label, "Full Screen Jalapeno");
+
+    ApplyData *data_full_screen_jalapeno = new ApplyData{&trainer, "FullScreenJalapeno", full_screen_jalapeno_apply_button, nullptr};
+    full_screen_jalapeno_apply_button->callback(apply_callback, data_full_screen_jalapeno);
+
+    full_screen_jalapeno_flex->end();
+    options1_flex->fixed(full_screen_jalapeno_flex, option_h);
+
+    // ------------------------------------------------------------------
+    // instant_complete_level (Apply)
+    // ------------------------------------------------------------------
+    Fl_Flex *instant_complete_flex = new Fl_Flex(0, 0, 0, 0, Fl_Flex::HORIZONTAL);
+    instant_complete_flex->gap(option_gap);
+
+    Fl_Button *instant_complete_apply_button = new Fl_Button(0, 0, 0, 0);
+    instant_complete_flex->fixed(instant_complete_apply_button, button_w);
+    tr(instant_complete_apply_button, "Apply");
+
+    Fl_Box *instant_complete_label = new Fl_Box(0, 0, 0, 0);
+    tr(instant_complete_label, "Instant Complete Level");
+
+    ApplyData *data_instant_complete = new ApplyData{&trainer, "InstantCompleteLevel", instant_complete_apply_button, nullptr};
+    instant_complete_apply_button->callback(apply_callback, data_instant_complete);
+
+    instant_complete_flex->end();
+    options1_flex->fixed(instant_complete_flex, option_h);
 
     Fl_Box *spacerBottom = new Fl_Box(0, 0, 0, 0);
     options1_flex->end();
