@@ -57,6 +57,13 @@ struct ToggleData
     Fl_Input *input;
 };
 
+// Structure to hold a widget pair (button and input)
+struct WidgetPair
+{
+    Fl_Widget *button; // Fl_Check_Button* or Fl_Button*
+    Fl_Input *input;   // nullptr if input not created
+};
+
 // Structure to hold callback data for info buttons
 struct InfoCallbackData
 {
@@ -779,40 +786,13 @@ Fl_Button *place_apply_widget(
     return apply_button;
 }
 
-Fl_Widget *place_indented_input_widget(
+WidgetPair place_indented_toggle_widget(
     Fl_Flex *parent_flex,
     const std::string &labelKey,
-    Fl_Input **out_input,
-    const char *input_default,
-    const char *input_min,
-    const char *input_max,
+    const char *input_default = nullptr,
+    const char *input_min = nullptr,
+    const char *input_max = nullptr,
     int input_type = FL_INT_INPUT)
-{
-    Fl_Flex *input_flex = new Fl_Flex(0, 0, 0, 0, Fl_Flex::HORIZONTAL);
-    input_flex->gap(UI_OPTION_GAP);
-
-    Fl_Box *indent_spacer = new Fl_Box(0, 0, 0, 0);
-    input_flex->fixed(indent_spacer, UI_BUTTON_WIDTH);
-
-    Fl_Input *input = new Fl_Input(0, 0, 0, 0);
-    input_flex->fixed(input, UI_BUTTON_WIDTH);
-    input->type(input_type);
-    set_input_values(input, input_default, input_min, input_max);
-    *out_input = input;
-
-    Fl_Box *label = new Fl_Box(0, 0, 0, 0);
-    tr(label, labelKey);
-
-    input_flex->end();
-    parent_flex->fixed(input_flex, UI_OPTION_HEIGHT);
-
-    return input;
-}
-
-Fl_Check_Button *place_indented_toggle_widget(
-    Fl_Flex *parent_flex,
-    const std::string &labelKey,
-    Fl_Check_Button **out_check_button = nullptr)
 {
     Fl_Flex *toggle_flex = new Fl_Flex(0, 0, 0, 0, Fl_Flex::HORIZONTAL);
     toggle_flex->gap(UI_OPTION_GAP);
@@ -829,11 +809,81 @@ Fl_Check_Button *place_indented_toggle_widget(
     Fl_Box *label = new Fl_Box(0, 0, 0, 0);
     tr(label, labelKey);
 
+    Fl_Input *input = nullptr;
+    if (input_default && input_min && input_max)
+    {
+        input = new Fl_Input(0, 0, 0, 0);
+        toggle_flex->fixed(input, UI_INPUT_WIDTH);
+        input->type(input_type);
+        set_input_values(input, input_default, input_min, input_max);
+    }
+
     toggle_flex->end();
     parent_flex->fixed(toggle_flex, UI_OPTION_HEIGHT);
 
-    if (out_check_button)
-        *out_check_button = check_button;
+    return WidgetPair{check_button, input};
+}
 
-    return check_button;
+WidgetPair place_indented_apply_widget(
+    Fl_Flex *parent_flex,
+    const std::string &labelKey,
+    const char *input_default = nullptr,
+    const char *input_min = nullptr,
+    const char *input_max = nullptr,
+    int input_type = FL_INT_INPUT)
+{
+    Fl_Flex *apply_flex = new Fl_Flex(0, 0, 0, 0, Fl_Flex::HORIZONTAL);
+    apply_flex->gap(UI_OPTION_GAP);
+
+    Fl_Box *indent_spacer = new Fl_Box(0, 0, 0, 0);
+    apply_flex->fixed(indent_spacer, UI_BUTTON_WIDTH);
+
+    Fl_Button *apply_button = new Fl_Button(0, 0, 0, 0);
+    apply_flex->fixed(apply_button, UI_BUTTON_WIDTH);
+    tr(apply_button, "Apply");
+
+    Fl_Box *label = new Fl_Box(0, 0, 0, 0);
+    tr(label, labelKey);
+
+    Fl_Input *input = nullptr;
+    if (input_default && input_min && input_max)
+    {
+        input = new Fl_Input(0, 0, 0, 0);
+        apply_flex->fixed(input, UI_INPUT_WIDTH);
+        input->type(input_type);
+        set_input_values(input, input_default, input_min, input_max);
+    }
+
+    apply_flex->end();
+    parent_flex->fixed(apply_flex, UI_OPTION_HEIGHT);
+
+    return WidgetPair{apply_button, input};
+}
+
+Fl_Input *place_indented_input_widget(
+    Fl_Flex *parent_flex,
+    const std::string &labelKey,
+    const char *input_default,
+    const char *input_min,
+    const char *input_max,
+    int input_type = FL_INT_INPUT)
+{
+    Fl_Flex *input_flex = new Fl_Flex(0, 0, 0, 0, Fl_Flex::HORIZONTAL);
+    input_flex->gap(UI_OPTION_GAP);
+
+    Fl_Box *indent_spacer = new Fl_Box(0, 0, 0, 0);
+    input_flex->fixed(indent_spacer, UI_BUTTON_WIDTH);
+
+    Fl_Input *input = new Fl_Input(0, 0, 0, 0);
+    input_flex->fixed(input, UI_BUTTON_WIDTH);
+    input->type(input_type);
+    set_input_values(input, input_default, input_min, input_max);
+
+    Fl_Box *label = new Fl_Box(0, 0, 0, 0);
+    tr(label, labelKey);
+
+    input_flex->end();
+    parent_flex->fixed(input_flex, UI_OPTION_HEIGHT);
+
+    return input;
 }

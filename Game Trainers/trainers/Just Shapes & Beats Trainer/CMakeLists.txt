@@ -1,5 +1,5 @@
-set(GAME_NAME "Plants_vs._Zombies_Replanted")
-set(TRAINER_NAME "Plants vs. Zombies_Replanted Trainer")
+set(GAME_NAME "Just_Shapes_and_Beats")
+set(TRAINER_NAME "Just Shapes & Beats Trainer")
 
 set(IL2CPP_TARGET "${GAME_NAME}_IL2CPP")
 
@@ -8,10 +8,7 @@ set(SUBSET_FONT_TARGET "${GAME_NAME}_SubsetFont")
 set(FONT_SUBSET_OUTPUT "${CMAKE_CURRENT_SOURCE_DIR}/NotoSansSC-Subset.ttf")
 set(FONT_SUBSET_SCRIPT "${CMAKE_SOURCE_DIR}/scripts/font_processor.py")
 set(FONT_FILE "${CMAKE_SOURCE_DIR}/scripts/NotoSansSC-Regular.ttf")
-set(TRANSLATION_FILES 
-    "${CMAKE_CURRENT_SOURCE_DIR}/translations.json"
-    "${CMAKE_CURRENT_SOURCE_DIR}/translation_extra.txt"
-)
+set(TRANSLATION_FILES "${CMAKE_CURRENT_SOURCE_DIR}/translations.json")
 
 # Run python script to generate the subsetted font
 add_custom_command(

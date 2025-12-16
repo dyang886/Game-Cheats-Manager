@@ -1,0 +1,28 @@
+{
+    "en_US": {
+        "English": "English",
+        "Please run the game first.": "Please run the game first.",
+        "Failed to activate.": "Failed to activate.",
+        "Failed to activate/deactivate.": "Failed to activate/deactivate.",
+        "Process Name:": "Process Name:",
+        "Process ID:": "Process ID:",
+        "Apply": "Apply",
+        "Just Shapes & Beats Trainer": "Just Shapes & Beats Trainer",
+        "God Mode": "God Mode",
+        "Add Beat Points": "Add Beat Points",
+        "Finish Level": "Finish Level"
+    },
+    "zh_CN": {
+        "简体中文": "简体中文",
+        "Please run the game first.": "请先运行游戏。",
+        "Failed to activate.": "激活失败。",
+        "Failed to activate/deactivate.": "激活/停用失败。",
+        "Process Name:": "进程名称：",
+        "Process ID:": "进程 ID:",
+        "Apply": "应用",
+        "Just Shapes & Beats Trainer": "Just Shapes & Beats Trainer",
+        "God Mode": "无敌模式",
+        "Add Beat Points": "添加 Beat Points",
+        "Finish Level": "完成关卡"
+    }
+}

@@ -1,0 +1,6 @@
+APP_ICON ICON "../../common/assets/logo.ico"
+INFO_IMG RCDATA "../../common/assets/info.png"
+LOGO_IMG RCDATA "logo.png"
+TRANSLATION_JSON RCDATA "translations.json"
+FONT_TTF RCDATA "NotoSansSC-Subset.ttf"
+IL2CPP_DLL RCDATA "IL2CPP.dll"

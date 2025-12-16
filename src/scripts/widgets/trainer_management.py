@@ -16,7 +16,7 @@ class TrainerManagementDialog(QDialog):
         super().__init__(parent)
         self.setWindowTitle(tr("Trainer Management"))
         self.setWindowIcon(QIcon(resource_path("assets/logo.ico")))
-        self.setMinimumWidth(550)
+        self.setMinimumWidth(650)
         self.active_alerts = []
 
         # Main layout
@@ -93,7 +93,7 @@ class TrainerManagementDialog(QDialog):
         layout.addLayout(columns)
 
         column1 = QVBoxLayout()
-        columns.addLayout(column1, stretch=0)
+        columns.addLayout(column1, stretch=2)
 
         logoPixmap = QPixmap(resource_path("assets/logo_trainer.png"))
         scaledLogoPixmap = logoPixmap.scaled(130, 130, Qt.AspectRatioMode.KeepAspectRatio, Qt.TransformationMode.SmoothTransformation)
@@ -105,7 +105,7 @@ class TrainerManagementDialog(QDialog):
         column2 = QVBoxLayout()
         column2.setSpacing(15)
         column2.addStretch(1)
-        columns.addLayout(column2, stretch=1)
+        columns.addLayout(column2, stretch=3)
         columns.setAlignment(column2, Qt.AlignmentFlag.AlignHCenter)
 
         # Enable GCM and Other trainer
@@ -141,7 +141,7 @@ class TrainerManagementDialog(QDialog):
         layout.addLayout(columns)
 
         column1 = QVBoxLayout()
-        columns.addLayout(column1, stretch=0)
+        columns.addLayout(column1, stretch=2)
 
         logoPixmap = QPixmap(resource_path("assets/fling.png"))
         scaledLogoPixmap = logoPixmap.scaled(130, 130, Qt.AspectRatioMode.KeepAspectRatio, Qt.TransformationMode.SmoothTransformation)
@@ -153,7 +153,7 @@ class TrainerManagementDialog(QDialog):
         column2 = QVBoxLayout()
         column2.setSpacing(15)
         column2.addStretch(1)
-        columns.addLayout(column2, stretch=1)
+        columns.addLayout(column2, stretch=3)
         columns.setAlignment(column2, Qt.AlignmentFlag.AlignHCenter)
 
         # Fling server selection
@@ -200,7 +200,7 @@ class TrainerManagementDialog(QDialog):
         layout.addLayout(columns)
 
         column1 = QVBoxLayout()
-        columns.addLayout(column1, stretch=0)
+        columns.addLayout(column1, stretch=2)
 
         logoPixmap = QPixmap(resource_path("assets/xiaoxing.png"))
         scaledLogoPixmap = logoPixmap.scaled(130, 130, Qt.AspectRatioMode.KeepAspectRatio, Qt.TransformationMode.SmoothTransformation)
@@ -212,7 +212,7 @@ class TrainerManagementDialog(QDialog):
         column2 = QVBoxLayout()
         column2.setSpacing(15)
         column2.addStretch(1)
-        columns.addLayout(column2, stretch=1)
+        columns.addLayout(column2, stretch=3)
         columns.setAlignment(column2, Qt.AlignmentFlag.AlignHCenter)
 
         # Enable XiaoXing trainer
@@ -253,7 +253,7 @@ class TrainerManagementDialog(QDialog):
         layout.addLayout(columns)
 
         column1 = QVBoxLayout()
-        columns.addLayout(column1, stretch=0)
+        columns.addLayout(column1, stretch=2)
 
         logoPixmap = QPixmap(resource_path("assets/wemod.png"))
         scaledLogoPixmap = logoPixmap.scaled(130, 130, Qt.AspectRatioMode.KeepAspectRatio, Qt.TransformationMode.SmoothTransformation)
@@ -265,7 +265,7 @@ class TrainerManagementDialog(QDialog):
         column2 = QVBoxLayout()
         column2.setSpacing(15)
         column2.addStretch(1)
-        columns.addLayout(column2, stretch=1)
+        columns.addLayout(column2, stretch=3)
         columns.setAlignment(column2, Qt.AlignmentFlag.AlignHCenter)
 
         # WeMod installation path
@@ -303,6 +303,16 @@ class TrainerManagementDialog(QDialog):
         versionLayout.addWidget(QLabel(tr("Installed WeMod Versions:")))
         self.versionCombo = QComboBox()
         versionLayout.addWidget(self.versionCombo)
+
+        # Patch method selection
+        patchLayout = QVBoxLayout()
+        patchLayout.setSpacing(2)
+        column2.addLayout(patchLayout)
+        patchLayout.addWidget(QLabel(tr("Patch Method:")))
+        self.patchCombo = QComboBox()
+        self.patchCombo.addItems(patch_methods.keys())
+        self.patchCombo.setCurrentText(list(patch_methods.keys())[0])
+        patchLayout.addWidget(self.patchCombo)
 
         # Unlock WeMod pro
         self.weModProCheckbox = QCheckBox(tr("Activate WeMod Pro"))
@@ -347,7 +357,7 @@ class TrainerManagementDialog(QDialog):
         layout.addLayout(columns)
 
         column1 = QVBoxLayout()
-        columns.addLayout(column1, stretch=0)
+        columns.addLayout(column1, stretch=2)
 
         logoPixmap = QPixmap(resource_path("assets/ce.png"))
         scaledLogoPixmap = logoPixmap.scaled(130, 130, Qt.AspectRatioMode.KeepAspectRatio, Qt.TransformationMode.SmoothTransformation)
@@ -359,7 +369,7 @@ class TrainerManagementDialog(QDialog):
         column2 = QVBoxLayout()
         column2.setSpacing(15)
         column2.addStretch(1)
-        columns.addLayout(column2, stretch=1)
+        columns.addLayout(column2, stretch=3)
         columns.setAlignment(column2, Qt.AlignmentFlag.AlignHCenter)
 
         # CE installation status
@@ -492,10 +502,11 @@ class TrainerManagementDialog(QDialog):
     def applyWeModCustomization(self):
         weModInstallPath = self.weModInstallLineEdit.text()
         selectedWeModVersion = self.versionCombo.currentText()
+        patchMethod = patch_methods[self.patchCombo.currentText()]
         self.weModApplyButton.setDisabled(True)
         self.weModResetButton.setDisabled(True)
 
-        self.apply_thread = WeModCustomization(self.weModVersions, weModInstallPath, selectedWeModVersion, self)
+        self.apply_thread = WeModCustomization(self.weModVersions, weModInstallPath, selectedWeModVersion, patchMethod, self)
         self.apply_thread.message.connect(self.show_alert, Qt.ConnectionType.BlockingQueuedConnection)
         self.apply_thread.finished.connect(self.on_finished)
         self.apply_thread.start()

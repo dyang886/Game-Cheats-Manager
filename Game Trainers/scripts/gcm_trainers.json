@@ -37,6 +37,12 @@
         "version": "2025.11.27"
     },
     {
+        "game_name": "Just Shapes & Beats",
+        "origin": "gcm",
+        "gcm_url": "GCM/GCM Trainers/Just Shapes & Beats Trainer.exe",
+        "version": "2025.11.29"
+    },
+    {
         "game_name": "Plants vs. Zombies: GOTY Edition",
         "origin": "gcm",
         "gcm_url": "GCM/GCM Trainers/Plants vs. Zombies_GOTY Edition Trainer.exe",

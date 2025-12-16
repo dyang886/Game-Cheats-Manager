@@ -509,7 +509,7 @@ extern "C" __declspec(dllexport) DWORD WINAPI AddPlantToGarden(LPVOID lpParam)
     return 1;
 }
 
-DWORD WINAPI mainThread(HMODULE hModule)
+DWORD WINAPI MainThread(HMODULE hModule)
 {
 #ifdef _DEBUG
     AllocConsole();
@@ -524,7 +524,7 @@ BOOL APIENTRY DllMain(HMODULE hModule, DWORD ul_reason_for_call, LPVOID lpReserv
     {
     case DLL_PROCESS_ATTACH:
         DisableThreadLibraryCalls(hModule);
-        CreateThread(nullptr, NULL, (LPTHREAD_START_ROUTINE)mainThread, hModule, NULL, nullptr);
+        CreateThread(nullptr, NULL, (LPTHREAD_START_ROUTINE)MainThread, hModule, NULL, nullptr);
         break;
     }
     return TRUE;

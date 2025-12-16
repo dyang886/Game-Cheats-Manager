@@ -25,6 +25,12 @@ msgstr "Official Site"
 msgid "GCM Server"
 msgstr "GCM Server"
 
+msgid "Yearly Subscription"
+msgstr "Yearly Subscription"
+
+msgid "Gifted Subscription"
+msgstr "Gifted Subscription"
+
 msgid "Search for installed"
 msgstr "Search for installed"
 
@@ -445,6 +451,9 @@ msgstr "Reset to default"
 
 msgid "Installed WeMod Versions:"
 msgstr "Installed WeMod Versions:"
+
+msgid "Patch Method:"
+msgstr "Patch Method:"
 
 msgid "Activate WeMod Pro"
 msgstr "Activate WeMod Pro"

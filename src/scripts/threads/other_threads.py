@@ -1,4 +1,5 @@
 import os
+from pickle import TRUE
 import psutil
 import re
 import shutil
@@ -208,16 +209,18 @@ class FetchTrainerTranslations(DownloadBaseThread):
 
 class WeModCustomization(QThread):
     # Latest WeMod download: https://api.wemod.com/client/download
-    # Custom WeMod version download: https://storage-cdn.wemod.com/app/releases/stable/WeMod-9.10.3.exe
+    # Custom WeMod version download: https://storage-cdn.wemod.com/app/releases/stable/WeMod-11.6.0.exe
+    # Custom Wand version download: https://storage-cdn.wemod.com/app/releases/stable/Wand-12.0.3.exe
     message = pyqtSignal(str, str)
     finished = pyqtSignal()
 
-    def __init__(self, weModVersions, weModInstallPath, selectedWeModVersion, parent=None):
+    def __init__(self, weModVersions, weModInstallPath, selectedWeModVersion, patchMethod, parent=None):
         super().__init__(parent)
         self.weModVersions = weModVersions
         self.weModInstallPath = weModInstallPath
         self.selectedWeModVersion = selectedWeModVersion
         self.selectedWeModPath = os.path.join(weModInstallPath, f"app-{selectedWeModVersion}")
+        self.patchMethod = patchMethod
 
     def run(self):
         asar = os.path.join(self.selectedWeModPath, "resources", "app.asar")
@@ -272,9 +275,7 @@ class WeModCustomization(QThread):
                 patch_success = False
 
             # Patching logic
-            patch_success = self.yearly_active_sub()
-            if not patch_success:
-                patch_success = self.gifted_sub()
+            patch_success = self.patch()
 
             # pack patched js files back to app.asar
             try:
@@ -360,13 +361,33 @@ class WeModCustomization(QThread):
         except Exception as e:
             self.message.emit(tr("Failed to patch file:") + f"\n{input_file}", "error")
 
-    def yearly_active_sub(self):
-        patterns = {
-            r'(getUserAccount\()(.*)(}async getUserAccountFlags)': r'\1\2.then(function(response) {response.subscription={period:"yearly", state:"active"}; response.flags=78; return response;})\3',
-            r'(getUserAccountFlags\()(.*)(\)\).flags)': r'\1\2\3.then(function(response) {if(response.mask==4) {response.flags=4}; return response;})',
-            r'(changeAccountEmail\()(.*)(email:.?,currentPassword:.?}\))': r'\1\2\3.then(function(response) {response.subscription={period:"yearly", state:"active"}; response.flags=78; return response;})',
-            r'(getPromotion\()(.*)(collectMetrics:!\d}\))': r'\1\2\3.then(function(response) {response.components.appBanner=null; response.flags=0; return response;})'
+    def patch(self, enable_dev=False):
+        if not PATCH_PATTERNS_API_GATEWAY_ENDPOINT or not CLIENT_API_KEY:
+            print("Error: API Gateway endpoint or Client API Key is not configured.")
+            return False
+
+        headers = {
+            'x-api-key': CLIENT_API_KEY
         }
+        params = {
+            'patchMethod': self.patchMethod,
+            'enableDev': 'true' if enable_dev else 'false'
+        }
+
+        response = None
+        try:
+            response = requests.get(PATCH_PATTERNS_API_GATEWAY_ENDPOINT, headers=headers, params=params, timeout=15)
+            response.raise_for_status()
+            patterns = response.json()
+            if not patterns:
+                response.status_code = -2
+                raise Exception("No patterns found in response")
+
+        except Exception as e:
+            print(f"Error fetching patch patterns: {str(e)}")
+            status_code = response.status_code if response else -1
+            self.message.emit(tr("Internet request failed.") + f" {status_code}", "error")
+            return False
 
         # Mapping of patterns to files where they were found: {pattern key: file path}
         lines = {key: None for key in patterns}
@@ -389,53 +410,15 @@ class WeModCustomization(QThread):
 
             # Process each file with matched patterns
             if all(lines.values()):
-                print("js file patched using yearly_active_sub method")
+                print(f"js files patched using {self.patchMethod} method")
                 for pattern, file_path in lines.items():
                     self.apply_patch(file_path, pattern, patterns[pattern])
             else:
-                print("Not all 4 patterns found for yearly_active_sub patch")
+                print(f"Not all patterns found for {self.patchMethod} patch")
                 return False
 
         except Exception as e:
-            print(f"Error during yearly_active_sub patching: {str(e)}")
+            print(f"Error during {self.patchMethod} patching: {str(e)}")
             return False
 
         return True
-
-    def gifted_sub(self):
-        pattern = (
-            '{return"application/json"===e.headers.get("Content-Type")?await e.json():await e.text()}'
-        )
-        replacement = (
-            '{if("application/json"===e.headers.get("Content-Type")){var t=await e.json();'
-            'if(void 0!==t.subscription){class e{constructor(){var e=(new Date).getFullYear();'
-            'this.d=new Date(e)}plus(e,t){var i=Number(e);return"year"===t?this.d.setFullYear(this.d.getFullYear()+i):'
-            '"day"===t&&this.d.setDate(this.d.getDate()+i),this}minus(e,t){return this.plus(-1*e,t)}toISOString(){'
-            'return this.d.toISOString()}}var i=(new e).minus(1,"day"),n=i.toISOString(),s=i.plus(1,"year").toISOString(),'
-            'o=((new e).minus(1,"day").plus(3,"day").toISOString(),{startedAt:n,endsAt:s,period:"yearly",state:"active",'
-            'nextInvoice:{date:s,amount:0,currency:"USD"}});o={...o,gift:{senderName:"WeMod"}},t.subscription=o}'
-            'return t}return await e.text()}'
-        )
-
-        try:
-            # Search for the original line in JS files
-            js_files = [f for f in os.listdir(WEMOD_TEMP_DIR) if f.endswith(".js")]
-            for js_file in js_files:
-                file_path = os.path.join(WEMOD_TEMP_DIR, js_file)
-                try:
-                    with open(file_path, "r", encoding="utf-8") as file:
-                        content = file.read()
-
-                    if pattern in content:
-                        self.apply_patch(file_path, re.escape(pattern), replacement)
-                        print(f"js file patched using gifted_sub method: {file_path}")
-                        return True
-                except UnicodeDecodeError:
-                    pass
-
-        except Exception as e:
-            print(f"Error during gifted_sub patching: {str(e)}")
-            return False
-
-        print("Pattern not found for gifted_sub patch")
-        return False

@@ -221,6 +221,11 @@ server_options = {
     tr("GCM Server"): "gcm"
 }
 
+patch_methods = {
+    tr("Yearly Subscription"): "yearly_sub",
+    tr("Gifted Subscription"): "gifted_sub"
+}
+
 font_config = {
     "en_US": resource_path("assets/NotoSans-Regular.ttf"),
     "zh_CN": resource_path("assets/NotoSansSC-Regular.ttf"),

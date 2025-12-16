@@ -1,17 +1,12 @@
-set(GAME_NAME "Plants_vs._Zombies_Replanted")
-set(TRAINER_NAME "Plants vs. Zombies_Replanted Trainer")
-
-set(IL2CPP_TARGET "${GAME_NAME}_IL2CPP")
+set(GAME_NAME "Inotia_4")
+set(TRAINER_NAME "Inotia 4 Trainer")
 
 set(VENV_PYTHON "${CMAKE_SOURCE_DIR}/.venv/Scripts/python.exe")
 set(SUBSET_FONT_TARGET "${GAME_NAME}_SubsetFont")
 set(FONT_SUBSET_OUTPUT "${CMAKE_CURRENT_SOURCE_DIR}/NotoSansSC-Subset.ttf")
 set(FONT_SUBSET_SCRIPT "${CMAKE_SOURCE_DIR}/scripts/font_processor.py")
 set(FONT_FILE "${CMAKE_SOURCE_DIR}/scripts/NotoSansSC-Regular.ttf")
-set(TRANSLATION_FILES 
-    "${CMAKE_CURRENT_SOURCE_DIR}/translations.json"
-    "${CMAKE_CURRENT_SOURCE_DIR}/translation_extra.txt"
-)
+set(TRANSLATION_FILES "${CMAKE_CURRENT_SOURCE_DIR}/translations.json")
 
 # Run python script to generate the subsetted font
 add_custom_command(
@@ -26,32 +21,9 @@ add_custom_target(${SUBSET_FONT_TARGET} ALL
     DEPENDS ${FONT_SUBSET_OUTPUT}
 )
 
-if(CMAKE_SIZEOF_VOID_P EQUAL 8)
-    # 64-bit architecture
-    set(MINHOOK_LIB "${CMAKE_SOURCE_DIR}/common/libs/x64/libMinHook.x64.lib")
-else()
-    # 32-bit architecture
-    set(MINHOOK_LIB "${CMAKE_SOURCE_DIR}/common/libs/x86/libMinHook.x86.lib")
-endif()
-
-# Compile IL2CPP.cpp to the build directory
-add_library(${IL2CPP_TARGET} SHARED
-    "${CMAKE_CURRENT_SOURCE_DIR}/IL2CPP.cpp"
-    "${CMAKE_SOURCE_DIR}/common/include/il2cpp/il2cpp.cpp"
-)
-target_link_libraries(${IL2CPP_TARGET} PRIVATE Common ${MINHOOK_LIB})
-
-# Move IL2CPP.dll to the trainer folder
-add_custom_command(TARGET ${IL2CPP_TARGET} POST_BUILD
-    COMMAND ${CMAKE_COMMAND} -E copy_if_different
-        "$<TARGET_FILE:${IL2CPP_TARGET}>"
-        "${CMAKE_CURRENT_SOURCE_DIR}/IL2CPP.dll"
-    COMMENT "Moving IL2CPP.dll to ${CMAKE_CURRENT_SOURCE_DIR}"
-)
-
 add_executable(${GAME_NAME} main.cpp)
 target_link_libraries(${GAME_NAME} PRIVATE Common)
-add_dependencies(${GAME_NAME} ${SUBSET_FONT_TARGET} ${IL2CPP_TARGET})
+add_dependencies(${GAME_NAME} ${SUBSET_FONT_TARGET})
 set_target_properties(${GAME_NAME} PROPERTIES
     WIN32_EXECUTABLE $<$<NOT:$<CONFIG:Debug>>:ON>
     OUTPUT_NAME ${TRAINER_NAME}

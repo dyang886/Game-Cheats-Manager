@@ -1,0 +1,40 @@
+{
+    "en_US": {
+        "English": "English",
+        "Please run the game first.": "Please run the game first.",
+        "Failed to activate.": "Failed to activate.",
+        "Failed to activate/deactivate.": "Failed to activate/deactivate.",
+        "Process Name:": "Process Name:",
+        "Process ID:": "Process ID:",
+        "Apply": "Apply",
+        "Inotia 4 Trainer": "Inotia 4 Trainer",
+        "Freeze Health": "Freeze Health",
+        "Freeze Mana": "Freeze Mana",
+        "Set Coins": "Set Coins",
+        "Set Exp": "Set Exp",
+        "Set Stat Points": "Set Stat Points",
+        "Set Skill Points": "Set Skill Points",
+        "Set Backpack Slot 1": "Get Current Mouse Selected Item to Backpack Slot 1",
+        "Must have slot 1 item": "Please make sure to have something in backpack slot 1 first to overwrite",
+        "Unlock All Mercenary Slots": "Unlock All Mercenary Slots"
+    },
+    "zh_CN": {
+        "简体中文": "简体中文",
+        "Please run the game first.": "请先运行游戏。",
+        "Failed to activate.": "激活失败。",
+        "Failed to activate/deactivate.": "激活/停用失败。",
+        "Process Name:": "进程名称：",
+        "Process ID:": "进程 ID:",
+        "Apply": "应用",
+        "Inotia 4 Trainer": "艾诺迪亚4修改器",
+        "Freeze Health": "冻结血量",
+        "Freeze Mana": "冻结魔法值",
+        "Set Coins": "设置金币",
+        "Set Exp": "设置经验值",
+        "Set Stat Points": "设置能力点",
+        "Set Skill Points": "设置技能点",
+        "Set Backpack Slot 1": "获取鼠标选中的物品到背包槽位1",
+        "Must have slot 1 item": "请先确保背包槽位1有物品以进行覆盖",
+        "Unlock All Mercenary Slots": "解锁所有佣兵槽位"
+    }
+}

@@ -2,7 +2,6 @@ cmake_minimum_required(VERSION 3.15)
 
 project(GameTrainers LANGUAGES CXX)
 
-# Set C++ standard and runtime library
 set(CMAKE_CXX_STANDARD 20)
 set(CMAKE_CXX_STANDARD_REQUIRED ON)
 set(CMAKE_MSVC_RUNTIME_LIBRARY "MultiThreaded$<$<CONFIG:Debug>:Debug>")
@@ -15,6 +14,8 @@ set(TRAINER_ARCHITECTURES
     "Feeding Frenzy 2_Shipwreck Showdown Trainer:x86"
     "Headbangers_Rhythm Royale Trainer:x64"
     "Heavy Weapon Trainer:x86"
+    "Inotia 4 Trainer:x64"
+    "Just Shapes & Beats Trainer:x64"
     "Plants vs. Zombies_GOTY Edition Trainer:x86"
     "Plants vs. Zombies_Replanted Trainer:x64"
     "Wizard of Legend 2 Trainer:x64"

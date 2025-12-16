@@ -8,12 +8,6 @@
 #include "trainer.h"
 #include "FLTKUtils.h"
 
-static Fl_Window *plant_list_window = nullptr;
-static Fl_Window *zombie_list_window = nullptr;
-static Fl_Check_Button *g_direction_check_button = nullptr;
-static Fl_Input *g_spawn_row_input = nullptr;
-static Fl_Check_Button *g_spawn_every_row_check_button = nullptr;
-
 // Callback function for apply button
 void apply_callback(Fl_Widget *widget, void *data)
 {
@@ -29,45 +23,41 @@ void apply_callback(Fl_Widget *widget, void *data)
         return;
     }
 
+    std::string inputValue = "0";
     bool status = true;
+    if (input && input->value())
+        inputValue = input->value();
 
-    if (optionName == "AddPlantToGarden")
+    if (optionName == "SetCoins")
     {
-        int plantID = 0;
-        int direction = 0;
-
-        if (input && input->value())
-            plantID = std::stoi(input->value());
-
-        if (g_direction_check_button)
-            direction = g_direction_check_button->value() ? 1 : 0;
-
-        status = trainer->addPlantToGarden(plantID, direction);
+        status = trainer->setCoins(std::stoi(inputValue));
     }
-    else if (optionName == "InstantCompleteLevel")
+    else if (optionName == "SetExp")
     {
-        status = trainer->instantCompleteLevel();
+        status = trainer->setExp(std::stoi(inputValue) ^ 0xa7b3c9d5);
     }
-    else if (optionName == "SpawnZombie")
+    else if (optionName == "SetStatPoints")
     {
-        int zombieType = 0;
-        int row = 0;
-        bool isEveryRow = false;
-
-        if (input && input->value())
-            zombieType = std::stoi(input->value());
-
-        if (g_spawn_row_input && g_spawn_row_input->value())
-            row = std::stoi(g_spawn_row_input->value()) - 1;
-
-        if (g_spawn_every_row_check_button)
-            isEveryRow = g_spawn_every_row_check_button->value() != 0;
-
-        status = trainer->spawnZombie(zombieType, row, isEveryRow);
+        status = trainer->setStatPoints(std::stoi(inputValue) ^ 0xa7b3c9d5);
     }
-    else if (optionName == "FullScreenJalapeno")
+    else if (optionName == "SetSkillPoints")
     {
-        status = trainer->fullScreenJalapeno();
+        status = trainer->setSkillPoints(std::stoi(inputValue) ^ 0xa7b3c9d5);
+    }
+    else if (optionName == "SetSlot1Item")
+    {
+        if (trainer->getSlot1Item() != 0)
+        {
+            unsigned int itemAddr = trainer->getCurMouseItem();
+            if (itemAddr != 0)
+                status = trainer->setSlot1Item(itemAddr);
+        }
+        else
+            fl_alert(t("Must have slot 1 item"));
+    }
+    else if (optionName == "UnlockMercenary")
+    {
+        status = trainer->unlockAllMercenarySlots();
     }
 
     // Finalize
@@ -98,54 +88,19 @@ void toggle_callback(Fl_Widget *widget, void *data)
     if (input && input->value())
         inputValue = input->value();
 
-    if (optionName == "NoPlantCooldown")
+    if (optionName == "FreezeHealth")
     {
         if (button->value())
-            status = trainer->noPlantCooldown();
+            status = trainer->freezeHealth();
         else
-            status = trainer->disableNamedHook(optionName);
+            status = trainer->disableNamedPointerToggle(optionName);
     }
-    else if (optionName == "NoPlantCost")
+    else if (optionName == "FreezeMana")
     {
         if (button->value())
-            status = trainer->noPlantCost();
+            status = trainer->freezeMana();
         else
-            status = trainer->disableNamedHook("NoPlantCost1") && trainer->disableNamedHook("NoPlantCost2") && trainer->disableNamedHook("NoPlantCost3");
-    }
-    else if (optionName == "AddSun")
-    {
-        if (button->value())
-            status = trainer->addSun(std::stoi(inputValue));
-        else
-            status = trainer->disableNamedHook(optionName);
-    }
-    else if (optionName == "SetCoin")
-    {
-        if (button->value())
-            status = trainer->setCoin(std::stoi(inputValue) / 10);
-        else
-            status = trainer->disableNamedHook(optionName);
-    }
-    else if (optionName == "SetFertilizerAndBugSpray")
-    {
-        if (button->value())
-            status = trainer->setFertilizerAndBugSpray(std::stoi(inputValue) + 1000);
-        else
-            status = trainer->disableNamedHook("SetFertilizerAndBugSprayInc") && trainer->disableNamedHook("SetFertilizerDec") && trainer->disableNamedHook("SetBugSprayDec");
-    }
-    else if (optionName == "SetChocolate")
-    {
-        if (button->value())
-            status = trainer->setChocolate(std::stoi(inputValue) + 1000);
-        else
-            status = trainer->disableNamedHook("SetChocolateInc") && trainer->disableNamedHook("SetChocolateDec");
-    }
-    else if (optionName == "SetTreeFood")
-    {
-        if (button->value())
-            status = trainer->setTreeFood(std::stoi(inputValue) + 1000);
-        else
-            status = trainer->disableNamedHook("TreeFoodInc") && trainer->disableNamedHook("TreeFoodDec");
+            status = trainer->disableNamedPointerToggle(optionName);
     }
 
     // Finalize
@@ -161,16 +116,6 @@ void toggle_callback(Fl_Widget *widget, void *data)
 
 static void main_window_close_callback(Fl_Widget *w, void *)
 {
-    if (plant_list_window)
-    {
-        Fl::delete_widget(plant_list_window);
-        plant_list_window = nullptr;
-    }
-    if (zombie_list_window)
-    {
-        Fl::delete_widget(zombie_list_window);
-        zombie_list_window = nullptr;
-    }
     RemoveFontMemResourceEx(font_handle);
     Fl::delete_widget(w);
 }
@@ -198,7 +143,7 @@ int main(int argc, char **argv)
     window->color(FL_FREE_COLOR);
     window->icon((char *)LoadIconA(GetModuleHandle(NULL), "APP_ICON"));
     window->callback(main_window_close_callback);
-    tr(window, "Plants vs. Zombies: Replanted Trainer");
+    tr(window, "Inotia 4 Trainer");
 
     // Setup fonts
     DWORD font_mem_size = 0;
@@ -207,11 +152,6 @@ int main(int argc, char **argv)
     font_handle = AddFontMemResourceEx((void *)font_data, font_mem_size, nullptr, &num_fonts);
     Fl::set_font(FL_FREE_FONT, "Noto Sans SC");
     fl_font(FL_FREE_FONT, font_size);
-
-    DWORD info_img_size = 0;
-    const unsigned char *info_img_data = load_resource("INFO_IMG", info_img_size);
-    Fl_PNG_Image *info_img = new Fl_PNG_Image(nullptr, info_img_data, (int)info_img_size);
-    info_img->scale(20, 20, 1, 0);
 
     // ------------------------------------------------------------------
     // Top Row: Language Selection
@@ -289,36 +229,21 @@ int main(int argc, char **argv)
     Fl_Box *spacerTop = new Fl_Box(0, 0, 0, 0);
 
     // Widget Placements
-    place_toggle_widget(options1_flex, &trainer, "NoPlantCooldown", "No Plant Cooldown");
+    place_toggle_widget(options1_flex, &trainer, "FreezeHealth", "Freeze Health");
 
-    place_toggle_widget(options1_flex, &trainer, "NoPlantCost", "No Plant Cost");
+    place_toggle_widget(options1_flex, &trainer, "FreezeMana", "Freeze Mana");
 
-    place_toggle_widget(options1_flex, &trainer, "AddSun", "Add Sun", nullptr, "999", "0", "9990");
+    place_apply_widget(options1_flex, &trainer, "SetCoins", "Set Coins", nullptr, "9999999", "1", "999999999");
 
-    place_toggle_widget(options1_flex, &trainer, "SetCoin", "Set Coins", nullptr, "9999999", "0", "999999990");
+    place_apply_widget(options1_flex, &trainer, "SetExp", "Set Exp", nullptr, "500000", "1", "999999999");
 
-    place_toggle_widget(options1_flex, &trainer, "SetFertilizerAndBugSpray", "Set Fertilizer and Bug Spray", nullptr, "99", "0", "999999999");
+    place_apply_widget(options1_flex, &trainer, "SetStatPoints", "Set Stat Points", nullptr, "99", "0", "999999999");
 
-    place_toggle_widget(options1_flex, &trainer, "SetChocolate", "Set Chocolate", nullptr, "99", "0", "999999999");
+    place_apply_widget(options1_flex, &trainer, "SetSkillPoints", "Set Skill Points", nullptr, "99", "0", "999999999");
 
-    place_toggle_widget(options1_flex, &trainer, "SetTreeFood", "Set Tree Food", nullptr, "99", "0", "999999999");
+    place_apply_widget(options1_flex, &trainer, "SetSlot1Item", "Set Backpack Slot 1");
 
-    Fl_Input *add_plant_input = nullptr;
-    std::vector<std::string> plant_columns = {"Plant ID", "Plant Name"};
-    Fl_Button *plant_info = create_info_button(&trainer, &add_plant_input, plant_columns, "Plant List", &plant_list_window, &Trainer::getPlantList, info_img);
-    place_apply_widget(options1_flex, &trainer, "AddPlantToGarden", "Add Plant to Garden", &add_plant_input, "0", "0", "39", FL_INT_INPUT, plant_info);
-    g_direction_check_button = dynamic_cast<Fl_Check_Button *>(place_indented_toggle_widget(options1_flex, "Facing Left").button);
-
-    Fl_Input *spawn_zombie_input = nullptr;
-    std::vector<std::string> zombie_columns = {"Zombie ID", "Zombie Name"};
-    Fl_Button *zombie_info = create_info_button(&trainer, &spawn_zombie_input, zombie_columns, "Zombie List", &zombie_list_window, &Trainer::getZombieList, info_img);
-    place_apply_widget(options1_flex, &trainer, "SpawnZombie", "Spawn Zombie", &spawn_zombie_input, "0", "0", "99", FL_INT_INPUT, zombie_info);
-    g_spawn_row_input = place_indented_input_widget(options1_flex, "Which Row", "1", "1", "6");
-    g_spawn_every_row_check_button = dynamic_cast<Fl_Check_Button *>(place_indented_toggle_widget(options1_flex, "Spawn in Every Row").button);
-
-    place_apply_widget(options1_flex, &trainer, "FullScreenJalapeno", "Full Screen Jalapeno");
-
-    place_apply_widget(options1_flex, &trainer, "InstantCompleteLevel", "Instant Complete Level");
+    place_apply_widget(options1_flex, &trainer, "UnlockMercenary", "Unlock All Mercenary Slots");
 
     // End of Option Column 1
     Fl_Box *spacerBottom = new Fl_Box(0, 0, 0, 0);

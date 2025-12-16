@@ -387,6 +387,25 @@ protected:
         return true;
     }
 
+    template <typename T>
+    T ReadFromDynamicAddress(const wchar_t *moduleName, const std::vector<unsigned int> &offsets)
+    {
+        uintptr_t targetAddr = resolveModuleDynamicAddress(moduleName, offsets);
+        if (targetAddr == 0)
+        {
+            return T();
+        }
+
+        T value;
+        if (!ReadProcessMemory(hProcess, reinterpret_cast<LPCVOID>(targetAddr), &value, sizeof(T), nullptr))
+        {
+            std::cerr << "[!] ReadProcessMemory failed at address 0x" << std::hex << targetAddr << std::dec << ". Error: " << GetLastError() << std::endl;
+            return T();
+        }
+
+        return value;
+    }
+
     // Find pattern with wildcards
     inline uintptr_t findPatternWild(const wchar_t *moduleName, const std::vector<std::string> &pattern)
     {
@@ -666,13 +685,15 @@ protected:
      *    - name: Unique string name, e.g., "HealthToggle"
      *    - offsets: Pointer chain offsets to reach the target value
      *    - desiredValue: The value to maintain at the target address
+     *    - valueType: (optional) Type hint for freezing current value
      ***********************************************************************/
-    template <typename T>
+    template <typename T, typename ValueType = T>
     inline bool createPointerToggle(
         const wchar_t *moduleName,
         const std::string &name,
         const std::vector<unsigned int> &offsets,
-        const T desiredValue)
+        const T desiredValue,
+        const ValueType *typeHint = nullptr)
     {
         if (pointerToggles.find(name) != pointerToggles.end())
         {
@@ -680,20 +701,37 @@ protected:
             return false;
         }
 
-        // Create a shared_ptr for PointerToggleInfo
-        auto pti = std::make_shared<PointerToggleInfo>();
-        pti->toggleName = name;
-        pti->offsets = offsets;
-        pti->desiredValue = desiredValue;
-        pti->active = true;
-        pti->valueSize = sizeof(T); // Store the size of the desired value
-
         // Resolve the address once
         uintptr_t targetAddr = resolveModuleDynamicAddress(moduleName, offsets);
         if (targetAddr == 0)
         {
             std::cerr << "[!] Failed to resolve address for pointer toggle '" << name << "'.\n";
             return false;
+        }
+
+        // Create a shared_ptr for PointerToggleInfo
+        auto pti = std::make_shared<PointerToggleInfo>();
+        pti->toggleName = name;
+        pti->offsets = offsets;
+        pti->active = true;
+
+        // Check if desiredValue is nullptr (freeze current value mode)
+        if constexpr (std::is_same_v<T, std::nullptr_t>)
+        {
+            // Read current value from memory using the type hint size
+            ValueType readValue{};
+            if (!ReadProcessMemory(hProcess, reinterpret_cast<LPVOID>(targetAddr), &readValue, sizeof(ValueType), nullptr))
+            {
+                std::cerr << "[!] Failed to read initial value for pointer toggle '" << name << "'.\n";
+                return false;
+            }
+            pti->desiredValue = readValue;
+            pti->valueSize = sizeof(ValueType);
+        }
+        else
+        {
+            pti->desiredValue = desiredValue;
+            pti->valueSize = sizeof(T); // Store the size of the desired value
         }
 
         // Insert into the map before starting the thread to ensure the pti remains valid

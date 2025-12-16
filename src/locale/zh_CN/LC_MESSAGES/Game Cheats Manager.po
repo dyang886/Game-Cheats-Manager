@@ -25,6 +25,12 @@ msgstr "官方网站"
 msgid "GCM Server"
 msgstr "GCM 服务器"
 
+msgid "Yearly Subscription"
+msgstr "年费订阅"
+
+msgid "Gifted Subscription"
+msgstr "礼物订阅"
+
 msgid "Search for installed"
 msgstr "搜索已安装修改器"
 
@@ -445,6 +451,9 @@ msgstr "恢复默认"
 
 msgid "Installed WeMod Versions:"
 msgstr "已安装的 WeMod 版本："
+
+msgid "Patch Method:"
+msgstr "激活方式："
 
 msgid "Activate WeMod Pro"
 msgstr "激活 WeMod 专业版"
