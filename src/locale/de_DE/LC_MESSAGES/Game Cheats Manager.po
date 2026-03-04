@@ -211,8 +211,8 @@ msgstr "Suche läuft..."
 msgid "Translating search results..."
 msgstr "Suchergebnisse werden übersetzt..."
 
-msgid "No results found."
-msgstr "Keine Ergebnisse gefunden."
+msgid "No search results found."
+msgstr "Keine Suchergebnisse gefunden."
 
 msgid "Translating keywords..."
 msgstr "Schlüsselwörter werden übersetzt..."

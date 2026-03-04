@@ -20,6 +20,7 @@ set(TRAINER_ARCHITECTURES
     "Outland Trainer:x86"
     "Plants vs. Zombies_GOTY Edition Trainer:x86"
     "Plants vs. Zombies_Replanted Trainer:x64"
+    "PvZ2 Gardendless Trainer:x64"
     "Wizard of Legend 2 Trainer:x64"
 )
 

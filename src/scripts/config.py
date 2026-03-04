@@ -90,7 +90,7 @@ def load_settings():
         "autoUpdateFlingData": True,
         "autoUpdateFlingTrainers": True,
         "enableXiaoXing": True,
-        "unlockXiaoXing": True,
+        "unlockXiaoXing": False,
         "autoUpdateXiaoXingData": True,
         "autoUpdateXiaoXingTrainers": True,
         "weModPath": wemod_install_path,

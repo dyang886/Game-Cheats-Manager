@@ -211,8 +211,8 @@ msgstr "Searching..."
 msgid "Translating search results..."
 msgstr "Translating search results..."
 
-msgid "No results found."
-msgstr "No results found."
+msgid "No search results found."
+msgstr "No search results found."
 
 msgid "Translating keywords..."
 msgstr "Translating keywords..."

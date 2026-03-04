@@ -93,7 +93,7 @@ class DownloadDisplayThread(DownloadBaseThread):
             trainer["trainer_name"] = future.result()
 
         if not DownloadBaseThread.trainer_urls:
-            self.message.emit(tr("No results found."), "failure")
+            self.message.emit(tr("No search results found."), "failure")
             self.finished.emit(1)
             return
 

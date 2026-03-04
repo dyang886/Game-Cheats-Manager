@@ -211,8 +211,8 @@ msgstr "搜尋中..."
 msgid "Translating search results..."
 msgstr "正在翻譯搜尋結果..."
 
-msgid "No results found."
-msgstr "找不到結果。"
+msgid "No search results found."
+msgstr "未找到相關修改器。"
 
 msgid "Translating keywords..."
 msgstr "翻譯關鍵字..."
