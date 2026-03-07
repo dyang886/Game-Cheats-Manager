@@ -471,6 +471,14 @@ class TrainerUploadDialog(QDialog):
         self.sourceEdit = QLineEdit()
         self.sourceEdit.setPlaceholderText(tr("Original URL or author"))
         sourceLayout.addWidget(self.sourceEdit)
+
+        source_info_label = QLabel(tr("If you made the trainer, please provide your author name"))
+        source_info_font = source_info_label.font()
+        source_info_font.setPointSize(9)
+        source_info_label.setFont(source_info_font)
+        source_info_label.setStyleSheet("color: gray;")
+        source_info_label.setWordWrap(True)
+        sourceLayout.addWidget(source_info_label)
         layout.addLayout(sourceLayout)
 
         # Trainer File Selection
@@ -511,7 +519,7 @@ class TrainerUploadDialog(QDialog):
 
         notes_info_label = QLabel(
             tr("Please make sure the trainer you are about to upload is tested to be safe and functional.") + "\n" +
-            tr("Trainer testing QQ group: 186859946, feel free to join and help verify the trainers you upload")
+            tr("For more info about trainer uploading, please join the QQ group to discuss: 186859946.")
         )
         notes_info_font = notes_info_label.font()
         notes_info_font.setPointSize(9)

@@ -237,7 +237,7 @@
         "author": "flarejune",
         "official_url": "https://www.bilibili.com/video/BV1pv6BB5End/",
         "gcm_url": "GCM/GCM Trainers/Nioh 3 Trainer [flarejune].exe",
-        "version": "2026.2.25"
+        "version": "2026.3.2"
     },
     {
         "game_name": "Nioh 3",
@@ -304,7 +304,7 @@
         "origin": "ct_other",
         "custom_name_en": "Inventory Editor",
         "custom_name_zh": "物品编辑器",
-        "gcm_url": "GCM/GCM Trainers/Assassin's Creed Valhalla Inventory Editor.ct",
+        "gcm_url": "GCM/GCM Trainers/Assassin's Creed Valhalla Inventory Editor.zip",
         "version": "2023.3.30"
     },
     {
@@ -337,8 +337,8 @@
         "game_name": "Minecraft: China Edition",
         "origin": "ct_other",
         "author": "Q1n9Ju",
-        "custom_name_en": "4399 Edition",
-        "custom_name_zh": "4399版",
+        "custom_name_en": "4399 Edition Trainer",
+        "custom_name_zh": "4399版修改器",
         "gcm_url": "GCM/GCM Trainers/Minecraft_China Edition Trainer [Q1n9Ju].ct",
         "version": "2026.2.27"
     },
@@ -516,7 +516,8 @@
     {
         "game_name": "Minecraft: China Edition",
         "origin": "ct_other",
-        "custom_name": "发烧游戏版",
+        "custom_name_en": "发烧游戏版 Trainer",
+        "custom_name_zh": "发烧游戏版修改器",
         "gcm_url": "GCM/GCM Trainers/Minecraft_China Edition Trainer.ct",
         "version": "2026.2.27"
     },
@@ -694,5 +695,263 @@
         "origin": "other",
         "gcm_url": "GCM/GCM Trainers/Warcraft III_The Frozen Throne Trainer.exe",
         "version": "2026.2.27"
+    },
+    {
+        "game_name": "Final Fantasy XV",
+        "origin": "other",
+        "author": "flarejune",
+        "gcm_url": "GCM/GCM Trainers/Final Fantasy XV Trainer [flarejune].exe",
+        "version": "2026.3.4"
+    },
+    {
+        "game_name": "ASTLIBRA Revision",
+        "origin": "ct_other",
+        "gcm_url": "GCM/GCM Trainers/ASTLIBRA Revision Trainer.ct",
+        "version": "2026.3.4"
+    },
+    {
+        "game_name": "Call to Arms - Gates of Hell: Ostfront",
+        "origin": "ct_other",
+        "author": "Kilnham",
+        "official_url": "https://fearlessrevolution.com/viewtopic.php?t=34980",
+        "gcm_url": "GCM/GCM Trainers/Call to Arms - Gates of Hell_Ostfront Trainer [Kilnham].ct",
+        "version": "2026.2.17"
+    },
+    {
+        "game_name": "Ebenezer and the Invisible World",
+        "origin": "ct_other",
+        "gcm_url": "GCM/GCM Trainers/Ebenezer and the Invisible World Trainer.ct",
+        "version": "2026.3.4"
+    },
+    {
+        "game_name": "FTL: Faster Than Light",
+        "origin": "other",
+        "author": "MrAntiFun",
+        "gcm_url": "GCM/GCM Trainers/FTL_Faster Than Light Trainer [MrAntiFun].exe",
+        "version": "2026.3.4"
+    },
+    {
+        "game_name": "Football Manager 2024",
+        "origin": "ct_other",
+        "author": "tdg6661",
+        "gcm_url": "GCM/GCM Trainers/Football Manager 2024 Trainer [tdg6661].zip",
+        "version": "2026.3.4"
+    },
+    {
+        "game_name": "Four Nights at the Burger Shop",
+        "origin": "ct_other",
+        "author": "jx666",
+        "gcm_url": "GCM/GCM Trainers/Four Nights at the Burger Shop Trainer [jx666].ct",
+        "version": "2026.3.4"
+    },
+    {
+        "game_name": "Guns of Fury",
+        "origin": "ct_other",
+        "gcm_url": "GCM/GCM Trainers/Guns of Fury Trainer.ct",
+        "version": "2026.3.4"
+    },
+    {
+        "game_name": "Long Yin Li Zhi Zhuan",
+        "origin": "ct_other",
+        "author": "简简单单2022",
+        "official_url": "https://bbs.3dmgame.com/thread-6653672-1-1.html",
+        "gcm_url": "GCM/GCM Trainers/Long Yin Li Zhi Zhuan Trainer [JianJianDanDan2022].ct",
+        "version": "2026.3.4"
+    },
+    {
+        "game_name": "Loot of Baal",
+        "origin": "ct_other",
+        "gcm_url": "GCM/GCM Trainers/Loot of Baal Trainer.ct",
+        "version": "2026.3.4"
+    },
+    {
+        "game_name": "Ms Wakayama's NTR Classroom",
+        "origin": "ct_other",
+        "author": "jx666",
+        "gcm_url": "GCM/GCM Trainers/Ms Wakayama's NTR Classroom Trainer [jx666].ct",
+        "version": "2026.3.4"
+    },
+    {
+        "game_name": "Songs of Silence",
+        "origin": "ct_other",
+        "author": "wzslrb",
+        "official_url": "https://bbs.3dmgame.com/thread-6597471-1-1.html",
+        "gcm_url": "GCM/GCM Trainers/Songs of Silence Trainer [wzslrb].ct",
+        "version": "2026.3.4"
+    },
+    {
+        "game_name": "Swag and Sorcery",
+        "origin": "ct_other",
+        "gcm_url": "GCM/GCM Trainers/Swag and Sorcery Trainer.ct",
+        "version": "2026.3.4"
+    },
+    {
+        "game_name": "Dead Cells",
+        "origin": "ct_other",
+        "gcm_url": "GCM/GCM Trainers/Dead Cells Trainer.ct",
+        "version": "2026.3.4"
+    },
+    {
+        "game_name": "Momodora: Moonlit Farewell",
+        "origin": "other",
+        "author": "好吃的香草雪球",
+        "custom_name_en": "Complete Collection Map",
+        "custom_name_zh": "全收集地图",
+        "official_url": "https://xueqiumaps.cn/",
+        "gcm_url": "GCM/GCM Trainers/Momodora_Moonlit Farewell Map [XueQiu].png",
+        "version": "2026.3.4"
+    },
+    {
+        "game_name": "Call of Duty: Modern Warfare 3",
+        "origin": "other",
+        "author": "Burmass",
+        "official_url": "https://patch.ali213.net/showpatch/12264.html#001",
+        "gcm_url": "GCM/GCM Trainers/Call of Duty_Modern Warfare 3 Trainer [Burmass].exe",
+        "version": "2026.3.4"
+    },
+    {
+        "game_name": "Back to the Dawn",
+        "origin": "ct_other",
+        "author": "ppapodir",
+        "gcm_url": "GCM/GCM Trainers/Back to the Dawn Trainer [ppapodir].ct",
+        "version": "2026.3.4"
+    },
+    {
+        "game_name": "A Simple Life with My Unobtrusive Sister",
+        "origin": "other",
+        "author": "jx666",
+        "gcm_url": "GCM/GCM Trainers/A Simple Life with My Unobtrusive Sister Trainer [jx666].exe",
+        "version": "2026.3.7"
+    },
+    {
+        "game_name": "Alice Escaped!",
+        "origin": "other",
+        "author": "ギナ",
+        "official_url": "https://space.bilibili.com/31947",
+        "gcm_url": "GCM/GCM Trainers/Alice Escaped! Trainer [Gina].zip",
+        "version": "2026.3.4"
+    },
+    {
+        "game_name": "Plants vs. Zombies",
+        "origin": "other",
+        "author": "DevilHand",
+        "gcm_url": "GCM/GCM Trainers/Plants vs. Zombies Trainer [DevilHand].exe",
+        "version": "2026.3.4"
+    },
+    {
+        "game_name": "Plants vs. Zombies",
+        "origin": "other",
+        "author": "seven-eleven",
+        "gcm_url": "GCM/GCM Trainers/Plants vs. Zombies Trainer [seven-eleven].exe",
+        "version": "2026.3.4"
+    },
+    {
+        "game_name": "Sand Land",
+        "origin": "ct_other",
+        "author": "Cielos",
+        "official_url": "https://fearlessrevolution.com/viewtopic.php?t=35922",
+        "gcm_url": "GCM/GCM Trainers/Sand Land Trainer [Cielos].ct",
+        "version": "2026.3.4"
+    },
+    {
+        "game_name": "Ling Xu",
+        "origin": "ct_other",
+        "author": "缤纷颜色",
+        "official_url": "https://space.bilibili.com/365816484",
+        "gcm_url": "GCM/GCM Trainers/Ling Xu Trainer [BinFenYanSe].ct",
+        "version": "2026.3.4"
+    },
+    {
+        "game_name": "Atelier Ryza: Ever Darkness & the Secret Hideout DX",
+        "origin": "ct_other",
+        "official_url": "https://opencheattables.com, https://bbs.3dmgame.com/thread-6648737-1-1.html",
+        "gcm_url": "GCM/GCM Trainers/Atelier Ryza_Ever Darkness & the Secret Hideout DX Trainer.ct",
+        "version": "2026.3.4"
+    },
+    {
+        "game_name": "Living With Sister: Monochrome Fantasy",
+        "origin": "ct_other",
+        "gcm_url": "GCM/GCM Trainers/Living With Sister_Monochrome Fantasy Trainer.ct",
+        "version": "2026.3.7"
+    },
+    {
+        "game_name": "Hyakusen no Jo ni Kawatareshi Toki",
+        "origin": "ct_other",
+        "gcm_url": "GCM/GCM Trainers/Hyakusen no Jo ni Kawatareshi Toki Trainer.ct",
+        "version": "2026.3.7"
+    },
+    {
+        "game_name": "Kenshi",
+        "origin": "ct_other",
+        "gcm_url": "GCM/GCM Trainers/Kenshi Trainer.ct",
+        "version": "2026.3.7"
+    },
+    {
+        "game_name": "Lifeguard Holic",
+        "origin": "ct_other",
+        "author": "jx666",
+        "gcm_url": "GCM/GCM Trainers/Lifeguard Holic Trainer [jx666].ct",
+        "version": "2026.3.7"
+    },
+    {
+        "game_name": "Plants vs. Zombies: GOTY Edition",
+        "origin": "ct_other",
+        "author": "加热时光",
+        "official_url": "https://mod.3dmgame.com/mod/197657",
+        "gcm_url": "GCM/GCM Trainers/Plants vs. Zombies_GOTY Edition Trainer [JiaReShiGuang].ct",
+        "version": "2023.5.16"
+    },
+    {
+        "game_name": "Rise of the Ronin",
+        "origin": "other",
+        "author": "flarejune",
+        "gcm_url": "GCM/GCM Trainers/Rise of the Ronin Trainer [flarejune].exe",
+        "version": "2026.3.7"
+    },
+    {
+        "game_name": "Song's Fantasy",
+        "origin": "ct_other",
+        "author": "Season168168",
+        "official_url": "https://bbs.3dmgame.com/thread-6656100-1-1.html",
+        "gcm_url": "GCM/GCM Trainers/Song's Fantasy Trainer [Season168168].ct",
+        "version": "2026.3.7"
+    },
+    {
+        "game_name": "Dragonkin: The Banished",
+        "origin": "ct_other",
+        "author": "Send",
+        "gcm_url": "GCM/GCM Trainers/Dragonkin_The Banished Trainer [Send].ct",
+        "version": "2026.3.7"
+    },
+    {
+        "game_name": "PEAK",
+        "origin": "other",
+        "gcm_url": "GCM/GCM Trainers/PEAK Trainer.zip",
+        "version": "2026.3.7"
+    },
+    {
+        "game_name": "No Man's Sky",
+        "origin": "other",
+        "author": "GoatFungus",
+        "custom_name_en": "Save Editor",
+        "custom_name_zh": "存档编辑器",
+        "official_url": "https://github.com/goatfungus/NMSSaveEditor",
+        "gcm_url": "GCM/GCM Trainers/No Man's Sky Save Editor [GoatFungus].zip",
+        "version": "2025.8.30"
+    },
+    {
+        "game_name": "Ling Xu",
+        "origin": "ct_other",
+        "author": "梦幻的天空",
+        "gcm_url": "GCM/GCM Trainers/Ling Xu Trainer [MengHuanDeTianKong].ct",
+        "version": "2026.3.7"
+    },
+    {
+        "game_name": "Multiverse Loot Hunter",
+        "origin": "ct_other",
+        "author": "缤纷颜色",
+        "official_url": "https://space.bilibili.com/365816484",
+        "gcm_url": "GCM/GCM Trainers/Multiverse Loot Hunter Trainer [BinFenYanSe].ct",
+        "version": "2025.12.27"
     }
 ]

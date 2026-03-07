@@ -477,6 +477,9 @@ msgstr "修改器來源（選填）："
 msgid "Original URL or author"
 msgstr "原始連結或作者"
 
+msgid "If you made the trainer, please provide your author name"
+msgstr "如果修改器為自製，請提供你的作者名"
+
 msgid "Trainer File:"
 msgstr "修改器檔案："
 
@@ -495,8 +498,8 @@ msgstr "其他補充說明..."
 msgid "Please make sure the trainer you are about to upload is tested to be safe and functional."
 msgstr "請確保您上傳的修改器已經過測試，安全且可正常使用。"
 
-msgid "Trainer testing QQ group: 186859946, feel free to join and help verify the trainers you upload"
-msgstr "修改器測試QQ群：186859946，歡迎加入並協助驗證您上傳的修改器"
+msgid "For more info about trainer uploading, please join the QQ group to discuss: 186859946."
+msgstr "如需了解更多關於上傳修改器的資訊，請加入QQ群討論：186859946。"
 
 msgid "Upload"
 msgstr "上傳"

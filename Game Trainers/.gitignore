@@ -9,8 +9,7 @@ MonoBridge.dll
 GCMInjection.dll
 IL2CPP.dll
 trainers/**/*.ttf
-upload_trainers.py
-fetch_trainers.py
+process_user_trainers.py
 user_trainers.json
 user_trainers.xlsx
 completed_trainers.txt

@@ -477,6 +477,9 @@ msgstr "Trainer-Quelle (Optional):"
 msgid "Original URL or author"
 msgstr "Original-URL oder Autor"
 
+msgid "If you made the trainer, please provide your author name"
+msgstr "Wenn du den Trainer selbst erstellt hast, gib bitte deinen Autorennamen an"
+
 msgid "Trainer File:"
 msgstr "Trainer-Datei:"
 
@@ -495,8 +498,8 @@ msgstr "Sonstige Ergänzungen..."
 msgid "Please make sure the trainer you are about to upload is tested to be safe and functional."
 msgstr "Bitte stellen Sie sicher, dass der Trainer, den Sie hochladen möchten, getestet, sicher und funktionsfähig ist."
 
-msgid "Trainer testing QQ group: 186859946, feel free to join and help verify the trainers you upload"
-msgstr "Trainer-Test QQ-Gruppe: 186859946, tritt gerne bei und hilf dabei, die von dir hochgeladenen Trainer zu überprüfen"
+msgid "For more info about trainer uploading, please join the QQ group to discuss: 186859946."
+msgstr "Für weitere Informationen zum Hochladen von Trainern tritt bitte der QQ-Gruppe bei: 186859946."
 
 msgid "Upload"
 msgstr "Hochladen"

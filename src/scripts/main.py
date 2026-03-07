@@ -382,7 +382,7 @@ class GameCheatsManager(QMainWindow):
             trainerPath = os.path.normpath(trainer.path)
             if os.path.isfile(trainerPath):
                 trainerName, trainerExt = os.path.splitext(os.path.basename(trainerPath))
-                if trainerExt.lower() in [".exe", ".ct"] and os.path.getsize(trainerPath) != 0:
+                if trainerExt.lower() in [".exe", ".ct", ".cetrainer", ".png"] and os.path.getsize(trainerPath) != 0:
                     self.flingListBox.addItem(trainerName)
                     self.trainers[trainerName] = trainerPath
             else:
@@ -392,7 +392,7 @@ class GameCheatsManager(QMainWindow):
                 for file in os.scandir(trainerPath):
                     filePath = os.path.normpath(file.path)
                     fileExt = os.path.splitext(file.name)[1]
-                    if file.is_file() and fileExt.lower() in [".exe", ".ct"] and file.name not in exe_exclusions:
+                    if file.is_file() and fileExt.lower() in [".exe", ".ct", ".cetrainer", ".png"] and file.name not in exe_exclusions:
                         exe_file_path = filePath
                         break
                 if exe_file_path:
