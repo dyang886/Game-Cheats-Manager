@@ -78,6 +78,7 @@ def load_settings():
         "checkAppUpdate": True,
         "launchAppOnStartup": False,
         "showWarning": True,
+        "showCEPrompt": True,
         "autoUpdateTranslations": True,
         "lastSeenAnnouncementId": "",
 

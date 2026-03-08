@@ -8,6 +8,7 @@ import stat
 import subprocess
 import sys
 import tempfile
+import webbrowser
 import winreg
 
 from PyQt6.QtCore import Qt, QTimer
@@ -46,6 +47,7 @@ class GameCheatsManager(QMainWindow):
         # Version and links
         self.appVersion = "2.4.5"
         self.websiteLink = "https://gamezonelabs.com"
+        self.allTrainersLink = "https://gamezonelabs.com/products/game-cheats-manager/trainers"
         self.githubLink = "https://github.com/dyang886/Game-Cheats-Manager"
         self.bilibiliLink = "https://space.bilibili.com/256673766"
 
@@ -131,6 +133,11 @@ class GameCheatsManager(QMainWindow):
         uploadTrainerAction = QAction(tr("Upload Trainer"), self)
         uploadTrainerAction.triggered.connect(self.open_trainer_upload)
         menu.addAction(uploadTrainerAction)
+
+        # Browse all trainers menu
+        browseAllTrainersAction = QAction(tr("Browse All Trainers"), self)
+        browseAllTrainersAction.triggered.connect(self.browse_all_trainers)
+        menu.addAction(browseAllTrainersAction)
 
         # Status bar setup
         self.statusbar = QStatusBar()
@@ -516,7 +523,13 @@ class GameCheatsManager(QMainWindow):
         msg_box.setStandardButtons(QMessageBox.StandardButton.Ok)
         ok_button = msg_box.button(QMessageBox.StandardButton.Ok)
         ok_button.setText("OK")
+        dontShowCheckbox = QCheckBox(tr("Don't show again"))
+        dontShowCheckbox.setStyleSheet("margin-top: 10px;")
+        msg_box.setCheckBox(dontShowCheckbox)
         msg_box.exec()
+        if dontShowCheckbox.isChecked():
+            settings["showCEPrompt"] = False
+            apply_settings(settings)
 
     def launch_trainer(self):
         try:
@@ -540,7 +553,7 @@ class GameCheatsManager(QMainWindow):
                 trainerExt = os.path.splitext(originalPath)[1].lower()
 
                 # Check if Cheat Engine is installed before launching .ct/.cetrainer files
-                if trainerExt in [".ct", ".cetrainer"] and not self.is_cheat_engine_available(trainerExt):
+                if trainerExt in [".ct", ".cetrainer"] and settings["showCEPrompt"] and not self.is_cheat_engine_available(trainerExt):
                     self.prompt_cheat_engine_install()
 
                 # Use "runas" for exe files (run as admin), "open" for other files (use default app)
@@ -917,6 +930,9 @@ class GameCheatsManager(QMainWindow):
         else:
             self.trainer_upload_window = TrainerUploadDialog(self)
             self.trainer_upload_window.show()
+
+    def browse_all_trainers(self):
+        webbrowser.open(self.allTrainersLink)
 
 
 if __name__ == "__main__":
