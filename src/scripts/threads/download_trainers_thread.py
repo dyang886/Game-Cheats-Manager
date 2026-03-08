@@ -34,7 +34,7 @@ class DownloadTrainersThread(DownloadBaseThread):
         os.makedirs(DOWNLOAD_TEMP_DIR, exist_ok=True)
 
         self.src_dst = []  # List content: { "src": source_path, "dst": destination_path, "version": YYYY.MM.DD }
-        self.antiCheatDst = ""
+        self.instructionDst = ""
         selected_trainer = None
         if not self.update_entry:
             selected_trainer = DownloadBaseThread.trainer_urls[self.index]
@@ -47,23 +47,21 @@ class DownloadTrainersThread(DownloadBaseThread):
             result = self.download_fling(selected_trainer)
         elif origin == "xiaoxing":
             result = self.download_xiaoxing(selected_trainer)
-        elif origin in ["the_cheat_script", "ct_other"]:
-            result = self.download_ct(selected_trainer)
-        elif origin in ["gcm", "other"]:
-            result = self.download_gcm(selected_trainer)
+        elif origin in ["the_cheat_script", "ct_other", "gcm", "other"]:
+            result = self.download_default(selected_trainer)
 
         try:
             for item in self.src_dst:
                 if os.path.exists(item["dst"]):
                     os.chmod(item["dst"], stat.S_IWRITE)
-                if os.path.splitext(item['src'])[1]:
+                if os.path.isfile(item['src']):
                     dst_dir = os.path.dirname(item["dst"])
                     os.makedirs(dst_dir, exist_ok=True)
                 else:
                     dst_dir = item["dst"]
                 shutil.move(item["src"], item["dst"])
 
-                if dst_dir != self.antiCheatDst:
+                if dst_dir != self.instructionDst:
                     info_dict = {
                         "game_name": selected_trainer["game_name"],
                         "origin": selected_trainer["origin"]
@@ -80,9 +78,9 @@ class DownloadTrainersThread(DownloadBaseThread):
             if os.path.exists(rhLog):
                 os.remove(rhLog)
 
-            if self.antiCheatDst and not self.update_entry:
-                self.messageBox.emit("info", tr("Attention"), tr("Please check folder for anti-cheat requirements!"))
-                os.startfile(self.antiCheatDst)
+            if self.instructionDst and not self.update_entry:
+                self.messageBox.emit("info", tr("Attention"), tr("This trainer requires additional setup before use. Please check the opened folder for instructions.\nThe instructions are always stored in the 'gcm-instructions' folder."))
+                os.startfile(self.instructionDst)
 
         except PermissionError as e:
             self.message.emit(tr("Trainer is currently in use, please close any programs using the file and try again."), "failure")
@@ -254,9 +252,9 @@ class DownloadTrainersThread(DownloadBaseThread):
 
         # Warn user if anti-cheat files found
         if cnt > 0:
-            self.antiCheatDst = os.path.join(self.trainerDownloadPath, trainerName_display, "anti-cheat")
+            self.instructionDst = os.path.join(self.trainerDownloadPath, trainerName_display, "gcm-instructions")
             for antiCheatFile in extractedAntiCheatNames:
-                self.src_dst.append({"src": os.path.join(DOWNLOAD_TEMP_DIR, antiCheatFile), "dst": os.path.join(self.antiCheatDst, antiCheatFile)})
+                self.src_dst.append({"src": os.path.join(DOWNLOAD_TEMP_DIR, antiCheatFile), "dst": os.path.join(self.instructionDst, antiCheatFile)})
 
         # Check if extracted trainer name is None
         if not extractedTrainerNames:
@@ -412,14 +410,18 @@ class DownloadTrainersThread(DownloadBaseThread):
     def handle_multi_version_archive(self, extractedContentPath, trainerName_display):
         temp_contents = os.listdir(extractedContentPath)
 
-        # Check if there are any executables (.exe, .ct, .cetrainer) in the root folder
+        # Check if there are any executables (.exe, .ct, .cetrainer, .png) in the root folder
         has_executable_in_root = any(
-            file.lower().endswith((".exe", ".ct", ".cetrainer"))
+            file.lower().endswith((".exe", ".ct", ".cetrainer", ".png"))
             for file in temp_contents
             if os.path.isfile(os.path.join(extractedContentPath, file))
         )
 
-        folders = [item for item in temp_contents if os.path.isdir(os.path.join(extractedContentPath, item))]
+        folders = [item for item in temp_contents if os.path.isdir(os.path.join(extractedContentPath, item)) and item != "gcm-instructions"]
+
+        # If gcm-instructions exists at root, this is a single trainer package, not multi-version
+        if os.path.isdir(os.path.join(extractedContentPath, "gcm-instructions")):
+            return False
 
         if not has_executable_in_root and len(folders) > 0:
             for folder_name in folders:
@@ -518,7 +520,7 @@ class DownloadTrainersThread(DownloadBaseThread):
                     else:
                         os.remove(input_file)
 
-    def download_gcm(self, selected_trainer):
+    def download_default(self, selected_trainer):
         if self.update_entry:
             trainerName_display = selected_trainer["trainer_name"]
             self.message.emit(tr("Updating ") + trainerName_display + "...", None)
@@ -567,65 +569,11 @@ class DownloadTrainersThread(DownloadBaseThread):
             shutil.rmtree(selected_trainer['trainer_dir'])
 
         if extracted:
-            # If the archive contains multiple version folders, split them up into multiple dest folders
-            if not self.handle_multi_version_archive(extractedContentPath, trainerName_display):
-                destination_path = os.path.join(self.trainerDownloadPath, trainerName_display)
-                self.src_dst.append({"src": extractedContentPath, "dst": destination_path})
-        else:
-            destination_path = os.path.join(self.trainerDownloadPath, trainerName_display)
-            self.src_dst.append({"src": trainerTemp, "dst": os.path.join(destination_path, os.path.basename(trainerTemp))})
+            # Set instruction destination if gcm-instructions folder present at root
+            instructionsFolder = os.path.join(extractedContentPath, "gcm-instructions")
+            if os.path.isdir(instructionsFolder):
+                self.instructionDst = os.path.join(self.trainerDownloadPath, trainerName_display, "gcm-instructions")
 
-        return True
-
-    def download_ct(self, selected_trainer):
-        if self.update_entry:
-            trainerName_display = selected_trainer["trainer_name"]
-            self.message.emit(tr("Updating ") + trainerName_display + "...", None)
-        else:
-            trainerName_display = self.symbol_replacement(selected_trainer["trainer_name"])
-            # Trainer duplication check
-            for trainerPath in self.trainers.keys():
-                if self.symbol_replacement(selected_trainer["trainer_name"]) == os.path.splitext(os.path.basename(trainerPath))[0]:
-                    self.message.emit(tr("Trainer already exists, aborted download."), "failure")
-                    time.sleep(self.download_finish_delay)
-                    self.finished.emit(1)
-                    return False
-
-        self.message.emit(tr("Downloading..."), None)
-        extractedContentPath = os.path.join(DOWNLOAD_TEMP_DIR, "extracted")
-        try:
-            signed_url = self.get_signed_download_url(selected_trainer['url'])
-            trainerTemp = self.request_download(signed_url, DOWNLOAD_TEMP_DIR)
-            if not trainerTemp:
-                raise Exception(tr("Internet request failed."))
-
-        except Exception as e:
-            self.message.emit(tr("An error occurred while downloading trainer: ") + str(e), "failure")
-            time.sleep(self.download_finish_delay)
-            self.finished.emit(1)
-            return False
-
-        # Extract compressed file if not single exe
-        extracted = False
-        if os.path.splitext(trainerTemp)[1] in [".zip", ".rar"]:
-            extracted = True
-            self.message.emit(tr("Decompressing..."), None)
-            try:
-                command = [unzip_path, "x", "-y", trainerTemp, f"-o{extractedContentPath}"]
-                subprocess.run(command, check=True, creationflags=subprocess.CREATE_NO_WINDOW)
-
-            except Exception as e:
-                self.message.emit(tr("An error occurred while extracting downloaded trainer: ") + str(e), "failure")
-                time.sleep(self.download_finish_delay)
-                self.finished.emit(1)
-                return False
-
-            os.remove(trainerTemp)
-
-        if self.update_entry:
-            shutil.rmtree(selected_trainer['trainer_dir'])
-
-        if extracted:
             # If the archive contains multiple version folders, split them up into multiple dest folders
             if not self.handle_multi_version_archive(extractedContentPath, trainerName_display):
                 destination_path = os.path.join(self.trainerDownloadPath, trainerName_display)

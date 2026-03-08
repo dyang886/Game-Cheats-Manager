@@ -241,8 +241,8 @@ msgstr "Keine Internetverbindung, Download fehlgeschlagen."
 msgid "Attention"
 msgstr "Achtung"
 
-msgid "Please check folder for anti-cheat requirements!"
-msgstr "Bitte prüfe den Ordner auf Anti-Cheat-Anforderungen!"
+msgid "This trainer requires additional setup before use. Please check the opened folder for instructions.\nThe instructions are always stored in the 'gcm-instructions' folder."
+msgstr "Dieser Trainer erfordert vor der Nutzung zusätzliche Einrichtung. Bitte überprüfe den geöffneten Ordner für Anweisungen.\nDie Anweisungen befinden sich immer im Ordner 'gcm-instructions'."
 
 msgid "An error occurred when moving trainer: "
 msgstr "Ein Fehler ist beim Verschieben des Trainers aufgetreten: "

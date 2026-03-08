@@ -241,8 +241,8 @@ msgstr "沒有網路連接，下載失敗。"
 msgid "Attention"
 msgstr "警告"
 
-msgid "Please check folder for anti-cheat requirements!"
-msgstr "請檢查資料夾以瞭解反作弊要求！"
+msgid "This trainer requires additional setup before use. Please check the opened folder for instructions.\nThe instructions are always stored in the 'gcm-instructions' folder."
+msgstr "此修改器在使用前需要額外設定。請查看已開啟的資料夾以獲取說明。\n相關說明始終存儲在 'gcm-instructions' 資料夾中。"
 
 msgid "An error occurred when moving trainer: "
 msgstr "移動修改器時出錯："

@@ -23,7 +23,10 @@ class UpdateTrainers(DownloadBaseThread):
     def check_trainer_update(self, trainer_path):
         """Check if a trainer needs an update and return update info if needed."""
         try:
-            trainer_dir = os.path.dirname(trainer_path)
+            if os.path.isdir(trainer_path):
+                trainer_dir = trainer_path
+            else:
+                trainer_dir = os.path.dirname(trainer_path)
             trainer_name = os.path.basename(trainer_dir)
             info_path = os.path.join(trainer_dir, "gcm_info.json")
             if not os.path.exists(info_path):

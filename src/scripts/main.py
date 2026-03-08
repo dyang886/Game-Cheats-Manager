@@ -44,7 +44,7 @@ class GameCheatsManager(QMainWindow):
         self.setMinimumSize(700, 520)
 
         # Version and links
-        self.appVersion = "2.4.4"
+        self.appVersion = "2.4.5"
         self.websiteLink = "https://gamezonelabs.com"
         self.githubLink = "https://github.com/dyang886/Game-Cheats-Manager"
         self.bilibiliLink = "https://space.bilibili.com/256673766"
@@ -377,27 +377,35 @@ class GameCheatsManager(QMainWindow):
             os.scandir(self.trainerDownloadPath),
             key=lambda dirent: sort_key_func(dirent.name)
         )
+        extension_priority = [".exe", ".ct", ".cetrainer", ".png"]
 
         for trainer in entries:
             trainerPath = os.path.normpath(trainer.path)
             if os.path.isfile(trainerPath):
                 trainerName, trainerExt = os.path.splitext(os.path.basename(trainerPath))
-                if trainerExt.lower() in [".exe", ".ct", ".cetrainer", ".png"] and os.path.getsize(trainerPath) != 0:
+                if trainerExt.lower() in extension_priority and os.path.getsize(trainerPath) != 0:
                     self.flingListBox.addItem(trainerName)
                     self.trainers[trainerName] = trainerPath
             else:
                 exe_exclusions = ["flashplayer_22.0.0.210_ax_debug.exe"]
                 trainerName = os.path.basename(trainerPath)
                 exe_file_path = None
+                candidates = {}
                 for file in os.scandir(trainerPath):
-                    filePath = os.path.normpath(file.path)
-                    fileExt = os.path.splitext(file.name)[1]
-                    if file.is_file() and fileExt.lower() in [".exe", ".ct", ".cetrainer", ".png"] and file.name not in exe_exclusions:
-                        exe_file_path = filePath
+                    fileExt = os.path.splitext(file.name)[1].lower()
+                    if file.is_file() and fileExt in extension_priority and file.name not in exe_exclusions:
+                        if fileExt not in candidates:
+                            candidates[fileExt] = os.path.normpath(file.path)
+                for ext in extension_priority:
+                    if ext in candidates:
+                        exe_file_path = candidates[ext]
                         break
                 if exe_file_path:
                     self.flingListBox.addItem(trainerName)
                     self.trainers[trainerName] = exe_file_path
+                elif os.path.exists(os.path.join(trainerPath, "gcm_info.json")):
+                    self.flingListBox.addItem(trainerName)
+                    self.trainers[trainerName] = trainerPath
 
     def cleanup_launch_junctions(self):
         temp_dir = tempfile.gettempdir()
@@ -517,6 +525,11 @@ class GameCheatsManager(QMainWindow):
                 trainerName = self.flingListBox.item(selection).text()
                 originalPath = os.path.normpath(self.trainers[trainerName])
 
+                # Folder-only trainer (no launchable file) — open the folder
+                if os.path.isdir(originalPath):
+                    os.startfile(originalPath)
+                    return
+
                 # Get a safe ASCII path to prevent legacy trainers from crashing
                 if settings["safePath"]:
                     trainerPath = self.get_ascii_launch_path(originalPath)
@@ -560,12 +573,15 @@ class GameCheatsManager(QMainWindow):
 
             if reply == QMessageBox.StandardButton.Yes:
                 try:
-                    os.chmod(trainerPath, stat.S_IWRITE)
-                    parent_dir = os.path.dirname(trainerPath)
-                    if os.path.basename(parent_dir) == trainerName:
-                        shutil.rmtree(parent_dir)
+                    if os.path.isdir(trainerPath):
+                        shutil.rmtree(trainerPath)
                     else:
-                        os.remove(trainerPath)
+                        os.chmod(trainerPath, stat.S_IWRITE)
+                        parent_dir = os.path.dirname(trainerPath)
+                        if os.path.basename(parent_dir) == trainerName:
+                            shutil.rmtree(parent_dir)
+                        else:
+                            os.remove(trainerPath)
                     self.flingListBox.takeItem(index)
                     self.show_cheats()
                 except PermissionError as e:
