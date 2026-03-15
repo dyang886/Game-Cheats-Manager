@@ -245,7 +245,7 @@
         "author": "大母鹅",
         "official_url": "https://www.loxin.top/archives/1017",
         "gcm_url": "GCM/GCM Trainers/Nioh 3 Trainer [DaMuE].exe",
-        "version": "2026.2.9"
+        "version": "2026.3.12"
     },
     {
         "game_name": "Portal Knights",
@@ -461,7 +461,7 @@
         "author": "Patka",
         "official_url": "https://fearlessrevolution.com/viewtopic.php?f=4&t=38072",
         "gcm_url": "GCM/GCM Trainers/R.I.P. - Reincarnation Insurance Program Trainer [Patka].ct",
-        "version": "2026.1.28"
+        "version": "2026.2.25"
     },
     {
         "game_name": "Risou no Hikikomori Seikatsu: Oyako no Shinmitsu Doukyo",
@@ -482,13 +482,13 @@
         "game_name": "Tormented Souls 2",
         "origin": "ct_other",
         "gcm_url": "GCM/GCM Trainers/Tormented Souls 2 Trainer.ct",
-        "version": "2026.2.27"
+        "version": "2026.3.10"
     },
     {
         "game_name": "Weapon Shop Fantasy",
         "origin": "ct_other",
         "gcm_url": "GCM/GCM Trainers/Weapon Shop Fantasy Trainer.ct",
-        "version": "2026.2.27"
+        "version": "2026.3.10"
     },
     {
         "game_name": "Yakuza Kiwami 2",
@@ -727,8 +727,9 @@
         "game_name": "FTL: Faster Than Light",
         "origin": "other",
         "author": "MrAntiFun",
+        "official_url": "https://mrantifun.net/threads/ftl-faster-than-light-trainer.228/",
         "gcm_url": "GCM/GCM Trainers/FTL_Faster Than Light Trainer [MrAntiFun].exe",
-        "version": "2026.3.4"
+        "version": "2014.4.22"
     },
     {
         "game_name": "Football Manager 2024",
@@ -756,7 +757,7 @@
         "author": "简简单单2022",
         "official_url": "https://bbs.3dmgame.com/thread-6653672-1-1.html",
         "gcm_url": "GCM/GCM Trainers/Long Yin Li Zhi Zhuan Trainer [JianJianDanDan2022].ct",
-        "version": "2026.3.4"
+        "version": "2026.3.15"
     },
     {
         "game_name": "Loot of Baal",
@@ -821,7 +822,7 @@
         "origin": "other",
         "author": "jx666",
         "gcm_url": "GCM/GCM Trainers/A Simple Life with My Unobtrusive Sister Trainer [jx666].exe",
-        "version": "2026.3.7"
+        "version": "2026.3.15"
     },
     {
         "game_name": "Alice Escaped!",
@@ -953,5 +954,235 @@
         "official_url": "https://space.bilibili.com/365816484",
         "gcm_url": "GCM/GCM Trainers/Multiverse Loot Hunter Trainer [BinFenYanSe].ct",
         "version": "2025.12.27"
+    },
+    {
+        "game_name": "Ready or Not",
+        "origin": "other",
+        "author": "Async",
+        "official_url": "https://www.nexusmods.com/readyornot/mods/6413",
+        "gcm_url": "GCM/GCM Trainers/Ready or Not Trainer [Async].exe",
+        "version": "2025.10.5"
+    },
+    {
+        "game_name": "Ready or Not",
+        "origin": "other",
+        "author": "LHY1339",
+        "official_url": "https://github.com/LHY1339/cheat_ready_or_not",
+        "gcm_url": "GCM/GCM Trainers/Ready or Not Trainer [LHY1339].zip",
+        "version": "2025.12.19"
+    },
+    {
+        "game_name": "Backrooms: Extractions",
+        "origin": "other",
+        "author": "LHY1339",
+        "official_url": "https://github.com/LHY1339/cheat_backrooms_extractions",
+        "gcm_url": "GCM/GCM Trainers/Backrooms_Extractions Trainer [LHY1339].exe",
+        "version": "2026.2.23"
+    },
+    {
+        "game_name": "Escape the Backrooms",
+        "origin": "other",
+        "author": "LHY1339",
+        "official_url": "https://github.com/LHY1339/cheat_escape_the_backrooms",
+        "gcm_url": "GCM/GCM Trainers/Escape the Backrooms Trainer [LHY1339].exe",
+        "version": "2026.2.28"
+    },
+    {
+        "game_name": "Castlevania Advance Collection",
+        "origin": "ct_other",
+        "author": "MBRKiNG",
+        "official_url": "https://fearlessrevolution.com/viewtopic.php?t=17550",
+        "gcm_url": "GCM/GCM Trainers/Castlevania Advance Collection Trainer [MBRKiNG].ct",
+        "version": "2021.9.28"
+    },
+    {
+        "game_name": "Command & Conquer 3: Kane's Wrath",
+        "origin": "other",
+        "gcm_url": "GCM/GCM Trainers/Command & Conquer 3_Kane's Wrath Trainer.exe",
+        "version": "2026.3.10"
+    },
+    {
+        "game_name": "Carnal Instinct",
+        "origin": "ct_other",
+        "author": "jk",
+        "official_url": "https://f95zone.to/members/mswasticsc.382845/#about",
+        "gcm_url": "GCM/GCM Trainers/Carnal Instinct Trainer [jk].ct",
+        "version": "2026.3.10"
+    },
+    {
+        "game_name": "Cities: Skylines",
+        "origin": "other",
+        "author": "MrAntiFun",
+        "official_url": "https://mrantifun.net/threads/cities-skylines-trainer.3650/",
+        "gcm_url": "GCM/GCM Trainers/Cities_Skylines Trainer [MrAntiFun].exe",
+        "version": "2015.5.10"
+    },
+    {
+        "game_name": "Hitman: Absolution",
+        "origin": "other",
+        "author": "Abolfazl.k",
+        "official_url": "http://abolfazl-k.ir/",
+        "gcm_url": "GCM/GCM Trainers/Hitman_Absolution Trainer [Abolfazl.k].exe",
+        "version": "2026.3.10"
+    },
+    {
+        "game_name": "Resident Evil 4: Ultimate HD Edition",
+        "origin": "other",
+        "author": "盖世班主",
+        "official_url": "https://bbs.3dmgame.com/thread-6051077-1-1.html",
+        "gcm_url": "GCM/GCM Trainers/Resident Evil 4_Ultimate HD Edition Trainer [GaiShiBanZhu].exe",
+        "version": "2023.1.1"
+    },
+    {
+        "game_name": "RoadCraft",
+        "origin": "ct_other",
+        "gcm_url": "GCM/GCM Trainers/RoadCraft Trainer.ct",
+        "version": "2026.3.10"
+    },
+    {
+        "game_name": "Stoneshard",
+        "origin": "other",
+        "author": "Pixel32E",
+        "custom_name_en": "Toolbox",
+        "custom_name_zh": "工具箱",
+        "official_url": "https://www.bilibili.com/video/BV1SUfBBgEti/",
+        "gcm_url": "GCM/GCM Trainers/Stoneshard Toolbox [Pixel32E].exe",
+        "version": "2026.2.23"
+    },
+    {
+        "game_name": "Dynasty Warriors 4",
+        "origin": "other",
+        "author": "allEnL",
+        "gcm_url": "GCM/GCM Trainers/Dynasty Warriors 4 Trainer [allEnL].exe",
+        "version": "2026.3.10"
+    },
+    {
+        "game_name": "Warcraft III: The Frozen Throne",
+        "origin": "other",
+        "author": "tctianchi",
+        "official_url": "https://github.com/Still4/War3Trainer",
+        "gcm_url": "GCM/GCM Trainers/Warcraft III_The Frozen Throne Trainer [tctianchi].exe",
+        "version": "2017.8.27"
+    },
+    {
+        "game_name": "Yet Another Zombie Survivors",
+        "origin": "ct_other",
+        "author": "Patka",
+        "gcm_url": "GCM/GCM Trainers/Yet Another Zombie Survivors Trainer [Patka].ct",
+        "version": "2025.12.12"
+    },
+    {
+        "game_name": "Subnautica",
+        "origin": "ct_other",
+        "author": "墨星",
+        "gcm_url": "GCM/GCM Trainers/Subnautica Trainer [MoXing].ct",
+        "version": "2026.3.10"
+    },
+    {
+        "game_name": "Castlevania Anniversary Collection",
+        "origin": "ct_other",
+        "author": "bbfox",
+        "official_url": "https://opencheattables.com/viewtopic.php?p=1287&hilit=castlevania#p1287",
+        "gcm_url": "GCM/GCM Trainers/Castlevania Anniversary Collection Trainer [bbfox].ct",
+        "version": "2023.6.4"
+    },
+    {
+        "game_name": "Castlevania Anniversary Collection",
+        "origin": "ct_other",
+        "author": "VampTY",
+        "official_url": "https://fearlessrevolution.com/viewtopic.php?t=9452",
+        "gcm_url": "GCM/GCM Trainers/Castlevania Anniversary Collection Trainer [VampTY].ct",
+        "version": "2020.2.1"
+    },
+    {
+        "game_name": "ReCore: Definitive Edition",
+        "origin": "ct_other",
+        "gcm_url": "GCM/GCM Trainers/ReCore_Definitive Edition Trainer.ct",
+        "version": "2026.3.10"
+    },
+    {
+        "game_name": "Ghostrunner",
+        "origin": "ct_other",
+        "author": "天乐1337",
+        "official_url": "https://www.bilibili.com/list/472721080",
+        "gcm_url": "GCM/GCM Trainers/Ghostrunner Trainer [TianLe1337].ct",
+        "version": "2025.12.25"
+    },
+    {
+        "game_name": "Metro: Last Light Redux",
+        "origin": "other",
+        "author": "Baracuda",
+        "official_url": "https://www.youtube.com/channel/UChHiOryGzGswzC-gzbSJNJQ",
+        "gcm_url": "GCM/GCM Trainers/Metro_Last Light Redux Trainer [Baracuda].exe",
+        "version": "2018.3.14"
+    },
+    {
+        "game_name": "Uncharted Waters IV HD Version",
+        "origin": "ct_other",
+        "gcm_url": "GCM/GCM Trainers/Uncharted Waters IV HD Version Trainer.ct",
+        "version": "2026.3.10"
+    },
+    {
+        "game_name": "NINJA GAIDEN: Master Collection",
+        "origin": "ct_other",
+        "author": "yamaha288",
+        "official_url": "https://bbs.3dmgame.com/forum.php?mod=viewthread&tid=6192035",
+        "gcm_url": "GCM/GCM Trainers/NINJA GAIDEN_Master Collection Trainer [yamaha288].ct",
+        "version": "2021.7.21"
+    },
+    {
+        "game_name": "Guns, Gore and Cannoli 2",
+        "origin": "other",
+        "author": "游侠网",
+        "official_url": "https://www.ali213.net/",
+        "gcm_url": "GCM/GCM Trainers/Guns, Gore and Cannoli 2 Trainer [YouXiaWang].exe",
+        "version": "2026.3.10"
+    },
+    {
+        "game_name": "Guns, Gore and Cannoli",
+        "origin": "other",
+        "author": "MrAntiFun",
+        "official_url": "https://mrantifun.net/threads/guns-gore-and-cannoli-trainer.4326/",
+        "gcm_url": "GCM/GCM Trainers/Guns, Gore and Cannoli Trainer [MrAntiFun].exe",
+        "version": "2018.8.15"
+    },
+    {
+        "game_name": "Guns, Gore and Cannoli 2",
+        "origin": "other",
+        "author": "MrAntiFun",
+        "official_url": "https://mrantifun.net/threads/guns-gore-and-cannoli-2-trainer.16674/",
+        "gcm_url": "GCM/GCM Trainers/Guns, Gore and Cannoli 2 Trainer [MrAntiFun].exe",
+        "version": "2018.8.2"
+    },
+    {
+        "game_name": "Forestia ~Farm Life in the Country~",
+        "origin": "other",
+        "author": "jx666",
+        "official_url": "https://www.bilibili.com/video/BV1FvNPzCELP",
+        "gcm_url": "GCM/GCM Trainers/Forestia ~Farm Life in the Country~ Trainer [jx666].exe",
+        "version": "2026.3.10"
+    },
+    {
+        "game_name": "Sudden Strike 4",
+        "origin": "ct_other",
+        "author": "Recifense",
+        "gcm_url": "GCM/GCM Trainers/Sudden Strike 4 Trainer [Recifense].ct",
+        "version": "2017.8.15"
+    },
+    {
+        "game_name": "Devil May Cry 4: Special Edition",
+        "origin": "other",
+        "author": "微风吹散的羽翼",
+        "official_url": "https://www.bilibili.com/opus/243069022670988982",
+        "gcm_url": "GCM/GCM Trainers/Devil May Cry 4_Special Edition Trainer [WeiFengChuiSanDeYuYi].exe",
+        "version": "2019.6.6"
+    },
+    {
+        "game_name": "Warcraft III: Reign of Chaos",
+        "origin": "other",
+        "author": "离不开电脑",
+        "official_url": "http://56q.5d6d.com/",
+        "gcm_url": "GCM/GCM Trainers/Warcraft III_Reign of Chaos Trainer [LiBuKaiDianNao].exe",
+        "version": "2026.3.10"
     }
 ]

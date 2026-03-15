@@ -85,13 +85,28 @@ public:
         }
         else
         {
-            lastCheckResult_ = checkCDP();
+            // WebSocket is down — quick HTTP check first (fast fail if game is gone)
+            if (!checkCDP())
+            {
+                lastCheckResult_ = false;
+            }
+            else
+            {
+                // Game is still alive — try to reconnect WebSocket
+                if (cachedWsPath_.empty())
+                    discoverPageWsPath(cachedWsPath_);
+
+                if (!cachedWsPath_.empty())
+                    lastCheckResult_ = wsReconnect(cachedWsPath_);
+                else
+                    lastCheckResult_ = true; // CDP alive, just can't get WS yet
+            }
         }
 
         if (!lastCheckResult_)
         {
             cdpFailCount_++;
-            if (cdpFailCount_ >= 5)
+            if (cdpFailCount_ >= 3)
             {
                 wsDisconnect();
                 cachedWsPath_.clear();
@@ -355,7 +370,7 @@ private:
         if (!hSession)
             return "";
 
-        DWORD timeout = 1000;
+        DWORD timeout = 500;
         WinHttpSetOption(hSession, WINHTTP_OPTION_CONNECT_TIMEOUT, &timeout, sizeof(timeout));
         WinHttpSetOption(hSession, WINHTTP_OPTION_RECEIVE_TIMEOUT, &timeout, sizeof(timeout));
         WinHttpSetOption(hSession, WINHTTP_OPTION_SEND_TIMEOUT, &timeout, sizeof(timeout));
@@ -492,7 +507,7 @@ private:
             return false;
 
         DWORD connectTimeout = 500;
-        DWORD sendRecvTimeout = 2000;
+        DWORD sendRecvTimeout = 3000;
         WinHttpSetOption(wsSession_, WINHTTP_OPTION_CONNECT_TIMEOUT, &connectTimeout, sizeof(connectTimeout));
         WinHttpSetOption(wsSession_, WINHTTP_OPTION_RECEIVE_TIMEOUT, &sendRecvTimeout, sizeof(sendRecvTimeout));
         WinHttpSetOption(wsSession_, WINHTTP_OPTION_SEND_TIMEOUT, &sendRecvTimeout, sizeof(sendRecvTimeout));
