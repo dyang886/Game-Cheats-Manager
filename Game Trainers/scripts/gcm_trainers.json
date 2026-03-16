@@ -686,9 +686,10 @@
     {
         "game_name": "The Legend of Nayuta: Boundless Trails",
         "origin": "ct_other",
-        "official_url": "https://opencheattables.com",
-        "gcm_url": "GCM/GCM Trainers/The Legend of Nayuta_Boundless Trails Trainer.ct",
-        "version": "2026.2.27"
+        "author": "bbfox",
+        "official_url": "https://opencheattables.com/viewtopic.php?t=11",
+        "gcm_url": "GCM/GCM Trainers/The Legend of Nayuta_Boundless Trails Trainer [bbfox].ct",
+        "version": "2022.7.24"
     },
     {
         "game_name": "Warcraft III: The Frozen Throne",
@@ -766,10 +767,10 @@
         "version": "2026.3.4"
     },
     {
-        "game_name": "Ms Wakayama's NTR Classroom",
+        "game_name": "Wakayama's NTR Classroom",
         "origin": "ct_other",
         "author": "jx666",
-        "gcm_url": "GCM/GCM Trainers/Ms Wakayama's NTR Classroom Trainer [jx666].ct",
+        "gcm_url": "GCM/GCM Trainers/Wakayama's NTR Classroom Trainer [jx666].ct",
         "version": "2026.3.4"
     },
     {
@@ -800,6 +801,7 @@
         "custom_name_zh": "全收集地图",
         "official_url": "https://xueqiumaps.cn/",
         "gcm_url": "GCM/GCM Trainers/Momodora_Moonlit Farewell Map [XueQiu].png",
+        "extension": "png",
         "version": "2026.3.4"
     },
     {
@@ -821,6 +823,7 @@
         "game_name": "A Simple Life with My Unobtrusive Sister",
         "origin": "other",
         "author": "jx666",
+        "official_url": "https://www.bilibili.com/video/BV1aaPhziEEp",
         "gcm_url": "GCM/GCM Trainers/A Simple Life with My Unobtrusive Sister Trainer [jx666].exe",
         "version": "2026.3.15"
     },
@@ -865,9 +868,10 @@
     {
         "game_name": "Atelier Ryza: Ever Darkness & the Secret Hideout DX",
         "origin": "ct_other",
-        "official_url": "https://opencheattables.com, https://bbs.3dmgame.com/thread-6648737-1-1.html",
-        "gcm_url": "GCM/GCM Trainers/Atelier Ryza_Ever Darkness & the Secret Hideout DX Trainer.ct",
-        "version": "2026.3.4"
+        "author": "bbfox",
+        "official_url": "https://opencheattables.com/viewtopic.php?t=1676, https://bbs.3dmgame.com/thread-6648737-1-1.html",
+        "gcm_url": "GCM/GCM Trainers/Atelier Ryza_Ever Darkness & the Secret Hideout DX Trainer [bbfox].ct",
+        "version": "2025.12.22"
     },
     {
         "game_name": "Living With Sister: Monochrome Fantasy",
@@ -928,6 +932,7 @@
         "game_name": "PEAK",
         "origin": "other",
         "gcm_url": "GCM/GCM Trainers/PEAK Trainer.zip",
+        "extension": "none",
         "version": "2026.3.7"
     },
     {
@@ -1082,7 +1087,7 @@
         "game_name": "Castlevania Anniversary Collection",
         "origin": "ct_other",
         "author": "bbfox",
-        "official_url": "https://opencheattables.com/viewtopic.php?p=1287&hilit=castlevania#p1287",
+        "official_url": "https://opencheattables.com/viewtopic.php?p=1287",
         "gcm_url": "GCM/GCM Trainers/Castlevania Anniversary Collection Trainer [bbfox].ct",
         "version": "2023.6.4"
     },
@@ -1184,5 +1189,149 @@
         "official_url": "http://56q.5d6d.com/",
         "gcm_url": "GCM/GCM Trainers/Warcraft III_Reign of Chaos Trainer [LiBuKaiDianNao].exe",
         "version": "2026.3.10"
+    },
+    {
+        "game_name": "Card Cultivation",
+        "origin": "ct_other",
+        "author": "3DM",
+        "official_url": "https://bbs.3dmgame.com/thread-6657707-1-1.html",
+        "gcm_url": "GCM/GCM Trainers/Card Cultivation Trainer [3DM].ct",
+        "version": "2026.3.15"
+    },
+    {
+        "game_name": "Plants vs. Zombies: Fusion",
+        "origin": "ct_other",
+        "gcm_url": "GCM/GCM Trainers/Plants vs. Zombies_Fusion Trainer.ct",
+        "version": "2026.3.15"
+    },
+    {
+        "game_name": "Revolution Idle",
+        "origin": "ct_other",
+        "author": "AkibaCat",
+        "gcm_url": "GCM/GCM Trainers/Revolution Idle Trainer [AkibaCat].ct",
+        "version": "2026.3.15"
+    },
+    {
+        "game_name": "Shadow Warrior 2",
+        "origin": "other",
+        "author": "FutureX",
+        "gcm_url": "GCM/GCM Trainers/Shadow Warrior 2 Trainer [FutureX].exe",
+        "version": "2026.3.15"
+    },
+    {
+        "game_name": "Swarm Bunker: Lust Defense",
+        "origin": "ct_other",
+        "author": "jx666",
+        "gcm_url": "GCM/GCM Trainers/Swarm Bunker_Lust Defense Trainer [jx666].ct",
+        "version": "2026.3.15"
+    },
+    {
+        "game_name": "Euro Truck Simulator 2",
+        "origin": "other",
+        "author": "SiberianCoffe",
+        "custom_name_en": "Save Editor",
+        "custom_name_zh": "存档编辑器",
+        "official_url": "https://github.com/CoffeSiberian/truck-tools",
+        "gcm_url": "GCM/GCM Trainers/Euro Truck Simulator 2 Save Editor [SiberianCoffe].zip",
+        "version": "2026.1.15"
+    },
+    {
+        "game_name": "Atelier Ryza 2: Lost Legends & the Secret Fairy DX",
+        "origin": "ct_other",
+        "author": "bbfox",
+        "official_url": "https://opencheattables.com/viewtopic.php?t=1712, https://bbs.3dmgame.com/thread-6656802-1-1.html",
+        "gcm_url": "GCM/GCM Trainers/Atelier Ryza 2_Lost Legends & the Secret Fairy DX Trainer [bbfox].ct",
+        "version": "2026.1.6"
+    },
+    {
+        "game_name": "Dragon Cliff",
+        "origin": "ct_other",
+        "author": "SeiKur0",
+        "official_url": "https://fearlessrevolution.com/viewtopic.php?t=6776",
+        "gcm_url": "GCM/GCM Trainers/Dragon Cliff Trainer [SeiKur0].ct",
+        "version": "2018.5.21"
+    },
+    {
+        "game_name": "Next Jianghu II",
+        "origin": "ct_other",
+        "gcm_url": "GCM/GCM Trainers/Next Jianghu II Trainer.ct",
+        "version": "2026.3.15"
+    },
+    {
+        "game_name": "Phasmophobia",
+        "origin": "other",
+        "author": "蚊子炸虾",
+        "custom_name_en": "Save Editor",
+        "custom_name_zh": "存档编辑器",
+        "gcm_url": "GCM/GCM Trainers/Phasmophobia Save Editor [WenZiZhaXia].exe",
+        "version": "2026.3.15"
+    },
+    {
+        "game_name": "Plants vs. Zombies: Hybrid",
+        "origin": "other",
+        "author": "PVZ屑UP",
+        "official_url": "https://www.bilibili.com/video/BV1JW421R7V2",
+        "gcm_url": "GCM/GCM Trainers/Plants vs. Zombies_Hybrid Trainer [PVZXieUP].exe",
+        "version": "2026.3.15"
+    },
+    {
+        "game_name": "Dishonored 2",
+        "origin": "other",
+        "author": "XLinmaster",
+        "official_url": "https://www.bilibili.com/video/BV1Rp9CYsEJd",
+        "gcm_url": "GCM/GCM Trainers/Dishonored 2 Trainer [XLinmaster].exe",
+        "version": "2026.3.16"
+    },
+    {
+        "game_name": "Elden Ring",
+        "origin": "other",
+        "author": "ClayAmore",
+        "custom_name_en": "Save Editor",
+        "custom_name_zh": "存档编辑器",
+        "official_url": "https://github.com/ClayAmore/ER-Save-Editor",
+        "gcm_url": "GCM/GCM Trainers/Elden Ring Save Editor [ClayAmore].exe",
+        "version": "2024.3.25"
+    },
+    {
+        "game_name": "Minecraft Dungeons",
+        "origin": "other",
+        "author": "CutFlame",
+        "custom_name_en": "Save Editor",
+        "custom_name_zh": "存档编辑器",
+        "official_url": "https://github.com/CutFlame/MCDSaveEdit",
+        "gcm_url": "GCM/GCM Trainers/Minecraft Dungeons Save Editor [CutFlame].exe",
+        "version": "2022.12.9"
+    },
+    {
+        "game_name": "Resist the succubus—The end of the female Knight",
+        "origin": "other",
+        "author": "jx666",
+        "gcm_url": "GCM/GCM Trainers/Resist the succubus—The end of the female Knight Trainer [jx666].zip",
+        "version": "2026.3.15"
+    },
+    {
+        "game_name": "ORGY DICE",
+        "origin": "other",
+        "author": "jx666",
+        "gcm_url": "GCM/GCM Trainers/ORGY DICE Trainer [jx666].zip",
+        "version": "2026.3.15"
+    },
+    {
+        "game_name": "ThornSin",
+        "origin": "other",
+        "author": "jx666",
+        "gcm_url": "GCM/GCM Trainers/ThornSin Trainer [jx666].zip",
+        "version": "2026.3.15"
+    },
+    {
+        "game_name": "Long Yin Li Zhi Zhuan",
+        "origin": "other",
+        "author": "Mizuof",
+        "custom_name_en": "Save Editor",
+        "custom_name_zh": "存档编辑器",
+        "official_url": "https://bbs.3dmgame.com/thread-6658860-1-1.html, https://www.bilibili.com/video/BV1mTPvzuEx1",
+        "gcm_url": "GCM/GCM Trainers/Long Yin Li Zhi Zhuan Save Editor [Mizuof].zip",
+        "extension": "html",
+        "version": "2026.3.15"
     }
 ]

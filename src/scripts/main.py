@@ -384,33 +384,47 @@ class GameCheatsManager(QMainWindow):
             os.scandir(self.trainerDownloadPath),
             key=lambda dirent: sort_key_func(dirent.name)
         )
-        extension_priority = [".exe", ".ct", ".cetrainer", ".png"]
+        default_extensions = [".exe", ".ct", ".cetrainer"]
 
         for trainer in entries:
             trainerPath = os.path.normpath(trainer.path)
             if os.path.isfile(trainerPath):
                 trainerName, trainerExt = os.path.splitext(os.path.basename(trainerPath))
-                if trainerExt.lower() in extension_priority and os.path.getsize(trainerPath) != 0:
+                if trainerExt.lower() in default_extensions and os.path.getsize(trainerPath) != 0:
                     self.flingListBox.addItem(trainerName)
                     self.trainers[trainerName] = trainerPath
             else:
                 exe_exclusions = ["flashplayer_22.0.0.210_ax_debug.exe"]
                 trainerName = os.path.basename(trainerPath)
-                exe_file_path = None
-                candidates = {}
-                for file in os.scandir(trainerPath):
-                    fileExt = os.path.splitext(file.name)[1].lower()
-                    if file.is_file() and fileExt in extension_priority and file.name not in exe_exclusions:
-                        if fileExt not in candidates:
-                            candidates[fileExt] = os.path.normpath(file.path)
-                for ext in extension_priority:
-                    if ext in candidates:
-                        exe_file_path = candidates[ext]
-                        break
-                if exe_file_path:
+
+                # Check gcm_info.json for custom extension
+                gcm_info_path = os.path.join(trainerPath, "gcm_info.json")
+                custom_ext = None
+                if os.path.exists(gcm_info_path):
+                    with open(gcm_info_path, 'r', encoding='utf-8') as f:
+                        custom_ext = json.load(f).get("extension")
+
+                # Determine target extensions: use custom if specified, otherwise defaults
+                if custom_ext == "none":
                     self.flingListBox.addItem(trainerName)
-                    self.trainers[trainerName] = exe_file_path
-                elif os.path.exists(os.path.join(trainerPath, "gcm_info.json")):
+                    self.trainers[trainerName] = trainerPath
+                    continue
+
+                target_exts = ["." + custom_ext] if custom_ext else default_extensions
+
+                matched_path = None
+                for ext in target_exts:
+                    for file in os.scandir(trainerPath):
+                        if file.is_file() and os.path.splitext(file.name)[1].lower() == ext and file.name not in exe_exclusions:
+                            matched_path = os.path.normpath(file.path)
+                            break
+                    if matched_path:
+                        break
+
+                if matched_path:
+                    self.flingListBox.addItem(trainerName)
+                    self.trainers[trainerName] = matched_path
+                elif os.path.exists(gcm_info_path):
                     self.flingListBox.addItem(trainerName)
                     self.trainers[trainerName] = trainerPath
 

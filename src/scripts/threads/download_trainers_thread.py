@@ -70,6 +70,8 @@ class DownloadTrainersThread(DownloadBaseThread):
                         info_dict["version"] = selected_trainer["version"]
                     if selected_trainer["origin"] in ["other", "ct_other"]:
                         info_dict["gcm_url"] = selected_trainer["url"]
+                    if selected_trainer.get("extension"):
+                        info_dict["extension"] = selected_trainer["extension"]
 
                     with open(os.path.join(dst_dir, "gcm_info.json"), "w", encoding="utf-8") as info_file:
                         json.dump(info_dict, info_file, ensure_ascii=False, indent=4)
