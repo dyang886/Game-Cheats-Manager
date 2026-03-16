@@ -57,7 +57,7 @@ class DownloadDisplayThread(DownloadBaseThread):
             if not status:
                 self.finished.emit(1)
                 return
-        
+
         # ======================================================
         # CT
         if settings["enableCT"]:
@@ -65,7 +65,7 @@ class DownloadDisplayThread(DownloadBaseThread):
             if not status:
                 self.finished.emit(1)
                 return
-        
+
         # ======================================================
         # GCM
         if settings["enableGCM"]:
@@ -180,7 +180,8 @@ class DownloadDisplayThread(DownloadBaseThread):
                             "custom_name_en": "",
                             "custom_name_zh": "",
                             "url": url,
-                            "version": ""
+                            "version": "",
+                            "extension": ""
                         })
 
             elif settings["flingDownloadServer"] == "gcm":
@@ -198,7 +199,8 @@ class DownloadDisplayThread(DownloadBaseThread):
                             "custom_name_en": "",
                             "custom_name_zh": "",
                             "url": url,
-                            "version": ""
+                            "version": "",
+                            "extension": ""
                         })
 
         except Exception as e:
@@ -243,7 +245,8 @@ class DownloadDisplayThread(DownloadBaseThread):
                                         "custom_name_en": "",
                                         "custom_name_zh": "",
                                         "url": url,
-                                        "version": ""
+                                        "version": "",
+                                        "extension": ""
                                     })
 
             elif settings["flingDownloadServer"] == "gcm":
@@ -262,7 +265,8 @@ class DownloadDisplayThread(DownloadBaseThread):
                             "custom_name_en": "",
                             "custom_name_zh": "",
                             "url": url,
-                            "version": version
+                            "version": version,
+                            "extension": ""
                         })
 
         except Exception as e:
@@ -298,7 +302,8 @@ class DownloadDisplayThread(DownloadBaseThread):
                         "custom_name_en": "",
                         "custom_name_zh": "",
                         "url": url,
-                        "version": version
+                        "version": version,
+                        "extension": ""
                     })
 
         except Exception as e:
@@ -310,7 +315,7 @@ class DownloadDisplayThread(DownloadBaseThread):
         time.sleep(self.status_pause_time)
 
         return True
-    
+
     def search_from_ct(self, keywordList):
         CTData = self.load_json_content("cheat_table.json")
 
@@ -338,7 +343,8 @@ class DownloadDisplayThread(DownloadBaseThread):
                         "custom_name_en": custom_name_en,
                         "custom_name_zh": custom_name_zh,
                         "url": url,
-                        "version": version
+                        "version": version,
+                        "extension": ""
                     })
 
         except Exception as e:
@@ -350,7 +356,7 @@ class DownloadDisplayThread(DownloadBaseThread):
         time.sleep(self.status_pause_time)
 
         return True
-    
+
     def search_from_gcm(self, keywordList):
         GCMData = self.load_json_content("gcm_trainers.json")
 
@@ -368,6 +374,7 @@ class DownloadDisplayThread(DownloadBaseThread):
                 custom_name = trainer.get('custom_name', '')
                 custom_name_en = trainer.get('custom_name_en', '')
                 custom_name_zh = trainer.get('custom_name_zh', '')
+                extension = trainer.get('extension', '')
 
                 if gameName and self.keyword_match(keywordList, gameName):
                     DownloadBaseThread.trainer_urls.append({
@@ -379,7 +386,8 @@ class DownloadDisplayThread(DownloadBaseThread):
                         "custom_name_en": custom_name_en,
                         "custom_name_zh": custom_name_zh,
                         "url": url,
-                        "version": version
+                        "version": version,
+                        "extension": extension
                     })
 
         except Exception as e:

@@ -758,7 +758,7 @@
         "author": "简简单单2022",
         "official_url": "https://bbs.3dmgame.com/thread-6653672-1-1.html",
         "gcm_url": "GCM/GCM Trainers/Long Yin Li Zhi Zhuan Trainer [JianJianDanDan2022].ct",
-        "version": "2026.3.15"
+        "version": "2026.3.16"
     },
     {
         "game_name": "Loot of Baal",
@@ -1303,10 +1303,10 @@
         "version": "2022.12.9"
     },
     {
-        "game_name": "Resist the succubus—The end of the female Knight",
+        "game_name": "Resist the succubus-The end of the female Knight",
         "origin": "other",
         "author": "jx666",
-        "gcm_url": "GCM/GCM Trainers/Resist the succubus—The end of the female Knight Trainer [jx666].zip",
+        "gcm_url": "GCM/GCM Trainers/Resist the succubus-The end of the female Knight Trainer [jx666].zip",
         "version": "2026.3.15"
     },
     {
@@ -1333,5 +1333,20 @@
         "gcm_url": "GCM/GCM Trainers/Long Yin Li Zhi Zhuan Save Editor [Mizuof].zip",
         "extension": "html",
         "version": "2026.3.15"
+    },
+    {
+        "game_name": "Forza Horizon 4",
+        "origin": "other",
+        "author": "tkwlee",
+        "official_url": "https://dl.3dmgame.com/patch/357760.html",
+        "gcm_url": "GCM/GCM Trainers/Forza Horizon 4 Trainer [tkwlee].exe",
+        "version": "2025.10.8"
+    },
+    {
+        "game_name": "Spirit Realm",
+        "origin": "other",
+        "author": "菠萝蜜",
+        "gcm_url": "GCM/GCM Trainers/Spirit Realm Trainer [BoLuoMi].exe",
+        "version": "2026.3.16"
     }
 ]
