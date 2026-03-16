@@ -61,6 +61,8 @@ class GameCheatsManager(QMainWindow):
         self.downloadable = False  # able to double click on download list or not
         self.downloadQueue = Queue()
         self.currentlyDownloading = False
+        self.lastSearchKeyword = ""  # Store last search keyword to restore results after download
+        self.lastSearchResults = []  # Store last search results to restore after download
         self.currentlyUpdatingTrainers = False
         self.currentlyUpdatingGCM = False
         self.currentlyUpdatingFling = False
@@ -653,6 +655,7 @@ class GameCheatsManager(QMainWindow):
         self.downloadListBox.clear()
         self.downloadable = False
         self.searchable = False
+        self.lastSearchKeyword = keyword  # Save keyword for restoring after download
 
         display_thread = DownloadDisplayThread(keyword, self)
         display_thread.message.connect(self.on_message, Qt.ConnectionType.BlockingQueuedConnection)
@@ -808,17 +811,60 @@ class GameCheatsManager(QMainWindow):
             self.downloadable = False
         else:
             self.downloadable = True
+            # Save search results for restoring after download
+            from threads.download_display_thread import DownloadBaseThread
+            self.lastSearchResults = DownloadBaseThread.trainer_urls.copy()
 
         self.searchable = True
         self.enable_download_widgets()
 
     def on_download_finished(self, status):
-        self.downloadable = False
-        self.searchable = True
-        self.enable_download_widgets()
-        self.show_cheats()
         self.currentlyDownloading = False
         self.start_next_download()
+        
+        # Only show message box and restore search results if download queue is empty
+        if self.downloadQueue.empty():
+            self.searchable = True
+            
+            # Show message box based on download status
+            if status == 0:
+                msg_box = QMessageBox(
+                    QMessageBox.Icon.Information,
+                    tr("Success"),
+                    tr("Download success!"),
+                    QMessageBox.StandardButton.Ok,
+                    self
+                )
+            else:
+                msg_box = QMessageBox(
+                    QMessageBox.Icon.Critical,
+                    tr("Attention"),
+                    tr("Failed to download trainer. Please check your network connection and try again."),
+                    QMessageBox.StandardButton.Ok,
+                    self
+                )
+            
+            ok_button = msg_box.button(QMessageBox.StandardButton.Ok)
+            ok_button.setText(tr("OK"))
+            msg_box.exec()
+            
+            # Update left panel (installed trainers list) first
+            self.show_cheats()
+            
+            # Restore previous search results after user clicks OK
+            if self.lastSearchKeyword and self.lastSearchResults:
+                self.downloadable = True
+                self.enable_download_widgets()
+                self.downloadListBox.clear()
+                for count, trainer in enumerate(self.lastSearchResults, start=1):
+                    self.downloadListBox.addItem(f"{count}. {trainer['trainer_name']}")
+            else:
+                self.downloadable = False
+                self.enable_download_widgets()
+                self.show_cheats()
+        else:
+            # More downloads pending, keep current state
+            pass
 
     def on_status_load(self, widgetName, message):
         statusWidget = StatusMessageWidget(widgetName, message)
