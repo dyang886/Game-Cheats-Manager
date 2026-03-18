@@ -12,9 +12,10 @@ import webbrowser
 import winreg
 
 from PyQt6.QtCore import Qt, QTimer
-from PyQt6.QtGui import QAction, QColor, QFont, QFontDatabase, QIcon
-from PyQt6.QtWidgets import QApplication, QFileDialog, QGridLayout, QHBoxLayout, QLabel, QLineEdit, QListWidgetItem, QMainWindow, QMessageBox, QStatusBar, QVBoxLayout, QWidget
+from PyQt6.QtGui import QAction, QColor, QFont, QFontDatabase, QIcon, QPainter, QPixmap
+from PyQt6.QtWidgets import QApplication, QFileDialog, QGridLayout, QHBoxLayout, QLabel, QLineEdit, QListWidgetItem, QMainWindow, QMessageBox, QProgressBar, QStatusBar, QVBoxLayout, QWidget
 from tendo import singleton
+from PyQt6.QtSvg import QSvgRenderer
 from PyQt6.QtSvgWidgets import QSvgWidget
 
 import style_sheet
@@ -45,21 +46,23 @@ class GameCheatsManager(QMainWindow):
         self.setMinimumSize(700, 520)
 
         # Version and links
-        self.appVersion = "2.4.6"
+        self.appVersion = "2.5.0-beta.2"
         self.websiteLink = "https://gamezonelabs.com"
         self.allTrainersLink = "https://gamezonelabs.com/products/game-cheats-manager/trainers"
         self.githubLink = "https://github.com/dyang886/Game-Cheats-Manager"
         self.bilibiliLink = "https://space.bilibili.com/256673766"
 
         # Variable management
-        self.trainerSearchEntryPrompt = tr("Search for installed")
-        self.downloadSearchEntryPrompt = tr("Search to download")
+        self.trainerSearchEntryPrompt = tr("Search for installed trainers")
+        self.downloadSearchEntryPrompt = tr("Enter keywords to download trainers")
         self.trainerDownloadPath = os.path.normpath(settings["downloadPath"])
 
         self.trainers = {}  # Store installed trainers: {trainer name: trainer path}
         self.searchable = True  # able to search online trainers or not
         self.downloadable = False  # able to double click on download list or not
         self.downloadQueue = Queue()
+        self.downloadProgressBar = None
+        self.downloadProgressLabel = None
         self.currentlyDownloading = False
         self.currentlyUpdatingTrainers = False
         self.currentlyUpdatingGCM = False
@@ -204,8 +207,23 @@ class GameCheatsManager(QMainWindow):
         downloadSearchLayout.addWidget(downloadSearchSvgWidget)
 
         self.downloadSearchEntry = QLineEdit()
+        actionIconStyle = LargerActionIconStyle(self.downloadSearchEntry.style())
+        actionIconStyle.setParent(self.downloadSearchEntry)
+        self.downloadSearchEntry.setStyle(actionIconStyle)
         self.downloadSearchEntry.setPlaceholderText(self.downloadSearchEntryPrompt)
         self.downloadSearchEntry.returnPressed.connect(self.on_enter_press)
+
+        enterSvg = '<svg xmlns="http://www.w3.org/2000/svg" viewBox="0 0 24 24" fill="none"><path d="M20 7V8.2C20 9.88016 20 10.7202 19.673 11.362C19.3854 11.9265 18.9265 12.3854 18.362 12.673C17.7202 13 16.8802 13 15.2 13H4M4 13L8 9M4 13L8 17" stroke="gray" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"/></svg>'
+        enterActionRenderer = QSvgRenderer(enterSvg.encode('utf-8'))
+        enterActionPixmap = QPixmap(32, 32)
+        enterActionPixmap.fill(Qt.GlobalColor.transparent)
+        enterActionPainter = QPainter(enterActionPixmap)
+        enterActionRenderer.render(enterActionPainter)
+        enterActionPainter.end()
+        self.downloadSearchAction = self.downloadSearchEntry.addAction(
+            QIcon(enterActionPixmap), QLineEdit.ActionPosition.TrailingPosition
+        )
+        self.downloadSearchAction.triggered.connect(self.on_enter_press)
         downloadSearchLayout.addWidget(self.downloadSearchEntry)
 
         # Display trainer search results
@@ -638,6 +656,8 @@ class GameCheatsManager(QMainWindow):
                 return
 
             self.downloadListBox.addItem(tr("Migrating existing trainers..."))
+            item = self.downloadListBox.item(self.downloadListBox.count() - 1)
+            item.setFlags(Qt.ItemFlag.NoItemFlags)
             migration_thread = PathChangeThread(self.trainerDownloadPath, changedPath, self)
             migration_thread.finished.connect(self.on_migration_finished)
             migration_thread.error.connect(self.on_migration_error)
@@ -645,6 +665,8 @@ class GameCheatsManager(QMainWindow):
 
         else:
             self.downloadListBox.addItem(tr("No path selected."))
+            item = self.downloadListBox.item(self.downloadListBox.count() - 1)
+            item.setFlags(Qt.ItemFlag.NoItemFlags)
             self.enable_all_widgets()
             return
 
@@ -760,26 +782,87 @@ class GameCheatsManager(QMainWindow):
             download_thread = DownloadTrainersThread(index, trainers, trainerDownloadPath, update_entry, self)
             download_thread.message.connect(self.on_message, Qt.ConnectionType.BlockingQueuedConnection)
             download_thread.messageBox.connect(self.on_message_box)
+            download_thread.progress.connect(self.on_download_progress)
             download_thread.finished.connect(self.on_download_finished)
             download_thread.start()
         else:
             self.currentlyDownloading = False
 
     def on_message(self, message, type=None):
-        item = QListWidgetItem(message)
+        noSelectFlags = Qt.ItemFlag.NoItemFlags
 
         if type == "clear":
             self.downloadListBox.clear()
+            self.downloadProgressBar = None
+        elif type == "result":
+            item = QListWidgetItem(message)
+            self.downloadListBox.addItem(item)
+        elif type == "download":
+            widget = QWidget()
+            widgetLayout = QVBoxLayout(widget)
+            widgetLayout.setContentsMargins(4, 2, 4, 2)
+            widgetLayout.setSpacing(2)
+            headerLayout = QHBoxLayout()
+            headerLayout.setContentsMargins(0, 0, 0, 0)
+            headerLayout.setSpacing(10)
+            label = QLabel(message)
+            headerLayout.addWidget(label)
+            self.downloadProgressLabel = QLabel()
+            self.downloadProgressLabel.setStyleSheet("color: gray;")
+            headerLayout.addWidget(self.downloadProgressLabel)
+            headerLayout.addStretch()
+            widgetLayout.addLayout(headerLayout)
+            self.downloadProgressBar = QProgressBar()
+            self.downloadProgressBar.setRange(0, 0)
+            self.downloadProgressBar.setFixedHeight(15)
+            widgetLayout.addWidget(self.downloadProgressBar)
+            item = QListWidgetItem()
+            item.setFlags(noSelectFlags)
+            item.setSizeHint(widget.sizeHint())
+            self.downloadListBox.addItem(item)
+            self.downloadListBox.setItemWidget(item, widget)
         elif type == "success":
+            self.downloadProgressBar = None
+            self.downloadProgressLabel = None
+            item = QListWidgetItem(message)
+            item.setFlags(noSelectFlags)
             item.setForeground(QColor('green'))
             # item.setBackground(QColor(0, 255, 0, 20))
             self.downloadListBox.addItem(item)
         elif type == "failure":
+            self.downloadProgressBar = None
+            self.downloadProgressLabel = None
+            item = QListWidgetItem(message)
+            item.setFlags(noSelectFlags)
             item.setForeground(QColor('red'))
             # item.setBackground(QColor(255, 0, 0, 20))
             self.downloadListBox.addItem(item)
         else:
+            item = QListWidgetItem(message)
+            item.setFlags(noSelectFlags)
             self.downloadListBox.addItem(item)
+
+    @staticmethod
+    def format_size(num_bytes):
+        for unit in ('B', 'KB', 'MB', 'GB'):
+            if num_bytes < 1024:
+                return f"{num_bytes:.1f} {unit}" if unit != 'B' else f"{num_bytes} {unit}"
+            num_bytes /= 1024
+        return f"{num_bytes:.1f} TB"
+
+    def on_download_progress(self, downloaded, total):
+        if self.downloadProgressBar:
+            if total > 0:
+                if self.downloadProgressBar.maximum() == 0:
+                    self.downloadProgressBar.setRange(0, 100)
+                self.downloadProgressBar.setValue(int(downloaded * 100 / total))
+            if self.downloadProgressLabel:
+                if total > 0:
+                    self.downloadProgressLabel.setText(
+                        f"{self.format_size(downloaded)} / {self.format_size(total)}"
+                    )
+                else:
+                    self.downloadProgressLabel.setText(self.format_size(downloaded))
 
     def on_message_box(self, type, title, text):
         if type == "info":

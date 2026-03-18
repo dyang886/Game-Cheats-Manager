@@ -190,7 +190,7 @@ class DownloadTrainersThread(DownloadBaseThread):
                     return False
 
         # Download trainer
-        self.message.emit(tr("Downloading..."), None)
+        self.message.emit(tr("Downloading..."), "download")
         try:
             targetUrl = selected_trainer["url"]
 
@@ -333,7 +333,7 @@ class DownloadTrainersThread(DownloadBaseThread):
                     self.finished.emit(1)
                     return False
 
-        self.message.emit(tr("Downloading..."), None)
+        self.message.emit(tr("Downloading..."), "download")
         extractedContentPath = os.path.join(DOWNLOAD_TEMP_DIR, "extracted")
         try:
             signed_url = self.get_signed_download_url(selected_trainer['url'])
@@ -536,7 +536,7 @@ class DownloadTrainersThread(DownloadBaseThread):
                     self.finished.emit(1)
                     return False
 
-        self.message.emit(tr("Downloading..."), None)
+        self.message.emit(tr("Downloading..."), "download")
         extractedContentPath = os.path.join(DOWNLOAD_TEMP_DIR, "extracted")
         try:
             signed_url = self.get_signed_download_url(selected_trainer['url'])

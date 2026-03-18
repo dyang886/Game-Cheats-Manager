@@ -103,7 +103,7 @@ class DownloadDisplayThread(DownloadBaseThread):
 
         self.message.emit("", "clear")
         for count, trainer in enumerate(DownloadBaseThread.trainer_urls, start=1):
-            self.message.emit(f"{count}. {trainer['trainer_name']}", None)
+            self.message.emit(f"{count}. {trainer['trainer_name']}", "result")
             print(f"{count}. {trainer['game_name']} | {trainer['trainer_name']} | {trainer['url']}")
 
         self.finished.emit(0)

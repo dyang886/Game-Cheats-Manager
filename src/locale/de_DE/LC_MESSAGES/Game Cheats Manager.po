@@ -31,11 +31,11 @@ msgstr "Jahres-Abonnement"
 msgid "Gifted Subscription"
 msgstr "Geschenktes Abonnement"
 
-msgid "Search for installed"
-msgstr "Installierte suchen"
+msgid "Search for installed trainers"
+msgstr "Installierte Trainer suchen"
 
-msgid "Search to download"
-msgstr "Zum Herunterladen suchen"
+msgid "Enter keywords to download trainers"
+msgstr "Stichwörter eingeben, um Trainer herunterzuladen"
 
 msgid "Options"
 msgstr "Optionen"
@@ -123,6 +123,9 @@ msgstr "Hinweis: Das offizielle Installationsprogramm von Cheat Engine enthält 
 
 msgid "Download from:"
 msgstr "Download unter:"
+
+msgid "Don't show again"
+msgstr "Nicht mehr anzeigen"
 
 msgid "Delete trainer"
 msgstr "Trainer löschen"
@@ -411,9 +414,6 @@ msgstr "Offizielle Website:"
 
 msgid "Bilibili:"
 msgstr "Bilibili:"
-
-msgid "Don't show again"
-msgstr "Nicht mehr anzeigen"
 
 msgid "Theme:"
 msgstr "Design:"

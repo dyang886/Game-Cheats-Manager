@@ -1,9 +1,16 @@
 from PyQt6.QtCore import QEasingCurve, QPropertyAnimation, QRect, Qt, QTimer, pyqtSignal
 from PyQt6.QtGui import QColor, QFont, QFontDatabase, QPainter, QPixmap
-from PyQt6.QtWidgets import QApplication, QFrame, QGraphicsDropShadowEffect, QHBoxLayout, QLabel, QListWidget, QListWidgetItem, QPushButton, QVBoxLayout, QWidget
+from PyQt6.QtWidgets import QApplication, QFrame, QGraphicsDropShadowEffect, QHBoxLayout, QLabel, QListWidget, QListWidgetItem, QProxyStyle, QPushButton, QStyle, QVBoxLayout, QWidget
 from zhon.cedict import simp, trad
 
 from config import *
+
+
+class LargerActionIconStyle(QProxyStyle):
+    def pixelMetric(self, metric, option=None, widget=None):
+        if metric == QStyle.PixelMetric.PM_SmallIconSize:
+            return 20
+        return super().pixelMetric(metric, option, widget)
 
 
 class ToastNotification(QWidget):

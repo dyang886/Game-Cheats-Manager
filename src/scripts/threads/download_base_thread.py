@@ -21,6 +21,7 @@ warnings.simplefilter("ignore", InsecureRequestWarning)
 class DownloadBaseThread(QThread):
     message = pyqtSignal(str, str)
     messageBox = pyqtSignal(str, str, str)
+    progress = pyqtSignal(int, int)
     finished = pyqtSignal(int)
 
     trainer_urls = []  # [{"game_name": str, "trainer_name": str, "origin": str, "author": str, "custom_name": str, "url": download url, "version": YYYY.MM.DD},]
@@ -58,18 +59,30 @@ class DownloadBaseThread(QThread):
         try:
             if use_cloudScraper:
                 scraper = cloudscraper.create_scraper()
-                req = scraper.get(url, headers=self.headers, verify=verify)
+                req = scraper.get(url, headers=self.headers, verify=verify, stream=True, timeout=30)
                 req.raise_for_status()
             else:
-                req = requests.get(url, headers=self.headers, verify=verify)
+                req = requests.get(url, headers=self.headers, verify=verify, stream=True, timeout=30)
                 req.raise_for_status()
         except Exception as e:
             print(f"Error requesting {url}: {str(e)}")
             return ""
 
         file_path = os.path.join(download_path, self.find_download_fname(req))
-        with open(file_path, "wb") as f:
-            f.write(req.content)
+        total_size = int(req.headers.get('content-length', 0))
+        downloaded = 0
+        try:
+            with open(file_path, "wb") as f:
+                for chunk in req.iter_content(chunk_size=8192):
+                    if chunk:
+                        f.write(chunk)
+                        downloaded += len(chunk)
+                        self.progress.emit(downloaded, total_size)
+        except Exception as e:
+            print(f"Error during download stream: {str(e)}")
+            if os.path.exists(file_path):
+                os.remove(file_path)
+            return ""
         self.downloaded_file_path = file_path
 
         return self.downloaded_file_path
