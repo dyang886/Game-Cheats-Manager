@@ -376,7 +376,15 @@ class DownloadDisplayThread(DownloadBaseThread):
                 custom_name_zh = trainer.get('custom_name_zh', '')
                 extension = trainer.get('extension', '')
 
-                if gameName and self.keyword_match(keywordList, gameName):
+                if gameName and gameName.lower() == "none":
+                    match_targets = [t for t in [custom_name_en, custom_name_zh, custom_name] if t]
+                    matched = any(self.keyword_match(keywordList, t) for t in match_targets)
+                elif gameName:
+                    matched = self.keyword_match(keywordList, gameName)
+                else:
+                    matched = False
+
+                if matched:
                     DownloadBaseThread.trainer_urls.append({
                         "game_name": gameName,
                         "trainer_name": None,

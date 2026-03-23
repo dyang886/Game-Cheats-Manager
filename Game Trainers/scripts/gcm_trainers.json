@@ -251,8 +251,9 @@
         "game_name": "Portal Knights",
         "origin": "other",
         "author": "FutureX",
+        "official_url": "https://trainer.futurexgame.com/2024/02/18/portal-knights-v0-7-v1-7-x-plus-10-trainer/",
         "gcm_url": "GCM/GCM Trainers/Portal Knights Trainer [FutureX].exe",
-        "version": "2026.2.25"
+        "version": "2024.2.18"
     },
     {
         "game_name": "Prototype",
@@ -432,7 +433,7 @@
         "game_name": "Matchmaking Inc.",
         "origin": "ct_other",
         "author": "Qiuzy",
-        "official_url": "https://steamcommunity.com/sharedfiles/filedetails/?id=3414461328",
+        "official_url": "https://steamcommunity.com/sharedfiles/filedetails/?id=3414461328, https://www.bilibili.com/video/BV1UJFBeCEJG",
         "gcm_url": "GCM/GCM Trainers/Matchmaking Inc. Trainer [Qiuzy].ct",
         "version": "2025.6.29"
     },
@@ -758,7 +759,7 @@
         "author": "简简单单2022",
         "official_url": "https://bbs.3dmgame.com/thread-6653672-1-1.html",
         "gcm_url": "GCM/GCM Trainers/Long Yin Li Zhi Zhuan Trainer [JianJianDanDan2022].ct",
-        "version": "2026.3.16"
+        "version": "2026.3.19"
     },
     {
         "game_name": "Loot of Baal",
@@ -1026,9 +1027,9 @@
         "game_name": "Hitman: Absolution",
         "origin": "other",
         "author": "Abolfazl.k",
-        "official_url": "http://abolfazl-k.ir/",
+        "official_url": "https://megagames.com/trainers/hitman-absolution-professional-edition-v104470-5-trainer-abolfazlk",
         "gcm_url": "GCM/GCM Trainers/Hitman_Absolution Trainer [Abolfazl.k].exe",
-        "version": "2026.3.10"
+        "version": "2019.12.30"
     },
     {
         "game_name": "Resident Evil 4: Ultimate HD Edition",
@@ -1128,14 +1129,6 @@
         "version": "2026.3.10"
     },
     {
-        "game_name": "NINJA GAIDEN: Master Collection",
-        "origin": "ct_other",
-        "author": "yamaha288",
-        "official_url": "https://bbs.3dmgame.com/forum.php?mod=viewthread&tid=6192035",
-        "gcm_url": "GCM/GCM Trainers/NINJA GAIDEN_Master Collection Trainer [yamaha288].ct",
-        "version": "2021.7.21"
-    },
-    {
         "game_name": "Guns, Gore and Cannoli 2",
         "origin": "other",
         "author": "游侠网",
@@ -1201,7 +1194,8 @@
     {
         "game_name": "Plants vs. Zombies: Fusion",
         "origin": "ct_other",
-        "gcm_url": "GCM/GCM Trainers/Plants vs. Zombies_Fusion Trainer.ct",
+        "author": "上山打篮球",
+        "gcm_url": "GCM/GCM Trainers/Plants vs. Zombies_Fusion Trainer [ShangShanDaLanQiu].ct",
         "version": "2026.3.15"
     },
     {
@@ -1215,8 +1209,9 @@
         "game_name": "Shadow Warrior 2",
         "origin": "other",
         "author": "FutureX",
+        "official_url": "https://megagames.com/trainers/shadow-warrior-2-v1130-9-trainer-futurex",
         "gcm_url": "GCM/GCM Trainers/Shadow Warrior 2 Trainer [FutureX].exe",
-        "version": "2026.3.15"
+        "version": "2016.10.26"
     },
     {
         "game_name": "Swarm Bunker: Lust Defense",
@@ -1348,5 +1343,290 @@
         "author": "菠萝蜜",
         "gcm_url": "GCM/GCM Trainers/Spirit Realm Trainer [BoLuoMi].exe",
         "version": "2026.3.16"
+    },
+    {
+        "game_name": "Terminator 2D: NO FATE",
+        "origin": "other",
+        "author": "LIRW",
+        "gcm_url": "GCM/GCM Trainers/Terminator 2D_NO FATE Trainer [LIRW].exe",
+        "version": "2026.3.19"
+    },
+    {
+        "game_name": "Bio Goddess: Doomsday Begins",
+        "origin": "ct_other",
+        "gcm_url": "GCM/GCM Trainers/Bio Goddess_Doomsday Begins Trainer.ct",
+        "version": "2026.3.19"
+    },
+    {
+        "game_name": "Grim Dawn",
+        "origin": "ct_other",
+        "author": "StinVec",
+        "official_url": "https://uploadrar.com/users/Kvex/",
+        "gcm_url": "GCM/GCM Trainers/Grim Dawn Trainer [StinVec].ct",
+        "version": "2026.3.3"
+    },
+    {
+        "game_name": "Europa Universalis IV",
+        "origin": "ct_other",
+        "gcm_url": "GCM/GCM Trainers/Europa Universalis IV Trainer.ct",
+        "version": "2026.3.19"
+    },
+    {
+        "game_name": "Immoral-Bathhouse",
+        "origin": "other",
+        "author": "jx666",
+        "gcm_url": "GCM/GCM Trainers/Immoral-Bathhouse Trainer [jx666].zip",
+        "version": "2026.3.19"
+    },
+    {
+        "game_name": "Plants vs. Zombies",
+        "origin": "other",
+        "author": "lmintlcx",
+        "custom_name_en": "Toolkit",
+        "custom_name_zh": "辅助工具",
+        "official_url": "https://pvz.tools/toolkit/",
+        "gcm_url": "GCM/GCM Trainers/Plants vs. Zombies Toolkit [lmintlcx].exe",
+        "version": "2024.6.22"
+    },
+    {
+        "game_name": "Middle-earth: Shadow of War",
+        "origin": "ct_other",
+        "author": "SeiKur0",
+        "official_url": "https://fearlessrevolution.com/viewtopic.php?t=5132",
+        "gcm_url": "GCM/GCM Trainers/Middle-earth_Shadow of War Trainer [SeiKur0].ct",
+        "version": "2018.8.16"
+    },
+    {
+        "game_name": "TEKKEN 8",
+        "origin": "other",
+        "author": "Fullcodes",
+        "gcm_url": "GCM/GCM Trainers/TEKKEN 8 Trainer [Fullcodes].exe",
+        "version": "2024.1.29"
+    },
+    {
+        "game_name": "Take Me To The Dungeon!!",
+        "origin": "other",
+        "author": "jx666",
+        "gcm_url": "GCM/GCM Trainers/Take Me To The Dungeon!! Trainer [jx666].zip",
+        "version": "2026.3.19"
+    },
+    {
+        "game_name": "Volcano Princess",
+        "origin": "ct_other",
+        "author": "Qiuzy",
+        "official_url": "https://steamcommunity.com/sharedfiles/filedetails/?id=3103837169, https://www.bilibili.com/video/BV1GDBoYSEW4/",
+        "gcm_url": "GCM/GCM Trainers/Volcano Princess Trainer [Qiuzy].ct",
+        "version": "2025.4.27"
+    },
+    {
+        "game_name": "NINJA GAIDEN Σ",
+        "origin": "ct_other",
+        "author": "yamaha288",
+        "official_url": "https://bbs.3dmgame.com/forum.php?mod=viewthread&tid=6192035",
+        "gcm_url": "GCM/GCM Trainers/NINJA GAIDEN Σ Trainer [yamaha288].ct",
+        "version": "2021.7.21"
+    },
+    {
+        "game_name": "NINJA GAIDEN Σ2",
+        "origin": "ct_other",
+        "author": "yamaha288",
+        "official_url": "https://bbs.3dmgame.com/forum.php?mod=viewthread&tid=6192035",
+        "gcm_url": "GCM/GCM Trainers/NINJA GAIDEN Σ2 Trainer [yamaha288].ct",
+        "version": "2021.7.21"
+    },
+    {
+        "game_name": "NINJA GAIDEN 3: Razor's Edge",
+        "origin": "ct_other",
+        "author": "yamaha288",
+        "official_url": "https://bbs.3dmgame.com/forum.php?mod=viewthread&tid=6192035",
+        "gcm_url": "GCM/GCM Trainers/NINJA GAIDEN 3_Razor's Edge Trainer [yamaha288].ct",
+        "version": "2021.7.21"
+    },
+    {
+        "game_name": "Monster Hunter Stories",
+        "origin": "ct_other",
+        "author": "洛雪loxin",
+        "gcm_url": "GCM/GCM Trainers/Monster Hunter Stories Trainer [loxin].zip",
+        "version": "2026.3.19"
+    },
+    {
+        "game_name": "Death Stranding 2: On the Beach",
+        "origin": "ct_other",
+        "gcm_url": "GCM/GCM Trainers/Death Stranding 2_On the Beach Trainer.ct",
+        "version": "2026.3.19"
+    },
+    {
+        "game_name": "Crimson Desert",
+        "origin": "other",
+        "author": "大母鹅",
+        "gcm_url": "GCM/GCM Trainers/Crimson Desert Trainer [DaMuE].exe",
+        "version": "2026.3.21"
+    },
+    {
+        "game_name": "Just Cause 2",
+        "origin": "other",
+        "author": "KelSat",
+        "gcm_url": "GCM/GCM Trainers/Just Cause 2 Trainer [KelSat].exe",
+        "version": "2026.3.22"
+    },
+    {
+        "game_name": "Max Payne 3",
+        "origin": "other",
+        "author": "MrAntiFun",
+        "official_url": "https://mrantifun.net/threads/max-payne-3-trainer.904/",
+        "gcm_url": "GCM/GCM Trainers/Max Payne 3 Trainer [MrAntiFun].exe",
+        "version": "2014.6.13"
+    },
+    {
+        "game_name": "Nexomon: Extinction",
+        "origin": "ct_other",
+        "author": "SilverRabbit90",
+        "official_url": "https://fearlessrevolution.com/viewtopic.php?t=26390",
+        "gcm_url": "GCM/GCM Trainers/Nexomon_Extinction Trainer [SilverRabbit90].ct",
+        "version": "2026.2.12"
+    },
+    {
+        "game_name": "PAGUI",
+        "origin": "ct_other",
+        "author": "血衣橘子",
+        "gcm_url": "GCM/GCM Trainers/PAGUI Trainer [XueYiJuZi].ct",
+        "version": "2026.3.22"
+    },
+    {
+        "game_name": "Trepang2",
+        "origin": "other",
+        "author": "FutureX",
+        "official_url": "https://megagames.com/trainers/trepang2-b2168-22-trainer-futurex",
+        "gcm_url": "GCM/GCM Trainers/Trepang2 Trainer [FutureX].exe",
+        "version": "2023.6.30"
+    },
+    {
+        "game_name": "Yu-Gi-Oh! Legacy of the Duelist: Link Evolution",
+        "origin": "ct_other",
+        "gcm_url": "GCM/GCM Trainers/Yu-Gi-Oh! Legacy of the Duelist_Link Evolution Trainer.ct",
+        "version": "2026.3.22"
+    },
+    {
+        "game_name": "Minecraft Dungeons",
+        "origin": "ct_other",
+        "author": "Birdi",
+        "gcm_url": "GCM/GCM Trainers/Minecraft Dungeons Trainer [Birdi].ct",
+        "version": "2026.3.22"
+    },
+    {
+        "game_name": "Silent Hill 4: The Room",
+        "origin": "other",
+        "author": "allEnL",
+        "gcm_url": "GCM/GCM Trainers/Silent Hill 4_The Room Trainer [allEnL].zip",
+        "version": "2026.3.22"
+    },
+    {
+        "game_name": "Chinese Online Game",
+        "origin": "ct_other",
+        "author": "acasfq",
+        "official_url": "https://bbs.3dmgame.com/thread-6521766-1-1.html",
+        "gcm_url": "GCM/GCM Trainers/Chinese Online Game Trainer [acasfq].ct",
+        "version": "2024.7.21"
+    },
+    {
+        "game_name": "Chinese Parents",
+        "origin": "ct_other",
+        "author": "Qiuzy",
+        "official_url": "https://steamcommunity.com/sharedfiles/filedetails/?id=3354899109, https://www.bilibili.com/video/BV1oaqyYJEPG",
+        "gcm_url": "GCM/GCM Trainers/Chinese Parents Trainer [Qiuzy].ct",
+        "version": "2025.3.9"
+    },
+    {
+        "game_name": "Minecraft Dungeons",
+        "origin": "ct_other",
+        "author": "Idlehands88",
+        "custom_name_en": "Item Editor",
+        "custom_name_zh": "物品编辑器",
+        "official_url": "https://fearlessrevolution.com/viewtopic.php?f=4&t=12672",
+        "gcm_url": "GCM/GCM Trainers/Minecraft Dungeons Trainer [Idlehands88].ct",
+        "version": "2020.5.29"
+    },
+    {
+        "game_name": "Silent Hill: Homecoming",
+        "origin": "other",
+        "author": "allEnL",
+        "gcm_url": "GCM/GCM Trainers/Silent Hill_Homecoming Trainer [allEnL].zip",
+        "version": "2003.3.6"
+    },
+    {
+        "game_name": "Ride The Dragon: The Awakening of the Dragon Tamer",
+        "origin": "other",
+        "author": "jx666",
+        "gcm_url": "GCM/GCM Trainers/Ride The Dragon_The Awakening of the Dragon Tamer Trainer [jx666].zip",
+        "version": "2026.3.22"
+    },
+    {
+        "game_name": "NINJA GAIDEN 2 Black",
+        "origin": "ct_other",
+        "gcm_url": "GCM/GCM Trainers/NINJA GAIDEN 2 Black Trainer.ct",
+        "version": "2026.3.22"
+    },
+    {
+        "game_name": "Demonic Mahjong",
+        "origin": "ct_other",
+        "author": "zeroqian",
+        "gcm_url": "GCM/GCM Trainers/Demonic Mahjong Trainer [zeroqian].ct",
+        "version": "2026.3.7"
+    },
+    {
+        "game_name": "Crimson Desert",
+        "origin": "ct_other",
+        "author": "简简单单2022",
+        "official_url": "https://bbs.3dmgame.com/thread-6660842-1-1.html",
+        "gcm_url": "GCM/GCM Trainers/Crimson Desert Trainer [JianJianDanDan2022].ct",
+        "version": "2026.3.22"
+    },
+    {
+        "game_name": "Cubic Cosmos",
+        "origin": "ct_other",
+        "gcm_url": "GCM/GCM Trainers/Cubic Cosmos Trainer.ct",
+        "version": "2026.3.22"
+    },
+    {
+        "game_name": "none",
+        "origin": "other",
+        "author": "鸣叶月",
+        "custom_name_en": "MingYeYue Game Helper",
+        "custom_name_zh": "鸣叶月游戏助手",
+        "official_url": "https://space.bilibili.com/510138740",
+        "gcm_url": "GCM/GCM Trainers/MingYeYueYouXiZhuShou [MingYeYue].zip",
+        "version": "2026.3.20"
+    },
+    {
+        "game_name": "Shadow Warrior 3",
+        "origin": "other",
+        "author": "FutureX",
+        "official_url": "https://trainer.futurexgame.com/2024/02/19/shadow-warrior-3-v1-0-plus-15-trainer/",
+        "gcm_url": "GCM/GCM Trainers/Shadow Warrior 3 Trainer [FutureX].exe",
+        "version": "2024.2.19"
+    },
+    {
+        "game_name": "Muse Dash",
+        "origin": "other",
+        "author": "FutureX",
+        "official_url": "https://trainer.futurexgame.com/2024/02/18/muse-dash-v20200731-plus-7-trainer/",
+        "gcm_url": "GCM/GCM Trainers/Muse Dash Trainer [FutureX].exe",
+        "version": "2024.2.18"
+    },
+    {
+        "game_name": "theHunter: Call of the Wild",
+        "origin": "other",
+        "author": "FutureX",
+        "official_url": "https://trainer.futurexgame.com/2024/02/19/thehunter-call-of-the-wild-v1-0-v2175916-plus-15-trainer/",
+        "gcm_url": "GCM/GCM Trainers/theHunter_Call of the Wild Trainer [FutureX].exe",
+        "version": "2024.2.19"
+    },
+    {
+        "game_name": "Muse Dash",
+        "origin": "other",
+        "author": "Abolfazl.k",
+        "official_url": "https://megagames.com/trainers/muse-dash-v107-2-trainer-abolfazlk",
+        "gcm_url": "GCM/GCM Trainers/Muse Dash Trainer [Abolfazl.k].exe",
+        "version": "2020.4.20"
     }
 ]

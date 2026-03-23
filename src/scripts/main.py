@@ -46,7 +46,7 @@ class GameCheatsManager(QMainWindow):
         self.setMinimumSize(700, 520)
 
         # Version and links
-        self.appVersion = "2.5.0-beta.2"
+        self.appVersion = "2.5.0-beta.3"
         self.websiteLink = "https://gamezonelabs.com"
         self.allTrainersLink = "https://gamezonelabs.com/products/game-cheats-manager/trainers"
         self.githubLink = "https://github.com/dyang886/Game-Cheats-Manager"
@@ -822,6 +822,10 @@ class GameCheatsManager(QMainWindow):
             self.downloadListBox.addItem(item)
             self.downloadListBox.setItemWidget(item, widget)
         elif type == "success":
+            if self.downloadProgressBar:
+                if self.downloadProgressBar.maximum() == 0:
+                    self.downloadProgressBar.setRange(0, 100)
+                self.downloadProgressBar.setValue(100)
             self.downloadProgressBar = None
             self.downloadProgressLabel = None
             item = QListWidgetItem(message)
@@ -830,6 +834,12 @@ class GameCheatsManager(QMainWindow):
             # item.setBackground(QColor(0, 255, 0, 20))
             self.downloadListBox.addItem(item)
         elif type == "failure":
+            if self.downloadProgressBar:
+                if self.downloadProgressBar.maximum() == 0:
+                    self.downloadProgressBar.setRange(0, 100)
+                    self.downloadProgressBar.setValue(0)
+                self.downloadProgressBar.setFormat("✕")
+                self.downloadProgressBar.setStyleSheet("QProgressBar::chunk { background-color: #cc3333; }")
             self.downloadProgressBar = None
             self.downloadProgressLabel = None
             item = QListWidgetItem(message)

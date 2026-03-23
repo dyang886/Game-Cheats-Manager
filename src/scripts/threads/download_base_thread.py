@@ -202,7 +202,7 @@ class DownloadBaseThread(QThread):
 
     def sanitize(self, text):
         text = re.sub(r'\d+', lambda x: self.arabic_to_roman(int(x.group())), text)
-        all_punctuation = string.punctuation + zhon.hanzi.punctuation
+        all_punctuation = (string.punctuation + zhon.hanzi.punctuation).replace('&', '')
         return ''.join(char for char in text if char not in all_punctuation and not char.isspace()).lower()
 
     @staticmethod
@@ -290,19 +290,28 @@ class DownloadBaseThread(QThread):
                 source_str = PREFIX_MAP[lang_key].get(origin, PREFIX_MAP[lang_key]["other"])
                 prefix = f"[{source_str}]" if source_str else ""
 
-            # 3. Translate Game Name
-            best_match = self.find_best_trainer_match(game_name, lang_key)
-            translated_game_name = best_match or game_name
-
-            # 4. Construct Final Name
-            if lang_key == "zh":
-                # Prioritize Chinese custom name, fallback to generic custom name, finally generic modifier
-                suffix = custom_name_zh or custom_name or "修改器"
-                trainerName = f"{prefix}《{translated_game_name}》{suffix}"
+            # 3. Handle game_name="none" case: display custom name directly
+            if game_name.lower() == "none":
+                if lang_key == "zh":
+                    display_name = custom_name_zh or custom_name or ""
+                    trainerName = f"{prefix} {display_name}" if prefix else display_name
+                else:
+                    display_name = custom_name_en or custom_name or ""
+                    trainerName = f"{prefix} {display_name}".strip() if prefix else display_name
             else:
-                # Prioritize English custom name, fallback to generic custom name, finally generic modifier
-                suffix = custom_name_en or custom_name or "Trainer"
-                trainerName = f"{prefix} {translated_game_name} {suffix}".strip()
+                # 3a. Translate Game Name
+                best_match = self.find_best_trainer_match(game_name, lang_key)
+                translated_game_name = best_match or game_name
+
+                # 4. Construct Final Name
+                if lang_key == "zh":
+                    # Prioritize Chinese custom name, fallback to generic custom name, finally generic modifier
+                    suffix = custom_name_zh or custom_name or "修改器"
+                    trainerName = f"{prefix}《{translated_game_name}》{suffix}"
+                else:
+                    # Prioritize English custom name, fallback to generic custom name, finally generic modifier
+                    suffix = custom_name_en or custom_name or "Trainer"
+                    trainerName = f"{prefix} {translated_game_name} {suffix}".strip()
 
         except Exception as e:
             print(f"An error occurred while translating trainer name: {str(e)}")
