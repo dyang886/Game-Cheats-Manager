@@ -70,7 +70,7 @@
         "origin": "gcm",
         "official_url": "https://pvzge.com/",
         "gcm_url": "GCM/GCM Trainers/PvZ2 Gardendless Trainer.exe",
-        "version": "2026.3.3"
+        "version": "2026.3.26"
     },
     {
         "game_name": "Wizard of Legend 2",
@@ -85,7 +85,7 @@
         "custom_name": "Workshop",
         "official_url": "https://github.com/RussDev7/CoreKeepersWorkshop",
         "gcm_url": "GCM/GCM Trainers/Core Keeper Workshop [RussDev7].zip",
-        "version": "2025.8.3"
+        "version": "2026.3.17"
     },
     {
         "game_name": "Unrailed 2: Back on Track",
@@ -974,8 +974,8 @@
         "origin": "other",
         "author": "LHY1339",
         "official_url": "https://github.com/LHY1339/cheat_ready_or_not",
-        "gcm_url": "GCM/GCM Trainers/Ready or Not Trainer [LHY1339].zip",
-        "version": "2025.12.19"
+        "gcm_url": "GCM/GCM Trainers/Ready or Not Trainer [LHY1339].exe",
+        "version": "2026.3.21"
     },
     {
         "game_name": "Backrooms: Extractions",
@@ -1496,7 +1496,7 @@
         "game_name": "Trepang2",
         "origin": "other",
         "author": "FutureX",
-        "official_url": "https://megagames.com/trainers/trepang2-b2168-22-trainer-futurex",
+        "official_url": "https://trainer.futurexgame.com/2024/02/19/trepang2-build2168-plus-22-trainer/",
         "gcm_url": "GCM/GCM Trainers/Trepang2 Trainer [FutureX].exe",
         "version": "2023.6.30"
     },

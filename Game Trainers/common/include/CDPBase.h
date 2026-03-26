@@ -210,7 +210,11 @@ public:
             *result = jsResult;
 
         if (jsResult.size() >= 4 && jsResult.compare(0, 4, "fail") == 0)
+        {
+            std::string msg = jsResult.size() > 6 && jsResult.compare(0, 6, "fail: ") == 0 ? jsResult.substr(6) : jsResult;
+            std::cerr << msg << std::endl;
             return false;
+        }
 
         return true;
     }
@@ -270,7 +274,6 @@ public:
 private:
     std::string settingsKey_;
     CDPLaunchMethod launchMethod_;
-
     int cdpPort_ = 9222;
     bool gameLaunched_ = false;
     bool lastCheckResult_ = false;

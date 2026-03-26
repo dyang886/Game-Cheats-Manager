@@ -7,11 +7,18 @@
 #include <FL/Fl_Flex.H>
 #include <FL/Fl_Table.H>
 #include <FL/forms.H>
+#include <sstream>
 #include "trainer.h"
 #include "FLTKUtils.h"
 
+// Version info
+static constexpr const char *TRAINER_NAME = "PvZ2 Gardendless Trainer";
+static constexpr const char *GAME_VERSION = "0.7.1";
+static constexpr const char *TRAINER_VERSION = "3.0";
+
 // Forward declarations for custom widgets
 static Fl_Input *g_game_path_input = nullptr;
+static Fl_Window *g_main_window = nullptr;
 
 // Struct for launch callback data
 struct LaunchData
@@ -38,6 +45,10 @@ void apply_callback(Fl_Widget *widget, void *data)
         return;
     }
 
+    // Capture cerr during trainer call to get specific error details
+    std::ostringstream errCapture;
+    auto *oldBuf = std::cerr.rdbuf(errCapture.rdbuf());
+
     bool status = true;
     std::string val = (input && input->value()[0]) ? input->value() : "0";
 
@@ -51,6 +62,16 @@ void apply_callback(Fl_Widget *widget, void *data)
         status = trainer->killAllZombies();
     else if (optionName == "UnlockAllPlants")
         status = trainer->unlockAllPlants();
+    else if (optionName == "MatureAllGardenPlants")
+        status = trainer->matureAllGardenPlants();
+    else if (optionName == "PlantAllGardenPlants")
+        status = trainer->plantAllGardenPlants();
+    else if (optionName == "ShovelAllGardenPlants")
+        status = trainer->shovelAllGardenPlants();
+    else if (optionName == "AddSprouts")
+        status = trainer->addSprouts(val);
+    else if (optionName == "SetPlantBoost")
+        status = trainer->setPlantBoost(val);
     else if (optionName == "AddCoins")
         status = trainer->addCoins(val);
     else if (optionName == "AddGems")
@@ -58,8 +79,16 @@ void apply_callback(Fl_Widget *widget, void *data)
     else if (optionName == "AddWorldKeys")
         status = trainer->addWorldKeys(val);
 
+    std::cerr.rdbuf(oldBuf);
+
     if (!status)
-        fl_alert(t("Failed to activate."));
+    {
+        std::string msg = t("Failed to activate.");
+        std::string details = errCapture.str();
+        if (!details.empty())
+            msg += std::string("\n") + details;
+        fl_alert("%s", msg.c_str());
+    }
 }
 
 /// Toggle callback — required by FLTKUtils.h forward declaration but unused
@@ -138,6 +167,20 @@ static void check_process_status_wrapper(void *data)
     Fl::repeat_timeout(1.0, check_process_status_wrapper, data);
 }
 
+static void update_window_title()
+{
+    if (!g_main_window)
+        return;
+    std::string title = std::string(t(TRAINER_NAME)) + " | Game v" + GAME_VERSION + " | Trainer v" + TRAINER_VERSION;
+    g_main_window->copy_label(title.c_str());
+}
+
+static void lang_title_callback(Fl_Widget *widget, void *data)
+{
+    change_language_callback(widget, data);
+    update_window_title();
+}
+
 static void main_window_close_callback(Fl_Widget *w, void *)
 {
     if (font_handle)
@@ -162,13 +205,12 @@ int main(int argc, char **argv)
     int win_x = (screen_w - win_w) / 2;
     int win_y = (screen_h - win_h) / 2;
 
-    Fl_Window *window = new Fl_Window(win_x, win_y, win_w, win_h);
+    g_main_window = new Fl_Window(win_x, win_y, win_w, win_h);
     Fl::scheme("gtk+");
     Fl::set_color(FL_FREE_COLOR, 0x1c1c1c00);
-    window->color(FL_FREE_COLOR);
-    window->icon((char *)LoadIconA(GetModuleHandle(NULL), "APP_ICON"));
-    window->callback(main_window_close_callback);
-    tr(window, "PvZ2 Gardendless Trainer");
+    g_main_window->color(FL_FREE_COLOR);
+    g_main_window->icon((char *)LoadIconA(GetModuleHandle(NULL), "APP_ICON"));
+    g_main_window->callback(main_window_close_callback);
 
     // Setup fonts
     DWORD font_mem_size = 0;
@@ -184,7 +226,7 @@ int main(int argc, char **argv)
     int lang_flex_height = 30;
     int lang_flex_width = 200;
 
-    Fl_Flex lang_flex(window->w() - lang_flex_width, 0, lang_flex_width, lang_flex_height, Fl_Flex::HORIZONTAL);
+    Fl_Flex lang_flex(g_main_window->w() - lang_flex_width, 0, lang_flex_width, lang_flex_height, Fl_Flex::HORIZONTAL);
     lang_flex.color(FL_BLACK);
 
     Fl_Radio_Round_Button *lang_en = new Fl_Radio_Round_Button(0, 0, 0, 0, "English");
@@ -193,8 +235,8 @@ int main(int argc, char **argv)
     lang_en->labelfont(FL_FREE_FONT);
     lang_en->labelsize(font_size);
     lang_en->labelcolor(FL_WHITE);
-    ChangeLanguageData *changeLanguageDataEN = new ChangeLanguageData{"en_US", window};
-    lang_en->callback(change_language_callback, changeLanguageDataEN);
+    ChangeLanguageData *changeLanguageDataEN = new ChangeLanguageData{"en_US", g_main_window};
+    lang_en->callback(lang_title_callback, changeLanguageDataEN);
 
     Fl_Radio_Round_Button *lang_zh = new Fl_Radio_Round_Button(0, 0, 0, 0, "简体中文");
     if (language == "zh_CN")
@@ -202,8 +244,8 @@ int main(int argc, char **argv)
     lang_zh->labelfont(FL_FREE_FONT);
     lang_zh->labelsize(font_size);
     lang_zh->labelcolor(FL_WHITE);
-    ChangeLanguageData *changeLanguageDataSC = new ChangeLanguageData{"zh_CN", window};
-    lang_zh->callback(change_language_callback, changeLanguageDataSC);
+    ChangeLanguageData *changeLanguageDataSC = new ChangeLanguageData{"zh_CN", g_main_window};
+    lang_zh->callback(lang_title_callback, changeLanguageDataSC);
 
     lang_flex.end();
 
@@ -250,8 +292,8 @@ int main(int argc, char **argv)
     // ------------------------------------------------------------------
     int col1_x = imageSize.first + UI_LEFT_MARGIN;
     int col1_y = lang_flex_height;
-    int col1_w = window->w() - (imageSize.first + UI_LEFT_MARGIN);
-    int col1_h = window->h() - lang_flex_height;
+    int col1_w = g_main_window->w() - (imageSize.first + UI_LEFT_MARGIN);
+    int col1_h = g_main_window->h() - lang_flex_height;
     Fl_Flex *options_flex = new Fl_Flex(col1_x, col1_y, col1_w, col1_h, Fl_Flex::VERTICAL);
     options_flex->margin(30, 20, 20, 20);
     options_flex->gap(8);
@@ -311,6 +353,21 @@ int main(int argc, char **argv)
 
     place_apply_widget(options_flex, &trainer, "UnlockAllPlants", "Unlock All Plants");
 
+    place_apply_widget(options_flex, &trainer, "SetPlantBoost", "Set All Plant Boosts", nullptr, "5", "0", "999999999");
+
+    // --- Separator ---
+    {
+        Fl_Box *sep = new Fl_Box(0, 0, 0, 0);
+        options_flex->fixed(sep, 5);
+    }
+
+    // --- Zen Garden Cheats ---
+    place_apply_widget(options_flex, &trainer, "PlantAllGardenPlants", "Plant All Garden Slots");
+
+    place_apply_widget(options_flex, &trainer, "MatureAllGardenPlants", "Mature All Garden Plants");
+
+    place_apply_widget(options_flex, &trainer, "ShovelAllGardenPlants", "Shovel All Garden Plants");
+
     // --- Separator ---
     {
         Fl_Box *sep = new Fl_Box(0, 0, 0, 0);
@@ -322,6 +379,8 @@ int main(int argc, char **argv)
 
     place_apply_widget(options_flex, &trainer, "AddGems", "Add Gems", nullptr, "999", "-999999999", "999999999");
 
+    place_apply_widget(options_flex, &trainer, "AddSprouts", "Add Sprouts", nullptr, "999", "-999999999", "999999999");
+
     place_apply_widget(options_flex, &trainer, "AddWorldKeys", "Add World Keys", nullptr, "10", "-999999999", "999999999");
 
     // --- Bottom spacer ---
@@ -329,12 +388,13 @@ int main(int argc, char **argv)
     options_flex->end();
 
     // Apply translations
-    change_language(language, window);
+    change_language(language, g_main_window);
+    update_window_title();
 
     // =========================
     // Finalize and Show Window
     // =========================
-    window->end();
-    window->show(argc, argv);
+    g_main_window->end();
+    g_main_window->show(argc, argv);
     return Fl::run();
 }
