@@ -63,7 +63,7 @@ class UpdateTrainers(DownloadBaseThread):
                     new_version = entry['version']
                     gcm_url = entry['gcm_url']
                     if current_version and new_version != current_version:
-                        return {
+                        update_info = {
                             "game_name": game_name,
                             "trainer_name": trainer_name,
                             "trainer_dir": trainer_dir,
@@ -71,6 +71,9 @@ class UpdateTrainers(DownloadBaseThread):
                             "url": gcm_url,
                             "version": new_version
                         }
+                        if entry.get('extension'):
+                            update_info["extension"] = entry['extension']
+                        return update_info
                     return None
             return None
 
