@@ -124,6 +124,15 @@
         "version": "2025.7.21"
     },
     {
+        "game_name": "Forza Horizon 5",
+        "origin": "other",
+        "author": "Merika",
+        "custom_name": "Mizu 中文版",
+        "official_url": "https://www.merika.dev/trainers/fh5, https://github.com/mizutop/Mizu_FH5Trainer_CN",
+        "gcm_url": "GCM/GCM Trainers/Forza Horizon 5 Trainer [Mizu].zip",
+        "version": "2026.1.22"
+    },
+    {
         "game_name": "Spore",
         "origin": "other",
         "author": "KelSat",
@@ -246,7 +255,7 @@
         "author": "大母鹅",
         "official_url": "https://www.loxin.top/archives/1017",
         "gcm_url": "GCM/GCM Trainers/Nioh 3 Trainer [DaMuE].exe",
-        "version": "2026.3.12"
+        "version": "2026.4.28"
     },
     {
         "game_name": "Portal Knights",
@@ -461,9 +470,9 @@
         "game_name": "R.I.P. - Reincarnation Insurance Program",
         "origin": "ct_other",
         "author": "Patka",
-        "official_url": "https://fearlessrevolution.com/viewtopic.php?f=4&t=38072",
+        "official_url": "https://fearlessrevolution.com/viewtopic.php?t=38072",
         "gcm_url": "GCM/GCM Trainers/R.I.P. - Reincarnation Insurance Program Trainer [Patka].ct",
-        "version": "2026.2.25"
+        "version": "2026.3.16"
     },
     {
         "game_name": "Risou no Hikikomori Seikatsu: Oyako no Shinmitsu Doukyo",
@@ -644,7 +653,7 @@
         "game_name": "Last Epoch",
         "origin": "ct_other",
         "author": "NidasBot",
-        "official_url": "https://fearlessrevolution.com/viewtopic.php?f=4&t=34670&sid=988c769c3a57edd5adf0ce218d9bf342",
+        "official_url": "https://fearlessrevolution.com/viewtopic.php?t=34670&sid=988c769c3a57edd5adf0ce218d9bf342",
         "gcm_url": "GCM/GCM Trainers/Last Epoch Trainer [NidasBot].ct",
         "version": "2026.2.27"
     },
@@ -659,7 +668,7 @@
         "game_name": "God Forsaken",
         "origin": "ct_other",
         "author": "Patka",
-        "official_url": "https://fearlessrevolution.com/viewtopic.php?f=4&t=37862",
+        "official_url": "https://fearlessrevolution.com/viewtopic.php?t=37862",
         "gcm_url": "GCM/GCM Trainers/God Forsaken Trainer [Patka].ct",
         "version": "2026.3.4"
     },
@@ -968,7 +977,7 @@
         "author": "Async",
         "official_url": "https://www.nexusmods.com/readyornot/mods/6413",
         "gcm_url": "GCM/GCM Trainers/Ready or Not Trainer [Async].exe",
-        "version": "2025.10.5"
+        "version": "2026.4.12"
     },
     {
         "game_name": "Ready or Not",
@@ -976,7 +985,7 @@
         "author": "LHY1339",
         "official_url": "https://github.com/LHY1339/cheat_ready_or_not",
         "gcm_url": "GCM/GCM Trainers/Ready or Not Trainer [LHY1339].exe",
-        "version": "2026.3.23"
+        "version": "2026.4.15"
     },
     {
         "game_name": "Backrooms: Extractions",
@@ -1133,9 +1142,9 @@
         "game_name": "Guns, Gore and Cannoli 2",
         "origin": "other",
         "author": "游侠网",
-        "official_url": "https://www.ali213.net/",
+        "official_url": "https://patch.ali213.net/showpatch/88085.html",
         "gcm_url": "GCM/GCM Trainers/Guns, Gore and Cannoli 2 Trainer [YouXiaWang].exe",
-        "version": "2026.3.10"
+        "version": "2018.3.5"
     },
     {
         "game_name": "Guns, Gore and Cannoli",
@@ -1462,7 +1471,7 @@
         "author": "大母鹅",
         "official_url": "https://www.loxin.top/archives/1050",
         "gcm_url": "GCM/GCM Trainers/Crimson Desert Trainer [DaMuE].exe",
-        "version": "2026.3.31"
+        "version": "2026.4.25"
     },
     {
         "game_name": "Just Cause 2",
@@ -1544,7 +1553,7 @@
         "author": "Idlehands88",
         "custom_name_en": "Item Editor",
         "custom_name_zh": "物品编辑器",
-        "official_url": "https://fearlessrevolution.com/viewtopic.php?f=4&t=12672",
+        "official_url": "https://fearlessrevolution.com/viewtopic.php?t=12672",
         "gcm_url": "GCM/GCM Trainers/Minecraft Dungeons Trainer [Idlehands88].ct",
         "version": "2020.5.29"
     },
@@ -1698,7 +1707,7 @@
         "game_name": "Grind Survivors",
         "origin": "ct_other",
         "author": "Patka",
-        "official_url": "https://fearlessrevolution.com/viewtopic.php?f=4&t=38601",
+        "official_url": "https://fearlessrevolution.com/viewtopic.php?t=38601",
         "gcm_url": "GCM/GCM Trainers/Grind Survivors Trainer [Patka].ct",
         "version": "2026.3.17"
     },
@@ -1735,7 +1744,7 @@
         "game_name": "Rise of the Tomb Raider",
         "origin": "ct_other",
         "author": "btmp",
-        "official_url": "https://fearlessrevolution.com/viewtopic.php?f=4&t=1579&start=15",
+        "official_url": "https://fearlessrevolution.com/viewtopic.php?t=1579&start=15",
         "gcm_url": "GCM/GCM Trainers/Rise of the Tomb Raider Trainer [btmp].ct",
         "version": "2023.2.17"
     },
@@ -1785,8 +1794,8 @@
         "origin": "other",
         "custom_name_en": "AX-Trainer",
         "custom_name_zh": "小斧头修改器",
-        "gcm_url": "GCM/GCM Trainers/AX-Trainer.exe",
-        "version": "2026.3.28"
+        "gcm_url": "GCM/GCM Trainers/AX-Trainer.zip",
+        "version": "2026.4.8"
     },
     {
         "game_name": "Bongo Cat",
@@ -1857,7 +1866,7 @@
         "game_name": "Eiyuden Chronicle: Hundred Heroes",
         "origin": "ct_other",
         "author": "DrummerIX",
-        "official_url": "https://fearlessrevolution.com/viewtopic.php?f=4&t=28724",
+        "official_url": "https://fearlessrevolution.com/viewtopic.php?t=28724",
         "gcm_url": "GCM/GCM Trainers/Eiyuden Chronicle_Hundred Heroes Trainer [DrummerIX].ct",
         "version": "2025.1.4"
     },
@@ -1997,7 +2006,7 @@
         "game_name": "Death Stranding 2: On the Beach",
         "origin": "ct_other",
         "author": "SunBeam",
-        "official_url": "https://fearlessrevolution.com/viewtopic.php?f=4&t=38616",
+        "official_url": "https://fearlessrevolution.com/viewtopic.php?t=38616",
         "gcm_url": "GCM/GCM Trainers/Death Stranding 2_On the Beach Trainer [SunBeam].zip",
         "version": "2026.3.18"
     },
@@ -2024,5 +2033,215 @@
         "official_url": "http://ra2master.51wyx.net/",
         "gcm_url": "GCM/GCM Trainers/Command & Conquer_Red Alert 2 Trainer [LinWuLiao].exe",
         "version": "2022.11.29"
+    },
+    {
+        "game_name": "The Ghost's Intimate Cure",
+        "origin": "other",
+        "author": "jx666",
+        "gcm_url": "GCM/GCM Trainers/The Ghost's Intimate Cure Trainer [jx666].zip",
+        "extension": "none",
+        "version": "2026.4.16"
+    },
+    {
+        "game_name": "Dark Elves of the Fallen",
+        "origin": "other",
+        "author": "jx666",
+        "gcm_url": "GCM/GCM Trainers/Dark Elves of the Fallen Trainer [jx666].zip",
+        "extension": "none",
+        "version": "2026.4.16"
+    },
+    {
+        "game_name": "La Vitalis: Immortal Loss",
+        "origin": "other",
+        "author": "jx666",
+        "gcm_url": "GCM/GCM Trainers/La Vitalis_Immortal Loss Trainer [jx666].zip",
+        "extension": "none",
+        "version": "2026.4.16"
+    },
+    {
+        "game_name": "PUBPET",
+        "origin": "other",
+        "author": "jx666",
+        "gcm_url": "GCM/GCM Trainers/PUBPET Trainer [jx666].zip",
+        "extension": "none",
+        "version": "2026.4.16"
+    },
+    {
+        "game_name": "Vivid Dead",
+        "origin": "other",
+        "author": "jx666",
+        "gcm_url": "GCM/GCM Trainers/Vivid Dead Trainer [jx666].zip",
+        "version": "2026.4.16"
+    },
+    {
+        "game_name": "Dying Light: The Beast",
+        "origin": "other",
+        "author": "大母鹅",
+        "official_url": "https://www.loxin.top/archives/860",
+        "gcm_url": "GCM/GCM Trainers/Dying Light_The Beast Trainer [DaMuE].exe",
+        "version": "2026.2.11"
+    },
+    {
+        "game_name": "Monster Hunter Stories 3: Twisted Reflection",
+        "origin": "other",
+        "author": "大母鹅",
+        "official_url": "https://www.loxin.top/archives/1041",
+        "gcm_url": "GCM/GCM Trainers/Monster Hunter Stories 3_Twisted Reflection Trainer [DaMuE].exe",
+        "version": "2026.3.24"
+    },
+    {
+        "game_name": "Escape from Duckov",
+        "origin": "other",
+        "author": "大母鹅",
+        "official_url": "https://www.loxin.top/archives/694",
+        "gcm_url": "GCM/GCM Trainers/Escape from Duckov Trainer [DaMuE].exe",
+        "version": "2025.10.24"
+    },
+    {
+        "game_name": "Resident Evil Requiem",
+        "origin": "other",
+        "author": "大母鹅",
+        "official_url": "https://www.loxin.top/archives/1033",
+        "gcm_url": "GCM/GCM Trainers/Resident Evil Requiem Trainer [DaMuE].exe",
+        "version": "2026.3.2"
+    },
+    {
+        "game_name": "WUCHANG: Fallen Feathers",
+        "origin": "other",
+        "author": "大母鹅",
+        "official_url": "https://www.loxin.top/archives/702",
+        "gcm_url": "GCM/GCM Trainers/WUCHANG_Fallen Feathers Trainer [DaMuE].exe",
+        "version": "2026.2.11"
+    },
+    {
+        "game_name": "DYNASTY WARRIORS: ORIGINS",
+        "origin": "other",
+        "author": "大母鹅",
+        "official_url": "https://www.loxin.top/archives/470",
+        "gcm_url": "GCM/GCM Trainers/DYNASTY WARRIORS_ORIGINS Trainer [DaMuE].exe",
+        "version": "2026.1.26"
+    },
+    {
+        "game_name": "INAZUMA ELEVEN: Victory Road",
+        "origin": "other",
+        "author": "大母鹅",
+        "official_url": "https://www.loxin.top/archives/971",
+        "gcm_url": "GCM/GCM Trainers/INAZUMA ELEVEN_Victory Road Trainer [DaMuE].exe",
+        "version": "2025.12.23"
+    },
+    {
+        "game_name": "Feastopia",
+        "origin": "ct_other",
+        "gcm_url": "GCM/GCM Trainers/Feastopia Trainer.ct",
+        "version": "2026.4.16"
+    },
+    {
+        "game_name": "Kingdom Rush 5: Alliance TD",
+        "origin": "ct_other",
+        "author": "musk",
+        "gcm_url": "GCM/GCM Trainers/Kingdom Rush 5_Alliance TD Trainer [musk].ct",
+        "version": "2026.4.16"
+    },
+    {
+        "game_name": "Wuppo",
+        "origin": "other",
+        "author": "游侠网",
+        "official_url": "https://patch.ali213.net/showpatch/63989.html",
+        "gcm_url": "GCM/GCM Trainers/Wuppo Trainer [YouXiaWang].exe",
+        "version": "2016.11.25"
+    },
+    {
+        "game_name": "Persona 5 Strikers",
+        "origin": "ct_other",
+        "author": "DhaosCollider",
+        "official_url": "https://fearlessrevolution.com/viewtopic.php?t=15332, https://bbs.3dmgame.com/thread-6545690-1-1.html",
+        "gcm_url": "GCM/GCM Trainers/Persona 5 Strikers Trainer [DhaosCollider].ct",
+        "version": "2022.7.10"
+    },
+    {
+        "game_name": "Supraland Six Inches Under",
+        "origin": "ct_other",
+        "author": "Csimbi",
+        "official_url": "https://fearlessrevolution.com/viewtopic.php?t=18862",
+        "gcm_url": "GCM/GCM Trainers/Supraland Six Inches Under Trainer [Csimbi].zip",
+        "version": "2022.1.19"
+    },
+    {
+        "game_name": "Contra: Operation Galuga",
+        "origin": "other",
+        "author": "PLAYMAGiC",
+        "gcm_url": "GCM/GCM Trainers/Contra_Operation Galuga Trainer [PLAYMAGiC].exe",
+        "version": "2024.3.15"
+    },
+    {
+        "game_name": "Zombie Gunship Survival",
+        "origin": "ct_other",
+        "author": "Neko",
+        "gcm_url": "GCM/GCM Trainers/Zombie Gunship Survival Trainer [Neko].ct",
+        "version": "2024.9.10"
+    },
+    {
+        "game_name": "Sekiro: Shadows Die Twice",
+        "origin": "ct_other",
+        "author": "Cielos",
+        "official_url": "http://fearlessrevolution.com/viewtopic.php?t=8938",
+        "gcm_url": "GCM/GCM Trainers/Sekiro_Shadows Die Twice Trainer [Cielos].zip",
+        "version": "2019.6.14"
+    },
+    {
+        "game_name": "Cinderia",
+        "origin": "ct_other",
+        "author": "ppapodir",
+        "official_url": "https://bbs.3dmgame.com/thread-6663538-1-1.html",
+        "gcm_url": "GCM/GCM Trainers/Cinderia Trainer [ppapodir].ct",
+        "version": "2026.3.31"
+    },
+    {
+        "game_name": "Resident Evil 4: Ultimate HD Edition",
+        "origin": "other",
+        "author": "潇潇蓝龙",
+        "official_url": "https://dl.3dmgame.com/patch/43817.html",
+        "gcm_url": "GCM/GCM Trainers/Resident Evil 4_Ultimate HD Edition Trainer [XiaoXiaoLanLong].exe",
+        "version": "2014.3.6"
+    },
+    {
+        "game_name": "DYNASTY WARRIORS: ORIGINS",
+        "origin": "ct_other",
+        "author": "雨夜de肖邦",
+        "official_url": "https://www.bilibili.com/video/BV1TgZXBzE6S",
+        "gcm_url": "GCM/GCM Trainers/DYNASTY WARRIORS_ORIGINS Trainer [YuYeDeXiaoBang].ct",
+        "version": "2026.2.18"
+    },
+    {
+        "game_name": "Cronos: The New Dawn",
+        "origin": "other",
+        "author": "Async",
+        "official_url": "https://www.nexusmods.com/cronosthenewdawn/mods/48",
+        "gcm_url": "GCM/GCM Trainers/Cronos_The New Dawn Trainer [Async].exe",
+        "version": "2025.9.20"
+    },
+    {
+        "game_name": "Dead Space Remake",
+        "origin": "other",
+        "author": "Async",
+        "official_url": "https://www.nexusmods.com/deadspace2023/mods/73",
+        "gcm_url": "GCM/GCM Trainers/Dead Space Remake Trainer [Async].exe",
+        "version": "2026.4.17"
+    },
+    {
+        "game_name": "Sniper Elite 5",
+        "origin": "other",
+        "author": "Async",
+        "official_url": "https://www.nexusmods.com/sniperelite5/mods/16",
+        "gcm_url": "GCM/GCM Trainers/Sniper Elite 5 Trainer [Async].exe",
+        "version": "2026.4.18"
+    },
+    {
+        "game_name": "Stray",
+        "origin": "other",
+        "author": "Async",
+        "official_url": "https://www.nexusmods.com/stray/mods/369",
+        "gcm_url": "GCM/GCM Trainers/Stray Trainer [Async].exe",
+        "version": "2025.9.4"
     }
 ]

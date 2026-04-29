@@ -409,11 +409,14 @@ msgstr ""
 "Wenn du diese Software inoffiziell bezahlt hast, melde den Verkäufer bitte umgehend.\n"
 "Unten findest du die offiziellen Links."
 
-msgid "Official Website:"
-msgstr "Offizielle Website:"
+msgid "Official Website: "
+msgstr "Offizielle Website: "
 
-msgid "Bilibili:"
-msgstr "Bilibili:"
+msgid "GitHub: "
+msgstr "GitHub: "
+
+msgid "Bilibili: "
+msgstr "Bilibili: "
 
 msgid "Theme:"
 msgstr "Design:"
@@ -537,9 +540,6 @@ msgstr "GCM-Daten automatisch aktualisieren"
 
 msgid "Update GCM and Other trainers automatically"
 msgstr "GCM- und andere Trainer automatisch aktualisieren"
-
-msgid "Official Website: "
-msgstr "Offizielle Website: "
 
 msgid "Download Server:"
 msgstr "Download-Server:"

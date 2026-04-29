@@ -108,8 +108,7 @@ class CopyRightWarning(QDialog):
         layout.addLayout(linksLayout)
 
         websiteUrl = self.parent().websiteLink
-        websiteText = tr('Official Website:')
-        websiteText = f'{websiteText} <a href="{websiteUrl}" style="text-decoration: none; color: #305CDE;">{websiteUrl}</a>'
+        websiteText = f'{tr("Official Website: ")}<a href="{websiteUrl}" style="text-decoration: none; color: #305CDE;">{websiteUrl}</a>'
         websiteLabel = QLabel(websiteText)
         websiteLabel.setAlignment(Qt.AlignmentFlag.AlignCenter)
         websiteLabel.setTextFormat(Qt.TextFormat.RichText)
@@ -117,7 +116,7 @@ class CopyRightWarning(QDialog):
         linksLayout.addWidget(websiteLabel)
 
         githubUrl = self.parent().githubLink
-        githubText = f'GitHub: <a href="{githubUrl}" style="text-decoration: none; color: #305CDE;">{githubUrl}</a>'
+        githubText = f'{tr("GitHub: ")}<a href="{githubUrl}" style="text-decoration: none; color: #305CDE;">{githubUrl}</a>'
         githubLabel = QLabel(githubText)
         githubLabel.setAlignment(Qt.AlignmentFlag.AlignCenter)
         githubLabel.setTextFormat(Qt.TextFormat.RichText)
@@ -125,8 +124,7 @@ class CopyRightWarning(QDialog):
         linksLayout.addWidget(githubLabel)
 
         bilibiliUrl = self.parent().bilibiliLink
-        text = tr("Bilibili:")
-        bilibiliText = f'{text} <a href="{bilibiliUrl}" style="text-decoration: none; color: #305CDE;">{bilibiliUrl}</a>'
+        bilibiliText = f'{tr("Bilibili: ")}<a href="{bilibiliUrl}" style="text-decoration: none; color: #305CDE;">{bilibiliUrl}</a>'
         bilibiliLabel = QLabel(bilibiliText)
         bilibiliLabel.setAlignment(Qt.AlignmentFlag.AlignCenter)
         bilibiliLabel.setTextFormat(Qt.TextFormat.RichText)
@@ -346,16 +344,20 @@ class AboutDialog(QDialog):
         self.currentVersionNumberLabel = QLabel(self.parent().appVersion)
         currentVersionLayout = QHBoxLayout()
         currentVersionLayout.setSpacing(3)
+        currentVersionLayout.addStretch(1)
         currentVersionLayout.addWidget(currentVersionTextLabel)
         currentVersionLayout.addWidget(self.currentVersionNumberLabel)
+        currentVersionLayout.addStretch(1)
         versionNumberLayout.addLayout(currentVersionLayout)
 
         newestVersionTextLabel = QLabel(tr("Newest version: "))
         self.newestVersionNumberLabel = QLabel(tr("Loading..."))
         newestVersionLayout = QHBoxLayout()
         newestVersionLayout.setSpacing(3)
+        newestVersionLayout.addStretch(1)
         newestVersionLayout.addWidget(newestVersionTextLabel)
         newestVersionLayout.addWidget(self.newestVersionNumberLabel)
+        newestVersionLayout.addStretch(1)
         versionNumberLayout.addLayout(newestVersionLayout)
 
         self.updateButton = CustomButton(tr("Update Now"))
@@ -374,8 +376,7 @@ class AboutDialog(QDialog):
         aboutLayout.addLayout(linksLayout)
 
         websiteUrl = self.parent().websiteLink
-        websiteText = tr('Official Website:')
-        websiteText = f'{websiteText} <a href="{websiteUrl}" style="text-decoration: none; color: #305CDE;">{websiteUrl}</a>'
+        websiteText = f'{tr("Official Website: ")}<a href="{websiteUrl}" style="text-decoration: none; color: #305CDE;">{websiteUrl}</a>'
         websiteLabel = QLabel(websiteText)
         websiteLabel.setAlignment(Qt.AlignmentFlag.AlignCenter)
         websiteLabel.setTextFormat(Qt.TextFormat.RichText)
@@ -383,7 +384,7 @@ class AboutDialog(QDialog):
         linksLayout.addWidget(websiteLabel)
 
         githubUrl = self.parent().githubLink
-        githubText = f'GitHub: <a href="{githubUrl}" style="text-decoration: none; color: #305CDE;">{githubUrl}</a>'
+        githubText = f'{tr("GitHub: ")}<a href="{githubUrl}" style="text-decoration: none; color: #305CDE;">{githubUrl}</a>'
         githubLabel = QLabel(githubText)
         githubLabel.setAlignment(Qt.AlignmentFlag.AlignCenter)
         githubLabel.setTextFormat(Qt.TextFormat.RichText)
@@ -391,8 +392,7 @@ class AboutDialog(QDialog):
         linksLayout.addWidget(githubLabel)
 
         bilibiliUrl = self.parent().bilibiliLink
-        text = tr("Bilibili:")
-        bilibiliText = f'{text} <a href="{bilibiliUrl}" style="text-decoration: none; color: #305CDE;">{bilibiliUrl}</a>'
+        bilibiliText = f'{tr("Bilibili: ")}<a href="{bilibiliUrl}" style="text-decoration: none; color: #305CDE;">{bilibiliUrl}</a>'
         bilibiliLabel = QLabel(bilibiliText)
         bilibiliLabel.setAlignment(Qt.AlignmentFlag.AlignCenter)
         bilibiliLabel.setTextFormat(Qt.TextFormat.RichText)

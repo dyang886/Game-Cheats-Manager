@@ -409,11 +409,14 @@ msgstr ""
 "如果您是通过非官方购买方式获得本软件，请立即举报卖家。\n"
 "以下为官方链接。"
 
-msgid "Official Website:"
-msgstr "官方网站:"
+msgid "Official Website: "
+msgstr "官方网站："
 
-msgid "Bilibili:"
-msgstr "B站作者主页:"
+msgid "GitHub: "
+msgstr "GitHub："
+
+msgid "Bilibili: "
+msgstr "B站作者主页："
 
 msgid "Theme:"
 msgstr "主题："
@@ -537,9 +540,6 @@ msgstr "自动更新 GCM 数据"
 
 msgid "Update GCM and Other trainers automatically"
 msgstr "自动更新 GCM 及其他修改器"
-
-msgid "Official Website: "
-msgstr "官方网站："
 
 msgid "Download Server:"
 msgstr "下载服务器："
