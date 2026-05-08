@@ -1,0 +1,34 @@
+{
+    "en_US": {
+        "English": "English",
+        "Zao Meng Xi You: Wu Shuang Trainer": "Zao Meng Xi You: Wu Shuang Trainer",
+        "Process Name:": "CDP Status:",
+        "Process ID:": "Port:",
+        "Launch Game": "Launch Game",
+        "Failed to launch game.": "Failed to launch the game.",
+        "Infinite HP": "Infinite HP",
+        "Infinite MP": "Infinite MP",
+        "Invincibility Mode": "Invincibility Mode",
+        "Please run the game first.": "Game not connected via CDP. Launch the game using the trainer.",
+        "Failed to activate.": "Failed to activate.",
+        "Damage Received Multiplier": "Damage Received Multiplier",
+        "Attack Damage Multiplier": "Attack Damage Multiplier",
+        "Apply": "Apply"
+    },
+    "zh_CN": {
+        "简体中文": "简体中文",
+        "Zao Meng Xi You: Wu Shuang Trainer": "造梦西游：无双 修改器",
+        "Process Name:": "CDP 状态:",
+        "Process ID:": "端口:",
+        "Launch Game": "启动游戏",
+        "Failed to launch game.": "启动游戏失败。",
+        "Infinite HP": "无限生命",
+        "Infinite MP": "无限魔法",
+        "Invincibility Mode": "无敌模式",
+        "Please run the game first.": "游戏未通过CDP连接。请使用修改器启动游戏。",
+        "Failed to activate.": "激活失败。",
+        "Damage Received Multiplier": "受伤倍率",
+        "Attack Damage Multiplier": "攻击伤害倍率",
+        "Apply": "应用"
+    }
+}

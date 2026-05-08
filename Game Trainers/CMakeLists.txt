@@ -22,6 +22,7 @@ set(TRAINER_ARCHITECTURES
     "Plants vs. Zombies_Replanted Trainer:x64"
     "PvZ2 Gardendless Trainer:x64"
     "Wizard of Legend 2 Trainer:x64"
+    "Zao Meng Xi You_Wu Shuang Trainer:x64"
 )
 
 add_subdirectory(common)

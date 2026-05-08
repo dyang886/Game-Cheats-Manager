@@ -26,7 +26,11 @@ enum class CDPLaunchMethod
     /// WebView2 / Tauri: set env var WEBVIEW2_ADDITIONAL_BROWSER_ARGUMENTS
     WebView2EnvVar,
     /// Electron / CEF / NW.js: append --remote-debugging-port=PORT to command line
-    CommandLineArg
+    CommandLineArg,
+    /// Games whose launcher exe rejects unknown flags: open steam://run/{appId}//--remote-debugging-port=PORT/
+    /// so Steam passes the flag to the inner Electron process exactly as a Steam launch option would.
+    /// gamePath is not used for launching.
+    SteamLaunchUrl,
 };
 
 class CDPBase
@@ -34,8 +38,8 @@ class CDPBase
 public:
     std::string gamePath;
 
-    CDPBase(const std::string &settingsKey, CDPLaunchMethod method = CDPLaunchMethod::WebView2EnvVar)
-        : settingsKey_(settingsKey), launchMethod_(method)
+    CDPBase(const std::string &settingsKey, CDPLaunchMethod method = CDPLaunchMethod::WebView2EnvVar, const std::string &steamAppId = "")
+        : settingsKey_(settingsKey), launchMethod_(method), steamAppId_(steamAppId)
     {
         loadSettings();
     }
@@ -105,17 +109,28 @@ public:
 
         if (!lastCheckResult_)
         {
+            // During the startup grace period (e.g. waiting for Steam to finish loading
+            // the game), skip failure counting so the trainer doesn't give up early.
+            if (startupGraceSecs_ > 0)
+            {
+                auto secsSinceLaunch = std::chrono::duration_cast<std::chrono::seconds>(
+                    now - launchTime_).count();
+                if (secsSinceLaunch < startupGraceSecs_)
+                    return lastCheckResult_;
+            }
             cdpFailCount_++;
             if (cdpFailCount_ >= 3)
             {
                 wsDisconnect();
                 cachedWsPath_.clear();
                 gameLaunched_ = false;
+                startupGraceSecs_ = 0;
                 cdpFailCount_ = 0;
             }
         }
         else
         {
+            startupGraceSecs_ = 0;
             cdpFailCount_ = 0;
         }
 
@@ -128,15 +143,30 @@ public:
 
     bool launchGame()
     {
-        if (gamePath.empty())
+        // SteamLaunchUrl doesn't use gamePath for launching.
+        if (gamePath.empty() && launchMethod_ != CDPLaunchMethod::SteamLaunchUrl)
             return false;
+
+        // cdpPort_ is loaded from settings (keyed by settingsKey_), so it reflects the
+        // port this trainer last used. Probing it first lets us reattach to an already-
+        // running instance without spawning a second process.
+        if (checkCDP())
+        {
+            gameLaunched_ = true;
+            saveSettings();
+            return true;
+        }
 
         cdpPort_ = findFreePort(9222);
 
-        std::string workDir = gamePath;
-        size_t lastSlash = workDir.find_last_of("\\/");
-        if (lastSlash != std::string::npos)
-            workDir = workDir.substr(0, lastSlash);
+        std::string workDir;
+        if (!gamePath.empty())
+        {
+            workDir = gamePath;
+            size_t lastSlash = workDir.find_last_of("\\/");
+            if (lastSlash != std::string::npos)
+                workDir = workDir.substr(0, lastSlash);
+        }
 
         STARTUPINFOA si = {};
         PROCESS_INFORMATION pi = {};
@@ -153,18 +183,35 @@ public:
                 gamePath.c_str(), nullptr, nullptr, nullptr, FALSE,
                 CREATE_NEW_PROCESS_GROUP, nullptr, workDir.c_str(), &si, &pi);
         }
-        else // CDPLaunchMethod::CommandLineArg
+        else if (launchMethod_ == CDPLaunchMethod::CommandLineArg)
         {
             std::string cmdLine = "\"" + gamePath + "\" --remote-debugging-port=" + std::to_string(cdpPort_);
             ok = CreateProcessA(
                 nullptr, cmdLine.data(), nullptr, nullptr, FALSE,
                 CREATE_NEW_PROCESS_GROUP, nullptr, workDir.c_str(), &si, &pi);
         }
+        else // CDPLaunchMethod::SteamLaunchUrl
+        {
+            // Open steam://run/{appId}//--remote-debugging-port={port}/ so Steam passes
+            // the flag to the inner Electron process, bypassing any launcher wrapper that
+            // rejects unknown command-line arguments.
+            std::string url = "steam://run/" + steamAppId_ + "//--remote-debugging-port=" + std::to_string(cdpPort_) + "/";
+            HINSTANCE result = ShellExecuteA(nullptr, "open", url.c_str(), nullptr, nullptr, SW_HIDE);
+            ok = ((UINT_PTR)result > 32);
+        }
 
         if (ok)
         {
-            CloseHandle(pi.hProcess);
-            CloseHandle(pi.hThread);
+            if (launchMethod_ == CDPLaunchMethod::SteamLaunchUrl)
+            {
+                launchTime_ = std::chrono::steady_clock::now();
+                startupGraceSecs_ = 90;
+            }
+            else
+            {
+                CloseHandle(pi.hProcess);
+                CloseHandle(pi.hThread);
+            }
             gameLaunched_ = true;
             saveSettings();
         }
@@ -246,6 +293,7 @@ public:
         }
 
         settings["game_path"] = gamePath;
+        settings["cdp_port"] = cdpPort_;
 
         std::ofstream ofile(path);
         ofile << settings.dump(4);
@@ -265,6 +313,8 @@ public:
 
             if (settings.contains("game_path"))
                 gamePath = settings["game_path"].get<std::string>();
+            if (settings.contains("cdp_port"))
+                cdpPort_ = settings["cdp_port"].get<int>();
         }
         catch (...)
         {
@@ -274,12 +324,15 @@ public:
 private:
     std::string settingsKey_;
     CDPLaunchMethod launchMethod_;
+    std::string steamAppId_;
     int cdpPort_ = 9222;
     bool gameLaunched_ = false;
     bool lastCheckResult_ = false;
     int cdpFailCount_ = 0;
     std::string cachedWsPath_;
     std::chrono::steady_clock::time_point lastCheckTime_;
+    std::chrono::steady_clock::time_point launchTime_;
+    int startupGraceSecs_ = 0;
 
     // Persistent WebSocket connection handles
     HINTERNET wsSession_ = nullptr;
