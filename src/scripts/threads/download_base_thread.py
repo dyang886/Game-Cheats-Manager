@@ -1,10 +1,11 @@
 import json
 import os
+import queue
 import re
 import string
 import threading
 import time
-from concurrent.futures import ThreadPoolExecutor, as_completed
+from concurrent.futures import ThreadPoolExecutor
 from urllib.parse import urlparse, unquote
 import uuid
 import warnings
@@ -26,8 +27,7 @@ warnings.simplefilter("ignore", InsecureRequestWarning)
 class DownloadBaseThread(QThread):
     message = pyqtSignal(str, str)
     messageBox = pyqtSignal(str, str, str)
-    # progress emits a list of (downloaded, total) per segment.
-    progress = pyqtSignal(list)
+    progress = pyqtSignal(list)  # [(downloaded, total)]
     finished = pyqtSignal(int)
 
     trainer_urls = []  # [{"game_name": str, "trainer_name": str, "origin": str, "author": str, "custom_name": str, "url": download url, "version": YYYY.MM.DD},]
@@ -77,79 +77,106 @@ class DownloadBaseThread(QThread):
         supports_ranges = req.headers.get('accept-ranges', '').lower() == 'bytes'
 
         if not use_cloudScraper and supports_ranges and total_size >= _PARALLEL_THRESHOLD:
-            mb = total_size / (1024 * 1024)
-            num_chunks = 2 if mb < 5 else 4 if mb < 20 else 6
+            num_workers = min(total_size // (1024 * 1024), 6)
         else:
-            num_chunks = 1
-        return self.download_parallel(req, url, file_path, total_size, verify, num_chunks)
+            num_workers = 1
+        return self.download_queued(req, url, file_path, total_size, verify, num_workers)
 
-    def download_parallel(self, initial_req, url, file_path, total_size, verify, num_chunks):
-        if num_chunks > 1:
+    def download_queued(self, initial_req, url, file_path, total_size, verify, num_workers):
+        total_units = min(total_size // (1024 * 1024), 24) if num_workers > 1 else 1
+        print(f"[Queue] starting: {total_units} units, {num_workers} workers, {total_size / (1024 * 1024):.1f} MB", flush=True)
+
+        unit_queue = queue.Queue()
+        if num_workers > 1:
+            unit_size = total_size // total_units
+            for i in range(total_units):
+                start = i * unit_size
+                end = (i + 1) * unit_size - 1 if i < total_units - 1 else total_size - 1
+                unit_queue.put((i, start, end))
             initial_req.close()
-            chunk_size = total_size // num_chunks
-            byte_ranges = [
-                (i * chunk_size, (i + 1) * chunk_size - 1 if i < num_chunks - 1 else total_size - 1)
-                for i in range(num_chunks)
-            ]
-            segment_totals = [end - start + 1 for start, end in byte_ranges]
         else:
-            byte_ranges = [None]
-            segment_totals = [total_size]
+            unit_queue.put((0, None, None))
 
-        segment_downloaded = [0] * num_chunks
+        # Pre-allocate file so workers can seek and write directly at their byte offsets
+        try:
+            with open(file_path, 'wb') as f:
+                f.truncate(total_size)
+        except Exception as e:
+            print(f"[Queue] failed to create file: {e}", flush=True)
+            return ""
+
+        total_downloaded = [0]
+        completed_units = [0]
+        total_failures = [0]
+        MAX_FAILURES = total_units + 10
+        stop_event = threading.Event()
         downloaded_lock = threading.Lock()
         last_emit = [0.0]
-        EMIT_INTERVAL = 0.05  # 50ms throttle to avoid flooding the UI thread
-        chunk_data = {}
+        EMIT_INTERVAL = 0.05
 
         def emit_progress():
-            self.progress.emit(
-                [(segment_downloaded[i], segment_totals[i]) for i in range(num_chunks)]
-            )
+            self.progress.emit([(total_downloaded[0], total_size)])
 
         emit_progress()
 
-        def fetch_chunk(idx, byte_range):
-            if byte_range is not None:
-                chunk_headers = {**self.headers, 'Range': f'bytes={byte_range[0]}-{byte_range[1]}'}
-                resp = requests.get(url, headers=chunk_headers, verify=verify, stream=True, timeout=60)
-                resp.raise_for_status()
-            else:
-                resp = initial_req
-            data = bytearray()
-            for piece in resp.iter_content(chunk_size=65536):
-                if piece:
-                    data.extend(piece)
-                    with downloaded_lock:
-                        segment_downloaded[idx] += len(piece)
-                        now = time.monotonic()
-                        if now - last_emit[0] >= EMIT_INTERVAL:
-                            last_emit[0] = now
-                            emit_progress()
-            with downloaded_lock:
-                emit_progress()
-            return idx, bytes(data)
+        def worker(worker_idx):
+            session = requests.Session() if num_workers > 1 else None
+            f = open(file_path, 'r+b')
+            try:
+                while not stop_event.is_set():
+                    try:
+                        unit_idx, start, end = unit_queue.get_nowait()
+                    except queue.Empty:
+                        break
 
-        try:
-            with ThreadPoolExecutor(max_workers=num_chunks) as executor:
-                futures = {executor.submit(fetch_chunk, i, byte_ranges[i]): i for i in range(num_chunks)}
-                for future in as_completed(futures):
-                    idx, data = future.result()
-                    chunk_data[idx] = data
-        except Exception as e:
-            print(f"Download failed: {e}")
-            return ""
+                    bytes_this_unit = 0
+                    try:
+                        if start is not None:
+                            resp = session.get(url, headers={**self.headers, 'Range': f'bytes={start}-{end}'}, verify=verify, stream=True, timeout=60)
+                            resp.raise_for_status()
+                        else:
+                            resp = initial_req
+                        f.seek(start if start is not None else 0)
+                        for piece in resp.iter_content(chunk_size=65536):
+                            if piece:
+                                f.write(piece)
+                                bytes_this_unit += len(piece)
+                                with downloaded_lock:
+                                    total_downloaded[0] += len(piece)
+                                    now = time.monotonic()
+                                    if now - last_emit[0] >= EMIT_INTERVAL:
+                                        last_emit[0] = now
+                                        emit_progress()
+                        with downloaded_lock:
+                            completed_units[0] += 1
+                        print(f"[Queue] unit {unit_idx + 1}/{total_units} done | worker {worker_idx} | queue remaining: {unit_queue.qsize()}", flush=True)
+                    except Exception as e:
+                        with downloaded_lock:
+                            total_downloaded[0] -= bytes_this_unit
+                            total_failures[0] += 1
+                            failures = total_failures[0]
+                        if failures >= MAX_FAILURES:
+                            stop_event.set()
+                            print(f"[Queue] unit {unit_idx} failed, aborting ({failures}/{MAX_FAILURES} total failures): {e}", flush=True)
+                        else:
+                            unit_queue.put((unit_idx, start, end))
+                            print(f"[Queue] unit {unit_idx} failed, re-enqueued ({failures}/{MAX_FAILURES} total failures): {e}", flush=True)
+            finally:
+                f.close()
+                if session:
+                    session.close()
 
-        try:
-            with open(file_path, 'wb') as f:
-                for idx in range(num_chunks):
-                    f.write(chunk_data[idx])
-        except Exception as e:
-            print(f"Error assembling file: {e}")
+        with ThreadPoolExecutor(max_workers=num_workers) as executor:
+            for i in range(num_workers):
+                executor.submit(worker, i)
+
+        if stop_event.is_set() or completed_units[0] < total_units:
+            print(f"[Queue] download failed: {total_failures[0]} total failures", flush=True)
             if os.path.exists(file_path):
                 os.remove(file_path)
             return ""
 
+        emit_progress()
         self.downloaded_file_path = file_path
         return file_path
 

@@ -172,8 +172,8 @@
     {
         "game_name": "theHunter: Call of the Wild",
         "origin": "other",
-        "author": "Marco Stel",
-        "gcm_url": "GCM/GCM Trainers/theHunter_Call of the Wild Trainer [Marco Stel].exe",
+        "author": "iNvIcTUs oRCuS",
+        "gcm_url": "GCM/GCM Trainers/theHunter_Call of the Wild Trainer [iNvIcTUs oRCuS].exe",
         "version": "2024.12.6"
     },
     {
@@ -825,7 +825,7 @@
         "game_name": "Call of Duty: Modern Warfare 3",
         "origin": "other",
         "author": "Burmass",
-        "official_url": "https://patch.ali213.net/showpatch/12264.html#001",
+        "official_url": "https://patch.ali213.net/showpatch/12264.html",
         "gcm_url": "GCM/GCM Trainers/Call of Duty_Modern Warfare 3 Trainer [Burmass].exe",
         "version": "2026.3.4"
     },
@@ -960,7 +960,8 @@
         "custom_name_zh": "存档编辑器",
         "official_url": "https://github.com/goatfungus/NMSSaveEditor",
         "gcm_url": "GCM/GCM Trainers/No Man's Sky Save Editor [GoatFungus].zip",
-        "version": "2025.8.30"
+        "extension": "NMSSaveEditor.bat",
+        "version": "2026.3.4"
     },
     {
         "game_name": "Ling Xu",
@@ -991,7 +992,7 @@
         "author": "LHY1339",
         "official_url": "https://github.com/LHY1339/cheat_ready_or_not",
         "gcm_url": "GCM/GCM Trainers/Ready or Not Trainer [LHY1339].exe",
-        "version": "2026.4.26"
+        "version": "2026.5.6"
     },
     {
         "game_name": "Backrooms: Extractions",
@@ -1147,7 +1148,7 @@
     {
         "game_name": "Guns, Gore and Cannoli 2",
         "origin": "other",
-        "author": "游侠网",
+        "author": "peizhaochen",
         "official_url": "https://patch.ali213.net/showpatch/88085.html",
         "gcm_url": "GCM/GCM Trainers/Guns, Gore and Cannoli 2 Trainer [YouXiaWang].exe",
         "version": "2018.3.5"
@@ -1477,7 +1478,7 @@
         "author": "大母鹅",
         "official_url": "https://www.loxin.top/archives/1050",
         "gcm_url": "GCM/GCM Trainers/Crimson Desert Trainer [DaMuE].exe",
-        "version": "2026.5.5"
+        "version": "2026.5.14"
     },
     {
         "game_name": "Just Cause 2",
@@ -1596,7 +1597,7 @@
         "author": "简简单单2022",
         "official_url": "https://bbs.3dmgame.com/thread-6660842-1-1.html",
         "gcm_url": "GCM/GCM Trainers/Crimson Desert Trainer [JianJianDanDan2022].ct",
-        "version": "2026.4.4"
+        "version": "2026.5.3"
     },
     {
         "game_name": "Cubic Cosmos",
@@ -1760,7 +1761,7 @@
         "author": "坏猫i",
         "official_url": "https://zmjy.1lsp.cn/?post=1",
         "gcm_url": "GCM/GCM Trainers/The Killing Antidote Trainer [HuaiMaoi].zip",
-        "version": "2024.2.26"
+        "version": "2024.5.17"
     },
     {
         "game_name": "Touhou Mystia's Izakaya",
@@ -2133,7 +2134,7 @@
         "author": "大母鹅",
         "official_url": "https://www.loxin.top/archives/971",
         "gcm_url": "GCM/GCM Trainers/INAZUMA ELEVEN_Victory Road Trainer [DaMuE].exe",
-        "version": "2025.12.23"
+        "version": "2026.4.21"
     },
     {
         "game_name": "Feastopia",
@@ -2151,9 +2152,9 @@
     {
         "game_name": "Wuppo",
         "origin": "other",
-        "author": "游侠网",
+        "author": "peizhaochen",
         "official_url": "https://patch.ali213.net/showpatch/63989.html",
-        "gcm_url": "GCM/GCM Trainers/Wuppo Trainer [YouXiaWang].exe",
+        "gcm_url": "GCM/GCM Trainers/Wuppo Trainer [peizhaochen].exe",
         "version": "2016.11.25"
     },
     {
@@ -2414,7 +2415,7 @@
         "author": "acasfq",
         "official_url": "https://bbs.3dmgame.com/thread-6662244-1-1.html",
         "gcm_url": "GCM/GCM Trainers/Beast Saga Trainer [acasfq].ct",
-        "version": "2026.4.10"
+        "version": "2026.5.1"
     },
     {
         "game_name": "Windrose",
@@ -2438,7 +2439,7 @@
         "author": "贊熹HU",
         "official_url": "https://bbs.3dmgame.com/thread-6661046-1-1.html",
         "gcm_url": "GCM/GCM Trainers/Death Stranding 2_On the Beach Trainer [ZanXiHU].ct",
-        "version": "2026.4.17"
+        "version": "2026.5.8"
     },
     {
         "game_name": "Dead Space 2",
@@ -2466,7 +2467,7 @@
         "game_name": "Command & Conquer: Red Alert 3",
         "origin": "other",
         "author": "闇之幻影",
-        "gcm_url": "GCM/GCM Trainers/Command & Conquer_Red Alert 3 Trainer [AnZhiHuanYing].exe",
+        "gcm_url": "GCM/GCM Trainers/Command & Conquer_Red Alert 3 Trainer [AnZhiHuanYing].zip",
         "version": "2009.12.31"
     },
     {
@@ -2481,7 +2482,7 @@
         "author": "jx666",
         "gcm_url": "GCM/GCM Trainers/The Wife Next Door Trainer [jx666].zip",
         "extension": "none",
-        "version": "2026.5.6"
+        "version": "2026.5.13"
     },
     {
         "game_name": "Football Manager 2026",
@@ -2510,6 +2511,220 @@
         "origin": "other",
         "author": "jx666",
         "gcm_url": "GCM/GCM Trainers/Fei Yue Xian Xing Lu Trainer [jx666].zip",
-        "version": "2026.5.6"
+        "version": "2026.5.13"
+    },
+    {
+        "game_name": "Call to Arms: Panzer Elite",
+        "origin": "other",
+        "gcm_url": "GCM/GCM Trainers/Call to Arms_Panzer Elite Trainer.exe",
+        "version": "2026.5.13"
+    },
+    {
+        "game_name": "Cell Destruction",
+        "origin": "other",
+        "author": "jx666",
+        "gcm_url": "GCM/GCM Trainers/Cell Destruction Trainer [jx666].zip",
+        "extension": "none",
+        "version": "2026.5.13"
+    },
+    {
+        "game_name": "Long Yin Li Zhi Zhuan",
+        "origin": "other",
+        "author": "tkwlee",
+        "gcm_url": "GCM/GCM Trainers/Long Yin Li Zhi Zhuan Trainer [tkwlee].zip",
+        "extension": "none",
+        "version": "2026.3.23"
+    },
+    {
+        "game_name": "Magical Princess",
+        "origin": "ct_other",
+        "author": "Qiuzy",
+        "official_url": "https://steamcommunity.com/sharedfiles/filedetails/?id=3716563703",
+        "gcm_url": "GCM/GCM Trainers/Magical Princess Trainer [Qiuzy].ct",
+        "version": "2026.5.7"
+    },
+    {
+        "game_name": "Megabonk",
+        "origin": "ct_other",
+        "author": "VampTY",
+        "official_url": "https://fearlessrevolution.com/viewtopic.php?t=36590",
+        "gcm_url": "GCM/GCM Trainers/Megabonk Trainer [VampTY].ct",
+        "version": "2025.10.6"
+    },
+    {
+        "game_name": "Need for Speed: Most Wanted",
+        "origin": "other",
+        "author": "阿忠",
+        "gcm_url": "GCM/GCM Trainers/Need for Speed_Most Wanted Trainer [JONG].exe",
+        "version": "2026.5.13"
+    },
+    {
+        "game_name": "NBA 2K17",
+        "origin": "other",
+        "author": "limnono",
+        "official_url": "https://bbs.3dmgame.com/thread-5282040-1-1.html",
+        "gcm_url": "GCM/GCM Trainers/NBA 2K17 Trainer [limnono].exe",
+        "version": "2025.2.1"
+    },
+    {
+        "game_name": "Tasty Bite: Food dating simulator",
+        "origin": "other",
+        "author": "jx666",
+        "gcm_url": "GCM/GCM Trainers/Tasty Bite_Food dating simulator Trainer [jx666].zip",
+        "extension": "none",
+        "version": "2026.5.13"
+    },
+    {
+        "game_name": "Wu Lin Qun Xia Zhuan",
+        "origin": "other",
+        "author": "清水剑神",
+        "custom_name_en": "Save Editor",
+        "custom_name_zh": "存档编辑器",
+        "gcm_url": "GCM/GCM Trainers/Wu Lin Qun Xia Zhuan Trainer [QingShuiJianShen].exe",
+        "version": "2026.5.13"
+    },
+    {
+        "game_name": "Crysis 2 Remastered",
+        "origin": "other",
+        "author": "iNvIcTUs oRCuS",
+        "gcm_url": "GCM/GCM Trainers/Crysis 2 Remastered Trainer [iNvIcTUs oRCuS].exe",
+        "version": "2022.12.28"
+    },
+    {
+        "game_name": "Crysis 3 Remastered",
+        "origin": "other",
+        "author": "iNvIcTUs oRCuS",
+        "gcm_url": "GCM/GCM Trainers/Crysis 3 Remastered Trainer [iNvIcTUs oRCuS].exe",
+        "version": "2022.12.30"
+    },
+    {
+        "game_name": "Everything is Crab: The Animal Evolution Roguelite",
+        "origin": "other",
+        "author": "ppapodir",
+        "official_url": "https://bbs.3dmgame.com/thread-6672045-1-1.html",
+        "gcm_url": "GCM/GCM Trainers/Everything is Crab_The Animal Evolution Roguelite Trainer [ppapodir].exe",
+        "version": "2026.5.9"
+    },
+    {
+        "game_name": "Assassin's Creed Unity",
+        "origin": "other",
+        "author": "hex",
+        "official_url": "https://www.nexusmods.com/assassinscreedunity/mods/364",
+        "gcm_url": "GCM/GCM Trainers/Assassin's Creed Unity Trainer [hex].exe",
+        "version": "2026.3.11"
+    },
+    {
+        "game_name": "Assassin's Creed Odyssey",
+        "origin": "other",
+        "author": "hex",
+        "official_url": "https://www.nexusmods.com/assassinscreedodyssey/mods/389",
+        "gcm_url": "GCM/GCM Trainers/Assassin's Creed Odyssey Trainer [hex].exe",
+        "version": "2026.2.15"
+    },
+    {
+        "game_name": "Assassin's Creed Origins",
+        "origin": "other",
+        "author": "hex",
+        "official_url": "https://www.nexusmods.com/assassinscreedorigins/mods/291",
+        "gcm_url": "GCM/GCM Trainers/Assassin's Creed Origins Trainer [hex].exe",
+        "version": "2025.12.26"
+    },
+    {
+        "game_name": "Cheng Xu Yuan De Ke Ban Yin Xiang",
+        "origin": "ct_other",
+        "author": "简简单单2022",
+        "official_url": "https://bbs.3dmgame.com/thread-6671491-1-1.html",
+        "gcm_url": "GCM/GCM Trainers/Cheng Xu Yuan De Ke Ban Yin Xiang Trainer [JianJianDanDan2022].ct",
+        "version": "2026.5.9"
+    },
+    {
+        "game_name": "Command & Conquer: Red Alert 2",
+        "origin": "other",
+        "author": "网上虫子",
+        "gcm_url": "GCM/GCM Trainers/Command & Conquer_Red Alert 2 Trainer [WangShangChongZi].exe",
+        "version": "2026.5.13"
+    },
+    {
+        "game_name": "Forza Horizon 6",
+        "origin": "other",
+        "author": "Shina",
+        "official_url": "https://www.nexusmods.com/forzahorizon6/mods/60",
+        "gcm_url": "GCM/GCM Trainers/Forza Horizon 6 Trainer [Shina].exe",
+        "version": "2026.5.17"
+    },
+    {
+        "game_name": "Langrisser I & II",
+        "origin": "other",
+        "author": "peizhaochen",
+        "official_url": "https://patch.ali213.net/showpatch/137783.html",
+        "gcm_url": "GCM/GCM Trainers/Langrisser I & II Trainer [peizhaochen].exe",
+        "version": "2020.3.11"
+    },
+    {
+        "game_name": "Mercenaries Series 1,2,3",
+        "origin": "ct_other",
+        "author": "lmrlmax",
+        "official_url": "https://fearlessrevolution.com/viewtopic.php?p=319950&sid=c965f5b612ae759561a29c8a9e1e850c#p319950",
+        "gcm_url": "GCM/GCM Trainers/Mercenaries Series 1,2,3 Trainer [lmrlmax].ct",
+        "version": "2023.10.17"
+    },
+    {
+        "game_name": "No Man's Sky",
+        "origin": "other",
+        "author": "zencq",
+        "custom_name_en": "Save Editor",
+        "custom_name_zh": "存档编辑器",
+        "official_url": "https://github.com/zencq/NomNom",
+        "gcm_url": "GCM/GCM Trainers/No Man's Sky Save Editor [zencq].zip",
+        "extension": "NomNom.exe",
+        "version": "2026.4.21"
+    },
+    {
+        "game_name": "Psychic Kung Fu Master",
+        "origin": "other",
+        "author": "ppapodir",
+        "official_url": "https://bbs.3dmgame.com/thread-6673490-1-1.html",
+        "gcm_url": "GCM/GCM Trainers/Psychic Kung Fu Master Trainer [ppapodir].exe",
+        "version": "2026.5.16"
+    },
+    {
+        "game_name": "Gurumin: A Monstrous Adventure",
+        "origin": "ct_other",
+        "custom_name_en": "Cube Game Edition Trainer",
+        "custom_name_zh": "方块游戏版修改器",
+        "gcm_url": "GCM/GCM Trainers/Gurumin_A Monstrous Adventure Trainer.ct",
+        "version": "2026.5.19"
+    },
+    {
+        "game_name": "Crazy Flasher",
+        "origin": "other",
+        "author": "哈适大佛",
+        "official_url": "https://share.weiyun.com/nfMOgcBS, https://www.bilibili.com/video/BV1Cj411671n",
+        "gcm_url": "GCM/GCM Trainers/Crazy Flasher Trainer [HaShiDaFo].exe",
+        "version": "2024.4.14"
+    },
+    {
+        "game_name": "Sangokushi Sousouden",
+        "origin": "other",
+        "author": "majiming",
+        "custom_name_en": "Universal Debugger",
+        "custom_name_zh": "通用调试器",
+        "gcm_url": "GCM/GCM Trainers/Sangokushi Sousouden Universal Debugger [majiming].exe",
+        "version": "2026.5.19"
+    },
+    {
+        "game_name": "Subnautica 2",
+        "origin": "other",
+        "author": "鸣叶月",
+        "official_url": "https://www.bilibili.com/video/BV1kA5e6uEyQ/",
+        "gcm_url": "GCM/GCM Trainers/Subnautica 2 Trainer [MingYeYue].exe",
+        "version": "2026.5.15"
+    },
+    {
+        "game_name": "Prototype",
+        "origin": "other",
+        "author": "Dami",
+        "gcm_url": "GCM/GCM Trainers/Prototype Trainer [Dami].exe",
+        "version": "2010.9.2"
     }
 ]

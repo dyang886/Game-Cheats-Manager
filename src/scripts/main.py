@@ -46,7 +46,7 @@ class GameCheatsManager(QMainWindow):
         self.setMinimumSize(700, 520)
 
         # Version and links
-        self.appVersion = "2.5.0-beta.4"
+        self.appVersion = "2.5.0-beta.5"
         self.websiteLink = "https://gamezonelabs.com"
         self.allTrainersLink = "https://gamezonelabs.com/products/game-cheats-manager/trainers"
         self.githubLink = "https://github.com/dyang886/Game-Cheats-Manager"
@@ -294,13 +294,12 @@ class GameCheatsManager(QMainWindow):
         try:
             pid = str(os.getpid())
             s3_path = f'GCM/Game Cheats Manager Setup {version}.exe'
-            subprocess.Popen(
-                [updater_path, '--pid', pid, '--s3-path', s3_path, '--theme', settings["theme"], '--language', settings["language"]],
-                creationflags=subprocess.DETACHED_PROCESS | subprocess.CREATE_NEW_PROCESS_GROUP,
-                start_new_session=True
-            )
+            params = f'--pid {pid} --s3-path "{s3_path}" --theme {settings["theme"]} --language {settings["language"]}'
+            result = ctypes.windll.shell32.ShellExecuteW(0, "runas", updater_path, params, None, 1)
+            if result <= 32:
+                raise OSError(f"ShellExecuteW failed with code {result}")
 
-        except subprocess.SubprocessError:
+        except OSError:
             QMessageBox.critical(self, tr("Failure"), tr("Failed to update application."))
 
     def send_notification(self, success, latest_version=0):
@@ -428,16 +427,21 @@ class GameCheatsManager(QMainWindow):
                     self.trainers[trainerName] = trainerPath
                     continue
 
-                target_exts = ["." + custom_ext] if custom_ext else default_extensions
-
                 matched_path = None
-                for ext in target_exts:
-                    for file in os.scandir(trainerPath):
-                        if file.is_file() and os.path.splitext(file.name)[1].lower() == ext and file.name not in exe_exclusions:
-                            matched_path = os.path.normpath(file.path)
+                if custom_ext and "." in custom_ext:
+                    # Full filename specified — resolve directly
+                    candidate = os.path.normpath(os.path.join(trainerPath, custom_ext))
+                    if os.path.isfile(candidate):
+                        matched_path = candidate
+                else:
+                    target_exts = ["." + custom_ext] if custom_ext else default_extensions
+                    for ext in target_exts:
+                        for file in os.scandir(trainerPath):
+                            if file.is_file() and os.path.splitext(file.name)[1].lower() == ext and file.name not in exe_exclusions:
+                                matched_path = os.path.normpath(file.path)
+                                break
+                        if matched_path:
                             break
-                    if matched_path:
-                        break
 
                 if matched_path:
                     self.flingListBox.addItem(trainerName)
@@ -453,7 +457,7 @@ class GameCheatsManager(QMainWindow):
                 if item.startswith("GCM_Launch_"):
                     junction_path = os.path.join(temp_dir, item)
                     try:
-                        subprocess.run(f'rmdir "{junction_path}"', shell=True, check=True, stdout=subprocess.DEVNULL, stderr=subprocess.DEVNULL)
+                        os.rmdir(junction_path)
                     except Exception:
                         pass
         except Exception as e:
@@ -496,7 +500,7 @@ class GameCheatsManager(QMainWindow):
         # Remove old junction if it exists
         if os.path.exists(junction_dir):
             try:
-                subprocess.run(f'rmdir "{junction_dir}"', shell=True, check=True, stdout=subprocess.DEVNULL, stderr=subprocess.DEVNULL)
+                os.rmdir(junction_dir)
             except Exception:
                 pass
 

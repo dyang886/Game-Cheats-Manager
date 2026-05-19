@@ -1,5 +1,5 @@
 from PyQt6.QtCore import QEasingCurve, QPropertyAnimation, QRect, QRectF, Qt, QTimer, pyqtSignal
-from PyQt6.QtGui import QColor, QFont, QFontDatabase, QPainter, QPainterPath, QPalette, QPen, QPixmap, QRegion
+from PyQt6.QtGui import QColor, QFont, QFontDatabase, QPainter, QPainterPath, QPen, QPixmap
 from PyQt6.QtWidgets import QApplication, QFrame, QGraphicsDropShadowEffect, QHBoxLayout, QLabel, QListWidget, QListWidgetItem, QProxyStyle, QPushButton, QSizePolicy, QStyle, QVBoxLayout, QWidget
 from zhon.cedict import simp, trad
 
@@ -523,45 +523,25 @@ class SegmentedProgressBar(QWidget):
             font.setBold(True)
             painter.setFont(font)
 
-            painter.setPen(self._text_outside_color())
+            painter.setPen(self._text_color())
             painter.drawText(rect, Qt.AlignmentFlag.AlignCenter, text)
-
-            if fill_rects:
-                region = QRegion()
-                for fr in fill_rects:
-                    region += QRegion(fr.toAlignedRect())
-                painter.save()
-                painter.setClipRegion(region)
-                painter.setPen(self._text_inside_color())
-                painter.drawText(rect, Qt.AlignmentFlag.AlignCenter, text)
-                painter.restore()
 
         painter.end()
 
     def _bg_color(self):
-        c = self.palette().color(QPalette.ColorRole.AlternateBase)
-        if not c.isValid() or c.alpha() == 0:
-            c = QColor(60, 60, 60) if self._is_dark() else QColor(220, 220, 220)
-        return c
+        return QColor("#2a2a2a") if self._is_dark() else QColor("#dcdcdc")
 
     def _fill_color(self):
-        c = self.palette().color(QPalette.ColorRole.Highlight)
-        if not c.isValid() or c.alpha() == 0:
-            c = QColor(70, 130, 230)
-        return c
+        return QColor("#0080e3") if self._is_dark() else QColor("#0057b7")
 
     def _border_color(self):
-        bg = self._bg_color()
-        return bg.lighter(180) if self._is_dark() else bg.darker(140)
+        return QColor("#555555") if self._is_dark() else QColor("#b0b0b0")
 
-    def _text_outside_color(self):
-        return self.palette().color(QPalette.ColorRole.Text)
-
-    def _text_inside_color(self):
-        return self.palette().color(QPalette.ColorRole.HighlightedText)
+    def _text_color(self):
+        return QColor("#ffffff") if self._is_dark() else QColor("#000000")
 
     def _is_dark(self):
-        return self.palette().color(QPalette.ColorRole.Window).lightness() < 128
+        return settings.get("theme", "dark") == "dark"
 
 
 class AlertWidget(QWidget):

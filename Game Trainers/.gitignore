@@ -14,5 +14,5 @@ user_trainers.json
 user_trainers.xlsx
 completed_trainers.txt
 User Trainers/
-documents/*.txt
-documents/*.md
+docs/*.txt
+docs/*.md
