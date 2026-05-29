@@ -149,7 +149,6 @@ class DownloadBaseThread(QThread):
                                         emit_progress()
                         with downloaded_lock:
                             completed_units[0] += 1
-                        print(f"[Queue] unit {unit_idx + 1}/{total_units} done | worker {worker_idx} | queue remaining: {unit_queue.qsize()}", flush=True)
                     except Exception as e:
                         with downloaded_lock:
                             total_downloaded[0] -= bytes_this_unit

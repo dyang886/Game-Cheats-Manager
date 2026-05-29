@@ -4,6 +4,7 @@ import shutil
 import stat
 import subprocess
 import time
+import traceback
 
 from bs4 import BeautifulSoup
 
@@ -22,83 +23,96 @@ class DownloadTrainersThread(DownloadBaseThread):
         self.update_error_delay = 3
 
     def run(self):
-        self.message.emit(tr("Checking for internet connection..."), None)
-        if not self.is_internet_connected():
-            self.message.emit(tr("No internet connection, download failed."), "failure")
-            time.sleep(self.download_finish_delay)
-            self.finished.emit(1)
-            return
-
-        if os.path.exists(DOWNLOAD_TEMP_DIR):
-            shutil.rmtree(DOWNLOAD_TEMP_DIR)
-        os.makedirs(DOWNLOAD_TEMP_DIR, exist_ok=True)
-
-        self.src_dst = []  # List content: { "src": source_path, "dst": destination_path, "version": YYYY.MM.DD }
-        self.instructionDst = ""
-        selected_trainer = None
-        if not self.update_entry:
-            selected_trainer = DownloadBaseThread.trainer_urls[self.index]
-        else:
-            selected_trainer = self.update_entry
-        origin = selected_trainer["origin"]
-
-        result = True
-        if origin == "fling_main" or origin == "fling_archive":
-            result = self.download_fling(selected_trainer)
-        elif origin == "xiaoxing":
-            result = self.download_xiaoxing(selected_trainer)
-        elif origin in ["the_cheat_script", "ct_other", "gcm", "other"]:
-            result = self.download_default(selected_trainer)
-
         try:
-            for item in self.src_dst:
-                if os.path.exists(item["dst"]):
-                    os.chmod(item["dst"], stat.S_IWRITE)
-                if os.path.isfile(item['src']):
-                    dst_dir = os.path.dirname(item["dst"])
-                    os.makedirs(dst_dir, exist_ok=True)
-                else:
-                    dst_dir = item["dst"]
-                shutil.move(item["src"], item["dst"])
+            self.message.emit(tr("Checking for internet connection..."), None)
+            if not self.is_internet_connected():
+                self.message.emit(tr("No internet connection, download failed."), "failure")
+                time.sleep(self.download_finish_delay)
+                self.finished.emit(1)
+                return
 
-                if dst_dir != self.instructionDst:
-                    info_dict = {
-                        "game_name": selected_trainer["game_name"],
-                        "origin": selected_trainer["origin"]
-                    }
-                    if selected_trainer.get("version"):
-                        info_dict["version"] = selected_trainer["version"]
-                    if selected_trainer["origin"] in ["other", "ct_other"]:
-                        info_dict["gcm_url"] = selected_trainer["url"]
-                    if selected_trainer.get("extension"):
-                        info_dict["extension"] = selected_trainer["extension"]
+            try:
+                if os.path.exists(DOWNLOAD_TEMP_DIR):
+                    shutil.rmtree(DOWNLOAD_TEMP_DIR)
+                os.makedirs(DOWNLOAD_TEMP_DIR, exist_ok=True)
+            except Exception as e:
+                self.message.emit(tr("Could not initialize the temporary download folder, please try turning your antivirus software off."), "failure")
+                time.sleep(self.update_error_delay)
+                self.finished.emit(1)
+                return
 
-                    with open(os.path.join(dst_dir, "gcm_info.json"), "w", encoding="utf-8") as info_file:
-                        json.dump(info_dict, info_file, ensure_ascii=False, indent=4)
+            self.src_dst = []  # List content: { "src": source_path, "dst": destination_path, "version": YYYY.MM.DD }
+            self.instructionDst = ""
+            selected_trainer = None
+            if not self.update_entry:
+                selected_trainer = DownloadBaseThread.trainer_urls[self.index]
+            else:
+                selected_trainer = self.update_entry
+            origin = selected_trainer["origin"]
 
-            rhLog = os.path.join(DOWNLOAD_TEMP_DIR, "rh.log")
-            if os.path.exists(rhLog):
-                os.remove(rhLog)
+            result = True
+            if origin == "fling_main" or origin == "fling_archive":
+                result = self.download_fling(selected_trainer)
+            elif origin == "xiaoxing":
+                result = self.download_xiaoxing(selected_trainer)
+            elif origin in ["the_cheat_script", "ct_other", "gcm", "other"]:
+                result = self.download_default(selected_trainer)
 
-            if self.instructionDst and not self.update_entry:
-                self.messageBox.emit("info", tr("Attention"), tr("This trainer requires additional setup before use. Please check the opened folder for instructions.\nThe instructions are always stored in the 'gcm-instructions' folder."))
-                os.startfile(self.instructionDst)
+            try:
+                for item in self.src_dst:
+                    if os.path.exists(item["dst"]):
+                        os.chmod(item["dst"], stat.S_IWRITE)
+                    if os.path.isfile(item['src']):
+                        dst_dir = os.path.dirname(item["dst"])
+                        os.makedirs(dst_dir, exist_ok=True)
+                    else:
+                        dst_dir = item["dst"]
+                    shutil.move(item["src"], item["dst"])
 
-        except PermissionError as e:
-            self.message.emit(tr("Trainer is currently in use, please close any programs using the file and try again."), "failure")
-            time.sleep(self.update_error_delay)
-            self.finished.emit(1)
-            return
+                    if dst_dir != self.instructionDst:
+                        info_dict = {
+                            "game_name": selected_trainer["game_name"],
+                            "origin": selected_trainer["origin"]
+                        }
+                        if selected_trainer.get("version"):
+                            info_dict["version"] = selected_trainer["version"]
+                        if selected_trainer["origin"] in ["other", "ct_other"]:
+                            info_dict["gcm_url"] = selected_trainer["url"]
+                        if selected_trainer.get("extension"):
+                            info_dict["extension"] = selected_trainer["extension"]
+
+                        with open(os.path.join(dst_dir, "gcm_info.json"), "w", encoding="utf-8") as info_file:
+                            json.dump(info_dict, info_file, ensure_ascii=False, indent=4)
+
+                rhLog = os.path.join(DOWNLOAD_TEMP_DIR, "rh.log")
+                if os.path.exists(rhLog):
+                    os.remove(rhLog)
+
+                if self.instructionDst and not self.update_entry:
+                    self.messageBox.emit("info", tr("Attention"), tr("This trainer requires additional setup before use. Please check the opened folder for instructions.\nThe instructions are always stored in the 'gcm-instructions' folder."))
+                    os.startfile(self.instructionDst)
+
+            except PermissionError as e:
+                self.message.emit(tr("Trainer is currently in use, please close any programs using the file and try again."), "failure")
+                time.sleep(self.update_error_delay)
+                self.finished.emit(1)
+                return
+            except Exception as e:
+                self.message.emit(tr("An error occurred when moving trainer: ") + str(e), "failure")
+                time.sleep(self.download_finish_delay)
+                self.finished.emit(1)
+                return
+
+            if result:
+                self.message.emit(tr("Download success!"), "success")
+                time.sleep(self.download_finish_delay)
+                self.finished.emit(0)
+
         except Exception as e:
-            self.message.emit(tr("An error occurred when moving trainer: ") + str(e), "failure")
+            traceback.print_exc()
+            self.message.emit(tr("An error occurred while downloading trainer: ") + str(e), "failure")
             time.sleep(self.download_finish_delay)
             self.finished.emit(1)
-            return
-
-        if result:
-            self.message.emit(tr("Download success!"), "success")
-            time.sleep(self.download_finish_delay)
-            self.finished.emit(0)
 
     def modify_fling_settings(self, removeBgMusic):
         # replace bg music in Documents folder

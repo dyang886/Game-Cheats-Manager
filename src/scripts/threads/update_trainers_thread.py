@@ -2,6 +2,7 @@ import concurrent.futures
 import os
 import shutil
 import time
+import traceback
 
 from PyQt6.QtCore import pyqtSignal
 
@@ -83,9 +84,9 @@ class UpdateTrainers(DownloadBaseThread):
 
     def run(self):
         statusWidgetName = "trainerUpdate"
-        self.message.emit(statusWidgetName, tr("Checking for trainer updates"))
-
         try:
+            self.message.emit(statusWidgetName, tr("Checking for trainer updates"))
+
             if os.path.exists(VERSION_TEMP_DIR):
                 shutil.rmtree(VERSION_TEMP_DIR)
 
@@ -100,8 +101,8 @@ class UpdateTrainers(DownloadBaseThread):
                     if result:
                         self.updateTrainer.emit(result)
 
-        except Exception as e:
-            print(f"Error during trainer update check: {str(e)}")
+        except Exception:
+            traceback.print_exc()
             self.update.emit(statusWidgetName, tr("Check trainer updates failed"), "error")
             time.sleep(2)
 

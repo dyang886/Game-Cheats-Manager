@@ -220,6 +220,9 @@ msgstr "Translating search results..."
 msgid "No search results found."
 msgstr "No search results found."
 
+msgid "An error occurred while searching for trainers: "
+msgstr "An error occurred while searching for trainers: "
+
 msgid "Translating keywords..."
 msgstr "Translating keywords..."
 
@@ -244,6 +247,9 @@ msgstr "Checking for internet connection..."
 msgid "No internet connection, download failed."
 msgstr "No internet connection, download failed."
 
+msgid "Could not initialize the temporary download folder, please try turning your antivirus software off."
+msgstr "Could not initialize the temporary download folder, please try turning your antivirus software off."
+
 msgid "Attention"
 msgstr "Attention"
 
@@ -259,6 +265,9 @@ msgstr "An error occurred when moving trainer: "
 
 msgid "Download success!"
 msgstr "Download success!"
+
+msgid "An error occurred while downloading trainer: "
+msgstr "An error occurred while downloading trainer: "
 
 msgid "Updating "
 msgstr "Updating "
@@ -278,9 +287,6 @@ msgstr "Failed to find trainer version."
 msgid "Internet request failed."
 msgstr "Internet request failed."
 
-msgid "An error occurred while downloading trainer: "
-msgstr "An error occurred while downloading trainer: "
-
 msgid "Decompressing..."
 msgstr "Decompressing..."
 
@@ -296,35 +302,35 @@ msgstr "Removing trainer background music..."
 msgid "Patching..."
 msgstr "Patching..."
 
-msgid "Updating data from GCM"
-msgstr "Updating data from GCM"
-
 msgid "Update from GCM failed"
 msgstr "Update from GCM failed"
 
-msgid "Updating data from FLiNG"
-msgstr "Updating data from FLiNG"
+msgid "Updating data from GCM"
+msgstr "Updating data from GCM"
 
 msgid "Update from FLiGN failed"
 msgstr "Update from FLiGN failed"
 
-msgid "Updating data from XiaoXing"
-msgstr "Updating data from XiaoXing"
+msgid "Updating data from FLiNG"
+msgstr "Updating data from FLiNG"
 
 msgid "Update from XiaoXing failed"
 msgstr "Update from XiaoXing failed"
 
-msgid "Updating data from CT"
-msgstr "Updating data from CT"
+msgid "Updating data from XiaoXing"
+msgstr "Updating data from XiaoXing"
 
 msgid "Update from CT failed"
 msgstr "Update from CT failed"
 
-msgid "Fetching trainer translations"
-msgstr "Fetching trainer translations"
+msgid "Updating data from CT"
+msgstr "Updating data from CT"
 
 msgid "Fetch trainer translations failed"
 msgstr "Fetch trainer translations failed"
+
+msgid "Fetching trainer translations"
+msgstr "Fetching trainer translations"
 
 msgid "Failed to retrieve upload authorization."
 msgstr "Failed to retrieve upload authorization."

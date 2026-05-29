@@ -5,6 +5,7 @@ import shutil
 import stat
 import subprocess
 import time
+import traceback
 
 from PyQt6.QtCore import QThread, pyqtSignal
 import requests
@@ -40,8 +41,8 @@ class AnnouncementFetchWorker(QThread):
             if announcement_id and announcement_id != settings.get("lastSeenAnnouncementId"):
                 self.announcementFetched.emit(newest)
 
-        except Exception as e:
-            print(f"Error fetching announcement: {e}")
+        except Exception:
+            traceback.print_exc()
             self.fetchFailed.emit()
 
 
@@ -78,8 +79,8 @@ class VersionFetchWorker(QThread):
                 print(f"Error: 'latest_version' not found in response. Response: {data}")
                 self.fetchFailed.emit()
 
-        except Exception as e:
-            print(f"Error retrieving latest version: {str(e)}")
+        except Exception:
+            traceback.print_exc()
             self.fetchFailed.emit()
 
 
@@ -107,7 +108,9 @@ class PathChangeThread(QThread):
             shutil.rmtree(self.source_path)
 
             self.finished.emit(self.destination_path)
+
         except Exception as e:
+            traceback.print_exc()
             self.error.emit(str(e))
 
 
@@ -121,14 +124,18 @@ class FetchGCMSite(DownloadBaseThread):
 
     def run(self):
         statusWidgetName = "gcm"
-        update_message = tr("Updating data from GCM")
         update_failed = tr("Update from GCM failed")
+        try:
+            self.message.emit(statusWidgetName, tr("Updating data from GCM"))
+            url = "GCM/Data/gcm_trainers.json"
+            signed_url = self.get_signed_download_url(url)
+            file_path = signed_url and self.request_download(signed_url, DATABASE_PATH)
+            if not file_path:
+                self.update.emit(statusWidgetName, update_failed, "error")
+                time.sleep(2)
 
-        self.message.emit(statusWidgetName, update_message)
-        url = "GCM/Data/gcm_trainers.json"
-        signed_url = self.get_signed_download_url(url)
-        file_path = signed_url and self.request_download(signed_url, DATABASE_PATH)
-        if not file_path:
+        except Exception:
+            traceback.print_exc()
             self.update.emit(statusWidgetName, update_failed, "error")
             time.sleep(2)
 
@@ -145,48 +152,55 @@ class FetchFlingSite(DownloadBaseThread):
 
     def run(self):
         statusWidgetName = "fling"
-        update_message1 = tr("Updating data from FLiNG") + " (1/2)"
-        update_failed1 = tr("Update from FLiGN failed") + " (1/2)"
-        update_message2 = tr("Updating data from FLiNG") + " (2/2)"
-        update_failed2 = tr("Update from FLiGN failed") + " (2/2)"
+        update_failed = tr("Update from FLiGN failed")
+        try:
+            update_message1 = tr("Updating data from FLiNG") + " (1/2)"
+            update_failed1 = update_failed + " (1/2)"
+            update_message2 = tr("Updating data from FLiNG") + " (2/2)"
+            update_failed2 = update_failed + " (2/2)"
 
-        # Fling archive
-        self.message.emit(statusWidgetName, update_message1)
-        if settings['flingDownloadServer'] == "official":
-            url = "https://archive.flingtrainer.com/"
-            content = self.get_webpage_content(url)
-            if not content:
-                self.update.emit(statusWidgetName, update_failed1, "error")
-                time.sleep(2)
-            else:
-                self.save_html_content(content, "fling_archive.html")
+            # Fling archive
+            self.message.emit(statusWidgetName, update_message1)
+            if settings['flingDownloadServer'] == "official":
+                url = "https://archive.flingtrainer.com/"
+                content = self.get_webpage_content(url)
+                if not content:
+                    self.update.emit(statusWidgetName, update_failed1, "error")
+                    time.sleep(2)
+                else:
+                    self.save_html_content(content, "fling_archive.html")
 
-        elif settings['flingDownloadServer'] == "gcm":
-            url = "GCM/Data/fling_archive.json"
-            signed_url = self.get_signed_download_url(url)
-            file_path = signed_url and self.request_download(signed_url, DATABASE_PATH)
-            if not file_path:
-                self.update.emit(statusWidgetName, update_failed1, "error")
-                time.sleep(2)
+            elif settings['flingDownloadServer'] == "gcm":
+                url = "GCM/Data/fling_archive.json"
+                signed_url = self.get_signed_download_url(url)
+                file_path = signed_url and self.request_download(signed_url, DATABASE_PATH)
+                if not file_path:
+                    self.update.emit(statusWidgetName, update_failed1, "error")
+                    time.sleep(2)
 
-        # Fling main
-        self.update.emit(statusWidgetName, update_message2, "load")
-        if settings['flingDownloadServer'] == "official":
-            url = "https://flingtrainer.com/all-trainers-a-z/"
-            content = self.get_webpage_content(url)
-            if not content:
-                self.update.emit(statusWidgetName, update_failed2, "error")
-                time.sleep(2)
-            else:
-                self.save_html_content(content, "fling_main.html")
+            # Fling main
+            self.update.emit(statusWidgetName, update_message2, "load")
+            if settings['flingDownloadServer'] == "official":
+                url = "https://flingtrainer.com/all-trainers-a-z/"
+                content = self.get_webpage_content(url)
+                if not content:
+                    self.update.emit(statusWidgetName, update_failed2, "error")
+                    time.sleep(2)
+                else:
+                    self.save_html_content(content, "fling_main.html")
 
-        elif settings['flingDownloadServer'] == "gcm":
-            url = "GCM/Data/fling_main.json"
-            signed_url = self.get_signed_download_url(url)
-            file_path = signed_url and self.request_download(signed_url, DATABASE_PATH)
-            if not file_path:
-                self.update.emit(statusWidgetName, update_failed2, "error")
-                time.sleep(2)
+            elif settings['flingDownloadServer'] == "gcm":
+                url = "GCM/Data/fling_main.json"
+                signed_url = self.get_signed_download_url(url)
+                file_path = signed_url and self.request_download(signed_url, DATABASE_PATH)
+                if not file_path:
+                    self.update.emit(statusWidgetName, update_failed2, "error")
+                    time.sleep(2)
+
+        except Exception:
+            traceback.print_exc()
+            self.update.emit(statusWidgetName, update_failed, "error")
+            time.sleep(2)
 
         self.finished.emit(statusWidgetName)
 
@@ -201,14 +215,18 @@ class FetchXiaoXingSite(DownloadBaseThread):
 
     def run(self):
         statusWidgetName = "xiaoxing"
-        update_message = tr("Updating data from XiaoXing")
         update_failed = tr("Update from XiaoXing failed")
+        try:
+            self.message.emit(statusWidgetName, tr("Updating data from XiaoXing"))
+            url = "GCM/Data/xiaoxing.json"
+            signed_url = self.get_signed_download_url(url)
+            file_path = signed_url and self.request_download(signed_url, DATABASE_PATH)
+            if not file_path:
+                self.update.emit(statusWidgetName, update_failed, "error")
+                time.sleep(2)
 
-        self.message.emit(statusWidgetName, update_message)
-        url = "GCM/Data/xiaoxing.json"
-        signed_url = self.get_signed_download_url(url)
-        file_path = signed_url and self.request_download(signed_url, DATABASE_PATH)
-        if not file_path:
+        except Exception:
+            traceback.print_exc()
             self.update.emit(statusWidgetName, update_failed, "error")
             time.sleep(2)
 
@@ -225,14 +243,18 @@ class FetchCTSite(DownloadBaseThread):
 
     def run(self):
         statusWidgetName = "ct"
-        update_message = tr("Updating data from CT")
         update_failed = tr("Update from CT failed")
+        try:
+            self.message.emit(statusWidgetName, tr("Updating data from CT"))
+            url = "GCM/Data/cheat_table.json"
+            signed_url = self.get_signed_download_url(url)
+            file_path = signed_url and self.request_download(signed_url, DATABASE_PATH)
+            if not file_path:
+                self.update.emit(statusWidgetName, update_failed, "error")
+                time.sleep(2)
 
-        self.message.emit(statusWidgetName, update_message)
-        url = "GCM/Data/cheat_table.json"
-        signed_url = self.get_signed_download_url(url)
-        file_path = signed_url and self.request_download(signed_url, DATABASE_PATH)
-        if not file_path:
+        except Exception:
+            traceback.print_exc()
             self.update.emit(statusWidgetName, update_failed, "error")
             time.sleep(2)
 
@@ -249,14 +271,18 @@ class FetchTrainerTranslations(DownloadBaseThread):
 
     def run(self):
         statusWidgetName = "translations"
-        fetch_message = tr("Fetching trainer translations")
         fetch_error = tr("Fetch trainer translations failed")
+        try:
+            self.message.emit(statusWidgetName, tr("Fetching trainer translations"))
+            url = "GCM/Data/translations.json"
+            signed_url = self.get_signed_download_url(url)
+            file_path = signed_url and self.request_download(signed_url, DATABASE_PATH)
+            if not file_path:
+                self.update.emit(statusWidgetName, fetch_error, "error")
+                time.sleep(2)
 
-        self.message.emit(statusWidgetName, fetch_message)
-        url = "GCM/Data/translations.json"
-        signed_url = self.get_signed_download_url(url)
-        file_path = signed_url and self.request_download(signed_url, DATABASE_PATH)
-        if not file_path:
+        except Exception:
+            traceback.print_exc()
             self.update.emit(statusWidgetName, fetch_error, "error")
             time.sleep(2)
 
@@ -280,28 +306,28 @@ class TrainerUploadWorker(QThread):
         self._is_cancelled = True
 
     def run(self):
-        meta_dict = {
-            'uploader-contact': self.contact_info,
-            'trainer-name': self.trainer_name,
-            'trainer-source': self.trainer_source,
-            'notes': self.notes
-        }
-        meta_json = json.dumps(meta_dict)
-
-        upload_data = DownloadBaseThread.get_signed_upload_url(self.file_path, meta_json)
-        if not upload_data:
-            self.finished.emit(False, tr("Failed to retrieve upload authorization."))
-            return
-
-        if self._is_cancelled:
-            return
-        upload_url = upload_data.get('uploadUrl')
-        required_headers = upload_data.get('requiredHeaders', {})
-        if not upload_url:
-            self.finished.emit(False, tr("Failed to retrieve upload url."))
-            return
-
         try:
+            meta_dict = {
+                'uploader-contact': self.contact_info,
+                'trainer-name': self.trainer_name,
+                'trainer-source': self.trainer_source,
+                'notes': self.notes
+            }
+            meta_json = json.dumps(meta_dict)
+
+            upload_data = DownloadBaseThread.get_signed_upload_url(self.file_path, meta_json)
+            if not upload_data:
+                self.finished.emit(False, tr("Failed to retrieve upload authorization."))
+                return
+
+            if self._is_cancelled:
+                return
+            upload_url = upload_data.get('uploadUrl')
+            required_headers = upload_data.get('requiredHeaders', {})
+            if not upload_url:
+                self.finished.emit(False, tr("Failed to retrieve upload url."))
+                return
+
             class ProgressFileObject:
                 def __init__(self, filepath, callback, cancel_check):
                     self.file = open(filepath, 'rb')
@@ -337,6 +363,7 @@ class TrainerUploadWorker(QThread):
             self.finished.emit(True, tr("Upload successful! Thank you for your contribution.\nYour trainer will be available for download after passing a manual review."))
 
         except Exception as e:
+            traceback.print_exc()
             if not self._is_cancelled:
                 self.finished.emit(False, tr("Upload failed: ") + str(e))
 
@@ -357,114 +384,119 @@ class WeModCustomization(QThread):
         self.patchMethod = patchMethod
 
     def run(self):
-        asar = os.path.join(self.selectedWeModPath, "resources", "app.asar")
-        asar_copy = os.path.join(WEMOD_TEMP_DIR, "app.asar")
-        asar_bak = os.path.join(self.selectedWeModPath, "resources", "app.asar.bak")
+        try:
+            asar = os.path.join(self.selectedWeModPath, "resources", "app.asar")
+            asar_copy = os.path.join(WEMOD_TEMP_DIR, "app.asar")
+            asar_bak = os.path.join(self.selectedWeModPath, "resources", "app.asar.bak")
 
-        weModExe_WeMod = os.path.join(self.selectedWeModPath, "WeMod.exe")  # ->  WeMod.exe latest is 11.6.0
-        weModExe_Wand = os.path.join(self.selectedWeModPath, "Wand.exe")  # ->  Wand.exe newest is 12.0.3
-        if os.path.exists(weModExe_Wand):
-            weModExeName = "Wand.exe"
-            weModExe = weModExe_Wand
-        else:
-            weModExeName = "WeMod.exe"
-            weModExe = weModExe_WeMod
-        weModExe_bak = os.path.join(self.selectedWeModPath, f"{weModExeName}.bak")
+            weModExe_WeMod = os.path.join(self.selectedWeModPath, "WeMod.exe")  # ->  WeMod.exe latest is 11.6.0
+            weModExe_Wand = os.path.join(self.selectedWeModPath, "Wand.exe")  # ->  Wand.exe newest is 12.0.3
+            if os.path.exists(weModExe_Wand):
+                weModExeName = "Wand.exe"
+                weModExe = weModExe_Wand
+            else:
+                weModExeName = "WeMod.exe"
+                weModExe = weModExe_WeMod
+            weModExe_bak = os.path.join(self.selectedWeModPath, f"{weModExeName}.bak")
 
-        # Terminate if WeMod is running
-        if self.is_program_running(weModExeName):
-            self.message.emit(tr("Wand is currently running,\nplease close the application first"), "error")
-            self.finished.emit()
-            return
+            # Terminate if WeMod is running
+            if self.is_program_running(weModExeName):
+                self.message.emit(tr("Wand is currently running,\nplease close the application first"), "error")
+                self.finished.emit()
+                return
 
-        # ===========================================================================
-        # Unlock WeMod Pro
-        if self.parent().weModProCheckbox.isChecked():
-            patch_success = True
+            # ===========================================================================
+            # Unlock WeMod Pro
+            if self.parent().weModProCheckbox.isChecked():
+                patch_success = True
 
-            try:
-                # 1. Remove asar integrity check
-                shutil.copyfile(weModExe, weModExe_bak)
-                self.replace_hex_in_file(weModExe_bak, weModExe, '00001101', '00000101')
-                os.remove(weModExe_bak)
+                try:
+                    # 1. Remove asar integrity check
+                    shutil.copyfile(weModExe, weModExe_bak)
+                    self.replace_hex_in_file(weModExe_bak, weModExe, '00001101', '00000101')
+                    os.remove(weModExe_bak)
 
-                # 2. Patch app.asar
-                os.makedirs(WEMOD_TEMP_DIR, exist_ok=True)
+                    # 2. Patch app.asar
+                    os.makedirs(WEMOD_TEMP_DIR, exist_ok=True)
+                    if os.path.exists(asar_bak):
+                        if os.path.exists(asar):
+                            os.remove(asar)
+                        os.rename(asar_bak, asar)
+                    shutil.copyfile(asar, asar_copy)
+                except Exception as e:
+                    self.message.emit(tr("Failed to patch file:") + f"{str(e)}", "error")
+                    self.finished.emit()
+                    return
+
+                # Extract app.asar file
+                try:
+                    command = [unzip_path, 'e', '-y', asar_copy, "app*bundle.js", "index.js", f"-o{WEMOD_TEMP_DIR}"]
+                    subprocess.run(command, check=True, creationflags=subprocess.CREATE_NO_WINDOW)
+                except Exception as e:
+                    self.message.emit(tr("Failed to extract file:") + f"\n{asar_copy}", "error")
+                    patch_success = False
+
+                # Patching logic
+                patch_success = self.patch()
+
+                # pack patched js files back to app.asar
+                try:
+                    shutil.copyfile(asar, asar_bak)
+                    command = [unzip_path, 'a', '-y', asar_copy, os.path.join(WEMOD_TEMP_DIR, '*.js')]
+                    subprocess.run(command, check=True, creationflags=subprocess.CREATE_NO_WINDOW)
+                    shutil.move(asar_copy, asar)
+                except Exception as e:
+                    self.message.emit(tr("Failed to patch file:") + f"\n{asar}", "error")
+                    patch_success = False
+
+                # Clean up
+                shutil.rmtree(WEMOD_TEMP_DIR)
+                if patch_success:
+                    self.message.emit(tr("Wand Pro activated"), "success")
+                else:
+                    self.message.emit(tr("Failed to activate Wand Pro"), "error")
+
+            else:
                 if os.path.exists(asar_bak):
                     if os.path.exists(asar):
                         os.remove(asar)
                     os.rename(asar_bak, asar)
-                shutil.copyfile(asar, asar_copy)
-            except Exception as e:
-                self.message.emit(tr("Failed to patch file:") + f"{str(e)}", "error")
-                self.finished.emit()
-                return
 
-            # Extract app.asar file
+                self.message.emit(tr("Wand Pro disabled"), "success")
+
+            # ===========================================================================
+            # Disable auto update
+            updateExe = os.path.join(self.weModInstallPath, "Update.exe")
+            updateExe_backup = os.path.join(self.weModInstallPath, "Update.exe.bak")
             try:
-                command = [unzip_path, 'e', '-y', asar_copy, "app*bundle.js", "index.js", f"-o{WEMOD_TEMP_DIR}"]
-                subprocess.run(command, check=True, creationflags=subprocess.CREATE_NO_WINDOW)
+                if self.parent().disableUpdateCheckbox.isChecked():
+                    if os.path.exists(updateExe):
+                        os.rename(updateExe, updateExe_backup)
+                        self.message.emit(tr("Wand auto update disabled"), "success")
+                else:
+                    if os.path.exists(updateExe_backup):
+                        os.rename(updateExe_backup, updateExe)
+                        self.message.emit(tr("Wand auto update enabled"), "success")
+                    elif not os.path.exists(updateExe):
+                        self.message.emit(tr("Failed to enable Wand auto update,\nplease try reinstalling Wand"), "error")
             except Exception as e:
-                self.message.emit(tr("Failed to extract file:") + f"\n{asar_copy}", "error")
-                patch_success = False
+                self.message.emit(tr("Failed to process Wand update file:") + f"\n{str(e)}", "error")
 
-            # Patching logic
-            patch_success = self.patch()
+            # ===========================================================================
+            # Delete other version folders
+            if self.parent().delOtherVersionsCheckbox.isChecked():
+                for version in self.weModVersions:
+                    if version != self.selectedWeModVersion:
+                        folder_path = os.path.join(self.weModInstallPath, f"app-{version}")
+                        try:
+                            shutil.rmtree(folder_path)
+                            self.message.emit(tr("Deleted Wand version: ") + version, "success")
+                        except Exception as e:
+                            self.message.emit(tr("Failed to delete Wand version: ") + version, "error")
 
-            # pack patched js files back to app.asar
-            try:
-                shutil.copyfile(asar, asar_bak)
-                command = [unzip_path, 'a', '-y', asar_copy, os.path.join(WEMOD_TEMP_DIR, '*.js')]
-                subprocess.run(command, check=True, creationflags=subprocess.CREATE_NO_WINDOW)
-                shutil.move(asar_copy, asar)
-            except Exception as e:
-                self.message.emit(tr("Failed to patch file:") + f"\n{asar}", "error")
-                patch_success = False
-
-            # Clean up
-            shutil.rmtree(WEMOD_TEMP_DIR)
-            if patch_success:
-                self.message.emit(tr("Wand Pro activated"), "success")
-            else:
-                self.message.emit(tr("Failed to activate Wand Pro"), "error")
-
-        else:
-            if os.path.exists(asar_bak):
-                if os.path.exists(asar):
-                    os.remove(asar)
-                os.rename(asar_bak, asar)
-
-            self.message.emit(tr("Wand Pro disabled"), "success")
-
-        # ===========================================================================
-        # Disable auto update
-        updateExe = os.path.join(self.weModInstallPath, "Update.exe")
-        updateExe_backup = os.path.join(self.weModInstallPath, "Update.exe.bak")
-        try:
-            if self.parent().disableUpdateCheckbox.isChecked():
-                if os.path.exists(updateExe):
-                    os.rename(updateExe, updateExe_backup)
-                    self.message.emit(tr("Wand auto update disabled"), "success")
-            else:
-                if os.path.exists(updateExe_backup):
-                    os.rename(updateExe_backup, updateExe)
-                    self.message.emit(tr("Wand auto update enabled"), "success")
-                elif not os.path.exists(updateExe):
-                    self.message.emit(tr("Failed to enable Wand auto update,\nplease try reinstalling Wand"), "error")
         except Exception as e:
-            self.message.emit(tr("Failed to process Wand update file:") + f"\n{str(e)}", "error")
-
-        # ===========================================================================
-        # Delete other version folders
-        if self.parent().delOtherVersionsCheckbox.isChecked():
-            for version in self.weModVersions:
-                if version != self.selectedWeModVersion:
-                    folder_path = os.path.join(self.weModInstallPath, f"app-{version}")
-                    try:
-                        shutil.rmtree(folder_path)
-                        self.message.emit(tr("Deleted Wand version: ") + version, "success")
-                    except Exception as e:
-                        self.message.emit(tr("Failed to delete Wand version: ") + version, "error")
+            traceback.print_exc()
+            self.message.emit(tr("Failed to patch file:") + f"\n{str(e)}", "error")
 
         self.finished.emit()
 

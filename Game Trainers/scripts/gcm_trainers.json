@@ -88,10 +88,11 @@
         "game_name": "Core Keeper",
         "origin": "other",
         "author": "RussDev7",
-        "custom_name": "Workshop",
+        "custom_name_en": "Inventory Editor",
+        "custom_name_zh": "物品编辑器",
         "official_url": "https://github.com/RussDev7/CoreKeepersWorkshop",
-        "gcm_url": "GCM/GCM Trainers/Core Keeper Workshop [RussDev7].zip",
-        "version": "2026.3.17"
+        "gcm_url": "GCM/GCM Trainers/Core Keeper Inventory Editor [RussDev7].zip",
+        "version": "2026.5.18"
     },
     {
         "game_name": "Unrailed 2: Back on Track",
@@ -133,7 +134,7 @@
         "game_name": "Forza Horizon 5",
         "origin": "other",
         "author": "Merika",
-        "custom_name": "Mizu 中文版",
+        "custom_name": "Mizu 中文版修改器",
         "official_url": "https://www.merika.dev/trainers/fh5, https://github.com/mizutop/Mizu_FH5Trainer_CN",
         "gcm_url": "GCM/GCM Trainers/Forza Horizon 5 Trainer [Mizu].zip",
         "version": "2026.1.22"
@@ -261,7 +262,7 @@
         "author": "大母鹅",
         "official_url": "https://www.loxin.top/archives/1017",
         "gcm_url": "GCM/GCM Trainers/Nioh 3 Trainer [DaMuE].exe",
-        "version": "2026.4.28"
+        "version": "2026.5.5"
     },
     {
         "game_name": "Portal Knights",
@@ -1597,7 +1598,7 @@
         "author": "简简单单2022",
         "official_url": "https://bbs.3dmgame.com/thread-6660842-1-1.html",
         "gcm_url": "GCM/GCM Trainers/Crimson Desert Trainer [JianJianDanDan2022].ct",
-        "version": "2026.5.3"
+        "version": "2026.5.12"
     },
     {
         "game_name": "Cubic Cosmos",
@@ -1808,7 +1809,7 @@
         "game_name": "Bongo Cat",
         "origin": "other",
         "author": "XV40",
-        "custom_name": "Mod",
+        "custom_name": "自动开箱 Mod",
         "official_url": "https://www.xiaoheihe.cn/app/bbs/link/170065045",
         "gcm_url": "GCM/GCM Trainers/Bongo Cat Mod [XV40].zip",
         "extension": "none",
@@ -2726,5 +2727,238 @@
         "author": "Dami",
         "gcm_url": "GCM/GCM Trainers/Prototype Trainer [Dami].exe",
         "version": "2010.9.2"
+    },
+    {
+        "game_name": "DYNASTY WARRIORS: ORIGINS",
+        "origin": "ct_other",
+        "author": "物理公式的鞠",
+        "official_url": "https://space.bilibili.com/433684709",
+        "gcm_url": "GCM/GCM Trainers/DYNASTY WARRIORS_ORIGINS Trainer [WuLiGongShiDeJu].ct",
+        "version": "2026.2.17"
+    },
+    {
+        "game_name": "Astro Prospector",
+        "origin": "ct_other",
+        "author": "wzslrb",
+        "official_url": "https://bbs.3dmgame.com/thread-6640878-1-1.html",
+        "gcm_url": "GCM/GCM Trainers/Astro Prospector Trainer [wzslrb].ct",
+        "version": "2025.12.19"
+    },
+    {
+        "game_name": "Carnal Instinct",
+        "origin": "ct_other",
+        "author": "Send",
+        "official_url": "https://fearlessrevolution.com/viewtopic.php?t=38140",
+        "gcm_url": "GCM/GCM Trainers/Carnal Instinct Trainer [Send].ct",
+        "version": "2026.2.3"
+    },
+    {
+        "game_name": "Company of Heroes: Tales of Valor",
+        "origin": "ct_other",
+        "author": "Recifense",
+        "official_url": "https://fearlessrevolution.com/viewtopic.php?t=747",
+        "gcm_url": "GCM/GCM Trainers/Company of Heroes_Tales of Valor Trainer [Recifense].ct",
+        "version": "2017.6.4"
+    },
+    {
+        "game_name": "GRIS",
+        "origin": "ct_other",
+        "author": "Cielos",
+        "official_url": "https://fearlessrevolution.com/viewtopic.php?t=9369",
+        "gcm_url": "GCM/GCM Trainers/GRIS Trainer [Cielos].ct",
+        "version": "2024.10.20"
+    },
+    {
+        "game_name": "Grand Theft Auto Online",
+        "origin": "other",
+        "author": "OnelyMaker",
+        "custom_name_en": "Key Macro",
+        "custom_name_zh": "按键宏",
+        "official_url": "https://docs.qq.com/aio/DTVJPUUh6T2J3ZEpC",
+        "gcm_url": "GCM/GCM Trainers/Grand Theft Auto Online Key Macro [OnelyMaker].exe",
+        "version": "2026.5.14"
+    },
+    {
+        "game_name": "House Flipper",
+        "origin": "other",
+        "author": "MrAntiFun",
+        "official_url": "https://mrantifun.net/threads/house-flipper-trainer.16392/",
+        "gcm_url": "GCM/GCM Trainers/House Flipper Trainer [MrAntiFun].exe",
+        "version": "2019.5.29"
+    },
+    {
+        "game_name": "Isekai Big Dick",
+        "origin": "other",
+        "author": "jx666",
+        "gcm_url": "GCM/GCM Trainers/Isekai Big Dick Trainer [jx666].zip",
+        "version": "2026.5.24"
+    },
+    {
+        "game_name": "Ultimate General: Civil War",
+        "origin": "other",
+        "author": "MrAntiFun",
+        "official_url": "https://mrantifun.net/threads/ultimate-general-civil-war-trainer.11514/",
+        "gcm_url": "GCM/GCM Trainers/Ultimate General_Civil War Trainer [MrAntiFun].exe",
+        "version": "2019.6.13"
+    },
+    {
+        "game_name": "Metro 2033 Redux",
+        "origin": "other",
+        "author": "LIRW",
+        "gcm_url": "GCM/GCM Trainers/Metro 2033 Redux Trainer [LIRW].zip",
+        "version": "2021.5.12"
+    },
+    {
+        "game_name": "Metro 2033 Redux",
+        "origin": "other",
+        "author": "hex",
+        "official_url": "https://www.nexusmods.com/metro2033redux/mods/32",
+        "gcm_url": "GCM/GCM Trainers/Metro 2033 Redux Trainer [hex].exe",
+        "version": "2025.8.2"
+    },
+    {
+        "game_name": "Dohna Dohna",
+        "origin": "ct_other",
+        "gcm_url": "GCM/GCM Trainers/Dohna Dohna Trainer.ct",
+        "version": "2026.5.24"
+    },
+    {
+        "game_name": "The Lewd Ordeals of a Way-Too-Easy Genius Elf",
+        "origin": "other",
+        "author": "jx666",
+        "gcm_url": "GCM/GCM Trainers/The Lewd Ordeals of a Way-Too-Easy Genius Elf Trainer [jx666].zip",
+        "version": "2026.5.24"
+    },
+    {
+        "game_name": "Forza Horizon 6",
+        "origin": "other",
+        "author": "老友几多",
+        "gcm_url": "GCM/GCM Trainers/Forza Horizon 6 Trainer [LaoYouJiDuo].exe",
+        "version": "2026.5.24"
+    },
+    {
+        "game_name": "Meteor Butterfly Sword",
+        "origin": "other",
+        "author": "うDraKon",
+        "gcm_url": "GCM/GCM Trainers/Meteor Butterfly Sword Trainer [UDraKon].exe",
+        "version": "2026.5.24"
+    },
+    {
+        "game_name": "Crimson Desert",
+        "origin": "other",
+        "author": "老友几多",
+        "gcm_url": "GCM/GCM Trainers/Crimson Desert Trainer [LaoYouJiDuo].exe",
+        "version": "2026.3.21"
+    },
+    {
+        "game_name": "Assassin's Creed II",
+        "origin": "other",
+        "author": "MrAntiFun",
+        "official_url": "https://mrantifun.net/threads/assassins-creed-2-trainer.130/",
+        "gcm_url": "GCM/GCM Trainers/Assassin's Creed II Trainer [MrAntiFun].exe",
+        "version": "2014.2.12"
+    },
+    {
+        "game_name": "Commandos: Origins",
+        "origin": "other",
+        "author": "Abolfazl.k",
+        "gcm_url": "GCM/GCM Trainers/Commandos_Origins Trainer [Abolfazl.k].exe",
+        "version": "2025.4.11"
+    },
+    {
+        "game_name": "Company of Heroes",
+        "origin": "other",
+        "author": "Slenderchat",
+        "gcm_url": "GCM/GCM Trainers/Company of Heroes Trainer [Slenderchat].exe",
+        "version": "2013.6.29"
+    },
+    {
+        "game_name": "Forza Horizon 6",
+        "origin": "other",
+        "author": "Akkariins",
+        "official_url": "https://www.bilibili.com/video/BV1XwGa65EZW",
+        "gcm_url": "GCM/GCM Trainers/Forza Horizon 6 Trainer [Akkariins].zip",
+        "version": "2026.5.28"
+    },
+    {
+        "game_name": "Grand Theft Auto V",
+        "origin": "other",
+        "author": "KaBoom",
+        "official_url": "http://kaboomtrainer.com/",
+        "gcm_url": "GCM/GCM Trainers/Grand Theft Auto V Trainer [KaBoom].zip",
+        "version": "2026.4.7"
+    },
+    {
+        "game_name": "Plants vs. Zombies",
+        "origin": "other",
+        "author": "Strawberry_BD",
+        "official_url": "https://tieba.baidu.com/p/5565838238",
+        "gcm_url": "GCM/GCM Trainers/Plants vs. Zombies Trainer [Strawberry_BD].zip",
+        "version": "2018.2.25"
+    },
+    {
+        "game_name": "Pandora's Toybox",
+        "origin": "ct_other",
+        "gcm_url": "GCM/GCM Trainers/Pandora's Toybox Trainer.ct",
+        "version": "2026.5.29"
+    },
+    {
+        "game_name": "RAID: World War II",
+        "origin": "other",
+        "author": "FutureX",
+        "official_url": "https://megagames.com/trainers/raid-world-war-ii-v11-6-trainer-futurex",
+        "gcm_url": "GCM/GCM Trainers/RAID_World War II Trainer [FutureX].exe",
+        "version": "2017.10.4"
+    },
+    {
+        "game_name": "Command & Conquer: Red Alert 3",
+        "origin": "other",
+        "author": "Abgetrennter",
+        "official_url": "https://github.com/Abgetrennter/Ra3-trainer-refine",
+        "gcm_url": "GCM/GCM Trainers/Command & Conquer_Red Alert 3 Trainer [Abgetrennter].exe",
+        "version": "2026.5.29"
+    },
+    {
+        "game_name": "Summer Clover",
+        "origin": "ct_other",
+        "author": "Crddp",
+        "gcm_url": "GCM/GCM Trainers/Summer Clover Trainer [Crddp].ct",
+        "version": "2026.5.29"
+    },
+    {
+        "game_name": "Brotato",
+        "origin": "other",
+        "author": "易子",
+        "gcm_url": "GCM/GCM Trainers/Brotato Trainer [YiZi].exe",
+        "version": "2023.4.1"
+    },
+    {
+        "game_name": "Left 4 Dead",
+        "origin": "other",
+        "author": "Enforcer",
+        "gcm_url": "GCM/GCM Trainers/Left 4 Dead Trainer [Enforcer].zip",
+        "version": "2008.12.4"
+    },
+    {
+        "game_name": "Left 4 Dead 2",
+        "origin": "other",
+        "author": "Enforcer",
+        "gcm_url": "GCM/GCM Trainers/Left 4 Dead 2 Trainer [Enforcer].zip",
+        "version": "2009.12.18"
+    },
+    {
+        "game_name": "Sid Meier's Civilization V",
+        "origin": "other",
+        "author": "MrAntiFun",
+        "official_url": "https://mrantifun.net/threads/sid-meier-civilization-5-trainer.246/",
+        "gcm_url": "GCM/GCM Trainers/Sid Meier's Civilization V Trainer [MrAntiFun].exe",
+        "version": "2016.11.12"
+    },
+    {
+        "game_name": "Command & Conquer: Yuri's Revenge",
+        "origin": "other",
+        "author": "游游荡荡",
+        "gcm_url": "GCM/GCM Trainers/Command & Conquer_Yuri's Revenge Trainer [YouYouDangDang].exe",
+        "version": "2015.12.31"
     }
 ]

@@ -1,6 +1,7 @@
 import concurrent.futures
 import re
 import time
+import traceback
 from urllib.parse import urljoin
 
 from bs4 import BeautifulSoup
@@ -17,96 +18,102 @@ class DownloadDisplayThread(DownloadBaseThread):
         self.status_pause_time = 0.2
 
     def run(self):
-        DownloadBaseThread.trainer_urls = []
-        keywordList = self.translate_keyword(self.keyword)
-        if not keywordList:
-            self.message.emit(tr("Failed to translate, please update translation data."), "failure")
-            self.finished.emit(1)
-            return
-        self.message.emit(tr("Searching..."), None)
-
-        # ======================================================
-        # Fling
-        status = self.search_from_fling_archive(keywordList)
-        if not status:
-            self.finished.emit(1)
-            return
-        status = self.search_from_fling_main(keywordList)
-        if not status:
-            self.finished.emit(1)
-            return
-
-        # Filter and prioritize trainers from the main site
-        filtered_trainer_urls = {}
-        for trainer in DownloadBaseThread.trainer_urls:
-            norm_name = self.sanitize(trainer["game_name"])
-
-            # Add trainer if not already present or replace only if from fling_main and current is from fling_archive
-            if norm_name not in filtered_trainer_urls:
-                filtered_trainer_urls[norm_name] = trainer
-            elif trainer["origin"] == "fling_main" and filtered_trainer_urls[norm_name]["origin"] == "fling_archive":
-                filtered_trainer_urls[norm_name] = trainer
-
-        # Update trainer_urls with filtered and deduplicated results
-        DownloadBaseThread.trainer_urls = list(filtered_trainer_urls.values())
-
-        # ======================================================
-        # XiaoXing
-        if settings["enableXiaoXing"]:
-            status = self.search_from_xiaoxing(keywordList)
-            if not status:
-                self.finished.emit(1)
-                return
-
-        # ======================================================
-        # CT
-        if settings["enableCT"]:
-            status = self.search_from_ct(keywordList)
-            if not status:
-                self.finished.emit(1)
-                return
-
-        # ======================================================
-        # GCM
-        if settings["enableGCM"]:
-            status = self.search_from_gcm(keywordList)
-            if not status:
-                self.finished.emit(1)
-                return
-
-        # ======================================================
-        # Finalize
-        self.message.emit(tr("Translating search results..."), None)
-        with concurrent.futures.ThreadPoolExecutor(max_workers=5) as executor:
-            futures = {
-                executor.submit(self.translate_trainer, trainer): trainer
-                for trainer in DownloadBaseThread.trainer_urls
-            }
-
-        # Update the translated names
-        for future in concurrent.futures.as_completed(futures):
-            trainer = futures[future]
-            if not future.result():
+        try:
+            DownloadBaseThread.trainer_urls = []
+            keywordList = self.translate_keyword(self.keyword)
+            if not keywordList:
                 self.message.emit(tr("Failed to translate, please update translation data."), "failure")
                 self.finished.emit(1)
                 return
-            trainer["trainer_name"] = future.result()
+            self.message.emit(tr("Searching..."), None)
 
-        if not DownloadBaseThread.trainer_urls:
-            self.message.emit(tr("No search results found."), "failure")
+            # ======================================================
+            # Fling
+            status = self.search_from_fling_archive(keywordList)
+            if not status:
+                self.finished.emit(1)
+                return
+            status = self.search_from_fling_main(keywordList)
+            if not status:
+                self.finished.emit(1)
+                return
+
+            # Filter and prioritize trainers from the main site
+            filtered_trainer_urls = {}
+            for trainer in DownloadBaseThread.trainer_urls:
+                norm_name = self.sanitize(trainer["game_name"])
+
+                # Add trainer if not already present or replace only if from fling_main and current is from fling_archive
+                if norm_name not in filtered_trainer_urls:
+                    filtered_trainer_urls[norm_name] = trainer
+                elif trainer["origin"] == "fling_main" and filtered_trainer_urls[norm_name]["origin"] == "fling_archive":
+                    filtered_trainer_urls[norm_name] = trainer
+
+            # Update trainer_urls with filtered and deduplicated results
+            DownloadBaseThread.trainer_urls = list(filtered_trainer_urls.values())
+
+            # ======================================================
+            # XiaoXing
+            if settings["enableXiaoXing"]:
+                status = self.search_from_xiaoxing(keywordList)
+                if not status:
+                    self.finished.emit(1)
+                    return
+
+            # ======================================================
+            # CT
+            if settings["enableCT"]:
+                status = self.search_from_ct(keywordList)
+                if not status:
+                    self.finished.emit(1)
+                    return
+
+            # ======================================================
+            # GCM
+            if settings["enableGCM"]:
+                status = self.search_from_gcm(keywordList)
+                if not status:
+                    self.finished.emit(1)
+                    return
+
+            # ======================================================
+            # Finalize
+            self.message.emit(tr("Translating search results..."), None)
+            with concurrent.futures.ThreadPoolExecutor(max_workers=5) as executor:
+                futures = {
+                    executor.submit(self.translate_trainer, trainer): trainer
+                    for trainer in DownloadBaseThread.trainer_urls
+                }
+
+            # Update the translated names
+            for future in concurrent.futures.as_completed(futures):
+                trainer = futures[future]
+                if not future.result():
+                    self.message.emit(tr("Failed to translate, please update translation data."), "failure")
+                    self.finished.emit(1)
+                    return
+                trainer["trainer_name"] = future.result()
+
+            if not DownloadBaseThread.trainer_urls:
+                self.message.emit(tr("No search results found."), "failure")
+                self.finished.emit(1)
+                return
+
+            # Sort based on translated names
+            sort_key_func = sort_trainers_key if settings["sortByOrigin"] else sort_trainers_key_ignore_prefix
+            DownloadBaseThread.trainer_urls.sort(key=lambda trainer: sort_key_func(trainer["trainer_name"]))
+
+            self.message.emit("", "clear")
+            for count, trainer in enumerate(DownloadBaseThread.trainer_urls, start=1):
+                self.message.emit(f"{count}. {trainer['trainer_name']}", "result")
+                print(f"{count}. {trainer['game_name']} | {trainer['trainer_name']} | {trainer['url']}")
+
+            self.finished.emit(0)
+
+        except Exception as e:
+            traceback.print_exc()
+            self.message.emit(tr("An error occurred while searching for trainers: ") + str(e), "failure")
             self.finished.emit(1)
-            return
-
-        # Sort based on translated names
-        sort_key_func = sort_trainers_key if settings["sortByOrigin"] else sort_trainers_key_ignore_prefix
-        DownloadBaseThread.trainer_urls.sort(key=lambda trainer: sort_key_func(trainer["trainer_name"]))
-
-        self.message.emit("", "clear")
-        for count, trainer in enumerate(DownloadBaseThread.trainer_urls, start=1):
-            self.message.emit(f"{count}. {trainer['trainer_name']}", "result")
-            print(f"{count}. {trainer['game_name']} | {trainer['trainer_name']} | {trainer['url']}")
-
-        self.finished.emit(0)
 
     def translate_keyword(self, keyword):
         translations = [keyword]

@@ -220,6 +220,9 @@ msgstr "翻译搜索结果中..."
 msgid "No search results found."
 msgstr "未找到相关修改器。"
 
+msgid "An error occurred while searching for trainers: "
+msgstr "搜索修改器时出错："
+
 msgid "Translating keywords..."
 msgstr "翻译关键词中..."
 
@@ -244,6 +247,9 @@ msgstr "检查网络连接中..."
 msgid "No internet connection, download failed."
 msgstr "没有网络连接，下载失败。"
 
+msgid "Could not initialize the temporary download folder, please try turning your antivirus software off."
+msgstr "无法初始化临时下载文件夹，请尝试关闭您的杀毒软件。"
+
 msgid "Attention"
 msgstr "警告"
 
@@ -259,6 +265,9 @@ msgstr "移动修改器时出错："
 
 msgid "Download success!"
 msgstr "下载成功！"
+
+msgid "An error occurred while downloading trainer: "
+msgstr "下载修改器时出错："
 
 msgid "Updating "
 msgstr "正在更新 "
@@ -278,9 +287,6 @@ msgstr "获取修改器版本失败。"
 msgid "Internet request failed."
 msgstr "网络请求失败。"
 
-msgid "An error occurred while downloading trainer: "
-msgstr "下载修改器时出错："
-
 msgid "Decompressing..."
 msgstr "解压中..."
 
@@ -296,35 +302,35 @@ msgstr "删除修改器背景音乐中..."
 msgid "Patching..."
 msgstr "打补丁中..."
 
-msgid "Updating data from GCM"
-msgstr "正在更新 GCM 数据"
-
 msgid "Update from GCM failed"
 msgstr "更新 GCM 数据失败"
 
-msgid "Updating data from FLiNG"
-msgstr "正在更新风灵月影数据"
+msgid "Updating data from GCM"
+msgstr "正在更新 GCM 数据"
 
 msgid "Update from FLiGN failed"
 msgstr "更新风灵月影数据失败"
 
-msgid "Updating data from XiaoXing"
-msgstr "正在更新小幸数据"
+msgid "Updating data from FLiNG"
+msgstr "正在更新风灵月影数据"
 
 msgid "Update from XiaoXing failed"
 msgstr "更新小幸数据失败"
 
-msgid "Updating data from CT"
-msgstr "正在更新 CT 表数据"
+msgid "Updating data from XiaoXing"
+msgstr "正在更新小幸数据"
 
 msgid "Update from CT failed"
 msgstr "更新 CT 表数据失败"
 
-msgid "Fetching trainer translations"
-msgstr "正在获取修改器翻译"
+msgid "Updating data from CT"
+msgstr "正在更新 CT 表数据"
 
 msgid "Fetch trainer translations failed"
 msgstr "获取修改器翻译失败"
+
+msgid "Fetching trainer translations"
+msgstr "正在获取修改器翻译"
 
 msgid "Failed to retrieve upload authorization."
 msgstr "获取上传授权失败。"

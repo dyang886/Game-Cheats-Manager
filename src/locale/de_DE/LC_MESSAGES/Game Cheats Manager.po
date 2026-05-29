@@ -220,6 +220,9 @@ msgstr "Suchergebnisse werden übersetzt..."
 msgid "No search results found."
 msgstr "Keine Suchergebnisse gefunden."
 
+msgid "An error occurred while searching for trainers: "
+msgstr "Ein Fehler ist beim Suchen nach Trainern aufgetreten: "
+
 msgid "Translating keywords..."
 msgstr "Schlüsselwörter werden übersetzt..."
 
@@ -244,6 +247,9 @@ msgstr "Internetverbindung wird geprüft..."
 msgid "No internet connection, download failed."
 msgstr "Keine Internetverbindung, Download fehlgeschlagen."
 
+msgid "Could not initialize the temporary download folder, please try turning your antivirus software off."
+msgstr "Der temporäre Download-Ordner konnte nicht initialisiert werden. Bitte versuche, deine Antivirensoftware zu deaktivieren."
+
 msgid "Attention"
 msgstr "Achtung"
 
@@ -259,6 +265,9 @@ msgstr "Ein Fehler ist beim Verschieben des Trainers aufgetreten: "
 
 msgid "Download success!"
 msgstr "Download erfolgreich!"
+
+msgid "An error occurred while downloading trainer: "
+msgstr "Ein Fehler ist beim Herunterladen des Trainers aufgetreten: "
 
 msgid "Updating "
 msgstr "Aktualisiere "
@@ -278,9 +287,6 @@ msgstr "Trainer-Version konnte nicht gefunden werden."
 msgid "Internet request failed."
 msgstr "Internet-Anfrage fehlgeschlagen."
 
-msgid "An error occurred while downloading trainer: "
-msgstr "Ein Fehler ist beim Herunterladen des Trainers aufgetreten: "
-
 msgid "Decompressing..."
 msgstr "Entpacke..."
 
@@ -296,35 +302,35 @@ msgstr "Hintergrundmusik des Trainers wird entfernt..."
 msgid "Patching..."
 msgstr "Patchen..."
 
-msgid "Updating data from GCM"
-msgstr "Daten von GCM werden aktualisiert"
-
 msgid "Update from GCM failed"
 msgstr "Update von GCM fehlgeschlagen"
 
-msgid "Updating data from FLiNG"
-msgstr "Daten von FLiNG werden aktualisiert"
+msgid "Updating data from GCM"
+msgstr "Daten von GCM werden aktualisiert"
 
 msgid "Update from FLiGN failed"
 msgstr "Update von FLiGN fehlgeschlagen"
 
-msgid "Updating data from XiaoXing"
-msgstr "Daten von XiaoXing werden aktualisiert"
+msgid "Updating data from FLiNG"
+msgstr "Daten von FLiNG werden aktualisiert"
 
 msgid "Update from XiaoXing failed"
 msgstr "Update von XiaoXing fehlgeschlagen"
 
-msgid "Updating data from CT"
-msgstr "Daten von CT werden aktualisiert"
+msgid "Updating data from XiaoXing"
+msgstr "Daten von XiaoXing werden aktualisiert"
 
 msgid "Update from CT failed"
 msgstr "Update von CT fehlgeschlagen"
 
-msgid "Fetching trainer translations"
-msgstr "Trainer-Übersetzungen werden abgerufen"
+msgid "Updating data from CT"
+msgstr "Daten von CT werden aktualisiert"
 
 msgid "Fetch trainer translations failed"
 msgstr "Abruf der Trainer-Übersetzungen fehlgeschlagen"
+
+msgid "Fetching trainer translations"
+msgstr "Trainer-Übersetzungen werden abgerufen"
 
 msgid "Failed to retrieve upload authorization."
 msgstr "Abruf der Upload-Berechtigung fehlgeschlagen."

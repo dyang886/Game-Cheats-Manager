@@ -46,7 +46,7 @@ class GameCheatsManager(QMainWindow):
         self.setMinimumSize(700, 520)
 
         # Version and links
-        self.appVersion = "2.5.0-beta.5"
+        self.appVersion = "2.5.0-beta.6"
         self.websiteLink = "https://gamezonelabs.com"
         self.allTrainersLink = "https://gamezonelabs.com/products/game-cheats-manager/trainers"
         self.githubLink = "https://github.com/dyang886/Game-Cheats-Manager"
