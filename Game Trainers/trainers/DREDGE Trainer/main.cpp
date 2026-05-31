@@ -10,6 +10,24 @@
 #include "FLTKUtils.h"
 
 static Fl_Window *info_window = nullptr;
+static Fl_Window *g_main_window = nullptr;
+static constexpr const char *TRAINER_NAME = "DREDGE Trainer";
+static constexpr const char *GAME_VERSION = "1.5.3";
+static constexpr const char *TRAINER_VERSION = "2.0";
+
+static void update_window_title()
+{
+    if (!g_main_window)
+        return;
+    std::string title = std::string(t(TRAINER_NAME)) + " | Game v" + GAME_VERSION + " | Trainer v" + TRAINER_VERSION;
+    g_main_window->copy_label(title.c_str());
+}
+
+static void lang_title_callback(Fl_Widget *widget, void *data)
+{
+    change_language_callback(widget, data);
+    update_window_title();
+}
 
 // Callback function for apply button
 void apply_callback(Fl_Widget *widget, void *data)
@@ -420,6 +438,7 @@ int main(int argc, char **argv)
     int win_y = (screen_h - win_h) / 2;
 
     Fl_Window *window = new Fl_Window(win_x, win_y, win_w, win_h);
+    g_main_window = window;
     Fl::scheme("gtk+");
     Fl::set_color(FL_FREE_COLOR, 0x1c1c1c00);
     window->color(FL_FREE_COLOR);
@@ -460,7 +479,7 @@ int main(int argc, char **argv)
     lang_en->labelsize(font_size);
     lang_en->labelcolor(FL_WHITE);
     ChangeLanguageData *changeLanguageDataEN = new ChangeLanguageData{"en_US", window};
-    lang_en->callback(change_language_callback, changeLanguageDataEN);
+    lang_en->callback(lang_title_callback, changeLanguageDataEN);
 
     Fl_Radio_Round_Button *lang_zh = new Fl_Radio_Round_Button(0, 0, 0, 0, "简体中文");
     if (language == "zh_CN")
@@ -469,7 +488,7 @@ int main(int argc, char **argv)
     lang_zh->labelsize(font_size);
     lang_zh->labelcolor(FL_WHITE);
     ChangeLanguageData *changeLanguageDataSC = new ChangeLanguageData{"zh_CN", window};
-    lang_zh->callback(change_language_callback, changeLanguageDataSC);
+    lang_zh->callback(lang_title_callback, changeLanguageDataSC);
 
     lang_flex.end();
 
@@ -736,6 +755,7 @@ int main(int argc, char **argv)
     Fl_Box *spacerBottom = new Fl_Box(0, 0, 0, 0);
     options1_flex->end();
     change_language(language, window);
+    update_window_title();
 
     // =========================
     // Finalize and Show Window

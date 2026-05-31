@@ -1,5 +1,6 @@
 set(GAME_NAME "Oil_Rush")
 set(TRAINER_NAME "Oil Rush Trainer")
+set(TRAINER_ARCH "x86")
 
 set(VENV_PYTHON "${CMAKE_SOURCE_DIR}/.venv/Scripts/python.exe")
 set(SUBSET_FONT_TARGET "${GAME_NAME}_SubsetFont")

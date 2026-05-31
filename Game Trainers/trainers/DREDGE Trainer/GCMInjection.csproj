@@ -1,23 +1,30 @@
 <Project Sdk="Microsoft.NET.Sdk">
   <PropertyGroup>
-    <TargetFramework>net8.0</TargetFramework>
+    <TargetFramework>netstandard2.1</TargetFramework>
     <OutputType>Library</OutputType>
+    <DebugType>none</DebugType>
+    <DebugSymbols>false</DebugSymbols>
   </PropertyGroup>
   <ItemGroup>
     <Reference Include="UnityEngine">
       <HintPath>F:/SteamLibrary/steamapps/common/DREDGE/DREDGE_Data/Managed/UnityEngine.dll</HintPath>
+      <Private>false</Private>
     </Reference>
     <Reference Include="UnityEngine.CoreModule">
       <HintPath>F:/SteamLibrary/steamapps/common/DREDGE/DREDGE_Data/Managed/UnityEngine.CoreModule.dll</HintPath>
+      <Private>false</Private>
     </Reference>
     <Reference Include="Unity.Localization">
       <HintPath>F:/SteamLibrary/steamapps/common/DREDGE/DREDGE_Data/Managed/Unity.Localization.dll</HintPath>
+      <Private>false</Private>
     </Reference>
     <Reference Include="Assembly-CSharp">
       <HintPath>F:/SteamLibrary/steamapps/common/DREDGE/DREDGE_Data/Managed/Assembly-CSharp.dll</HintPath>
+      <Private>false</Private>
     </Reference>
     <Reference Include="Sirenix.Serialization">
       <HintPath>F:/SteamLibrary/steamapps/common/DREDGE/DREDGE_Data/Managed/Sirenix.Serialization.dll</HintPath>
+      <Private>false</Private>
     </Reference>
   </ItemGroup>
 </Project>

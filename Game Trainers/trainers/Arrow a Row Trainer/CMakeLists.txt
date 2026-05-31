@@ -1,5 +1,6 @@
 set(GAME_NAME "Arrow_A_Row")
 set(TRAINER_NAME "Arrow A Row Trainer")
+set(TRAINER_ARCH "x64")
 
 set(VENV_PYTHON "${CMAKE_SOURCE_DIR}/.venv/Scripts/python.exe")
 set(SUBSET_FONT_TARGET "${GAME_NAME}_SubsetFont")

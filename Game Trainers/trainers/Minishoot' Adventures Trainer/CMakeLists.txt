@@ -1,6 +1,6 @@
-set(GAME_NAME "DREDGE")
-set(TRAINER_NAME "DREDGE Trainer")
-set(TRAINER_ARCH "x86")
+set(GAME_NAME "Minishoot_Adventures")
+set(TRAINER_NAME "Minishoot' Adventures Trainer")
+set(TRAINER_ARCH "x64")
 
 set(CSHARP_TARGET "${GAME_NAME}_GCMInjection")
 set(CSHARP_SOURCE "${CMAKE_CURRENT_SOURCE_DIR}/GCMInjection.cs")
@@ -14,10 +14,7 @@ set(SUBSET_FONT_TARGET "${GAME_NAME}_SubsetFont")
 set(FONT_SUBSET_OUTPUT "${CMAKE_CURRENT_SOURCE_DIR}/NotoSansSC-Subset.ttf")
 set(FONT_SUBSET_SCRIPT "${CMAKE_SOURCE_DIR}/scripts/font_processor.py")
 set(FONT_FILE "${CMAKE_SOURCE_DIR}/scripts/NotoSansSC-Regular.ttf")
-set(TRANSLATION_FILES 
-    "${CMAKE_CURRENT_SOURCE_DIR}/translations.json"
-    "${CMAKE_CURRENT_SOURCE_DIR}/translation_extra.txt"
-)
+set(TRANSLATION_FILES "${CMAKE_CURRENT_SOURCE_DIR}/translations.json")
 
 # Run python script to generate the subsetted font
 add_custom_command(

@@ -11,13 +11,13 @@ public:
 
     static inline const wchar_t *moduleName = L"mono-2.0-bdwgc.dll";
 
-    bool godMode(BYTE enable)
+    bool godMode(bool enable)
     {
-        std::vector<unsigned int> offsets1 = {0x00561CCC, 0xC, 0x4, 0x6C, 0x18, 0x0, 0xAC, 0x94}; // No death
-        std::vector<unsigned int> offsets2 = {0x00561CCC, 0xC, 0x4, 0x6C, 0x18, 0x0, 0xAC, 0x95}; // No damage
-        bool result1 = WriteToDynamicAddress(moduleName, offsets1, enable);
-        bool result2 = WriteToDynamicAddress(moduleName, offsets2, enable);
-        return result1 && result2;
+        if (initializeDllInjection())
+        {
+            return invokeMethod("", "GCMInjection", "SetGodMode", {enable});
+        }
+        return false;
     }
 
     inline bool setSanity(float newVal)

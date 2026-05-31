@@ -1,0 +1,8 @@
+<Project>
+  <PropertyGroup>
+    <GCMInjectionBuildRoot>$(MSBuildThisFileDirectory)..\..\build\trainers\Minishoot' Adventures Trainer\GCMInjection\</GCMInjectionBuildRoot>
+    <BaseOutputPath>$(GCMInjectionBuildRoot)bin\</BaseOutputPath>
+    <BaseIntermediateOutputPath>$(GCMInjectionBuildRoot)obj\</BaseIntermediateOutputPath>
+    <MSBuildProjectExtensionsPath>$(BaseIntermediateOutputPath)</MSBuildProjectExtensionsPath>
+  </PropertyGroup>
+</Project>

@@ -40,6 +40,7 @@ target_link_libraries(Common INTERFACE
     gdiplus
     ws2_32
     shlwapi
+    psapi
 )
 
 # Define MonoBridge as a shared library

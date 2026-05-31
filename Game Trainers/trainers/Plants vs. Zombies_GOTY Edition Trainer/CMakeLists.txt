@@ -1,5 +1,6 @@
 set(GAME_NAME "Plants_vs._Zombies_GOTY_Edition")
 set(TRAINER_NAME "Plants vs. Zombies_GOTY Edition Trainer")
+set(TRAINER_ARCH "x86")
 
 set(VENV_PYTHON "${CMAKE_SOURCE_DIR}/.venv/Scripts/python.exe")
 set(SUBSET_FONT_TARGET "${GAME_NAME}_SubsetFont")

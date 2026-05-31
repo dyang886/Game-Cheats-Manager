@@ -1,5 +1,6 @@
 set(GAME_NAME "Zao_Meng_Xi_You_Wu_Shuang")
 set(TRAINER_NAME "Zao Meng Xi You_Wu Shuang Trainer")
+set(TRAINER_ARCH "x64")
 
 set(VENV_PYTHON "${CMAKE_SOURCE_DIR}/.venv/Scripts/python.exe")
 set(SUBSET_FONT_TARGET "${GAME_NAME}_SubsetFont")

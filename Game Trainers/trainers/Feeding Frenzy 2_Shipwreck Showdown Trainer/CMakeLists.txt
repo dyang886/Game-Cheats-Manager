@@ -1,5 +1,6 @@
 set(GAME_NAME "Feeding_Frenzy_2_Shipwreck_Showdown")
 set(TRAINER_NAME "Feeding Frenzy 2_Shipwreck Showdown Trainer")
+set(TRAINER_ARCH "x86")
 
 set(VENV_PYTHON "${CMAKE_SOURCE_DIR}/.venv/Scripts/python.exe")
 set(SUBSET_FONT_TARGET "${GAME_NAME}_SubsetFont")

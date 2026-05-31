@@ -1,5 +1,6 @@
 set(GAME_NAME "Just_Shapes_and_Beats")
 set(TRAINER_NAME "Just Shapes & Beats Trainer")
+set(TRAINER_ARCH "x64")
 
 set(IL2CPP_TARGET "${GAME_NAME}_IL2CPP")
 

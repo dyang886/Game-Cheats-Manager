@@ -1,5 +1,6 @@
 set(GAME_NAME "Plants_vs._Zombies_Replanted")
 set(TRAINER_NAME "Plants vs. Zombies_Replanted Trainer")
+set(TRAINER_ARCH "x64")
 
 set(IL2CPP_TARGET "${GAME_NAME}_IL2CPP")
 

@@ -3,9 +3,8 @@
 
 #include <FL/Fl.H>
 #include "TrainerBase.h"
-#include <mutex>
+#include <psapi.h>
 #include <shlwapi.h>
-#include <sstream>
 #include <variant>
 
 class MonoBase : public TrainerBase
@@ -31,27 +30,27 @@ public:
         if (loggingBuffer)
         {
             UnmapViewOfFile(loggingBuffer);
-            loggingBuffer = NULL;
+            loggingBuffer = nullptr;
         }
         if (hLoggingMapFile)
         {
             CloseHandle(hLoggingMapFile);
-            hLoggingMapFile = NULL;
+            hLoggingMapFile = nullptr;
         }
         if (responseBuffer)
         {
             UnmapViewOfFile(responseBuffer);
-            responseBuffer = NULL;
+            responseBuffer = nullptr;
         }
         if (hResponseMapFile)
         {
             CloseHandle(hResponseMapFile);
-            hResponseMapFile = NULL;
+            hResponseMapFile = nullptr;
         }
         if (hResponseEvent)
         {
             CloseHandle(hResponseEvent);
-            hResponseEvent = NULL;
+            hResponseEvent = nullptr;
         }
 
         if (!bridgeDllPath.empty())
@@ -65,7 +64,7 @@ public:
             bridgeDllPath.clear();
         }
 
-        if (extractedFiles.size() > 0)
+        if (!extractedFiles.empty())
         {
             for (const auto &file : extractedFiles)
             {
@@ -75,6 +74,8 @@ public:
         }
 
         dllInjected = false;
+        bridgeDllBase = 0;
+        funcPtrs = {};
     }
 
     bool initializeDllInjection()
@@ -86,15 +87,6 @@ public:
 
             if (!getFunctionPointers())
                 return false;
-
-            if (!loadAssembly("GCMINJECTION_DLL"))
-                return false;
-
-            if (!invokeMethod("", "GCMInjection", "Initialize", {}))
-            {
-                std::cerr << "[!] Failed to initialize dispatcher.\n";
-                return false;
-            }
 
             if (!initializeLoggingChannel())
             {
@@ -108,6 +100,18 @@ public:
                 return false;
             }
 
+            if (!loadAssembly("GCMINJECTION_DLL"))
+            {
+                std::cerr << "[!] Failed to load injected assembly.\n";
+                return false;
+            }
+
+            if (!invokeMethod("", "GCMInjection", "Initialize", {}))
+            {
+                std::cerr << "[!] Failed to initialize dispatcher.\n";
+                return false;
+            }
+
             dllInjected = true;
         }
         return dllInjected;
@@ -116,22 +120,23 @@ public:
     bool initializeLoggingChannel()
     {
         std::string loggingSharedMemName = "TrainerLoggingSharedMemory_" + std::to_string(procId);
-        hLoggingMapFile = CreateFileMappingA(INVALID_HANDLE_VALUE, NULL, PAGE_READWRITE, 0, loggingBufferSize, loggingSharedMemName.c_str());
-        if (hLoggingMapFile == NULL)
+        hLoggingMapFile = CreateFileMappingA(INVALID_HANDLE_VALUE, nullptr, PAGE_READWRITE, 0, loggingBufferSize, loggingSharedMemName.c_str());
+        if (hLoggingMapFile == nullptr)
         {
             std::cerr << "[!] Could not create file mapping object: " << GetLastError() << "\n";
             return false;
         }
 
         loggingBuffer = MapViewOfFile(hLoggingMapFile, FILE_MAP_ALL_ACCESS, 0, 0, 0);
-        if (loggingBuffer == NULL)
+        if (loggingBuffer == nullptr)
         {
             std::cerr << "[!] Could not map view of file: " << GetLastError() << "\n";
             CloseHandle(hLoggingMapFile);
-            hLoggingMapFile = NULL;
+            hLoggingMapFile = nullptr;
             return false;
         }
 
+        ZeroMemory(loggingBuffer, sizeof(SharedMemoryHeader));
         return true;
     }
 
@@ -143,16 +148,32 @@ public:
         {
             SharedMemoryHeader *header = static_cast<SharedMemoryHeader *>(self->loggingBuffer);
             char *bufferStart = static_cast<char *>(self->loggingBuffer) + sizeof(SharedMemoryHeader);
-
-            std::lock_guard<std::mutex> lock(header->mutex);
+            size_t capacity = self->loggingBufferSize - sizeof(SharedMemoryHeader);
 
             while (header->head != header->tail)
             {
+                if (header->tail + sizeof(size_t) > capacity)
+                {
+                    header->tail = 0;
+                    continue;
+                }
+
                 size_t length = *reinterpret_cast<size_t *>(bufferStart + header->tail);
+                if (length == 0)
+                {
+                    header->tail = 0;
+                    continue;
+                }
+                if (length > capacity || header->tail + sizeof(size_t) + length > capacity)
+                {
+                    header->tail = 0;
+                    continue;
+                }
+
                 char *msgPtr = bufferStart + header->tail + sizeof(size_t);
                 std::string message(msgPtr, length);
                 std::cout << message << "\n";
-                header->tail = (header->tail + sizeof(size_t) + length) % (self->loggingBufferSize - sizeof(SharedMemoryHeader));
+                header->tail = (header->tail + sizeof(size_t) + length) % capacity;
             }
         }
 
@@ -162,34 +183,35 @@ public:
     bool initializeRequestChannel()
     {
         std::string responseSharedMemName = "TrainerResponseSharedMemory_" + std::to_string(procId);
-        hResponseMapFile = CreateFileMappingA(INVALID_HANDLE_VALUE, NULL, PAGE_READWRITE, 0, responseBufferSize, responseSharedMemName.c_str());
-        if (hResponseMapFile == NULL)
+        hResponseMapFile = CreateFileMappingA(INVALID_HANDLE_VALUE, nullptr, PAGE_READWRITE, 0, responseBufferSize, responseSharedMemName.c_str());
+        if (hResponseMapFile == nullptr)
         {
             std::cerr << "[!] Could not create response file mapping object: " << GetLastError() << "\n";
             return false;
         }
 
         responseBuffer = MapViewOfFile(hResponseMapFile, FILE_MAP_ALL_ACCESS, 0, 0, 0);
-        if (responseBuffer == NULL)
+        if (responseBuffer == nullptr)
         {
             std::cerr << "[!] Could not map view of response file: " << GetLastError() << "\n";
             CloseHandle(hResponseMapFile);
-            hResponseMapFile = NULL;
+            hResponseMapFile = nullptr;
             return false;
         }
 
         std::string eventName = "TrainerResponseEvent_" + std::to_string(procId);
-        hResponseEvent = CreateEventA(NULL, FALSE, FALSE, eventName.c_str());
-        if (hResponseEvent == NULL)
+        hResponseEvent = CreateEventA(nullptr, FALSE, FALSE, eventName.c_str());
+        if (hResponseEvent == nullptr)
         {
             std::cerr << "[!] Could not create response event: " << GetLastError() << "\n";
             UnmapViewOfFile(responseBuffer);
             CloseHandle(hResponseMapFile);
-            hResponseMapFile = NULL;
-            responseBuffer = NULL;
+            hResponseMapFile = nullptr;
+            responseBuffer = nullptr;
             return false;
         }
 
+        *reinterpret_cast<size_t *>(responseBuffer) = 0;
         return true;
     }
 
@@ -245,20 +267,22 @@ public:
             return false;
         }
 
-        WaitForSingleObject(hThread, INFINITE);
-        DWORD exitCode = 0;
-        GetExitCodeThread(hThread, &exitCode);
+        DWORD waitResult = WaitForSingleObject(hThread, 5000);
         CloseHandle(hThread);
-
-        if (exitCode == 0)
+        if (waitResult != WAIT_OBJECT_0)
         {
-            std::cerr << "[!] LoadLibraryW failed in target process.\n";
-            VirtualFreeEx(hProcess, allocMem, 0, MEM_RELEASE);
+            std::cerr << "[!] Timed out while loading MonoBridge.dll in target process.\n";
             return false;
         }
 
-        bridgeDllBase = static_cast<uintptr_t>(exitCode);
         VirtualFreeEx(hProcess, allocMem, 0, MEM_RELEASE);
+
+        if (!findInjectedBridgeBase())
+        {
+            std::cerr << "[!] Failed to find injected MonoBridge.dll in target process.\n";
+            return false;
+        }
+
         return true;
     }
 
@@ -310,12 +334,37 @@ public:
             return false;
         }
 
-        WaitForSingleObject(hThread, INFINITE);
+        DWORD waitResult = WaitForSingleObject(hThread, 5000);
+        DWORD exitCode = 0;
+        GetExitCodeThread(hThread, &exitCode);
         CloseHandle(hThread);
+
+        if (waitResult != WAIT_OBJECT_0)
+        {
+            std::cerr << "[!] Timed out while retrieving bridge function pointers.\n";
+            FreeLibrary(hLocalDll);
+            return false;
+        }
+
+        if (exitCode != 0)
+        {
+            std::cerr << "[!] Remote GetFunctionPointersThread failed: " << exitCode << "\n";
+            VirtualFreeEx(hProcess, allocMem, 0, MEM_RELEASE);
+            FreeLibrary(hLocalDll);
+            return false;
+        }
 
         if (!ReadProcessMemory(hProcess, allocMem, &funcPtrs, sizeof(FunctionPointers), nullptr))
         {
             std::cerr << "[!] Failed to read function pointers from target process.\n";
+            VirtualFreeEx(hProcess, allocMem, 0, MEM_RELEASE);
+            FreeLibrary(hLocalDll);
+            return false;
+        }
+
+        if (!funcPtrs.LoadAssemblyThread || !funcPtrs.InvokeMethodThread)
+        {
+            std::cerr << "[!] Bridge returned invalid function pointers.\n";
             VirtualFreeEx(hProcess, allocMem, 0, MEM_RELEASE);
             FreeLibrary(hLocalDll);
             return false;
@@ -382,9 +431,22 @@ public:
             return false;
         }
 
-        WaitForSingleObject(hThread, INFINITE);
+        DWORD waitResult = WaitForSingleObject(hThread, 5000);
+        DWORD exitCode = 0;
+        GetExitCodeThread(hThread, &exitCode);
         CloseHandle(hThread);
+        if (waitResult != WAIT_OBJECT_0)
+        {
+            std::cerr << "[!] Timed out while loading assembly in target process.\n";
+            return false;
+        }
+
         VirtualFreeEx(hProcess, allocMem, 0, MEM_RELEASE);
+        if (exitCode != 0)
+        {
+            std::cerr << "[!] Failed to load assembly in target process.\n";
+            return false;
+        }
         return true;
     }
 
@@ -486,7 +548,7 @@ public:
         }
         invokeParams.paramCount = static_cast<int>(params.size());
         invokeParams.paramValues = reinterpret_cast<ParamValue *>(paramValuesMem);
-        if (!WriteProcessMemory(hProcess, paramValuesMem, paramValues.data(), paramValuesSize, nullptr))
+        if (paramValuesSize > 0 && !WriteProcessMemory(hProcess, paramValuesMem, paramValues.data(), paramValuesSize, nullptr))
         {
             std::cerr << "[!] Failed to write parameter values.\n";
             VirtualFreeEx(hProcess, allocMem, 0, MEM_RELEASE);
@@ -509,25 +571,22 @@ public:
             return false;
         }
 
-        std::stringstream ss;
-        ss << "[+] Invoked method " << (namespaceName.empty() ? "" : namespaceName + ".") << className << "." << methodName << "(";
-        for (size_t i = 0; i < params.size(); ++i)
-        {
-            if (i > 0)
-                ss << ", ";
-            if (std::holds_alternative<int>(params[i]))
-                ss << std::get<int>(params[i]);
-            else if (std::holds_alternative<float>(params[i]))
-                ss << std::get<float>(params[i]);
-            else if (std::holds_alternative<std::string>(params[i]))
-                ss << "\"" << std::get<std::string>(params[i]) << "\"";
-        }
-        ss << ")\n";
-        std::cout << ss.str();
-
-        WaitForSingleObject(hThread, INFINITE);
+        DWORD waitResult = WaitForSingleObject(hThread, 5000);
+        DWORD exitCode = 0;
+        GetExitCodeThread(hThread, &exitCode);
         CloseHandle(hThread);
+        if (waitResult != WAIT_OBJECT_0)
+        {
+            std::cerr << "[!] Timed out while invoking method " << className << "." << methodName << ".\n";
+            return false;
+        }
+
         VirtualFreeEx(hProcess, allocMem, 0, MEM_RELEASE);
+        if (exitCode != 0)
+        {
+            std::cerr << "[!] Failed to invoke method " << className << "." << methodName << ".\n";
+            return false;
+        }
         return true;
     }
 
@@ -570,12 +629,12 @@ private:
     uintptr_t bridgeDllBase = 0;
 
     // For injected dll communication
-    HANDLE hLoggingMapFile = NULL;
+    HANDLE hLoggingMapFile = nullptr;
     LPVOID loggingBuffer = nullptr;
     const size_t loggingBufferSize = 1024 * 1024;
-    HANDLE hResponseMapFile = NULL;
-    LPVOID responseBuffer = NULL;
-    HANDLE hResponseEvent = NULL;
+    HANDLE hResponseMapFile = nullptr;
+    LPVOID responseBuffer = nullptr;
+    HANDLE hResponseEvent = nullptr;
     const size_t responseBufferSize = 1024 * 1024;
 
     struct FunctionPointers
@@ -616,10 +675,62 @@ private:
 
     struct SharedMemoryHeader
     {
-        size_t head;
-        size_t tail;
-        std::mutex mutex;
+        volatile size_t head;
+        volatile size_t tail;
     };
+
+    bool findInjectedBridgeBase()
+    {
+        std::wstring dllName = bridgeDllPath.substr(bridgeDllPath.find_last_of(L"\\/") + 1);
+        DWORD pollStart = GetTickCount();
+        constexpr DWORD pollTimeout = 2000;
+
+        while ((GetTickCount() - pollStart) < pollTimeout)
+        {
+            HMODULE modules[1024];
+            DWORD needed = 0;
+            if (EnumProcessModules(hProcess, modules, sizeof(modules), &needed))
+            {
+                int numModules = static_cast<int>(needed / sizeof(HMODULE));
+                for (int i = 0; i < numModules; i++)
+                {
+                    wchar_t modulePath[MAX_PATH];
+                    if (GetModuleFileNameExW(hProcess, modules[i], modulePath, MAX_PATH))
+                    {
+                        wchar_t *moduleName = PathFindFileNameW(modulePath);
+                        if (_wcsicmp(modulePath, bridgeDllPath.c_str()) == 0 || _wcsicmp(moduleName, dllName.c_str()) == 0)
+                        {
+                            bridgeDllBase = reinterpret_cast<uintptr_t>(modules[i]);
+                            return true;
+                        }
+                    }
+                }
+            }
+
+            Sleep(50);
+        }
+
+        return false;
+    }
+
+    bool writeResourceToFile(const std::wstring &path, const void *data, DWORD size)
+    {
+        HANDLE hFile = CreateFileW(path.c_str(), GENERIC_WRITE, 0, nullptr, CREATE_ALWAYS, FILE_ATTRIBUTE_NORMAL, nullptr);
+        if (hFile == INVALID_HANDLE_VALUE)
+            return false;
+
+        DWORD bytesWritten = 0;
+        BOOL ok = WriteFile(hFile, data, size, &bytesWritten, nullptr);
+        CloseHandle(hFile);
+
+        if (!ok || bytesWritten != size)
+        {
+            DeleteFileW(path.c_str());
+            return false;
+        }
+
+        return true;
+    }
 
     /** Extracts a DLL from embedded resources to a temporary file
      * @param resourceName The resource identifier (e.g., "MONOBRIDGE_DLL")
@@ -650,71 +761,61 @@ private:
         }
 
         DWORD dwSize = SizeofResource(hModule, hResource);
-        WCHAR tempPath[MAX_PATH];
+        if (dwSize == 0)
+        {
+            std::cerr << "[!] Empty resource: " << resourceName << "\n";
+            return L"";
+        }
 
+        WCHAR tempPath[MAX_PATH];
         if (resourceName == "MONOBRIDGE_DLL")
         {
-            // Create a unique subdirectory to avoid name collisions
             GUID guid;
-            CoCreateGuid(&guid);
+            if (FAILED(CoCreateGuid(&guid)))
+            {
+                std::cerr << "[!] Failed to create temporary MonoBridge directory name.\n";
+                return L"";
+            }
+
             WCHAR subDir[MAX_PATH];
-            StringFromGUID2(guid, subDir, MAX_PATH); // Generates a unique string like "{xxxxxxxx-xxxx-xxxx-xxxx-xxxxxxxxxxxx}"
+            StringFromGUID2(guid, subDir, MAX_PATH);
             GetTempPathW(MAX_PATH, tempPath);
             wcscat_s(tempPath, MAX_PATH, subDir);
-            CreateDirectoryW(tempPath, nullptr);
+            if (!CreateDirectoryW(tempPath, nullptr))
+            {
+                std::cerr << "[!] Failed to create MonoBridge temp directory.\n";
+                return L"";
+            }
 
-            // Construct the full path with the desired name
             WCHAR dllPath[MAX_PATH];
             wcscpy_s(dllPath, MAX_PATH, tempPath);
             wcscat_s(dllPath, MAX_PATH, L"\\");
             wcscat_s(dllPath, MAX_PATH, L"MonoBridge.dll");
 
-            HANDLE hFile = CreateFileW(dllPath, GENERIC_WRITE, 0, nullptr, CREATE_ALWAYS, FILE_ATTRIBUTE_NORMAL, nullptr);
-            if (hFile == INVALID_HANDLE_VALUE)
-            {
-                std::cerr << "[!] Failed to create MonoBridge file: " << wstringToString(dllPath) << "\n";
-                return L"";
-            }
-
-            DWORD bytesWritten;
-            WriteFile(hFile, pData, dwSize, &bytesWritten, nullptr);
-            CloseHandle(hFile);
-
-            if (bytesWritten != dwSize)
+            if (!writeResourceToFile(dllPath, pData, dwSize))
             {
                 std::cerr << "[!] Failed to write MonoBridge resource to file: " << wstringToString(dllPath) << "\n";
-                DeleteFileW(dllPath);
+                RemoveDirectoryW(tempPath);
                 return L"";
             }
 
             return std::wstring(dllPath);
         }
-        else
+
+        WCHAR tempFileName[MAX_PATH];
+        GetTempPathW(MAX_PATH, tempPath);
+        if (!GetTempFileNameW(tempPath, L"RES", 0, tempFileName))
         {
-            // Default behavior: use a temporary filename
-            WCHAR tempFileName[MAX_PATH];
-            GetTempPathW(MAX_PATH, tempPath);
-            GetTempFileNameW(tempPath, L"RES", 0, tempFileName);
-
-            HANDLE hFile = CreateFileW(tempFileName, GENERIC_WRITE, 0, nullptr, CREATE_ALWAYS, FILE_ATTRIBUTE_NORMAL, nullptr);
-            if (hFile == INVALID_HANDLE_VALUE)
-            {
-                std::cerr << "[!] Failed to create temporary file for resource.\n";
-                return L"";
-            }
-
-            DWORD bytesWritten;
-            WriteFile(hFile, pData, dwSize, &bytesWritten, nullptr);
-            CloseHandle(hFile);
-
-            if (bytesWritten != dwSize)
-            {
-                std::cerr << "[!] Failed to write resource to temporary file.\n";
-                DeleteFileW(tempFileName);
-                return L"";
-            }
-
-            return std::wstring(tempFileName);
+            std::cerr << "[!] Failed to create temporary file for resource.\n";
+            return L"";
         }
+
+        if (!writeResourceToFile(tempFileName, pData, dwSize))
+        {
+            std::cerr << "[!] Failed to write resource to temporary file.\n";
+            return L"";
+        }
+
+        return std::wstring(tempFileName);
     }
 };

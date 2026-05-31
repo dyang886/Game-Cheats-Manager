@@ -9,7 +9,7 @@
         "game_name": "DREDGE",
         "origin": "gcm",
         "gcm_url": "GCM/GCM Trainers/DREDGE Trainer.exe",
-        "version": "2025.11.27"
+        "version": "2026.5.31"
     },
     {
         "game_name": "Feeding Frenzy 2: Shipwreck Showdown",
@@ -40,6 +40,12 @@
         "origin": "gcm",
         "gcm_url": "GCM/GCM Trainers/Just Shapes & Beats Trainer.exe",
         "version": "2026.2.8"
+    },
+    {
+        "game_name": "Minishoot' Adventures",
+        "origin": "gcm",
+        "gcm_url": "GCM/GCM Trainers/Minishoot' Adventures Trainer.exe",
+        "version": "2026.5.31"
     },
     {
         "game_name": "Oil Rush",

@@ -1,5 +1,4 @@
 ﻿using UnityEngine;
-using System.IO;
 using UnityEngine.Localization.Settings;
 using UnityEngine.Localization;
 using System;
@@ -30,7 +29,15 @@ public class MainThreadDispatcher : MonoBehaviour
         {
             while (actionQueue.Count > 0)
             {
-                actionQueue.Dequeue().Invoke();
+                Action action = actionQueue.Dequeue();
+                try
+                {
+                    action.Invoke();
+                }
+                catch (Exception ex)
+                {
+                    GCMInjection.LogException("MainThreadDispatcher.Update action failed", ex);
+                }
             }
         }
     }
@@ -44,6 +51,10 @@ public class MainThreadDispatcher : MonoBehaviour
                 instance.actionQueue.Enqueue(action);
             }
         }
+        else
+        {
+            GCMInjection.Log("MainThreadDispatcher.Enqueue failed because dispatcher is missing.");
+        }
     }
 }
 
@@ -55,16 +66,73 @@ public static class GCMInjection
     [DllImport("MonoBridge.dll")]
     private static extern void SendResponse(string message);
 
-    private static void Log(string message)
+    public static void Log(string message)
     {
         string formattedMessage = "[GCMInjection] " + message;
         SendData(formattedMessage);
     }
 
+    public static void LogException(string message, Exception ex)
+    {
+        Log(message + ": " + ex);
+    }
+
+    private static bool SetBooleanMember(object target, string propertyName, string backingFieldName, bool value)
+    {
+        if (target == null)
+        {
+            return false;
+        }
+
+        Type type = target.GetType();
+        PropertyInfo property = type.GetProperty(propertyName, BindingFlags.Instance | BindingFlags.Public | BindingFlags.NonPublic);
+        MethodInfo setter = property != null ? property.GetSetMethod(true) : null;
+        if (setter != null)
+        {
+            setter.Invoke(target, new object[] { value });
+            return true;
+        }
+
+        FieldInfo field = type.GetField(backingFieldName, BindingFlags.Instance | BindingFlags.Public | BindingFlags.NonPublic);
+        if (field != null)
+        {
+            field.SetValue(target, value);
+            return true;
+        }
+
+        return false;
+    }
+
     public static void Initialize()
     {
+        GameObject existing = GameObject.Find("MainThreadDispatcher");
+        if (existing != null)
+        {
+            return;
+        }
+
         GameObject go = new GameObject("MainThreadDispatcher");
         go.AddComponent<MainThreadDispatcher>();
+    }
+
+    public static void SetGodMode(bool enabled)
+    {
+        MainThreadDispatcher.Enqueue(() =>
+        {
+            Player player = GameManager.Instance != null ? GameManager.Instance.Player : null;
+            if (player == null)
+            {
+                Log("SetGodMode failed: player is unavailable.");
+                return;
+            }
+
+            bool setGod = SetBooleanMember(player, "IsGodModeEnabled", "<IsGodModeEnabled>k__BackingField", enabled);
+            bool setImmune = SetBooleanMember(player, "IsImmuneModeEnabled", "<IsImmuneModeEnabled>k__BackingField", enabled);
+            if (!setGod || !setImmune)
+            {
+                Log("SetGodMode failed: player god/immune fields were not found.");
+            }
+        });
     }
 
     public static void SpawnItem(int index)
@@ -127,11 +195,12 @@ public static class GCMInjection
         });
     }
 
-    public static void FreezeTime(bool freeze)
+    public static void FreezeTime(int freeze)
     {
+        bool enabled = freeze != 0;
         MainThreadDispatcher.Enqueue(() =>
         {
-            GameManager.Instance.Time.ToggleFreezeTime(freeze);
+            GameManager.Instance.Time.ToggleFreezeTime(enabled);
         });
     }
 
