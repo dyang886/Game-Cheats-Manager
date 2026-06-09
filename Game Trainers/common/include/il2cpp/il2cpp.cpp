@@ -24,12 +24,56 @@ namespace IL2CPP {
 		#include IL2CPP_API_H
 		#undef DO_API
 
+		struct RequiredApi
+		{
+			const char* name;
+			void* address;
+		};
+
+		RequiredApi required[] = {
+			{"il2cpp_domain_get", reinterpret_cast<void*>(API::il2cpp_domain_get)},
+			{"il2cpp_thread_attach", reinterpret_cast<void*>(API::il2cpp_thread_attach)},
+			{"il2cpp_domain_get_assemblies", reinterpret_cast<void*>(API::il2cpp_domain_get_assemblies)},
+			{"il2cpp_assembly_get_image", reinterpret_cast<void*>(API::il2cpp_assembly_get_image)},
+			{"il2cpp_class_from_name", reinterpret_cast<void*>(API::il2cpp_class_from_name)},
+			{"il2cpp_class_get_method_from_name", reinterpret_cast<void*>(API::il2cpp_class_get_method_from_name)},
+			{"il2cpp_class_get_field_from_name", reinterpret_cast<void*>(API::il2cpp_class_get_field_from_name)},
+			{"il2cpp_class_get_methods", reinterpret_cast<void*>(API::il2cpp_class_get_methods)},
+			{"il2cpp_class_get_fields", reinterpret_cast<void*>(API::il2cpp_class_get_fields)},
+			{"il2cpp_class_get_parent", reinterpret_cast<void*>(API::il2cpp_class_get_parent)},
+			{"il2cpp_method_get_name", reinterpret_cast<void*>(API::il2cpp_method_get_name)},
+			{"il2cpp_field_get_name", reinterpret_cast<void*>(API::il2cpp_field_get_name)},
+			{"il2cpp_field_get_offset", reinterpret_cast<void*>(API::il2cpp_field_get_offset)},
+			{"il2cpp_string_new", reinterpret_cast<void*>(API::il2cpp_string_new)},
+		};
+
+		bool missingRequiredApi = false;
+		for (const auto& api : required)
+		{
+			if (!api.address)
+			{
+				printf("[!] Missing IL2CPP API export: %s\n", api.name);
+				missingRequiredApi = true;
+			}
+		}
+
+		if (missingRequiredApi)
+			return false;
+
 		domain = API::il2cpp_domain_get();
+		if (!domain)
+		{
+			printf("[!] il2cpp_domain_get returned null.\n");
+			return false;
+		}
 
 		return true;
 	}
 
 	void Attach() {
+		if (!API::il2cpp_thread_attach || !domain)
+			return;
+
 		API::il2cpp_thread_attach(domain);
 	}
 	

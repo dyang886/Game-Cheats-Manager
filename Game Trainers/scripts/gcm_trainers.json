@@ -45,7 +45,7 @@
         "game_name": "Minishoot' Adventures",
         "origin": "gcm",
         "gcm_url": "GCM/GCM Trainers/Minishoot' Adventures Trainer.exe",
-        "version": "2026.5.31"
+        "version": "2026.6.1"
     },
     {
         "game_name": "Oil Rush",
@@ -371,7 +371,7 @@
         "origin": "ct_other",
         "author": "jx666",
         "gcm_url": "GCM/GCM Trainers/CYAN BRAIN Trainer [jx666].ct",
-        "version": "2026.2.27"
+        "version": "2026.6.6"
     },
     {
         "game_name": "Call of Cthulhu",
@@ -968,14 +968,24 @@
         "official_url": "https://github.com/goatfungus/NMSSaveEditor",
         "gcm_url": "GCM/GCM Trainers/No Man's Sky Save Editor [GoatFungus].zip",
         "extension": "NMSSaveEditor.bat",
-        "version": "2026.3.4"
+        "version": "2026.6.5"
+    },
+    {
+        "game_name": "No Man's Sky",
+        "origin": "other",
+        "author": "GoatFungus",
+        "custom_name": "存档编辑器汉化版",
+        "official_url": "https://github.com/goatfungus/NMSSaveEditor, https://github.com/Lilyltt/NMSSaveEditor-CHS",
+        "gcm_url": "GCM/GCM Trainers/No Man's Sky Save Editor Chinese Version [GoatFungus].zip",
+        "version": "2025.8.31"
     },
     {
         "game_name": "Ling Xu",
         "origin": "ct_other",
         "author": "梦幻的天空",
+        "official_url": "https://bbs.3dmgame.com/thread-6660742-1-1.html",
         "gcm_url": "GCM/GCM Trainers/Ling Xu Trainer [MengHuanDeTianKong].ct",
-        "version": "2026.3.7"
+        "version": "2026.3.24"
     },
     {
         "game_name": "Multiverse Loot Hunter",
@@ -999,7 +1009,7 @@
         "author": "LHY1339",
         "official_url": "https://github.com/LHY1339/cheat_ready_or_not",
         "gcm_url": "GCM/GCM Trainers/Ready or Not Trainer [LHY1339].exe",
-        "version": "2026.5.6"
+        "version": "2026.6.6"
     },
     {
         "game_name": "Backrooms: Extractions",
@@ -1015,7 +1025,7 @@
         "author": "LHY1339",
         "official_url": "https://github.com/LHY1339/cheat_escape_the_backrooms",
         "gcm_url": "GCM/GCM Trainers/Escape the Backrooms Trainer [LHY1339].exe",
-        "version": "2026.2.28"
+        "version": "2026.6.5"
     },
     {
         "game_name": "Castlevania Advance Collection",
@@ -2884,7 +2894,7 @@
         "author": "Akkariins",
         "official_url": "https://www.bilibili.com/video/BV1XwGa65EZW",
         "gcm_url": "GCM/GCM Trainers/Forza Horizon 6 Trainer [Akkariins].zip",
-        "version": "2026.5.28"
+        "version": "2026.6.3"
     },
     {
         "game_name": "Grand Theft Auto V",
@@ -2966,5 +2976,173 @@
         "author": "游游荡荡",
         "gcm_url": "GCM/GCM Trainers/Command & Conquer_Yuri's Revenge Trainer [YouYouDangDang].exe",
         "version": "2015.12.31"
+    },
+    {
+        "game_name": "Assassin's Creed Freedom Cry",
+        "origin": "other",
+        "author": "MrAntiFun",
+        "official_url": "https://mrantifun.net/threads/assassins-creed-4-black-flag-trainer.5/",
+        "gcm_url": "GCM/GCM Trainers/Assassin's Creed Freedom Cry Trainer [MrAntiFun].exe",
+        "version": "2014.3.10"
+    },
+    {
+        "game_name": "DRAGON QUEST III HD-2D Remake",
+        "origin": "ct_other",
+        "author": "DrummerIX",
+        "official_url": "https://fearlessrevolution.com/viewtopic.php?t=32684",
+        "gcm_url": "GCM/GCM Trainers/DRAGON QUEST III HD-2D Remake Trainer [DrummerIX].zip",
+        "version": "2024.12.17"
+    },
+    {
+        "game_name": "Darksiders II Deathinitive Edition",
+        "origin": "ct_other",
+        "author": "Akuma",
+        "official_url": "https://fearlessrevolution.com/viewtopic.php?t=675",
+        "gcm_url": "GCM/GCM Trainers/Darksiders II Deathinitive Edition Trainer [Akuma].ct",
+        "version": "2020.4.10"
+    },
+    {
+        "game_name": "Dying Light",
+        "origin": "ct_other",
+        "author": "XXXeLxxx",
+        "official_url": "https://fearlessrevolution.com/viewtopic.php?t=38550",
+        "gcm_url": "GCM/GCM Trainers/Dying Light Trainer [XXXeLxxx].ct",
+        "version": "2026.4.14"
+    },
+    {
+        "game_name": "God's Blessing On That Desire World!",
+        "origin": "other",
+        "author": "jx666",
+        "gcm_url": "GCM/GCM Trainers/God's Blessing On That Desire World! Trainer [jx666].zip",
+        "version": "2026.5.27"
+    },
+    {
+        "game_name": "Plants vs. Zombies",
+        "origin": "other",
+        "author": "AS17666",
+        "gcm_url": "GCM/GCM Trainers/Plants vs. Zombies Trainer [AS17666].exe",
+        "version": "2026.6.6"
+    },
+    {
+        "game_name": "Romestead",
+        "origin": "other",
+        "author": "WanFeng2025",
+        "custom_name_en": "Save Editor",
+        "custom_name_zh": "存档编辑器",
+        "official_url": "https://github.com/WanFeng2025/RomesteadSaveModifier",
+        "gcm_url": "GCM/GCM Trainers/Romestead Trainer [WanFeng2025].zip",
+        "version": "2026.5.30"
+    },
+    {
+        "game_name": "Command & Conquer: Red Alert 2",
+        "origin": "other",
+        "author": "Ynapmoc",
+        "gcm_url": "GCM/GCM Trainers/Command & Conquer_Red Alert 2 Trainer [Ynapmoc].zip",
+        "version": "2022.2.6"
+    },
+    {
+        "game_name": "Romestead",
+        "origin": "other",
+        "author": "jx666",
+        "gcm_url": "GCM/GCM Trainers/Romestead Trainer [jx666].zip",
+        "version": "2026.5.30"
+    },
+    {
+        "game_name": "Romestead",
+        "origin": "ct_other",
+        "author": "Leymond",
+        "official_url": "https://fearlessrevolution.com/viewtopic.php?t=39573",
+        "gcm_url": "GCM/GCM Trainers/Romestead Trainer [Leymond].zip",
+        "version": "2026.5.30"
+    },
+    {
+        "game_name": "Yakuza Rogue EX: Hikari Ayukawa",
+        "origin": "other",
+        "author": "jx666",
+        "gcm_url": "GCM/GCM Trainers/Yakuza Rogue EX_Hikari Ayukawa Trainer [jx666].zip",
+        "version": "2026.6.4"
+    },
+    {
+        "game_name": "Call of Duty: Black Ops",
+        "origin": "other",
+        "author": "dR.oLLe",
+        "gcm_url": "GCM/GCM Trainers/Call of Duty_Black Ops Trainer [dR.oLLe].exe",
+        "version": "2011.3.5"
+    },
+    {
+        "game_name": "The King of Fighters XV",
+        "origin": "other",
+        "author": "FutureX",
+        "official_url": "https://megagames.com/trainers/king-fighters-xv-v10-12-trainer-futurex",
+        "gcm_url": "GCM/GCM Trainers/The King of Fighters XV Trainer [FutureX].exe",
+        "version": "2022.2.18"
+    },
+    {
+        "game_name": "Death Road to Canada",
+        "origin": "other",
+        "author": "peizhaochen",
+        "official_url": "https://patch.ali213.net/showpatch/59709.html",
+        "gcm_url": "GCM/GCM Trainers/Death Road to Canada Trainer [peizhaochen].exe",
+        "version": "2016.8.4"
+    },
+    {
+        "game_name": "Sex, Secrets & Used Tech",
+        "origin": "other",
+        "author": "jx666",
+        "gcm_url": "GCM/GCM Trainers/Sex, Secrets & Used Tech Trainer [jx666].zip",
+        "version": "2026.6.1"
+    },
+    {
+        "game_name": "Zwei II Plus",
+        "origin": "ct_other",
+        "gcm_url": "GCM/GCM Trainers/Zwei II Plus Trainer.ct",
+        "version": "2026.5.31"
+    },
+    {
+        "game_name": "LONESTAR",
+        "origin": "ct_other",
+        "author": "缤纷颜色",
+        "official_url": "https://www.bilibili.com/video/BV1kb421v7Jz",
+        "gcm_url": "GCM/GCM Trainers/LONESTAR Trainer [BinFenYanSe].ct",
+        "version": "2025.4.17"
+    },
+    {
+        "game_name": "Digimon Story Time Stranger",
+        "origin": "ct_other",
+        "gcm_url": "GCM/GCM Trainers/Digimon Story Time Stranger Trainer.ct",
+        "version": "2026.6.2"
+    },
+    {
+        "game_name": "Digimon Story Time Stranger",
+        "origin": "ct_other",
+        "author": "Tuuuup!",
+        "official_url": "https://www.playground.ru/digimon_story_time_stranger/cheat/digimon_story_time_stranger_tablitsa_13_dlya_cheat_engine_ot_tuuuup_redaktor_igroka_deneg_skorosti-1796072",
+        "gcm_url": "GCM/GCM Trainers/Digimon Story Time Stranger Trainer [Tuuuup!].ct",
+        "version": "2025.10.5"
+    },
+    {
+        "game_name": "Watch Dogs: Legion",
+        "origin": "other",
+        "author": "reg2k",
+        "custom_name_en": "Inventory Editor",
+        "custom_name_zh": "物品编辑器",
+        "official_url": "https://www.nexusmods.com/watchdogslegion/mods/18",
+        "gcm_url": "GCM/GCM Trainers/Watch Dogs_Legion Inventory Editor [reg2k].zip",
+        "version": "2022.5.7"
+    },
+    {
+        "game_name": "Elden Ring Nightreign",
+        "origin": "ct_other",
+        "author": "Hexinton",
+        "official_url": "https://www.nexusmods.com/eldenringnightreign/mods/127",
+        "gcm_url": "GCM/GCM Trainers/Elden Ring Nightreign Trainer [Hexinton].zip",
+        "version": "2025.12.17"
+    },
+    {
+        "game_name": "Wind Fantasy",
+        "origin": "other",
+        "author": "箭情",
+        "gcm_url": "GCM/GCM Trainers/Wind Fantasy Trainer [QianQing].exe",
+        "version": "2017.8.24"
     }
 ]

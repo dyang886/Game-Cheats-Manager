@@ -1,0 +1,36 @@
+{
+    "en_US": {
+        "English": "English",
+        "Please run the game first.": "Please run the game first.",
+        "Failed to activate.": "Failed to activate.",
+        "Failed to activate/deactivate.": "Failed to activate/deactivate.",
+        "Process Name:": "Process Name:",
+        "Process ID:": "Process ID:",
+        "Dancing Line Trainer": "Dancing Line Trainer",
+        "Apply": "Apply",
+        "Set Stars": "Set Stars",
+        "Set Notes": "Set Notes",
+        "Finish Level Perfectly": "Finish Level Perfectly",
+        "Unlock All Skins and Decorations": "Unlock All Skins and Decorations",
+        "Enable Removed Levels": "Enable Removed Levels",
+        "Test Removed Level Bundles": "Test Removed Level Bundles",
+        "No Collision": "No Collision"
+    },
+    "zh_CN": {
+        "简体中文": "简体中文",
+        "Please run the game first.": "请先运行游戏。",
+        "Failed to activate.": "激活失败。",
+        "Failed to activate/deactivate.": "激活/停用失败。",
+        "Process Name:": "进程名称：",
+        "Process ID:": "进程 ID:",
+        "Dancing Line Trainer": "《跳舞的线》修改器",
+        "Apply": "应用",
+        "Set Stars": "设置星星",
+        "Set Notes": "设置音符",
+        "Finish Level Perfectly": "完美通关",
+        "Unlock All Skins and Decorations": "解锁所有皮肤与装饰",
+        "Enable Removed Levels": "启用已移除关卡",
+        "Test Removed Level Bundles": "测试已移除关卡资源包",
+        "No Collision": "无碰撞"
+    }
+}
