@@ -12,8 +12,6 @@
         "Set Notes": "Set Notes",
         "Finish Level Perfectly": "Finish Level Perfectly",
         "Unlock All Skins and Decorations": "Unlock All Skins and Decorations",
-        "Enable Removed Levels": "Enable Removed Levels",
-        "Test Removed Level Bundles": "Test Removed Level Bundles",
         "No Collision": "No Collision"
     },
     "zh_CN": {
@@ -29,8 +27,6 @@
         "Set Notes": "设置音符",
         "Finish Level Perfectly": "完美通关",
         "Unlock All Skins and Decorations": "解锁所有皮肤与装饰",
-        "Enable Removed Levels": "启用已移除关卡",
-        "Test Removed Level Bundles": "测试已移除关卡资源包",
         "No Collision": "无碰撞"
     }
 }

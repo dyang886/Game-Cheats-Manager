@@ -49,10 +49,6 @@ void apply_callback(Fl_Widget *widget, void *data)
             status = trainer->finishLevelPerfectly();
         else if (optionName == "UnlockAllSkinsAndDecorations")
             status = trainer->unlockAllSkinsAndDecorations();
-        else if (optionName == "EnableRemovedLevels")
-            status = trainer->enableRemovedLevels();
-        else if (optionName == "TestRemovedLevelBundles")
-            status = trainer->testRemovedLevelBundles();
     }
     catch (...)
     {
@@ -259,10 +255,6 @@ int main(int argc, char **argv)
     place_apply_widget(options_flex, &trainer, "FinishLevelPerfectly", "Finish Level Perfectly");
 
     place_apply_widget(options_flex, &trainer, "UnlockAllSkinsAndDecorations", "Unlock All Skins and Decorations");
-
-    place_apply_widget(options_flex, &trainer, "EnableRemovedLevels", "Enable Removed Levels");
-
-    place_apply_widget(options_flex, &trainer, "TestRemovedLevelBundles", "Test Removed Level Bundles");
 
     place_toggle_widget(options_flex, &trainer, "ToggleNoCollision", "No Collision");
 

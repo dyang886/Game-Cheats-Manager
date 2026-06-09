@@ -1324,18 +1324,6 @@ extern "C" __declspec(dllexport) DWORD WINAPI FinishLevelPerfectly(LPVOID lpPara
     return 1;
 }
 
-extern "C" __declspec(dllexport) DWORD WINAPI EnableRemovedLevels(LPVOID lpParam)
-{
-    std::cout << "[!] Enable Removed Levels is temporarily disabled.\n";
-    return 0;
-}
-
-extern "C" __declspec(dllexport) DWORD WINAPI TestRemovedLevelBundles(LPVOID lpParam)
-{
-    std::cout << "[!] Removed level bundle probe is temporarily disabled.\n";
-    return 0;
-}
-
 extern "C" __declspec(dllexport) DWORD WINAPI UnlockAllSkinsAndDecorations(LPVOID lpParam)
 {
     if (!InitializeIL2CPP())

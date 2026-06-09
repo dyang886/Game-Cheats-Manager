@@ -33,22 +33,6 @@ public:
         return false;
     }
 
-    bool enableRemovedLevels()
-    {
-        if (initializeDllInjection())
-            return invokeMethod("EnableRemovedLevels");
-
-        return false;
-    }
-
-    bool testRemovedLevelBundles()
-    {
-        if (initializeDllInjection())
-            return invokeMethod("TestRemovedLevelBundles");
-
-        return false;
-    }
-
     bool unlockAllSkinsAndDecorations()
     {
         if (initializeDllInjection())
