@@ -11,7 +11,7 @@ import tempfile
 import webbrowser
 import winreg
 
-from PyQt6.QtCore import Qt, QTimer
+from PyQt6.QtCore import QEvent, Qt, QTimer
 from PyQt6.QtGui import QAction, QColor, QFont, QFontDatabase, QIcon, QPainter, QPixmap
 from PyQt6.QtWidgets import QApplication, QFileDialog, QGridLayout, QHBoxLayout, QLabel, QLineEdit, QListWidgetItem, QMainWindow, QMessageBox, QStatusBar, QVBoxLayout, QWidget
 from tendo import singleton
@@ -32,6 +32,7 @@ class GameCheatsManager(QMainWindow):
 
     def __init__(self):
         super().__init__()
+        self.setWindowFlag(Qt.WindowType.FramelessWindowHint, True)
 
         # Single instance check and basic UI setup
         try:
@@ -141,6 +142,7 @@ class GameCheatsManager(QMainWindow):
         browseAllTrainersAction = QAction(tr("Browse All Trainers"), self)
         browseAllTrainersAction.triggered.connect(self.browse_all_trainers)
         menu.addAction(browseAllTrainersAction)
+        self.setup_window_chrome(menu)
 
         # Status bar setup
         self.statusbar = QStatusBar()
@@ -280,6 +282,23 @@ class GameCheatsManager(QMainWindow):
     # ===========================================================================
     # Core functions
     # ===========================================================================
+    def setup_window_chrome(self, menu):
+        chrome = QWidget(self)
+        chrome.setObjectName("WindowChrome")
+        chromeLayout = QVBoxLayout(chrome)
+        chromeLayout.setContentsMargins(0, 0, 0, 0)
+        chromeLayout.setSpacing(0)
+
+        self.titleBar = WindowTitleBar(self)
+        chromeLayout.addWidget(self.titleBar)
+        chromeLayout.addWidget(menu)
+        self.setMenuWidget(chrome)
+
+    def changeEvent(self, event):
+        super().changeEvent(event)
+        if event.type() == QEvent.Type.WindowStateChange and hasattr(self, "titleBar"):
+            self.titleBar.sync_window_state()
+
     def closeEvent(self, event):
         self.cleanup_launch_junctions()
         super().closeEvent(event)

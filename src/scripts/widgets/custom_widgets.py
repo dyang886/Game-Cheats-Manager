@@ -1,9 +1,122 @@
+import ctypes
+import sys
+
 from PyQt6.QtCore import QEasingCurve, QPropertyAnimation, QRect, QRectF, Qt, QTimer, pyqtSignal
 from PyQt6.QtGui import QColor, QFont, QFontDatabase, QPainter, QPainterPath, QPen, QPixmap
 from PyQt6.QtWidgets import QApplication, QFrame, QGraphicsDropShadowEffect, QHBoxLayout, QLabel, QListWidget, QListWidgetItem, QProxyStyle, QPushButton, QSizePolicy, QStyle, QVBoxLayout, QWidget
 from zhon.cedict import simp, trad
 
 from config import *
+
+
+def apply_native_title_bar_theme(window):
+    if sys.platform != "win32":
+        return
+
+    try:
+        hwnd = int(window.winId())
+        use_dark = ctypes.c_int(1 if settings.get("theme", "dark") == "dark" else 0)
+        # DWMWA_USE_IMMERSIVE_DARK_MODE is 20 on current Windows builds and
+        # 19 on older Windows 10 builds that first exposed the attribute.
+        for attribute in (20, 19):
+            ctypes.windll.dwmapi.DwmSetWindowAttribute(
+                hwnd,
+                attribute,
+                ctypes.byref(use_dark),
+                ctypes.sizeof(use_dark),
+            )
+    except Exception:
+        pass
+
+
+class WindowTitleBar(QWidget):
+    def __init__(self, window):
+        super().__init__(window)
+        self.window = window
+        self._drag_pos = None
+        self.setObjectName("WindowTitleBar")
+        self.setFixedHeight(34)
+
+        layout = QHBoxLayout(self)
+        layout.setContentsMargins(10, 0, 0, 0)
+        layout.setSpacing(8)
+
+        self.iconLabel = QLabel()
+        self.iconLabel.setFixedSize(18, 18)
+        self.iconLabel.setPixmap(window.windowIcon().pixmap(16, 16))
+        layout.addWidget(self.iconLabel)
+
+        self.titleLabel = QLabel(window.windowTitle())
+        self.titleLabel.setObjectName("WindowTitleText")
+        self.titleLabel.setSizePolicy(QSizePolicy.Policy.Expanding, QSizePolicy.Policy.Fixed)
+        layout.addWidget(self.titleLabel)
+
+        self.minimizeButton = self._create_button("−", "Minimize")
+        self.maximizeButton = self._create_button("□", "Maximize")
+        self.closeButton = self._create_button("×", "Close")
+        self.closeButton.setObjectName("WindowCloseButton")
+
+        layout.addWidget(self.minimizeButton)
+        layout.addWidget(self.maximizeButton)
+        layout.addWidget(self.closeButton)
+
+        self.minimizeButton.clicked.connect(window.showMinimized)
+        self.maximizeButton.clicked.connect(self.toggle_maximized)
+        self.closeButton.clicked.connect(window.close)
+        window.windowTitleChanged.connect(self.titleLabel.setText)
+
+    def _create_button(self, text, tooltip):
+        button = QPushButton(text)
+        button.setObjectName("WindowTitleButton")
+        button.setToolTip(tooltip)
+        button.setFixedSize(46, 34)
+        button.setCursor(Qt.CursorShape.PointingHandCursor)
+        button.setFocusPolicy(Qt.FocusPolicy.NoFocus)
+        return button
+
+    def toggle_maximized(self):
+        if self.window.isMaximized():
+            self.window.showNormal()
+        else:
+            self.window.showMaximized()
+        self.sync_window_state()
+
+    def sync_window_state(self):
+        if self.window.isMaximized():
+            self.maximizeButton.setText("❐")
+            self.maximizeButton.setToolTip("Restore")
+        else:
+            self.maximizeButton.setText("□")
+            self.maximizeButton.setToolTip("Maximize")
+
+    def mouseDoubleClickEvent(self, event):
+        if event.button() == Qt.MouseButton.LeftButton:
+            self.toggle_maximized()
+            event.accept()
+            return
+        super().mouseDoubleClickEvent(event)
+
+    def mousePressEvent(self, event):
+        if event.button() == Qt.MouseButton.LeftButton:
+            handle = self.window.windowHandle()
+            if handle and handle.startSystemMove():
+                event.accept()
+                return
+            self._drag_pos = event.globalPosition().toPoint() - self.window.frameGeometry().topLeft()
+            event.accept()
+            return
+        super().mousePressEvent(event)
+
+    def mouseMoveEvent(self, event):
+        if self._drag_pos and event.buttons() & Qt.MouseButton.LeftButton and not self.window.isMaximized():
+            self.window.move(event.globalPosition().toPoint() - self._drag_pos)
+            event.accept()
+            return
+        super().mouseMoveEvent(event)
+
+    def mouseReleaseEvent(self, event):
+        self._drag_pos = None
+        super().mouseReleaseEvent(event)
 
 
 class LargerActionIconStyle(QProxyStyle):

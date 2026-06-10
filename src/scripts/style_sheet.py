@@ -3,18 +3,60 @@ white = """
         background-color: #ffffff;
     }}
 
+    QWidget#WindowChrome,
+    QWidget#WindowTitleBar {{
+        background-color: #ffffff;
+    }}
+
+    QWidget#WindowChrome {{
+        border-bottom: 1px solid #dddddd;
+    }}
+
+    QLabel#WindowTitleText {{
+        color: #000000;
+    }}
+
+    QPushButton#WindowTitleButton,
+    QPushButton#WindowCloseButton {{
+        border: none;
+        border-radius: 0px;
+        background-color: transparent;
+        color: #000000;
+        padding: 0px;
+        font-weight: normal;
+        outline: none;
+    }}
+
+    QPushButton#WindowTitleButton:hover {{
+        background-color: #e6e6e6;
+    }}
+
+    QPushButton#WindowTitleButton:pressed {{
+        background-color: #d9d9d9;
+    }}
+
+    QPushButton#WindowCloseButton:hover {{
+        background-color: #c42b1c;
+        color: #ffffff;
+    }}
+
+    QPushButton#WindowCloseButton:pressed {{
+        background-color: #a3261b;
+        color: #ffffff;
+    }}
+
     QStatusBar::item {{
         border: none;
     }}
 
     QMenuBar {{
-        background-color: #f9f9f9;
+        background-color: #ffffff;
     }}
 
     QMenuBar::item {{
-        background-color: #f9f9f9;
+        background-color: #ffffff;
         color: #000000;
-        padding: 5px;
+        padding: 6px 8px;
     }}
 
     QMenuBar::item:selected {{
@@ -287,37 +329,80 @@ black = """
         background-color: #1c1c1c;
     }}
 
+    QWidget#WindowChrome,
+    QWidget#WindowTitleBar {{
+        background-color: #1c1c1c;
+    }}
+
+    QWidget#WindowChrome {{
+        border-bottom: 1px solid #2f2f2f;
+    }}
+
+    QLabel#WindowTitleText {{
+        color: #ffffff;
+    }}
+
+    QPushButton#WindowTitleButton,
+    QPushButton#WindowCloseButton {{
+        border: none;
+        border-radius: 0px;
+        background-color: transparent;
+        color: #ffffff;
+        padding: 0px;
+        font-weight: normal;
+        outline: none;
+    }}
+
+    QPushButton#WindowTitleButton:hover {{
+        background-color: #2a2a2a;
+    }}
+
+    QPushButton#WindowTitleButton:pressed {{
+        background-color: #242424;
+    }}
+
+    QPushButton#WindowCloseButton:hover {{
+        background-color: #c42b1c;
+        color: #ffffff;
+    }}
+
+    QPushButton#WindowCloseButton:pressed {{
+        background-color: #a3261b;
+        color: #ffffff;
+    }}
+
     QStatusBar::item {{
         border: none;
     }}
 
     QMenuBar {{
-        background-color: #2e2e2e;
+        background-color: #1c1c1c;
     }}
 
     QMenuBar::item {{
-        background-color: #2e2e2e;
+        background-color: #1c1c1c;
         color: #FFFFFF;
-        padding: 5px;
+        padding: 6px 8px;
     }}
 
     QMenuBar::item:selected {{
-        background-color: #484848;
+        background-color: #2a2a2a;
     }}
 
     QMenu {{
         background-color: #1c1c1c;
-        border: 2px solid #ffffff;
+        border: 1px solid #3a3a3a;
         border-radius: 5px;
     }}
 
     QMenu::item {{
         background-color: #1c1c1c;
         color: #FFFFFF;
+        padding: 6px 24px 6px 12px;
     }}
 
     QMenu::item:selected {{
-        background-color: #484848;
+        background-color: #2a2a2a;
     }}
 
     QStatusBar {{
