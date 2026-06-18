@@ -32,12 +32,13 @@ else()
     set(MINHOOK_LIB "${CMAKE_SOURCE_DIR}/common/libs/x86/libMinHook.x86.lib")
 endif()
 
-# Compile IL2CPP.cpp to the build directory
+# Compile IL2CPP.cpp to the build directory.
+# This trainer resolves the protected IL2CPP runtime by direct memory reads
+# (mem_resolver.h) and does not use the il2cpp API, so il2cpp.cpp is not compiled.
 add_library(${IL2CPP_TARGET} SHARED
     "${CMAKE_CURRENT_SOURCE_DIR}/IL2CPP.cpp"
-    "${CMAKE_SOURCE_DIR}/common/include/il2cpp/il2cpp.cpp"
 )
-target_link_libraries(${IL2CPP_TARGET} PRIVATE Common ${MINHOOK_LIB})
+target_link_libraries(${IL2CPP_TARGET} PRIVATE Common ${MINHOOK_LIB} psapi)
 
 # Move IL2CPP.dll to the trainer folder
 add_custom_command(TARGET ${IL2CPP_TARGET} POST_BUILD

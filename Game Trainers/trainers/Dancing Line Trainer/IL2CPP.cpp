@@ -1,1369 +1,754 @@
-#include <cstring>
+// Dancing Line trainer (protected IL2CPP build).
+//
+// The game ships with a commercial protector (Virbox/SenseShield-class): the
+// global-metadata is encrypted and decrypted on-demand, and the il2cpp API exports
+// are renamed + control-flow-obfuscated. Metadata-touching API calls (class_from_name,
+// image_get_class, ...) also return null when called from an injected (non-runtime)
+// thread. So we do NOT use the il2cpp API at all.
+//
+// Instead we resolve everything by reading the live runtime structures directly
+// (see mem_resolver.h): scan the heap for Il2CppClass structs anchored on the
+// Assembly-CSharp image pointer, then read methods/fields straight from the structs.
+// Class and method names are plaintext in the live structures.
+//
+// All game methods are CALLED from inside MinHook detours, which run on the game's
+// own (runtime-attached) threads. The exported cheat functions run on injected
+// remote threads, so they only set request flags; a per-frame hook applies them.
+
+#include <windows.h>
+#include <cstdio>
+#include <cstdint>
 #include <iostream>
-#include <string>
-#include "il2cpp/il2cpp.h"
+#include "MinHook.h"
+#include "mem_resolver.h"
 
-using namespace IL2CPP;
-
-// =============================================================
-// Constants & Config
-// =============================================================
-
-const char *ASSEMBLY_GAME = "Assembly-CSharp";
-const char *NAMESPACE_GLOBAL = "";
-const char *NAMESPACE_CHARACTER = "DancingLine.Character";
-const char *NAMESPACE_DANCING_LINE = "DancingLine";
-const char *NAMESPACE_GAME_LOOP = "DancingLine.GameLoop";
-const char *NAMESPACE_LEVEL = "DancingLine.Level";
-const char *NAMESPACE_LEVEL_TRIGGERS = "DancingLine.Level.Triggers";
-const char *NAMESPACE_MONETIZATION = "DancingLine.Monetyzation";
-const char *NAMESPACE_MUSICIAL = "DancingLine.Musicial";
-const char *NAMESPACE_SECURITY = "DancingLine.Security";
-const char *NAMESPACE_CUSTOMIZATION = "DancingLine.Character.Customization";
-const char *NAMESPACE_STORE = "DancingLine.UI.Store";
-
-const char *CLASS_COINS_CONTROLLER = "CoinsController";
-const char *CLASS_EINT = "eint";
-const char *CLASS_GAME_CHARACTER = "GameCharacter";
-const char *CLASS_HERO = "Hero";
-const char *CLASS_HERO_CLASSIC = "HeroClassic";
-const char *CLASS_KILL_HARACTER = "KillHaracter";
-const char *CLASS_LEVEL_BORDER = "LevelBorder";
-const char *CLASS_LEVEL_BASE = "LevelBase";
-const char *CLASS_LEVELS_CONTROLLER = "LevelsController";
-const char *CLASS_FAKE_GAME_CHARACTER = "FakeGameCharacter";
-const char *CLASS_MUSICIAL_MANAGER = "MusicialManager";
-const char *CLASS_USER_DATA_MANAGER = "UserDataManager";
-const char *CLASS_UPDATE_LOOP_HANDLER = "UpdateLoopHandler";
-const char *CLASS_LINE_CUSTOMIZATION_CONTROLLER = "LineCustomizationController";
-const char *CLASS_LINE_CUSTOMIZATION_SETTINGS = "LineCustomizationSettings";
-const char *CLASS_ORNAMENT_CONTROLLER = "OrnamentController";
-const char *CLASS_STORE_PANEL_TAB_HATS = "StorePanelTabHats";
-const char *CLASS_STORE_PANEL_TAB_SKIN = "StorePanelTabSkin";
-
-const char *METHOD_COMPLETE_LEVEL = "CompleteLevel";
-const char *METHOD_HERO_KILLED = "HeroKilled";
-const char *METHOD_KILL = "Kill";
-const char *METHOD_ON_TRIGGER_ENTER = "OnTriggerEnter";
-const char *METHOD_ON_UPDATE = "OnUpdate";
-const char *METHOD_ON_COLLISION_ENTER = "OnCollisionEnter";
-const char *METHOD_REFRESH_COUNTER = "RefreshCounter";
-const char *METHOD_REACHED_100 = "Reached100";
-const char *METHOD_SAVE = "Save";
-const char *METHOD_SAVE_DATA = "SaveData";
-const char *METHOD_SET_DIAMONTS_COLLECTED = "set_DiamontsCollected";
-const char *METHOD_SET_IS_PERFECT_REACHED_BEFORE = "set_IsPerfectReachedBefore";
-const char *METHOD_SET_STARS_COLLECTED = "set_StarsCollected";
-const char *METHOD_SHOW_LEVEL_AFTER_COMPLETED = "ShowLevelAfterCompleted";
-const char *METHOD_STAR_REACHED = "StarReached";
-const char *METHOD_START = "Start";
-const char *METHOD_UPDATE = "Update";
-const char *METHOD_GAME_CHARACTER_KILLED = "Killed";
-const char *METHOD_GET_MUSICIAL_NOTE_AMOUNT = "get_MusicialNoteAmount";
-const char *METHOD_GET_CURRENT_DIAMONTS_COLLECTED = "get_CurrentDiamontsCollected";
-const char *METHOD_GET_CURRENT_RUN_STARS = "get_CurrentRunStars";
-const char *METHOD_GET_CURRENT_RUN_STARS_COLLECTED = "get_CurrentRunStarsCollected";
-const char *METHOD_GET_CURRENT_RUN_STARS_WHEN_DIE = "get_CurrentRunStarsCollectedWhenDie";
-const char *METHOD_GET_IS_PERFECT_ON_CURRENT_RUN = "get_IsPerfectOnCurrentRun";
-const char *METHOD_ADD_MUSIC_NOTE = "addMusicNote";
-const char *METHOD_REDUCE_MUSIC_NOTE = "reduceMusicNote";
-const char *METHOD_GET_SETTINGS = "get_Settings";
-const char *METHOD_GET_IS_UNLOCKED = "get_IsUnlocked";
-const char *METHOD_UNLOCK = "Unlock";
-const char *METHOD_SET_HAVE_ACT_REWARD = "setHaveActReward";
-const char *METHOD_REFRESH = "Refresh";
-
-const char *COINS_DATA_KEY = "currentCoins";
-const char *FIELD_INSTANCE = "instance";
-const char *FIELD_COINS = "coins";
-const char *FIELD_CURRENT_LEVEL = "<CurrentLevel>k__BackingField";
-const char *FIELD_LIST_ITEMS = "_items";
-const char *FIELD_LIST_SIZE = "_size";
-const char *FIELD_GAME_CHARACTER_CURRENT_LEVEL = "currentLevel";
-const char *FIELD_STARTING_FROM_CHECKPOINT = "startingFromCheckpoint";
-const char *FIELD_STARTING_FROM_CHECKPOINT_COUNTER = "startingFromCheckpointCounter";
-const char *FIELD_CURRENT_DIAMONTS_COLLECTED = "_currentDiamontsCollected";
-const char *FIELD_STARTED = "<started>k__BackingField";
+// Logging: plain std::cout. In debug builds a console is allocated so output is visible.
 
 // =============================================================
-// Types & State
+// Class / method names (plaintext in the live runtime)
 // =============================================================
 
-struct EInt
+namespace N
 {
-    int v;
-    int k;
-    int o;
-};
-
-struct IntCommand
-{
-    bool active = false;
-    int value = 0;
-};
-
-typedef void (*VoidMethod_t)(void *instance, const MethodInfo *method);
-typedef bool (*StaticBoolMethod_t)(const MethodInfo *method);
-typedef void (*StaticVoidMethod_t)(const MethodInfo *method);
-typedef int (*StaticGetInt_t)(const MethodInfo *method);
-typedef void (*StaticSetInt_t)(int value, const MethodInfo *method);
-typedef bool (*StaticReduceInt_t)(int value, const MethodInfo *method);
-typedef ARRAY *(*GetArray_t)(void *instance, const MethodInfo *method);
-typedef EInt (*IntToEInt_t)(int value, const MethodInfo *method);
-typedef int (*GetInt_t)(void *instance, const MethodInfo *method);
-typedef bool (*GetBool_t)(void *instance, const MethodInfo *method);
-typedef int (*ListCount_t)(void *instance, const MethodInfo *method);
-typedef bool (*ListContainsObject_t)(void *instance, void *item, const MethodInfo *method);
-typedef void (*SaveInt_t)(STRING *name, int value, bool localOnly, const MethodInfo *method);
-typedef void (*SetBool_t)(void *instance, bool value, const MethodInfo *method);
-typedef void (*SetInt_t)(void *instance, int value, const MethodInfo *method);
-typedef void (*HeroKill_t)(void *instance, void *obstacle, const MethodInfo *method);
-typedef void (*TriggerEnter_t)(void *instance, void *collider, const MethodInfo *method);
-typedef void (*CollisionEnter_t)(void *instance, void *collision, const MethodInfo *method);
-typedef void (*LevelBaseHeroKilled_t)(void *instance, void *hero, const MethodInfo *method);
-typedef void (*LevelBaseOnUpdate_t)(void *instance, float deltaTime, float smoothDeltaTime, float unscaledDeltaTime, const MethodInfo *method);
-
-bool g_IsInitialized = false;
-bool g_NoCollisionEnabled = false;
-bool g_FinishLevelPerfectlyRequested = false;
-bool g_ApplyingCommands = false;
-bool g_WaitingForLevelStartLogged = false;
-bool g_StarsUiRefreshQueued = false;
-bool g_StoreTabsRefreshQueued = false;
-bool g_ForcePerfectResult = false;
-
-IntCommand g_StarsCommand;
-IntCommand g_NotesCommand;
-void *g_CurrentLevel = nullptr;
-void *g_PerfectResultLevel = nullptr;
-void *g_CoinsController = nullptr;
-void *g_GameCharacter = nullptr;
-CLASS *g_EIntClass = nullptr;
-CLASS *g_UpdateLoopClass = nullptr;
-
-HOOK *g_LevelUpdateHook = nullptr;
-HOOK *g_UpdateLoopHook = nullptr;
-HOOK *g_LevelCurrentRunStarsHook = nullptr;
-HOOK *g_LevelCurrentRunStarsCollectedHook = nullptr;
-HOOK *g_LevelCurrentRunStarsWhenDieHook = nullptr;
-HOOK *g_LevelCurrentDiamondsHook = nullptr;
-HOOK *g_LevelIsPerfectHook = nullptr;
-HOOK *g_GameCharacterUpdateHook = nullptr;
-HOOK *g_CoinsStartHook = nullptr;
-HOOK *g_CoinsRefreshHook = nullptr;
-HOOK *g_HeroKillHook = nullptr;
-HOOK *g_HeroClassicKillHook = nullptr;
-HOOK *g_HeroCollisionHook = nullptr;
-HOOK *g_GameCharacterKilledHook = nullptr;
-HOOK *g_LevelHeroKilledHook = nullptr;
-HOOK *g_KillHaracterHook = nullptr;
-HOOK *g_LevelBorderHook = nullptr;
-HOOK *g_FakeGameCharacterKilledHook = nullptr;
-
-// =============================================================
-// Helpers
-// =============================================================
-
-METHOD *FindMethod(CLASS *klass, const char *methodName, int paramCount)
-{
-    if (!klass)
-        return nullptr;
-
-    return klass->Method(methodName, paramCount);
+    const char *MONET = "DancingLine.Monetyzation";
+    const char *CHAR = "DancingLine.Character";
+    const char *DL = "DancingLine";
+    const char *GAMELOOP = "DancingLine.GameLoop";
+    const char *LEVEL = "DancingLine.Level";
+    const char *LEVEL_TRIG = "DancingLine.Level.Triggers";
+    const char *MUSIC = "DancingLine.Musicial";
+    const char *CUSTOM = "DancingLine.Character.Customization";
+    const char *STORE = "DancingLine.UI.Store";
+    const char *GLOBAL = "";
+    const char *LEVEL_THELINE = "Levels.Level_TheLine";
 }
 
-METHOD *FindMethodInHierarchy(CLASS *klass, const char *methodName, int paramCount)
+// =============================================================
+// Method signatures (il2cpp passes a hidden trailing const MethodInfo*)
+// =============================================================
+
+// ACTk "eint" (DancingLine.Security.eint, in Assembly-CSharp-firstpass). Oversized to 16
+// bytes to safely cover the real struct; on Win x64 any non-1/2/4/8 size uses the same ABI
+// (sret return, by-ref param), so the exact size only needs to be <= this.
+struct EInt { int32_t a, b, c, d; };
+typedef EInt (*IntToEInt_t)(int value, const void *method);              // eint.op_Implicit(int)
+typedef void (*SetCoinsEInt_t)(void *inst, EInt value, const void *method); // CoinsController.set_Coins(eint)
+
+typedef void (*VoidInst_t)(void *inst, const void *method);
+typedef int (*GetIntInst_t)(void *inst, const void *method);
+typedef bool (*GetBoolInst_t)(void *inst, const void *method);
+typedef void (*IntInst_t)(void *inst, int v, const void *method);
+typedef void (*IntBoolInst_t)(void *inst, int v, bool b, const void *method);
+typedef void (*BoolInst_t)(void *inst, bool v, const void *method);
+typedef void *(*GetPtrInst_t)(void *inst, const void *method);
+// statics (no instance)
+typedef void (*StaticVoid_t)(const void *method);
+typedef bool (*StaticBool_t)(const void *method);
+typedef int (*StaticGetInt_t)(const void *method);
+typedef void (*StaticSetInt_t)(int v, const void *method);
+// hooks
+typedef void (*OnUpdate_t)(void *inst, float a, float b, float c, const void *method);
+typedef void (*Kill_t)(void *inst, void *arg, const void *method);
+typedef void (*HeroKilled_t)(void *inst, void *hero, const void *method);
+
+// =============================================================
+// Resolver helpers
+// =============================================================
+
+struct Method
 {
-    while (klass)
+    void *mi = nullptr;  // MethodInfo*
+    void *ptr = nullptr; // methodPointer (mi[0])
+    explicit operator bool() const { return ptr != nullptr; }
+};
+
+static Method Resolve(const char *ns, const char *cls, const char *name, int paramCount = -1)
+{
+    Method m;
+    if (void *k = MemRes::GetClass(ns, cls))
     {
-        if (auto method = FindMethod(klass, methodName, paramCount))
-            return method;
-
-        klass = (CLASS *)IL2CPP::API::il2cpp_class_get_parent(klass);
+        m.mi = MemRes::FindMethodInfo(k, name, paramCount);
+        if (m.mi)
+            m.ptr = *reinterpret_cast<void **>(m.mi);
     }
+    return m;
+}
 
+template <class Fn>
+static Fn As(const Method &m) { return reinterpret_cast<Fn>(m.ptr); }
+
+// Install a MinHook detour on a resolved method; returns the original trampoline.
+template <class Fn>
+static Fn InstallHook(const char *ns, const char *cls, const char *name, int paramCount, void *detour)
+{
+    Method m = Resolve(ns, cls, name, paramCount);
+    if (!m)
+    {
+        std::cout << "[!] hook target not found: " << ns << "." << cls << "::" << name << "\n";
+        return nullptr;
+    }
+    void *orig = nullptr;
+    if (MH_CreateHook(m.ptr, detour, &orig) == MH_OK && MH_EnableHook(m.ptr) == MH_OK)
+        return reinterpret_cast<Fn>(orig);
+    std::cout << "[!] MinHook failed for " << ns << "." << cls << "::" << name << "\n";
     return nullptr;
 }
 
-FIELD *FindFieldInHierarchy(CLASS *klass, const char *fieldName)
+// Note: we deliberately do NOT heap-scan for instances. A scan for "object whose
+// klass-pointer == target class" also matches stack slots and field references that
+// merely hold the pointer, and calling a method on such a bogus "instance" crashes.
+// Real instances are captured from hook detours (the genuine `this`).
+
+// =============================================================
+// State
+// =============================================================
+
+static bool g_initialized = false;
+
+// command requests (set by exported funcs, applied on the game thread)
+static bool g_setStarsReq = false; static int g_starsValue = 0;
+static bool g_setNotesReq = false; static int g_notesValue = 0;
+static bool g_finishReq = false;
+static bool g_unlockReq = false;
+static bool g_noCollision = false;
+
+// captured instances
+static void *g_coins = nullptr;       // CoinsController
+static void *g_level = nullptr;       // LevelBase (fallback for GetCurrentLevel)
+static void *g_customCtrl = nullptr;  // LineCustomizationController (captured via get_Settings)
+static bool g_hatsDone = false;       // unlock-hats applied once
+static bool g_unlockApplied = false;  // an unlock ran this session (drives refresh-on-tab-show)
+
+// finish-level forced-result state
+static bool g_forcePerfect = false;
+static bool g_finishing = false; // re-entrancy guard for the finish sequence
+static void *g_perfectLevel = nullptr;
+
+// hook trampolines (originals)
+static OnUpdate_t o_LevelOnUpdate = nullptr;
+static VoidInst_t o_UpdateLoop = nullptr;
+static VoidInst_t o_CoinsStart = nullptr;
+static VoidInst_t o_CoinsRefresh = nullptr;
+static GetIntInst_t o_RunStars = nullptr;
+static GetIntInst_t o_RunStarsCollected = nullptr;
+static GetIntInst_t o_RunStarsWhenDie = nullptr;
+static GetIntInst_t o_RunDiamonds = nullptr;
+static GetBoolInst_t o_IsPerfect = nullptr;
+static Kill_t o_HeroKill = nullptr;
+static Kill_t o_HeroClassicKill = nullptr;
+static Kill_t o_HeroCollision = nullptr;
+static VoidInst_t o_CharKilled = nullptr;
+static HeroKilled_t o_LevelHeroKilled = nullptr;
+static VoidInst_t o_KillHaracter = nullptr;
+static Kill_t o_LevelBorder = nullptr;
+static VoidInst_t o_FakeKilled = nullptr;
+static GetPtrInst_t o_GetSettings = nullptr;
+static VoidInst_t o_SkinTabShow = nullptr;
+static VoidInst_t o_HatsTabShow = nullptr;
+
+// =============================================================
+// Cheat application (always called on the game thread, from a hook)
+// =============================================================
+
+static bool CallSaveData()
 {
-    while (klass)
-    {
-        if (auto field = klass->Field(fieldName))
-            return field;
-
-        klass = (CLASS *)IL2CPP::API::il2cpp_class_get_parent(klass);
-    }
-
-    return nullptr;
-}
-
-OBJECT *GetSingletonInstance(CLASS *klass)
-{
-    if (!klass)
-        return nullptr;
-
-    auto instanceField = FindFieldInHierarchy(klass, FIELD_INSTANCE);
-    if (!instanceField)
-        return nullptr;
-
-    return instanceField->GetStaticObject();
-}
-
-void *GetCoinsController()
-{
-    if (g_CoinsController)
-        return g_CoinsController;
-
-    auto assembly = IL2CPP::Assembly(ASSEMBLY_GAME);
-    auto coinsClass = assembly ? assembly->Namespace(NAMESPACE_MONETIZATION)->Class(CLASS_COINS_CONTROLLER) : nullptr;
-    g_CoinsController = GetSingletonInstance(coinsClass);
-
-    return g_CoinsController;
-}
-
-void *GetLevelsController()
-{
-    auto assembly = IL2CPP::Assembly(ASSEMBLY_GAME);
-    auto levelsClass = assembly ? assembly->Namespace(NAMESPACE_DANCING_LINE)->Class(CLASS_LEVELS_CONTROLLER) : nullptr;
-    return GetSingletonInstance(levelsClass);
-}
-
-void *GetCurrentLevel()
-{
-    if (g_CurrentLevel)
-        return g_CurrentLevel;
-
-    auto assembly = IL2CPP::Assembly(ASSEMBLY_GAME);
-    if (!assembly)
-        return nullptr;
-
-    auto levelsClass = assembly->Namespace(NAMESPACE_DANCING_LINE)->Class(CLASS_LEVELS_CONTROLLER);
-    OBJECT *levelsController = GetSingletonInstance(levelsClass);
-    if (levelsController)
-    {
-        if (auto currentLevelField = FindFieldInHierarchy(levelsClass, FIELD_CURRENT_LEVEL))
-            g_CurrentLevel = currentLevelField->GetObject(levelsController);
-    }
-
-    if (!g_CurrentLevel && g_GameCharacter)
-    {
-        OBJECT *character = (OBJECT *)g_GameCharacter;
-        if (auto currentLevelField = FindFieldInHierarchy(character->Class(), FIELD_GAME_CHARACTER_CURRENT_LEVEL))
-            g_CurrentLevel = currentLevelField->GetObject(character);
-    }
-
-    return g_CurrentLevel;
-}
-
-std::string ToUtf8(STRING *value)
-{
-    if (!value)
-        return {};
-
-    std::string result;
-    result.reserve(value->length);
-    for (int i = 0; i < value->length; ++i)
-    {
-        auto ch = value->chars[i];
-        result.push_back(ch > 0 && ch < 0x80 ? static_cast<char>(ch) : '?');
-    }
-
-    return result;
-}
-
-bool TypeNameContains(const Il2CppType *type, const char *needle)
-{
-    if (!type || !needle)
+    Method m = Resolve(N::GLOBAL, "UserDataManager", "SaveData", -1);
+    if (!m)
         return false;
-
-    const char *typeName = IL2CPP::API::il2cpp_type_get_name(type);
-    return typeName && std::strstr(typeName, needle);
+    As<StaticBool_t>(m)(m.mi);
+    return true;
 }
 
-CLASS *FindClassByImageScan(const char *className, const char *namespaceNeedle)
+// Build an eint from an int via DancingLine.Security.eint.op_Implicit(int) (the value
+// encryption). Picks the int->eint overload (param 0 == I4) among the op_Implicit methods.
+static bool BuildEInt(int value, EInt &out)
 {
-    size_t assemblyCount = 0;
-    auto assemblies = IL2CPP::API::il2cpp_domain_get_assemblies(IL2CPP::API::il2cpp_domain_get(), &assemblyCount);
-    if (!assemblies)
-        return nullptr;
-
-    CLASS *fallback = nullptr;
-    for (size_t assemblyIndex = 0; assemblyIndex < assemblyCount; ++assemblyIndex)
-    {
-        auto image = IL2CPP::API::il2cpp_assembly_get_image(assemblies[assemblyIndex]);
-        if (!image)
-            continue;
-
-        size_t classCount = IL2CPP::API::il2cpp_image_get_class_count(image);
-        for (size_t classIndex = 0; classIndex < classCount; ++classIndex)
-        {
-            auto klass = (CLASS *)IL2CPP::API::il2cpp_image_get_class(image, classIndex);
-            if (!klass)
-                continue;
-
-            const char *name = IL2CPP::API::il2cpp_class_get_name(klass);
-            if (!name || std::strcmp(name, className) != 0)
-                continue;
-
-            const char *namespaze = IL2CPP::API::il2cpp_class_get_namespace(klass);
-            bool namespaceMatches = !namespaceNeedle || (namespaze && std::strstr(namespaze, namespaceNeedle));
-            if (namespaceMatches)
-                return klass;
-
-            if (!fallback)
-                fallback = klass;
-        }
-    }
-
-    return fallback;
-}
-
-CLASS *GetEIntClass()
-{
-    if (g_EIntClass)
-        return g_EIntClass;
-
-    auto assembly = IL2CPP::Assembly(ASSEMBLY_GAME);
-    if (assembly)
-    {
-        g_EIntClass = assembly->Namespace(NAMESPACE_SECURITY)->Class(CLASS_EINT);
-
-        if (!g_EIntClass)
-            g_EIntClass = assembly->Namespace(NAMESPACE_GLOBAL)->Class(CLASS_EINT);
-    }
-
-    if (!g_EIntClass)
-        g_EIntClass = FindClassByImageScan(CLASS_EINT, "Security");
-
-    return g_EIntClass;
-}
-
-CLASS *GetUpdateLoopClass()
-{
-    if (g_UpdateLoopClass)
-        return g_UpdateLoopClass;
-
-    auto assembly = IL2CPP::Assembly(ASSEMBLY_GAME);
-    if (assembly)
-        g_UpdateLoopClass = assembly->Namespace(NAMESPACE_GAME_LOOP)->Class(CLASS_UPDATE_LOOP_HANDLER);
-
-    if (!g_UpdateLoopClass)
-        g_UpdateLoopClass = FindClassByImageScan(CLASS_UPDATE_LOOP_HANDLER, NAMESPACE_GAME_LOOP);
-
-    return g_UpdateLoopClass;
-}
-
-METHOD *FindMethodByParams(CLASS *klass, const char *methodName, const char *param0, const char *param1, const char *param2)
-{
-    if (!klass)
-        return nullptr;
-
-    void *iter = nullptr;
-    const MethodInfo *method = nullptr;
-    while ((method = IL2CPP::API::il2cpp_class_get_methods(klass, &iter)))
-    {
-        if (std::strcmp(IL2CPP::API::il2cpp_method_get_name(method), methodName) != 0)
-            continue;
-
-        if (IL2CPP::API::il2cpp_method_get_param_count(method) != 3)
-            continue;
-
-        if (!TypeNameContains(IL2CPP::API::il2cpp_method_get_param(method, 0), param0))
-            continue;
-
-        if (!TypeNameContains(IL2CPP::API::il2cpp_method_get_param(method, 1), param1))
-            continue;
-
-        if (!TypeNameContains(IL2CPP::API::il2cpp_method_get_param(method, 2), param2))
-            continue;
-
-        return (METHOD *)method;
-    }
-
-    return nullptr;
-}
-
-METHOD *FindMethodByParam(CLASS *klass, const char *methodName, const char *param0)
-{
-    if (!klass)
-        return nullptr;
-
-    void *iter = nullptr;
-    const MethodInfo *method = nullptr;
-    while ((method = IL2CPP::API::il2cpp_class_get_methods(klass, &iter)))
-    {
-        if (std::strcmp(IL2CPP::API::il2cpp_method_get_name(method), methodName) != 0)
-            continue;
-
-        if (IL2CPP::API::il2cpp_method_get_param_count(method) != 1)
-            continue;
-
-        if (TypeNameContains(IL2CPP::API::il2cpp_method_get_param(method, 0), param0))
-            return (METHOD *)method;
-    }
-
-    return nullptr;
-}
-
-METHOD *FindIntToEIntMethod(CLASS *eintClass)
-{
+    void *eintClass = MemRes::GetClass("DancingLine.Security", "eint");
     if (!eintClass)
-        return nullptr;
-
-    void *iter = nullptr;
-    const MethodInfo *method = nullptr;
-    while ((method = IL2CPP::API::il2cpp_class_get_methods(eintClass, &iter)))
-    {
-        const char *name = IL2CPP::API::il2cpp_method_get_name(method);
-        if (!name || std::strcmp(name, "op_Implicit") != 0)
-            continue;
-
-        if (IL2CPP::API::il2cpp_method_get_param_count(method) != 1)
-            continue;
-
-        if (TypeNameContains(IL2CPP::API::il2cpp_method_get_return_type(method), "eint") &&
-            TypeNameContains(IL2CPP::API::il2cpp_method_get_param(method, 0), "Int32"))
-        {
-            return (METHOD *)method;
-        }
-    }
-
-    return nullptr;
+        return false;
+    void *mi = MemRes::FindMethodInfoP0(eintClass, "op_Implicit", 1, MemRes::IL2CPP_TYPE_I4);
+    if (!mi)
+        return false;
+    out = reinterpret_cast<IntToEInt_t>(*reinterpret_cast<void **>(mi))(value, mi);
+    return true;
 }
 
-bool CallSaveData()
+// Original working method: set the eint value directly via the setter, then refresh the UI.
+static bool ApplyStars(int value)
 {
-    auto assembly = IL2CPP::Assembly(ASSEMBLY_GAME);
-    if (!assembly)
+    if (value < 0)
+        value = 0;
+    void *coinsClass = MemRes::GetClass(N::MONET, "CoinsController");
+    void *inst = g_coins ? g_coins : MemRes::GetSingleton(coinsClass); // singleton, no hook needed
+    if (!inst || !coinsClass)
         return false;
 
-    auto saveClass = assembly->Namespace(NAMESPACE_GLOBAL)->Class(CLASS_USER_DATA_MANAGER);
-    auto saveMethod = FindMethod(saveClass, METHOD_SAVE_DATA, 0);
-    if (!saveMethod)
+    EInt e{};
+    if (!BuildEInt(value, e))
         return false;
 
-    auto SaveData = saveMethod->FindFunction<StaticBoolMethod_t>();
-    return SaveData && SaveData(saveMethod);
-}
-
-bool SaveStarsToUserData(int value)
-{
-    auto assembly = IL2CPP::Assembly(ASSEMBLY_GAME);
-    if (!assembly)
+    Method setCoins = Resolve(N::MONET, "CoinsController", "set_Coins", 1);
+    if (!setCoins)
         return false;
+    reinterpret_cast<SetCoinsEInt_t>(setCoins.ptr)(inst, e, setCoins.mi);
 
-    auto userDataClass = assembly->Namespace(NAMESPACE_GLOBAL)->Class(CLASS_USER_DATA_MANAGER);
-    auto saveMethod = FindMethodByParams(userDataClass, METHOD_SAVE, "String", "Int32", "Boolean");
-    if (!saveMethod)
-        return false;
-
-    SaveInt_t SaveInt = saveMethod->FindFunction<SaveInt_t>();
-    if (!SaveInt)
-        return false;
-
-    SaveInt(IL2CPP::String(COINS_DATA_KEY), value, false, saveMethod);
+    if (Method rc = Resolve(N::MONET, "CoinsController", "RefreshCounter", 0))
+        As<VoidInst_t>(rc)(inst, rc.mi);
     CallSaveData();
+    std::cout << "[+] Stars set to " << value << ".\n";
     return true;
 }
 
-bool RefreshStoreTab(const char *className)
+// Original working method: add/reduce by delta (these fire the note-counter change event
+// that refreshes the UI; the direct set_MusicialNoteAmount setter does not). All static.
+static bool ApplyNotes(int value)
 {
-    auto assembly = IL2CPP::Assembly(ASSEMBLY_GAME);
-    auto tabClass = assembly ? assembly->Namespace(NAMESPACE_STORE)->Class(className) : nullptr;
-    auto refreshMethod = FindMethod(tabClass, METHOD_REFRESH, 0);
-    auto Refresh = refreshMethod ? refreshMethod->FindFunction<StaticVoidMethod_t>() : nullptr;
-    if (!Refresh)
+    if (value < 0)
+        value = 0;
+    Method get = Resolve(N::MUSIC, "MusicialManager", "get_MusicialNoteAmount", 0);
+    Method add = Resolve(N::MUSIC, "MusicialManager", "addMusicNote", 1);
+    Method reduce = Resolve(N::MUSIC, "MusicialManager", "reduceMusicNote", 1);
+    if (!get || !add || !reduce)
         return false;
-
-    Refresh(refreshMethod);
+    int cur = As<StaticGetInt_t>(get)(get.mi);
+    int delta = value - cur;
+    if (delta > 0)
+        As<StaticSetInt_t>(add)(delta, add.mi);
+    else if (delta < 0)
+        As<StaticSetInt_t>(reduce)(-delta, reduce.mi);
+    CallSaveData();
+    std::cout << "[+] Notes set to " << value << " (was " << cur << ").\n";
     return true;
 }
 
-int UnlockAllLineSkins()
+static void ApplyPerfectStats(void *klass, void *level)
 {
-    auto assembly = IL2CPP::Assembly(ASSEMBLY_GAME);
-    auto controllerClass = assembly ? assembly->Namespace(NAMESPACE_CUSTOMIZATION)->Class(CLASS_LINE_CUSTOMIZATION_CONTROLLER) : nullptr;
-    auto controller = GetSingletonInstance(controllerClass);
-    auto settingsMethod = FindMethod(controllerClass, METHOD_GET_SETTINGS, 0);
-    auto GetSettings = settingsMethod ? settingsMethod->FindFunction<GetArray_t>() : nullptr;
-    if (!controller || !GetSettings)
+    int crowns = 3, diamonds = 10;
+    if (Method m = Resolve(N::LEVEL, "LevelBase", "StarReached", 1))
+        for (int i = 0; i < crowns; ++i)
+            As<IntInst_t>(m)(level, i, m.mi);
+    if (Method m = Resolve(N::LEVEL, "LevelBase", "set_StarsCollected", 1))
+        As<IntInst_t>(m)(level, crowns, m.mi);
+    if (Method m = Resolve(N::LEVEL, "LevelBase", "set_DiamontsCollected", 1))
+        As<IntInst_t>(m)(level, diamonds, m.mi);
+    if (Method m = Resolve(N::LEVEL, "LevelBase", "set_IsPerfectReachedBefore", 1))
+        As<BoolInst_t>(m)(level, true, m.mi);
+
+    int diamondsOff = MemRes::FindFieldOffset(klass, "_currentDiamontsCollected");
+    if (diamondsOff >= 0)
+        *reinterpret_cast<int *>((uint8_t *)level + diamondsOff) = diamonds;
+}
+
+// The current level from the LevelsController singleton (never stale, unlike a captured
+// instance from a previous level). Backing fields are obfuscated, but the getter name is intact.
+static void *GetCurrentLevel()
+{
+    void *lcClass = MemRes::GetClass(N::DL, "LevelsController");
+    void *lc = MemRes::GetSingleton(lcClass);
+    Method getCur = Resolve(N::DL, "LevelsController", "get_CurrentLevel", 0);
+    if (lc && getCur)
+        return As<GetPtrInst_t>(getCur)(lc, getCur.mi);
+    return g_level; // fallback to the captured instance
+}
+
+// True only while the line is actually moving (in-level), false in the "tap to play" / ready
+// pre-level states. Replaces the original's obfuscated `<started>` field check.
+static bool LevelIsPlaying(void *level)
+{
+    if (!level)
+        return false;
+    Method m = Resolve(N::LEVEL, "LevelBase", "get_IsPlaying", 0);
+    return m && As<GetBoolInst_t>(m)(level, m.mi);
+}
+
+// True only when `level` is the on-screen, playable level — i.e. the "ready / tap to play"
+// pre-level state or the line-moving in-level state. False on the menu, store, level-select,
+// and the post-run results screen. Used to decide whether a finish request is honored or
+// silently dropped, so triggering "Finish Level Perfectly" outside a level does nothing.
+static bool LevelIsActiveContext(void *level)
+{
+    if (!level)
+        return false;
+    // A completed run is the results screen, not an active level.
+    if (Method m = Resolve(N::LEVEL, "LevelBase", "get_IsRunCompleted", 0))
+        if (As<GetBoolInst_t>(m)(level, m.mi))
+            return false;
+    // Line moving -> definitely in-level.
+    if (LevelIsPlaying(level))
+        return true;
+    // Not playing yet: only "ready" if the level scene is actually loaded (resources up).
+    // At the menu / level-select the previous level's resources are unloaded, so this is false.
+    if (Method m = Resolve(N::LEVEL, "LevelBase", "get_AreResourcesLoaded", 0))
+        return As<GetBoolInst_t>(m)(level, m.mi);
+    return false;
+}
+
+static bool g_finishWaitLogged = false;
+static bool g_finishDropLogged = false;
+
+static bool ApplyFinishLevel()
+{
+    if (g_finishing)
+        return true; // re-entrant call (e.g. a kill fires mid-sequence): no-op
+    void *level = GetCurrentLevel();
+    void *klass = MemRes::GetClass(N::LEVEL, "LevelBase");
+
+    // Not in a level (menu / store / level-select / results screen): drop the request so it
+    // does nothing, instead of letting it linger and fire when the next level starts moving.
+    if (!level || !klass || !LevelIsActiveContext(level))
     {
-        std::cout << "[!] LineCustomizationController is not available yet.\n";
-        return -1;
+        if (!g_finishDropLogged)
+        {
+            std::cout << "[*] Finish Level Perfectly ignored (not in a level).\n";
+            g_finishDropLogged = true;
+        }
+        return true; // clears g_finishReq in Pump
     }
 
-    auto settingsArray = GetSettings(controller, settingsMethod);
-    if (!settingsArray)
-        return 0;
-
-    int unlockedCount = 0;
-    for (size_t i = 0; i < settingsArray->MaxLength(); ++i)
+    if (!LevelIsPlaying(level))
     {
-        auto settings = settingsArray->GetObject(i);
+        // In a level but still in the "ready / tap to play" pre-level state: keep it queued
+        // and let it apply the moment the line starts moving.
+        if (!g_finishWaitLogged)
+        {
+            std::cout << "[*] Finish Level Perfectly queued until the line starts moving.\n";
+            g_finishWaitLogged = true;
+        }
+        return false; // wait for the actual in-level state
+    }
+    g_finishWaitLogged = false;
+    g_finishDropLogged = false;
+
+    // One-shot: clear the request and mark "finishing" up front so the heavy CompleteLevel/
+    // ShowLevelAfterCompleted sequence runs exactly once, even though calling them re-enters
+    // the game's update/kill hooks. Kill detours suppress death while g_finishing is set.
+    g_finishing = true;
+    g_finishReq = false;
+    g_forcePerfect = true;
+    g_perfectLevel = level;
+    ApplyPerfectStats(klass, level);
+
+    if (Method m = Resolve(N::LEVEL, "LevelBase", "Reached100", 0))
+        As<VoidInst_t>(m)(level, m.mi);
+    if (Method m = Resolve(N::LEVEL, "LevelBase", "CompleteLevel", 0))
+        As<VoidInst_t>(m)(level, m.mi);
+    if (Method m = Resolve(N::LEVEL, "LevelBase", "ShowLevelAfterCompleted", 0))
+        As<VoidInst_t>(m)(level, m.mi);
+    ApplyPerfectStats(klass, level);
+    CallSaveData();
+    g_finishing = false;
+    std::cout << "[+] Finish Level Perfectly applied.\n";
+    return true;
+}
+
+// Original working method: get the LineCustomizationController, enumerate get_Settings()
+// (an Il2CppArray of settings objects), and Unlock each not-yet-unlocked one. The controller
+// is created lazily (exists once the customization screen is touched), so we use the instance
+// captured by the get_Settings hook, falling back to the static singleton.
+static int UnlockLineSkins()
+{
+    void *ctrlClass = MemRes::GetClass(N::CUSTOM, "LineCustomizationController");
+    void *ctrl = g_customCtrl ? g_customCtrl : MemRes::GetSingleton(ctrlClass);
+    Method getSettings = Resolve(N::CUSTOM, "LineCustomizationController", "get_Settings", 0);
+    if (!ctrl || !getSettings)
+        return -1; // controller not available yet; retry once the skins screen is opened
+
+    // call via the original trampoline to avoid re-entering the capture detour
+    auto arr = o_GetSettings ? o_GetSettings(ctrl, getSettings.mi)
+                             : As<GetPtrInst_t>(getSettings)(ctrl, getSettings.mi);
+    if (!arr)
+        return 0;
+    // Il2CppArray (x64): max_length @ 0x18, data starts @ 0x20
+    uint32_t len = *reinterpret_cast<uint32_t *>((uint8_t *)arr + 0x18);
+    void **items = reinterpret_cast<void **>((uint8_t *)arr + 0x20);
+    int unlocked = 0;
+    for (uint32_t i = 0; i < len && i < 4096; ++i)
+    {
+        void *settings = items[i];
         if (!settings)
             continue;
-
-        auto settingsClass = settings->Class();
-        auto isUnlockedMethod = FindMethod(settingsClass, METHOD_GET_IS_UNLOCKED, 0);
-        auto unlockMethod = FindMethod(settingsClass, METHOD_UNLOCK, 0);
-        auto IsUnlocked = isUnlockedMethod ? isUnlockedMethod->FindFunction<GetBool_t>() : nullptr;
-        auto Unlock = unlockMethod ? unlockMethod->FindFunction<VoidMethod_t>() : nullptr;
-        if (!Unlock)
+        // resolve Unlock / get_IsUnlocked on the element's actual runtime class
+        void *sKlass = *reinterpret_cast<void **>(settings); // object->klass @ offset 0
+        if (!sKlass)
             continue;
-
-        if (IsUnlocked && IsUnlocked(settings, isUnlockedMethod))
+        void *miUnlock = MemRes::FindMethodInfo(sKlass, "Unlock", 0);
+        void *miIs = MemRes::FindMethodInfo(sKlass, "get_IsUnlocked", 0);
+        if (miIs && reinterpret_cast<GetBoolInst_t>(*(void **)miIs)(settings, miIs))
             continue;
-
-        Unlock(settings, unlockMethod);
-        ++unlockedCount;
+        if (miUnlock)
+        {
+            reinterpret_cast<VoidInst_t>(*(void **)miUnlock)(settings, miUnlock);
+            ++unlocked;
+        }
     }
-
-    return unlockedCount;
+    return unlocked;
 }
 
-int UnlockAllLineHats()
+static int UnlockLineHats()
 {
-    auto assembly = IL2CPP::Assembly(ASSEMBLY_GAME);
-    auto ornamentClass = assembly ? assembly->Namespace(NAMESPACE_GLOBAL)->Class(CLASS_ORNAMENT_CONTROLLER) : nullptr;
-    auto unlockMethod = FindMethod(ornamentClass, METHOD_SET_HAVE_ACT_REWARD, 1);
-    auto UnlockHat = unlockMethod ? unlockMethod->FindFunction<StaticSetInt_t>() : nullptr;
-    if (!UnlockHat)
-    {
-        std::cout << "[!] OrnamentController is not available yet.\n";
+    Method m = Resolve(N::GLOBAL, "OrnamentController", "setHaveActReward", 1);
+    if (!m)
         return -1;
-    }
-
-    constexpr int hatTypes[] = {1, 2, 3, 4, 5, 6, 7, 8, 9};
-    for (int hatType : hatTypes)
-        UnlockHat(hatType, unlockMethod);
-
-    return static_cast<int>(sizeof(hatTypes) / sizeof(hatTypes[0]));
+    const int hatTypes[] = {1, 2, 3, 4, 5, 6, 7, 8, 9};
+    for (int t : hatTypes)
+        As<StaticSetInt_t>(m)(t, m.mi);
+    return (int)(sizeof(hatTypes) / sizeof(hatTypes[0]));
 }
 
-bool ApplyUnlockAllSkinsAndDecorations()
+// Refresh a store panel tab so the UI reflects the unlocks (Refresh is static).
+static bool RefreshStoreTab(const char *className)
 {
-    int skinCount = UnlockAllLineSkins();
-    int hatCount = UnlockAllLineHats();
-    if (skinCount < 0 || hatCount < 0)
+    Method m = Resolve(N::STORE, className, "Refresh", 0);
+    if (!m)
+        return false;
+    As<StaticVoid_t>(m)(m.mi);
+    return true;
+}
+
+static bool ApplyUnlock()
+{
+    // Hats (OrnamentController.setHaveActReward, static) apply immediately, once.
+    if (!g_hatsDone && UnlockLineHats() >= 0)
+        g_hatsDone = true;
+
+    // Skins need the LineCustomizationController, which is created lazily. Keep the request
+    // queued (return false) until it exists, so opening the customization screen completes it.
+    int skins = UnlockLineSkins();
+    if (skins < 0)
         return false;
 
     CallSaveData();
-    g_StoreTabsRefreshQueued = true;
-
-    std::cout << "[+] Unlocked line skins/hats. Skins changed: " << skinCount
-              << ", hats processed: " << hatCount << ".\n";
+    g_unlockApplied = true;               // make each tab refresh itself when next shown
+    RefreshStoreTab("StorePanelTabSkin"); // refresh the currently-visible tab now
+    RefreshStoreTab("StorePanelTabHats");
+    std::cout << "[+] Unlock applied. skins changed=" << skins << " hatsDone=" << g_hatsDone << "\n";
     return true;
 }
 
-bool BuildEInt(int value, EInt &out)
+// pump all queued commands (runs on the game thread)
+static bool g_pumping = false;
+static void Pump()
 {
-    auto assembly = IL2CPP::Assembly(ASSEMBLY_GAME);
-    if (!assembly)
-    {
-        std::cout << "[!] BuildEInt failed: assembly unavailable.\n";
-        return false;
-    }
-
-    auto eintClass = GetEIntClass();
-    if (!eintClass)
-    {
-        std::cout << "[!] BuildEInt failed: eint class unavailable.\n";
-        return false;
-    }
-
-    auto implicitMethod = FindIntToEIntMethod(eintClass);
-    if (!implicitMethod)
-    {
-        std::cout << "[!] BuildEInt failed: int -> eint method not found.\n";
-        return false;
-    }
-
-    IntToEInt_t IntToEInt = implicitMethod->FindFunction<IntToEInt_t>();
-    if (!IntToEInt)
-    {
-        std::cout << "[!] BuildEInt failed: int -> eint function pointer missing.\n";
-        return false;
-    }
-
-    out = IntToEInt(value, implicitMethod);
-    return true;
-}
-
-bool SetCoinsFieldOnly(void *coinsController, CLASS *coinsClass, int value)
-{
-    if (!coinsController || !coinsClass)
-        return false;
-
-    EInt coinsValue{};
-    if (!BuildEInt(value, coinsValue))
-    {
-        std::cout << "[!] Failed to build live stars value.\n";
-        return false;
-    }
-
-    if (auto coinsField = FindFieldInHierarchy(coinsClass, FIELD_COINS))
-    {
-        coinsField->SetValue((OBJECT *)coinsController, &coinsValue);
-        return true;
-    }
-
-    return false;
-}
-
-bool RefreshCoinsCounterThroughController()
-{
-    void *coinsController = GetCoinsController();
-    auto assembly = IL2CPP::Assembly(ASSEMBLY_GAME);
-    auto coinsClass = assembly ? assembly->Namespace(NAMESPACE_MONETIZATION)->Class(CLASS_COINS_CONTROLLER) : nullptr;
-    if (!coinsController || !coinsClass)
-        return false;
-
-    if (auto refreshMethod = FindMethod(coinsClass, METHOD_REFRESH_COUNTER, 0))
-    {
-        if (g_CoinsRefreshHook && g_CoinsRefreshHook->get_original<VoidMethod_t>())
-        {
-            g_CoinsRefreshHook->get_original<VoidMethod_t>()(coinsController, refreshMethod);
-            return true;
-        }
-        else if (auto RefreshCounter = refreshMethod->FindFunction<VoidMethod_t>())
-        {
-            RefreshCounter(coinsController, refreshMethod);
-            return true;
-        }
-    }
-
-    return false;
-}
-
-void ProcessQueuedStarsUiRefresh()
-{
-    if (!g_StarsUiRefreshQueued)
+    if (g_pumping)
         return;
-
-    g_StarsUiRefreshQueued = false;
-    if (!RefreshCoinsCounterThroughController())
-        g_StarsUiRefreshQueued = true;
-}
-
-void ProcessQueuedStoreTabsRefresh()
-{
-    if (!g_StoreTabsRefreshQueued)
-        return;
-
-    g_StoreTabsRefreshQueued = false;
-    RefreshStoreTab(CLASS_STORE_PANEL_TAB_SKIN);
-    RefreshStoreTab(CLASS_STORE_PANEL_TAB_HATS);
-}
-
-bool ApplyStarsToCoinsController(int value)
-{
-    if (value < 0)
-        value = 0;
-
-    void *coinsController = GetCoinsController();
-    auto assembly = IL2CPP::Assembly(ASSEMBLY_GAME);
-    auto coinsClass = assembly ? assembly->Namespace(NAMESPACE_MONETIZATION)->Class(CLASS_COINS_CONTROLLER) : nullptr;
-    if (!coinsController || !coinsClass)
-    {
-        std::cout << "[!] CoinsController is not available yet.\n";
-        return false;
-    }
-
-    if (!SetCoinsFieldOnly(coinsController, coinsClass, value))
-        return false;
-
-    SaveStarsToUserData(value);
-    g_StarsUiRefreshQueued = true;
-
-    return true;
-}
-
-bool ApplyNotesToMusicialManager(int value)
-{
-    if (value < 0)
-        value = 0;
-
-    auto assembly = IL2CPP::Assembly(ASSEMBLY_GAME);
-    auto musicClass = assembly ? assembly->Namespace(NAMESPACE_MUSICIAL)->Class(CLASS_MUSICIAL_MANAGER) : nullptr;
-    auto getNotesMethod = FindMethod(musicClass, METHOD_GET_MUSICIAL_NOTE_AMOUNT, 0);
-    auto addNotesMethod = FindMethod(musicClass, METHOD_ADD_MUSIC_NOTE, 1);
-    auto reduceNotesMethod = FindMethod(musicClass, METHOD_REDUCE_MUSIC_NOTE, 1);
-    if (!getNotesMethod || !addNotesMethod || !reduceNotesMethod)
-    {
-        std::cout << "[!] MusicialManager note methods are not available yet.\n";
-        return false;
-    }
-
-    auto GetNotes = getNotesMethod->FindFunction<StaticGetInt_t>();
-    auto AddNotes = addNotesMethod->FindFunction<StaticSetInt_t>();
-    auto ReduceNotes = reduceNotesMethod->FindFunction<StaticReduceInt_t>();
-    if (!GetNotes || !AddNotes || !ReduceNotes)
-        return false;
-
-    int currentValue = GetNotes(getNotesMethod);
-    int delta = value - currentValue;
-    if (delta > 0)
-        AddNotes(delta, addNotesMethod);
-    else if (delta < 0 && !ReduceNotes(-delta, reduceNotesMethod))
-        return false;
-
-    CallSaveData();
-    return true;
-}
-
-int GetListCount(void *list)
-{
-    if (!list)
-        return 0;
-
-    auto listObject = (OBJECT *)list;
-    if (auto countMethod = FindMethod(listObject->Class(), "get_Count", 0))
-    {
-        if (auto GetCount = countMethod->FindFunction<ListCount_t>())
-            return GetCount(list, countMethod);
-    }
-
-    if (auto sizeField = FindFieldInHierarchy(listObject->Class(), FIELD_LIST_SIZE))
-        return sizeField->GetValue<int>(listObject);
-
-    return 0;
-}
-
-void *GetListItem(void *list, int index)
-{
-    if (!list || index < 0)
-        return nullptr;
-
-    auto listObject = (OBJECT *)list;
-    auto itemsField = FindFieldInHierarchy(listObject->Class(), FIELD_LIST_ITEMS);
-    if (!itemsField)
-        return nullptr;
-
-    auto items = itemsField->GetArray(listObject);
-    if (!items || index >= static_cast<int>(items->MaxLength()))
-        return nullptr;
-
-    return items->GetObject(index);
-}
-
-bool ListContainsObject(void *list, void *item)
-{
-    if (!list || !item)
-        return false;
-
-    auto method = FindMethod(((OBJECT *)list)->Class(), "Contains", 1);
-    auto Contains = method ? method->FindFunction<ListContainsObject_t>() : nullptr;
-    return Contains && Contains(list, item, method);
-}
-
-void ApplyQueuedCommands()
-{
-    if (g_ApplyingCommands)
-        return;
-
-    g_ApplyingCommands = true;
-
-    if (g_StarsCommand.active && ApplyStarsToCoinsController(g_StarsCommand.value))
-    {
-        std::cout << "[+] Stars set to " << g_StarsCommand.value << ".\n";
-        g_StarsCommand.active = false;
-    }
-    else if (g_StarsCommand.active)
-    {
-        std::cout << "[!] Stars apply remains queued.\n";
-    }
-
-    if (g_NotesCommand.active && ApplyNotesToMusicialManager(g_NotesCommand.value))
-    {
-        std::cout << "[+] Notes set to " << g_NotesCommand.value << ".\n";
-        g_NotesCommand.active = false;
-    }
-    else if (g_NotesCommand.active)
-    {
-        std::cout << "[!] Notes apply remains queued.\n";
-    }
-
-    g_ApplyingCommands = false;
-    ProcessQueuedStarsUiRefresh();
-    ProcessQueuedStoreTabsRefresh();
-}
-
-void ApplyPerfectResultStats(CLASS *levelClass, void *levelInstance)
-{
-    bool enabled = true;
-    bool disabled = false;
-    int zero = 0;
-    int crowns = 3;
-    int diamonds = 10;
-
-    if (auto checkpointField = levelClass->Field(FIELD_STARTING_FROM_CHECKPOINT))
-        checkpointField->SetValue((OBJECT *)levelInstance, &disabled);
-
-    if (auto checkpointCounterField = levelClass->Field(FIELD_STARTING_FROM_CHECKPOINT_COUNTER))
-        checkpointCounterField->SetValue((OBJECT *)levelInstance, &zero);
-
-    if (auto currentDiamondsField = levelClass->Field(FIELD_CURRENT_DIAMONTS_COLLECTED))
-        currentDiamondsField->SetValue((OBJECT *)levelInstance, &diamonds);
-
-    if (auto starReachedMethod = FindMethod(levelClass, METHOD_STAR_REACHED, 1))
-    {
-        auto StarReached = starReachedMethod->FindFunction<SetInt_t>();
-        for (int i = 0; i < crowns; ++i)
-            StarReached(levelInstance, i, starReachedMethod);
-    }
-
-    if (auto starsMethod = FindMethod(levelClass, METHOD_SET_STARS_COLLECTED, 1))
-        starsMethod->FindFunction<SetInt_t>()(levelInstance, crowns, starsMethod);
-
-    if (auto diamondsMethod = FindMethod(levelClass, METHOD_SET_DIAMONTS_COLLECTED, 1))
-        diamondsMethod->FindFunction<SetInt_t>()(levelInstance, diamonds, diamondsMethod);
-
-    if (auto perfectMethod = FindMethod(levelClass, METHOD_SET_IS_PERFECT_REACHED_BEFORE, 1))
-        perfectMethod->FindFunction<SetBool_t>()(levelInstance, enabled, perfectMethod);
-}
-
-void ApplyFinishLevelPerfectly(void *levelInstance)
-{
-    levelInstance = levelInstance ? levelInstance : GetCurrentLevel();
-
-    if (!levelInstance)
-    {
-        std::cout << "[!] LevelBase instance is not available yet. Finish command remains queued.\n";
-        return;
-    }
-
-    auto assembly = IL2CPP::Assembly(ASSEMBLY_GAME);
-    auto levelClass = assembly ? assembly->Namespace(NAMESPACE_LEVEL)->Class(CLASS_LEVEL_BASE) : nullptr;
-    if (!levelClass)
-        return;
-
-    if (auto startedField = FindFieldInHierarchy(levelClass, FIELD_STARTED))
-    {
-        bool started = startedField->GetValue<bool>((OBJECT *)levelInstance);
-        if (!started)
-        {
-            if (!g_WaitingForLevelStartLogged)
-            {
-                std::cout << "[*] Finish Level Perfectly is queued until the level starts moving.\n";
-                g_WaitingForLevelStartLogged = true;
-            }
-            return;
-        }
-    }
-
-    g_WaitingForLevelStartLogged = false;
-    g_ForcePerfectResult = true;
-    g_PerfectResultLevel = levelInstance;
-
-    ApplyPerfectResultStats(levelClass, levelInstance);
-
-    if (auto reachedMethod = FindMethod(levelClass, METHOD_REACHED_100, 0))
-        reachedMethod->FindFunction<VoidMethod_t>()(levelInstance, reachedMethod);
-
-    if (auto completeMethod = FindMethod(levelClass, METHOD_COMPLETE_LEVEL, 0))
-        completeMethod->FindFunction<VoidMethod_t>()(levelInstance, completeMethod);
-
-    if (auto showMethod = FindMethod(levelClass, METHOD_SHOW_LEVEL_AFTER_COMPLETED, 0))
-        showMethod->FindFunction<VoidMethod_t>()(levelInstance, showMethod);
-
-    ApplyPerfectResultStats(levelClass, levelInstance);
-    CallSaveData();
-
-    g_FinishLevelPerfectlyRequested = false;
-    std::cout << "[+] Finish Level Perfectly applied.\n";
+    g_pumping = true;
+    if (g_setStarsReq && ApplyStars(g_starsValue))
+        g_setStarsReq = false;
+    if (g_setNotesReq && ApplyNotes(g_notesValue))
+        g_setNotesReq = false;
+    if (g_finishReq && ApplyFinishLevel())
+        g_finishReq = false;
+    if (g_unlockReq && ApplyUnlock())
+        g_unlockReq = false;
+    g_pumping = false;
 }
 
 // =============================================================
-// Hooks
+// Detours
 // =============================================================
 
-void Detour_LevelBase_OnUpdate(void *instance, float deltaTime, float smoothDeltaTime, float unscaledDeltaTime, const MethodInfo *method)
+static void Detour_UpdateLoop(void *inst, const void *method)
 {
-    if (instance)
-        g_CurrentLevel = instance;
-
-    if (g_LevelUpdateHook && g_LevelUpdateHook->get_original<LevelBaseOnUpdate_t>())
-        g_LevelUpdateHook->get_original<LevelBaseOnUpdate_t>()(instance, deltaTime, smoothDeltaTime, unscaledDeltaTime, method);
-
-    ApplyQueuedCommands();
-
-    if (g_FinishLevelPerfectlyRequested)
-        ApplyFinishLevelPerfectly(instance);
+    if (o_UpdateLoop)
+        o_UpdateLoop(inst, method);
+    Pump();
 }
 
-void Detour_UpdateLoop_Update(void *instance, const MethodInfo *method)
+static void Detour_LevelOnUpdate(void *inst, float a, float b, float c, const void *method)
 {
-    if (g_UpdateLoopHook && g_UpdateLoopHook->get_original<VoidMethod_t>())
-        g_UpdateLoopHook->get_original<VoidMethod_t>()(instance, method);
-
-    ApplyQueuedCommands();
+    if (inst)
+        g_level = inst;
+    if (o_LevelOnUpdate)
+        o_LevelOnUpdate(inst, a, b, c, method);
+    Pump();
 }
 
-void Detour_GameCharacter_OnUpdate(void *instance, float deltaTime, float smoothDeltaTime, float unscaledDeltaTime, const MethodInfo *method)
+// Capture-only detours: just record the instance. Commands are applied from the main
+// update-loop ticks (Pump), never mid-UI-render, to avoid stalling the frame.
+static void Detour_CoinsStart(void *inst, const void *method)
 {
-    if (instance)
-    {
-        g_GameCharacter = instance;
-        OBJECT *character = (OBJECT *)instance;
-        if (auto currentLevelField = FindFieldInHierarchy(character->Class(), FIELD_GAME_CHARACTER_CURRENT_LEVEL))
-            g_CurrentLevel = currentLevelField->GetObject(character);
-    }
-
-    if (g_GameCharacterUpdateHook && g_GameCharacterUpdateHook->get_original<LevelBaseOnUpdate_t>())
-        g_GameCharacterUpdateHook->get_original<LevelBaseOnUpdate_t>()(instance, deltaTime, smoothDeltaTime, unscaledDeltaTime, method);
-
-    ApplyQueuedCommands();
-
-    if (g_FinishLevelPerfectlyRequested)
-        ApplyFinishLevelPerfectly(GetCurrentLevel());
+    if (inst)
+        g_coins = inst;
+    if (o_CoinsStart)
+        o_CoinsStart(inst, method);
 }
 
-void Detour_CoinsController_Start(void *instance, const MethodInfo *method)
+static void Detour_CoinsRefresh(void *inst, const void *method)
 {
-    if (instance)
-        g_CoinsController = instance;
-
-    if (g_CoinsStartHook && g_CoinsStartHook->get_original<VoidMethod_t>())
-        g_CoinsStartHook->get_original<VoidMethod_t>()(instance, method);
-
-    ApplyQueuedCommands();
+    if (inst)
+        g_coins = inst;
+    if (o_CoinsRefresh)
+        o_CoinsRefresh(inst, method);
 }
 
-void Detour_CoinsController_RefreshCounter(void *instance, const MethodInfo *method)
+// capture the LineCustomizationController instance when the game accesses its settings
+// (i.e. when the customization/skins screen is shown), so Unlock can run.
+static void *Detour_GetSettings(void *inst, const void *method)
 {
-    if (instance)
-        g_CoinsController = instance;
-
-    if (g_CoinsRefreshHook && g_CoinsRefreshHook->get_original<VoidMethod_t>())
-        g_CoinsRefreshHook->get_original<VoidMethod_t>()(instance, method);
-
-    ApplyQueuedCommands();
+    if (inst)
+        g_customCtrl = inst;
+    return o_GetSettings ? o_GetSettings(inst, method) : nullptr;
 }
 
-int Detour_LevelBase_GetCurrentRunStars(void *instance, const MethodInfo *method)
+// After an unlock, refresh each store tab when it's shown. The static Refresh only reaches the
+// currently-subscribed (visible) tab, so navigating to the other page would otherwise stay stale.
+static void Detour_SkinTabShow(void *inst, const void *method)
 {
-    if (g_ForcePerfectResult && (!g_PerfectResultLevel || g_PerfectResultLevel == instance))
+    if (o_SkinTabShow)
+        o_SkinTabShow(inst, method);
+    if (g_unlockApplied)
+        RefreshStoreTab("StorePanelTabSkin");
+}
+static void Detour_HatsTabShow(void *inst, const void *method)
+{
+    if (o_HatsTabShow)
+        o_HatsTabShow(inst, method);
+    if (g_unlockApplied)
+        RefreshStoreTab("StorePanelTabHats");
+}
+
+// forced perfect-result getters
+static int Detour_RunStars(void *inst, const void *method)
+{
+    if (g_forcePerfect && (!g_perfectLevel || g_perfectLevel == inst))
         return 3;
-
-    if (g_LevelCurrentRunStarsHook && g_LevelCurrentRunStarsHook->get_original<GetInt_t>())
-        return g_LevelCurrentRunStarsHook->get_original<GetInt_t>()(instance, method);
-
-    return 0;
+    return o_RunStars ? o_RunStars(inst, method) : 0;
 }
-
-int Detour_LevelBase_GetCurrentRunStarsCollected(void *instance, const MethodInfo *method)
+static int Detour_RunStarsCollected(void *inst, const void *method)
 {
-    if (g_ForcePerfectResult && (!g_PerfectResultLevel || g_PerfectResultLevel == instance))
+    if (g_forcePerfect && (!g_perfectLevel || g_perfectLevel == inst))
         return 3;
-
-    if (g_LevelCurrentRunStarsCollectedHook && g_LevelCurrentRunStarsCollectedHook->get_original<GetInt_t>())
-        return g_LevelCurrentRunStarsCollectedHook->get_original<GetInt_t>()(instance, method);
-
-    return 0;
+    return o_RunStarsCollected ? o_RunStarsCollected(inst, method) : 0;
 }
-
-int Detour_LevelBase_GetCurrentRunStarsWhenDie(void *instance, const MethodInfo *method)
+static int Detour_RunStarsWhenDie(void *inst, const void *method)
 {
-    if (g_ForcePerfectResult && (!g_PerfectResultLevel || g_PerfectResultLevel == instance))
+    if (g_forcePerfect && (!g_perfectLevel || g_perfectLevel == inst))
         return 3;
-
-    if (g_LevelCurrentRunStarsWhenDieHook && g_LevelCurrentRunStarsWhenDieHook->get_original<GetInt_t>())
-        return g_LevelCurrentRunStarsWhenDieHook->get_original<GetInt_t>()(instance, method);
-
-    return 0;
+    return o_RunStarsWhenDie ? o_RunStarsWhenDie(inst, method) : 0;
 }
-
-int Detour_LevelBase_GetCurrentDiamonds(void *instance, const MethodInfo *method)
+static int Detour_RunDiamonds(void *inst, const void *method)
 {
-    if (g_ForcePerfectResult && (!g_PerfectResultLevel || g_PerfectResultLevel == instance))
+    if (g_forcePerfect && (!g_perfectLevel || g_perfectLevel == inst))
         return 10;
-
-    if (g_LevelCurrentDiamondsHook && g_LevelCurrentDiamondsHook->get_original<GetInt_t>())
-        return g_LevelCurrentDiamondsHook->get_original<GetInt_t>()(instance, method);
-
-    return 0;
+    return o_RunDiamonds ? o_RunDiamonds(inst, method) : 0;
 }
-
-bool Detour_LevelBase_GetIsPerfectOnCurrentRun(void *instance, const MethodInfo *method)
+static bool Detour_IsPerfect(void *inst, const void *method)
 {
-    if (g_ForcePerfectResult && (!g_PerfectResultLevel || g_PerfectResultLevel == instance))
+    if (g_forcePerfect && (!g_perfectLevel || g_perfectLevel == inst))
         return true;
-
-    if (g_LevelIsPerfectHook && g_LevelIsPerfectHook->get_original<GetBool_t>())
-        return g_LevelIsPerfectHook->get_original<GetBool_t>()(instance, method);
-
-    return false;
+    return o_IsPerfect ? o_IsPerfect(inst, method) : false;
 }
 
-void Detour_Hero_Kill(void *instance, void *obstacle, const MethodInfo *method)
+// no-collision suppressors
+static void Detour_HeroKill(void *inst, void *arg, const void *method)
 {
-    if (g_FinishLevelPerfectlyRequested)
-    {
-        ApplyFinishLevelPerfectly(GetCurrentLevel());
-        return;
-    }
-
-    if (g_NoCollisionEnabled)
-        return;
-
-    if (g_HeroKillHook && g_HeroKillHook->get_original<HeroKill_t>())
-        g_HeroKillHook->get_original<HeroKill_t>()(instance, obstacle, method);
+    if (g_finishReq || g_finishing) return; // suppress death; Pump applies the finish
+    if (g_noCollision) return;
+    if (o_HeroKill) o_HeroKill(inst, arg, method);
 }
-
-void Detour_HeroClassic_Kill(void *instance, void *obstacle, const MethodInfo *method)
+static void Detour_HeroClassicKill(void *inst, void *arg, const void *method)
 {
-    if (g_FinishLevelPerfectlyRequested)
-    {
-        ApplyFinishLevelPerfectly(GetCurrentLevel());
-        return;
-    }
-
-    if (g_NoCollisionEnabled)
-        return;
-
-    if (g_HeroClassicKillHook && g_HeroClassicKillHook->get_original<HeroKill_t>())
-        g_HeroClassicKillHook->get_original<HeroKill_t>()(instance, obstacle, method);
+    if (g_finishReq || g_finishing) return; // suppress death; Pump applies the finish
+    if (g_noCollision) return;
+    if (o_HeroClassicKill) o_HeroClassicKill(inst, arg, method);
 }
-
-void Detour_Hero_OnCollisionEnter(void *instance, void *collision, const MethodInfo *method)
+static void Detour_HeroCollision(void *inst, void *arg, const void *method)
 {
-    if (g_FinishLevelPerfectlyRequested)
-    {
-        ApplyFinishLevelPerfectly(GetCurrentLevel());
-        return;
-    }
-
-    if (g_NoCollisionEnabled)
-        return;
-
-    if (g_HeroCollisionHook && g_HeroCollisionHook->get_original<CollisionEnter_t>())
-        g_HeroCollisionHook->get_original<CollisionEnter_t>()(instance, collision, method);
+    if (g_finishReq || g_finishing) return; // suppress death; Pump applies the finish
+    if (g_noCollision) return;
+    if (o_HeroCollision) o_HeroCollision(inst, arg, method);
 }
-
-void Detour_GameCharacter_Killed(void *instance, const MethodInfo *method)
+static void Detour_CharKilled(void *inst, const void *method)
 {
-    if (g_FinishLevelPerfectlyRequested)
-    {
-        ApplyFinishLevelPerfectly(GetCurrentLevel());
-        return;
-    }
-
-    if (g_NoCollisionEnabled)
-        return;
-
-    if (g_GameCharacterKilledHook && g_GameCharacterKilledHook->get_original<VoidMethod_t>())
-        g_GameCharacterKilledHook->get_original<VoidMethod_t>()(instance, method);
+    if (g_finishReq || g_finishing) return; // suppress death; Pump applies the finish
+    if (g_noCollision) return;
+    if (o_CharKilled) o_CharKilled(inst, method);
 }
-
-void Detour_LevelBase_HeroKilled(void *instance, void *hero, const MethodInfo *method)
+static void Detour_LevelHeroKilled(void *inst, void *hero, const void *method)
 {
-    if (g_FinishLevelPerfectlyRequested)
-    {
-        ApplyFinishLevelPerfectly(instance);
-        return;
-    }
-
-    if (g_NoCollisionEnabled)
-        return;
-
-    if (g_LevelHeroKilledHook && g_LevelHeroKilledHook->get_original<LevelBaseHeroKilled_t>())
-        g_LevelHeroKilledHook->get_original<LevelBaseHeroKilled_t>()(instance, hero, method);
+    if (inst) g_level = inst;
+    if (g_finishReq || g_finishing) return; // suppress death; Pump applies the finish
+    if (g_noCollision) return;
+    if (o_LevelHeroKilled) o_LevelHeroKilled(inst, hero, method);
 }
-
-void Detour_KillHaracter_Kill(void *instance, const MethodInfo *method)
+static void Detour_KillHaracter(void *inst, const void *method)
 {
-    if (g_FinishLevelPerfectlyRequested)
-    {
-        ApplyFinishLevelPerfectly(GetCurrentLevel());
-        return;
-    }
-
-    if (g_NoCollisionEnabled)
-        return;
-
-    if (g_KillHaracterHook && g_KillHaracterHook->get_original<VoidMethod_t>())
-        g_KillHaracterHook->get_original<VoidMethod_t>()(instance, method);
+    if (g_finishReq || g_finishing) return; // suppress death; Pump applies the finish
+    if (g_noCollision) return;
+    if (o_KillHaracter) o_KillHaracter(inst, method);
 }
-
-void Detour_LevelBorder_OnTriggerEnter(void *instance, void *collider, const MethodInfo *method)
+static void Detour_LevelBorder(void *inst, void *col, const void *method)
 {
-    if (g_FinishLevelPerfectlyRequested)
-    {
-        ApplyFinishLevelPerfectly(GetCurrentLevel());
-        return;
-    }
-
-    if (g_NoCollisionEnabled)
-        return;
-
-    if (g_LevelBorderHook && g_LevelBorderHook->get_original<TriggerEnter_t>())
-        g_LevelBorderHook->get_original<TriggerEnter_t>()(instance, collider, method);
+    if (g_finishReq || g_finishing) return; // suppress death; Pump applies the finish
+    if (g_noCollision) return;
+    if (o_LevelBorder) o_LevelBorder(inst, col, method);
 }
-
-void Detour_FakeGameCharacter_Killed(void *instance, const MethodInfo *method)
+static void Detour_FakeKilled(void *inst, const void *method)
 {
-    if (g_FinishLevelPerfectlyRequested)
-    {
-        ApplyFinishLevelPerfectly(GetCurrentLevel());
-        return;
-    }
-
-    if (g_NoCollisionEnabled)
-        return;
-
-    if (g_FakeGameCharacterKilledHook && g_FakeGameCharacterKilledHook->get_original<VoidMethod_t>())
-        g_FakeGameCharacterKilledHook->get_original<VoidMethod_t>()(instance, method);
-}
-
-bool HookLevel(MEMORY &memory, ASSEMBLY *assembly)
-{
-    auto levelClass = assembly->Namespace(NAMESPACE_LEVEL)->Class(CLASS_LEVEL_BASE);
-    if (!levelClass)
-        return false;
-
-    if (auto updateMethod = FindMethod(levelClass, METHOD_ON_UPDATE, 3))
-        g_LevelUpdateHook = updateMethod->Hook<LevelBaseOnUpdate_t>(memory, Detour_LevelBase_OnUpdate);
-    else
-        return false;
-
-    if (auto heroKilledMethod = FindMethod(levelClass, METHOD_HERO_KILLED, 1))
-        g_LevelHeroKilledHook = heroKilledMethod->Hook<LevelBaseHeroKilled_t>(memory, Detour_LevelBase_HeroKilled);
-
-    if (auto currentRunStarsMethod = FindMethod(levelClass, METHOD_GET_CURRENT_RUN_STARS, 0))
-        g_LevelCurrentRunStarsHook = currentRunStarsMethod->Hook<GetInt_t>(memory, Detour_LevelBase_GetCurrentRunStars);
-
-    if (auto currentRunStarsCollectedMethod = FindMethod(levelClass, METHOD_GET_CURRENT_RUN_STARS_COLLECTED, 0))
-        g_LevelCurrentRunStarsCollectedHook = currentRunStarsCollectedMethod->Hook<GetInt_t>(memory, Detour_LevelBase_GetCurrentRunStarsCollected);
-
-    if (auto currentRunStarsWhenDieMethod = FindMethod(levelClass, METHOD_GET_CURRENT_RUN_STARS_WHEN_DIE, 0))
-        g_LevelCurrentRunStarsWhenDieHook = currentRunStarsWhenDieMethod->Hook<GetInt_t>(memory, Detour_LevelBase_GetCurrentRunStarsWhenDie);
-
-    if (auto currentDiamondsMethod = FindMethod(levelClass, METHOD_GET_CURRENT_DIAMONTS_COLLECTED, 0))
-        g_LevelCurrentDiamondsHook = currentDiamondsMethod->Hook<GetInt_t>(memory, Detour_LevelBase_GetCurrentDiamonds);
-
-    if (auto isPerfectMethod = FindMethod(levelClass, METHOD_GET_IS_PERFECT_ON_CURRENT_RUN, 0))
-        g_LevelIsPerfectHook = isPerfectMethod->Hook<GetBool_t>(memory, Detour_LevelBase_GetIsPerfectOnCurrentRun);
-
-    return true;
-}
-
-bool HookGameCharacterUpdate(MEMORY &memory, ASSEMBLY *assembly)
-{
-    auto characterNs = assembly->Namespace(NAMESPACE_CHARACTER);
-    auto gameCharacterClass = characterNs ? characterNs->Class(CLASS_GAME_CHARACTER) : nullptr;
-    auto updateMethod = FindMethod(gameCharacterClass, METHOD_ON_UPDATE, 3);
-    if (!updateMethod)
-        return false;
-
-    g_GameCharacterUpdateHook = updateMethod->Hook<LevelBaseOnUpdate_t>(memory, Detour_GameCharacter_OnUpdate);
-    return g_GameCharacterUpdateHook != nullptr;
-}
-
-bool HookUpdateLoop(MEMORY &memory, ASSEMBLY *assembly)
-{
-    auto loopClass = GetUpdateLoopClass();
-    auto updateMethod = FindMethod(loopClass, METHOD_UPDATE, 0);
-    if (!updateMethod)
-        return false;
-
-    g_UpdateLoopHook = updateMethod->Hook<VoidMethod_t>(memory, Detour_UpdateLoop_Update);
-    return g_UpdateLoopHook != nullptr;
-}
-
-bool HookCurrency(MEMORY &memory, ASSEMBLY *assembly)
-{
-    auto coinsClass = assembly->Namespace(NAMESPACE_MONETIZATION)->Class(CLASS_COINS_CONTROLLER);
-    if (!coinsClass)
-        return false;
-
-    if (auto startMethod = FindMethod(coinsClass, METHOD_START, 0))
-        g_CoinsStartHook = startMethod->Hook<VoidMethod_t>(memory, Detour_CoinsController_Start);
-
-    if (auto refreshMethod = FindMethod(coinsClass, METHOD_REFRESH_COUNTER, 0))
-        g_CoinsRefreshHook = refreshMethod->Hook<VoidMethod_t>(memory, Detour_CoinsController_RefreshCounter);
-
-    return g_CoinsStartHook || g_CoinsRefreshHook;
-}
-
-bool HookNoCollision(MEMORY &memory, ASSEMBLY *assembly)
-{
-    auto characterNs = assembly->Namespace(NAMESPACE_CHARACTER);
-    if (!characterNs)
-        return false;
-
-    auto heroClass = characterNs->Class(CLASS_HERO);
-    if (auto killMethod = FindMethod(heroClass, METHOD_KILL, 1))
-        g_HeroKillHook = killMethod->Hook<HeroKill_t>(memory, Detour_Hero_Kill);
-
-    if (auto collisionMethod = FindMethod(heroClass, METHOD_ON_COLLISION_ENTER, 1))
-        g_HeroCollisionHook = collisionMethod->Hook<CollisionEnter_t>(memory, Detour_Hero_OnCollisionEnter);
-
-    auto heroClassicClass = characterNs->Class(CLASS_HERO_CLASSIC);
-    if (auto killMethod = FindMethod(heroClassicClass, METHOD_KILL, 1))
-        g_HeroClassicKillHook = killMethod->Hook<HeroKill_t>(memory, Detour_HeroClassic_Kill);
-
-    auto gameCharacterClass = characterNs->Class(CLASS_GAME_CHARACTER);
-    if (auto killedMethod = FindMethod(gameCharacterClass, METHOD_GAME_CHARACTER_KILLED, 0))
-        g_GameCharacterKilledHook = killedMethod->Hook<VoidMethod_t>(memory, Detour_GameCharacter_Killed);
-
-    auto levelNs = assembly->Namespace(NAMESPACE_LEVEL_TRIGGERS);
-    auto borderClass = levelNs ? levelNs->Class(CLASS_LEVEL_BORDER) : nullptr;
-    if (auto borderMethod = FindMethod(borderClass, METHOD_ON_TRIGGER_ENTER, 1))
-        g_LevelBorderHook = borderMethod->Hook<TriggerEnter_t>(memory, Detour_LevelBorder_OnTriggerEnter);
-
-    auto dancingLineNs = assembly->Namespace(NAMESPACE_DANCING_LINE);
-    auto killHaracterClass = dancingLineNs ? dancingLineNs->Class(CLASS_KILL_HARACTER) : nullptr;
-    if (auto killHaracterMethod = FindMethod(killHaracterClass, METHOD_KILL, 0))
-        g_KillHaracterHook = killHaracterMethod->Hook<VoidMethod_t>(memory, Detour_KillHaracter_Kill);
-
-    auto fakeNs = assembly->Namespace("Levels.Level_TheLine");
-    auto fakeCharacterClass = fakeNs ? fakeNs->Class(CLASS_FAKE_GAME_CHARACTER) : nullptr;
-    if (auto fakeKilledMethod = FindMethod(fakeCharacterClass, METHOD_GAME_CHARACTER_KILLED, 0))
-        g_FakeGameCharacterKilledHook = fakeKilledMethod->Hook<VoidMethod_t>(memory, Detour_FakeGameCharacter_Killed);
-
-    return g_HeroKillHook || g_HeroClassicKillHook || g_HeroCollisionHook || g_GameCharacterKilledHook || g_LevelBorderHook || g_KillHaracterHook || g_FakeGameCharacterKilledHook;
+    if (g_finishReq || g_finishing) return; // suppress death; Pump applies the finish
+    if (g_noCollision) return;
+    if (o_FakeKilled) o_FakeKilled(inst, method);
 }
 
 // =============================================================
 // Initialization
 // =============================================================
 
-bool InitializeIL2CPP()
+static bool Initialize()
 {
-    if (g_IsInitialized)
+    if (g_initialized)
         return true;
 
-    MEMORY memory;
-    if (!IL2CPP::Initialize(memory))
+    if (!MemRes::Init())
     {
-        std::cout << "[!] Failed to initialize IL2CPP.\n";
+        std::cout << "[!] MemRes::Init failed (no Assembly-CSharp image).\n";
         return false;
     }
+    std::cout << "[+] Resolver ready. classes=" << MemRes::g_classes.size() << "\n";
 
-    IL2CPP::Attach();
+    MH_Initialize();
 
-    auto assembly = IL2CPP::Assembly(ASSEMBLY_GAME);
-    if (!assembly)
-    {
-        std::cout << "[!] Failed to find assembly: " << ASSEMBLY_GAME << "\n";
-        return false;
-    }
+    // tick sources (apply queued commands on the game thread). UpdateLoopHandler.Update fires
+    // every frame in every screen (menu included); LevelBase.OnUpdate also captures the level.
+    o_UpdateLoop = InstallHook<VoidInst_t>(N::GAMELOOP, "UpdateLoopHandler", "Update", 0, (void *)Detour_UpdateLoop);
+    o_LevelOnUpdate = InstallHook<OnUpdate_t>(N::LEVEL, "LevelBase", "OnUpdate", 3, (void *)Detour_LevelOnUpdate);
+    o_CoinsStart = InstallHook<VoidInst_t>(N::MONET, "CoinsController", "Start", 0, (void *)Detour_CoinsStart);
+    o_CoinsRefresh = InstallHook<VoidInst_t>(N::MONET, "CoinsController", "RefreshCounter", 0, (void *)Detour_CoinsRefresh);
+    o_GetSettings = InstallHook<GetPtrInst_t>(N::CUSTOM, "LineCustomizationController", "get_Settings", 0, (void *)Detour_GetSettings);
+    o_SkinTabShow = InstallHook<VoidInst_t>(N::STORE, "StorePanelTabSkin", "Show", 0, (void *)Detour_SkinTabShow);
+    o_HatsTabShow = InstallHook<VoidInst_t>(N::STORE, "StorePanelTabHats", "Show", 0, (void *)Detour_HatsTabShow);
 
-    if (!HookLevel(memory, assembly))
-    {
-        std::cout << "[!] Failed to install LevelBase hooks.\n";
-        return false;
-    }
+    // forced perfect-result getters
+    o_RunStars = InstallHook<GetIntInst_t>(N::LEVEL, "LevelBase", "get_CurrentRunStars", 0, (void *)Detour_RunStars);
+    o_RunStarsCollected = InstallHook<GetIntInst_t>(N::LEVEL, "LevelBase", "get_CurrentRunStarsCollected", 0, (void *)Detour_RunStarsCollected);
+    o_RunStarsWhenDie = InstallHook<GetIntInst_t>(N::LEVEL, "LevelBase", "get_CurrentRunStarsCollectedWhenDie", 0, (void *)Detour_RunStarsWhenDie);
+    o_RunDiamonds = InstallHook<GetIntInst_t>(N::LEVEL, "LevelBase", "get_CurrentDiamontsCollected", 0, (void *)Detour_RunDiamonds);
+    o_IsPerfect = InstallHook<GetBoolInst_t>(N::LEVEL, "LevelBase", "get_IsPerfectOnCurrentRun", 0, (void *)Detour_IsPerfect);
 
-    if (!HookGameCharacterUpdate(memory, assembly))
-        std::cout << "[!] GameCharacter update hook was not installed.\n";
+    // no-collision / finish-on-death hooks
+    o_HeroKill = InstallHook<Kill_t>(N::CHAR, "Hero", "Kill", 1, (void *)Detour_HeroKill);
+    o_HeroClassicKill = InstallHook<Kill_t>(N::CHAR, "HeroClassic", "Kill", 1, (void *)Detour_HeroClassicKill);
+    o_HeroCollision = InstallHook<Kill_t>(N::CHAR, "Hero", "OnCollisionEnter", 1, (void *)Detour_HeroCollision);
+    o_CharKilled = InstallHook<VoidInst_t>(N::CHAR, "GameCharacter", "Killed", 0, (void *)Detour_CharKilled);
+    o_LevelHeroKilled = InstallHook<HeroKilled_t>(N::LEVEL, "LevelBase", "HeroKilled", 1, (void *)Detour_LevelHeroKilled);
+    o_KillHaracter = InstallHook<VoidInst_t>(N::DL, "KillHaracter", "Kill", 0, (void *)Detour_KillHaracter);
+    o_LevelBorder = InstallHook<Kill_t>(N::LEVEL_TRIG, "LevelBorder", "OnTriggerEnter", 1, (void *)Detour_LevelBorder);
+    o_FakeKilled = InstallHook<VoidInst_t>(N::LEVEL_THELINE, "FakeGameCharacter", "Killed", 0, (void *)Detour_FakeKilled);
 
-    if (!HookUpdateLoop(memory, assembly))
-        std::cout << "[!] UpdateLoopHandler hook was not installed. Stars UI refresh may wait for another game update hook.\n";
-
-    if (!HookCurrency(memory, assembly))
-        std::cout << "[!] CoinsController refresh hooks were not installed. Set Stars will still save directly.\n";
-
-    if (!HookNoCollision(memory, assembly))
-        std::cout << "[!] No Collision hooks were not installed.\n";
-
-    g_IsInitialized = true;
-    std::cout << "[+] Dancing Line IL2CPP initialization complete.\n";
+    g_initialized = true;
+    std::cout << "[+] Dancing Line trainer initialized.\n";
     return true;
 }
 
 // =============================================================
-// Exported Functions
+// Exported cheat functions (run on injected remote threads; set flags only)
 // =============================================================
 
 extern "C" __declspec(dllexport) DWORD WINAPI SetStars(LPVOID lpParam)
 {
-    int value = *(int *)lpParam;
-    if (!InitializeIL2CPP())
+    if (!Initialize())
         return 0;
-
-    g_StarsCommand.value = value;
-    std::cout << "[+] Set Stars requested: " << value << "\n";
-
-    if (ApplyStarsToCoinsController(value))
-    {
-        g_StarsCommand.active = false;
-        std::cout << "[+] Stars set to " << value << ".\n";
-    }
-    else
-    {
-        g_StarsCommand.active = true;
-        std::cout << "[!] Stars apply queued for Unity update.\n";
-    }
-
+    g_starsValue = *reinterpret_cast<int *>(lpParam);
+    g_setStarsReq = true;
+    std::cout << "[+] Set Stars requested: " << g_starsValue << "\n";
     return 1;
 }
 
 extern "C" __declspec(dllexport) DWORD WINAPI SetNotes(LPVOID lpParam)
 {
-    int value = *(int *)lpParam;
-    if (!InitializeIL2CPP())
+    if (!Initialize())
         return 0;
-
-    g_NotesCommand.value = value;
-    g_NotesCommand.active = true;
-    std::cout << "[+] Set Notes queued: " << value << "\n";
-
+    g_notesValue = *reinterpret_cast<int *>(lpParam);
+    g_setNotesReq = true;
+    std::cout << "[+] Set Notes requested: " << g_notesValue << "\n";
     return 1;
 }
 
 extern "C" __declspec(dllexport) DWORD WINAPI FinishLevelPerfectly(LPVOID lpParam)
 {
-    if (!InitializeIL2CPP())
+    if (!Initialize())
         return 0;
-
-    g_FinishLevelPerfectlyRequested = true;
-    std::cout << "[+] Finish Level Perfectly queued.\n";
-
+    // Prevent multiple queuing: ignore repeat presses while a request is pending or applying.
+    if (g_finishReq || g_finishing)
+    {
+        std::cout << "[*] Finish Level Perfectly already pending; ignoring repeat.\n";
+        return 1;
+    }
+    // The game thread decides (next tick) whether we're actually in a level: it honors the
+    // request in the ready / in-level states and silently drops it everywhere else.
+    g_finishWaitLogged = false;
+    g_finishDropLogged = false;
+    g_finishReq = true;
+    std::cout << "[+] Finish Level Perfectly requested.\n";
     return 1;
 }
 
 extern "C" __declspec(dllexport) DWORD WINAPI UnlockAllSkinsAndDecorations(LPVOID lpParam)
 {
-    if (!InitializeIL2CPP())
+    if (!Initialize())
         return 0;
-
-    return ApplyUnlockAllSkinsAndDecorations() ? 1 : 0;
+    g_unlockReq = true;
+    std::cout << "[+] Unlock All queued.\n";
+    return 1;
 }
 
 extern "C" __declspec(dllexport) DWORD WINAPI ToggleNoCollision(LPVOID lpParam)
 {
-    bool enabled = *(bool *)lpParam;
-    if (!InitializeIL2CPP())
+    if (!Initialize())
         return 0;
-
-    g_NoCollisionEnabled = enabled;
-    std::cout << "[+] No Collision set to: " << (enabled ? "ON" : "OFF") << "\n";
+    g_noCollision = *reinterpret_cast<bool *>(lpParam);
+    std::cout << "[+] No Collision: " << (g_noCollision ? "ON" : "OFF") << "\n";
     return 1;
 }
 
 // =============================================================
-// DLL Main
+// DllMain
 // =============================================================
 
-DWORD WINAPI MainThread(HMODULE hModule)
+DWORD WINAPI MainThread(HMODULE)
 {
 #ifdef _DEBUG
     AllocConsole();
-    freopen_s((FILE **)(stdout), "CONOUT$", "w", stdout);
+    freopen_s(reinterpret_cast<FILE **>(stdout), "CONOUT$", "w", stdout);
+
+    // Disable the console's QuickEdit mode. Otherwise a click (or click-drag) in the console
+    // enters text-selection mode, which blocks the next WriteConsole until you click away. Since
+    // the cheats log through std::cout from inside the detours (i.e. on the game's own threads),
+    // that selection would stall the game thread and freeze the whole game.
+    HANDLE hConIn = GetStdHandle(STD_INPUT_HANDLE);
+    DWORD conMode = 0;
+    if (hConIn != INVALID_HANDLE_VALUE && GetConsoleMode(hConIn, &conMode))
+        SetConsoleMode(hConIn, (conMode & ~ENABLE_QUICK_EDIT_MODE) | ENABLE_EXTENDED_FLAGS);
 #endif
     return 0;
 }
 
-BOOL APIENTRY DllMain(HMODULE hModule, DWORD ul_reason_for_call, LPVOID lpReserved)
+BOOL APIENTRY DllMain(HMODULE hModule, DWORD reason, LPVOID)
 {
-    switch (ul_reason_for_call)
+    if (reason == DLL_PROCESS_ATTACH)
     {
-    case DLL_PROCESS_ATTACH:
         DisableThreadLibraryCalls(hModule);
-        CreateThread(nullptr, NULL, (LPTHREAD_START_ROUTINE)MainThread, hModule, NULL, nullptr);
-        break;
+        CreateThread(nullptr, 0, reinterpret_cast<LPTHREAD_START_ROUTINE>(MainThread), hModule, 0, nullptr);
     }
     return TRUE;
 }

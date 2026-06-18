@@ -11,7 +11,7 @@
 
 // Version info
 static constexpr const char *TRAINER_NAME = "Dancing Line Trainer";
-static constexpr const char *GAME_VERSION = "TODO";
+static constexpr const char *GAME_VERSION = "1.0.8.1160";
 static constexpr const char *TRAINER_VERSION = "1.0";
 
 static Fl_Window *g_main_window = nullptr;
