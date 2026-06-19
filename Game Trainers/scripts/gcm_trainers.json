@@ -318,7 +318,9 @@
     {
         "game_name": "Dynasty Warriors 6",
         "origin": "ct_other",
-        "gcm_url": "GCM/GCM Trainers/Dynasty Warriors 6 Trainer.ct",
+        "author": "物理公式的鞠",
+        "official_url": "https://space.bilibili.com/433684709",
+        "gcm_url": "GCM/GCM Trainers/Dynasty Warriors 6 Trainer [WuLiGongShiDeJu].ct",
         "version": "2026.2.27"
     },
     {
@@ -332,10 +334,12 @@
     {
         "game_name": "Assassin's Creed Valhalla",
         "origin": "ct_other",
+        "author": "HK26",
+        "official_url": "https://fearlessrevolution.com/viewtopic.php?p=280033#p280033",
         "custom_name_en": "Inventory Editor",
         "custom_name_zh": "物品编辑器",
-        "gcm_url": "GCM/GCM Trainers/Assassin's Creed Valhalla Inventory Editor.zip",
-        "version": "2023.3.30"
+        "gcm_url": "GCM/GCM Trainers/Assassin's Creed Valhalla Inventory Editor [HK26].zip",
+        "version": "2022.12.31"
     },
     {
         "game_name": "Assassin's Creed Origins",
@@ -390,14 +394,26 @@
     {
         "game_name": "Castlevania Dominus Collection",
         "origin": "ct_other",
-        "gcm_url": "GCM/GCM Trainers/Castlevania Dominus Collection Trainer.ct",
-        "version": "2026.2.27"
+        "author": "glaucocfg",
+        "official_url": "https://fearlessrevolution.com/viewtopic.php?p=384544#p384544",
+        "gcm_url": "GCM/GCM Trainers/Castlevania Dominus Collection Trainer [glaucocfg].ct",
+        "version": "2024.12.14"
     },
     {
         "game_name": "Dark Souls III",
         "origin": "ct_other",
-        "gcm_url": "GCM/GCM Trainers/Dark Souls III Trainer.ct",
-        "version": "2026.2.27"
+        "author": "你爹飞升前突然",
+        "official_url": "https://patch.ali213.net/showpatch/56881.html",
+        "gcm_url": "GCM/GCM Trainers/Dark Souls III Trainer [NiDieFeiShengQianTuRan].ct",
+        "version": "2016.5.20"
+    },
+    {
+        "game_name": "Dark Souls III",
+        "origin": "ct_other",
+        "author": "inuNorii",
+        "official_url": "https://github.com/The-Grand-Archives/Dark-Souls-III-CT-TGA",
+        "gcm_url": "GCM/GCM Trainers/Dark Souls III Trainer [inuNorii].ct",
+        "version": "2024.3.6"
     },
     {
         "game_name": "Dispatch",
@@ -476,14 +492,18 @@
     {
         "game_name": "Monster Hunter Wilds",
         "origin": "ct_other",
-        "gcm_url": "GCM/GCM Trainers/Monster Hunter Wilds Trainer.ct",
-        "version": "2026.2.27"
+        "author": "Marcus101RR",
+        "official_url": "https://www.nexusmods.com/monsterhunterwilds/mods/251",
+        "gcm_url": "GCM/GCM Trainers/Monster Hunter Wilds Trainer [Marcus101RR].ct",
+        "version": "2026.4.7"
     },
     {
         "game_name": "Persona 5 Royal",
         "origin": "ct_other",
-        "gcm_url": "GCM/GCM Trainers/Persona 5 Royal Trainer.zip",
-        "version": "2026.2.27"
+        "author": "DaVinci030",
+        "official_url": "https://fearlessrevolution.com/viewtopic.php?t=21800",
+        "gcm_url": "GCM/GCM Trainers/Persona 5 Royal Trainer [DaVinci030].zip",
+        "version": "2022.10.22"
     },
     {
         "game_name": "R.I.P. - Reincarnation Insurance Program",
@@ -511,8 +531,10 @@
     {
         "game_name": "Tormented Souls 2",
         "origin": "ct_other",
-        "gcm_url": "GCM/GCM Trainers/Tormented Souls 2 Trainer.ct",
-        "version": "2026.3.10"
+        "author": "Cidrow",
+        "official_url": "https://fearlessrevolution.com/viewtopic.php?p=429244#p429244",
+        "gcm_url": "GCM/GCM Trainers/Tormented Souls 2 Trainer [Cidrow].ct",
+        "version": "2025.10.29"
     },
     {
         "game_name": "Weapon Shop Fantasy",
@@ -537,19 +559,21 @@
         "version": "2026.2.9"
     },
     {
-        "game_name": "Ys I & II Chronicles",
+        "game_name": "Ys I & II Chronicles+",
         "origin": "ct_other",
+        "author": "battalion",
         "official_url": "https://fearlessrevolution.com/viewtopic.php?p=202571#p202571, https://tieba.baidu.com/p/9486277413",
-        "gcm_url": "GCM/GCM Trainers/Ys I & II Chronicles Trainer.zip",
-        "version": "2026.2.27"
+        "gcm_url": "GCM/GCM Trainers/Ys I & II Chronicles+ Trainer [battalion].zip",
+        "version": "2022.8.20"
     },
     {
         "game_name": "Minecraft: China Edition",
         "origin": "ct_other",
+        "author": "tfhhd",
         "custom_name_en": "发烧游戏版 Trainer",
         "custom_name_zh": "发烧游戏版修改器",
-        "gcm_url": "GCM/GCM Trainers/Minecraft_China Edition Trainer.ct",
-        "version": "2026.2.27"
+        "gcm_url": "GCM/GCM Trainers/Minecraft_China Edition Trainer [tfhhd].ct",
+        "version": "2026.1.10"
     },
     {
         "game_name": "Castle Crashers",
@@ -576,8 +600,9 @@
     {
         "game_name": "Backmir",
         "origin": "ct_other",
-        "gcm_url": "GCM/GCM Trainers/Backmir Trainer.ct",
-        "version": "2026.2.27"
+        "author": "xia",
+        "gcm_url": "GCM/GCM Trainers/Backmir Trainer [xia].ct",
+        "version": "2024.5.9"
     },
     {
         "game_name": "Command & Conquer: Red Alert 3",
@@ -595,8 +620,10 @@
     {
         "game_name": "Granblue Fantasy: Relink",
         "origin": "ct_other",
-        "gcm_url": "GCM/GCM Trainers/Granblue Fantasy_Relink Trainer.ct",
-        "version": "2026.2.27"
+        "author": "Moma",
+        "official_url": "https://www.caimogu.cc/post/965761.html",
+        "gcm_url": "GCM/GCM Trainers/Granblue Fantasy_Relink Trainer [Moma].zip",
+        "version": "2024.6.22"
     },
     {
         "game_name": "Matchmaking Inc.",
@@ -636,14 +663,28 @@
     {
         "game_name": "Tales of Graces f Remastered",
         "origin": "ct_other",
-        "gcm_url": "GCM/GCM Trainers/Tales of Graces f Remastered Trainer.ct",
-        "version": "2026.2.27"
+        "author": "3DM",
+        "official_url": "https://bbs.3dmgame.com/thread-6563242-1-1.html",
+        "gcm_url": "GCM/GCM Trainers/Tales of Graces f Remastered Trainer [3DM].ct",
+        "version": "2025.1.21"
     },
     {
         "game_name": "Assassin's Creed Odyssey",
         "origin": "ct_other",
-        "gcm_url": "GCM/GCM Trainers/Assassin's Creed Odyssey Trainer.ct",
-        "version": "2020.5.10"
+        "author": "3DM",
+        "official_url": "https://bbs.3dmgame.com/thread-6168948-1-1.html",
+        "gcm_url": "GCM/GCM Trainers/Assassin's Creed Odyssey Trainer [3DM].ct",
+        "version": "2022.8.14"
+    },
+    {
+        "game_name": "Assassin's Creed Odyssey",
+        "origin": "ct_other",
+        "author": "Budabum",
+        "custom_name_en": "Inventory Editor",
+        "custom_name_zh": "物品编辑器",
+        "official_url": "https://www.nexusmods.com/assassinscreedodyssey/mods/96",
+        "gcm_url": "GCM/GCM Trainers/Assassin's Creed Odyssey Inventory Editor [Budabum].ct",
+        "version": "2019.9.20"
     },
     {
         "game_name": "Living With Sister: Monochrome Fantasy",
@@ -718,7 +759,8 @@
     {
         "game_name": "Warcraft III: The Frozen Throne",
         "origin": "other",
-        "gcm_url": "GCM/GCM Trainers/Warcraft III_The Frozen Throne Trainer.exe",
+        "author": "Creep345",
+        "gcm_url": "GCM/GCM Trainers/Warcraft III_The Frozen Throne Trainer [Creep345].exe",
         "version": "2026.2.27"
     },
     {
@@ -731,8 +773,10 @@
     {
         "game_name": "ASTLIBRA Revision",
         "origin": "ct_other",
-        "gcm_url": "GCM/GCM Trainers/ASTLIBRA Revision Trainer.ct",
-        "version": "2026.3.4"
+        "author": "破打游戏的Po",
+        "official_url": "https://www.bilibili.com/video/BV1t841177PK",
+        "gcm_url": "GCM/GCM Trainers/ASTLIBRA Revision Trainer [PoDaYouXiDePo].ct",
+        "version": "2023.2.21"
     },
     {
         "game_name": "Call to Arms - Gates of Hell: Ostfront",
@@ -773,8 +817,10 @@
     {
         "game_name": "Guns of Fury",
         "origin": "ct_other",
-        "gcm_url": "GCM/GCM Trainers/Guns of Fury Trainer.ct",
-        "version": "2026.3.4"
+        "author": "LIOBOSS",
+        "official_url": "https://fearlessrevolution.com/viewtopic.php?p=393247#p393247",
+        "gcm_url": "GCM/GCM Trainers/Guns of Fury Trainer [LIOBOSS].ct",
+        "version": "2025.2.16"
     },
     {
         "game_name": "Long Yin Li Zhi Zhuan",
@@ -3366,5 +3412,116 @@
         "official_url": "https://bbs.3dmgame.com/thread-6522278-1-1.html",
         "gcm_url": "GCM/GCM Trainers/Immortal Way of Life Trainer [ShangYuFuYunQi].ct",
         "version": "2025.6.3"
+    },
+    {
+        "game_name": "Elden Ring",
+        "origin": "other",
+        "author": "Hexinton",
+        "official_url": "https://www.nexusmods.com/eldenring/mods/48, https://www.nexusmods.com/eldenring/mods/8205",
+        "gcm_url": "GCM/GCM Trainers/Elden Ring Trainer [Hexinton].zip",
+        "version": "2026.1.19"
+    },
+    {
+        "game_name": "OVERKILL's The Walking Dead",
+        "origin": "other",
+        "author": "peizhaochen",
+        "official_url": "https://patch.ali213.net/showpatch/104461.html",
+        "gcm_url": "GCM/GCM Trainers/OVERKILL's The Walking Dead Trainer [peizhaochen].exe",
+        "version": "2018.11.10"
+    },
+    {
+        "game_name": "Arma 3",
+        "origin": "other",
+        "author": "MrAntiFun",
+        "official_url": "https://mrantifun.net/threads/arma-3-trainer.88/",
+        "gcm_url": "GCM/GCM Trainers/Arma 3 Trainer [MrAntiFun].exe",
+        "version": "2019.2.13"
+    },
+    {
+        "game_name": "Command & Conquer: Generals - Zero Hour",
+        "origin": "other",
+        "author": "Kayb.S",
+        "gcm_url": "GCM/GCM Trainers/Command & Conquer_Generals - Zero Hour Trainer [Kayb.S].exe",
+        "version": "2026.6.18"
+    },
+    {
+        "game_name": "Castlevania: Lords of Shadow",
+        "origin": "other",
+        "author": "AfterMan",
+        "gcm_url": "GCM/GCM Trainers/Castlevania_Lords of Shadow Trainer [AfterMan].exe",
+        "version": "2013.8.30"
+    },
+    {
+        "game_name": "Escape the Backrooms",
+        "origin": "other",
+        "author": "Monika",
+        "official_url": "https://www.bilibili.com/video/BV17U7U61EBG",
+        "gcm_url": "GCM/GCM Trainers/Escape the Backrooms Trainer [Monika].exe",
+        "version": "2026.6.16"
+    },
+    {
+        "game_name": "Glamour Kaleidoscope",
+        "origin": "other",
+        "author": "jx666",
+        "gcm_url": "GCM/GCM Trainers/Glamour Kaleidoscope Trainer [jx666].zip",
+        "version": "2026.6.16"
+    },
+    {
+        "game_name": "Loopmancer",
+        "origin": "other",
+        "gcm_url": "GCM/GCM Trainers/Loopmancer Trainer.exe",
+        "version": "2026.6.15"
+    },
+    {
+        "game_name": "Teenage Mutant Ninja Turtles: Splintered Fate",
+        "origin": "other",
+        "author": "Abolfazl.k",
+        "official_url": "https://megagames.com/trainers/teenage-mutant-ninja-turtles-splintered-fate-v10-3-trainer-abolfazlk",
+        "gcm_url": "GCM/GCM Trainers/Teenage Mutant Ninja Turtles_Splintered Fate Trainer [Abolfazl.k].exe",
+        "version": "2024.12.22"
+    },
+    {
+        "game_name": "The Legend of Tianding",
+        "origin": "other",
+        "author": "王小滔",
+        "official_url": "https://game.ok5168.com/index/KingModifier/105.html",
+        "gcm_url": "GCM/GCM Trainers/The Legend of Tianding Trainer [WangXiaoTao].exe",
+        "version": "2024.8.19"
+    },
+    {
+        "game_name": "Kingdom Two Crowns",
+        "origin": "ct_other",
+        "author": "故纸隅",
+        "gcm_url": "GCM/GCM Trainers/Kingdom Two Crowns Trainer [GuZhiYu].ct",
+        "version": "2026.6.18"
+    },
+    {
+        "game_name": "Immortal Joan: Cyber Revolution",
+        "origin": "other",
+        "author": "jx666",
+        "gcm_url": "GCM/GCM Trainers/Immortal Joan_Cyber Revolution Trainer [jx666].zip",
+        "version": "2026.6.15"
+    },
+    {
+        "game_name": "Immortal Family",
+        "origin": "ct_other",
+        "author": "27CaT",
+        "official_url": "https://www.27cat.com/thread-12330-1-1.html",
+        "gcm_url": "GCM/GCM Trainers/Immortal Family Trainer [27CaT].ct",
+        "version": "2023.9.21"
+    },
+    {
+        "game_name": "Love Confessions on the Adventure",
+        "origin": "other",
+        "author": "jx666",
+        "gcm_url": "GCM/GCM Trainers/Love Confessions on the Adventure Trainer [jx666].zip",
+        "version": "2026.6.18"
+    },
+    {
+        "game_name": "Princess Maker 2 Refine",
+        "origin": "ct_other",
+        "author": "yjb",
+        "gcm_url": "GCM/GCM Trainers/Princess Maker 2 Refine Trainer [yjb].ct",
+        "version": "2026.6.18"
     }
 ]
