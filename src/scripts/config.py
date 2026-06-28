@@ -7,9 +7,9 @@ import re
 import sys
 import tempfile
 
-import pinyin
 import polib
 import zhon.cedict as chinese_characters
+from pypinyin import lazy_pinyin
 
 from secret_config import *
 
@@ -143,7 +143,7 @@ def is_chinese(text):
 
 def sort_trainers_key(name):
     if is_chinese(name):
-        return pinyin.get(name, format="strip", delimiter=" ")
+        return " ".join(lazy_pinyin(name))
     return name
 
 
@@ -152,7 +152,7 @@ def sort_trainers_key_ignore_prefix(name):
     real_name = prefix_regex.sub("", name)
 
     if is_chinese(real_name):
-        return pinyin.get(real_name, format="strip", delimiter=" ")
+        return " ".join(lazy_pinyin(real_name))
     return real_name
 
 

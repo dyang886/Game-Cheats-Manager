@@ -121,7 +121,7 @@
         "custom_name_en": "Relic Editor",
         "custom_name_zh": "遗物修改助手",
         "official_url": "https://space.bilibili.com/58332755",
-        "gcm_url": "GCM/GCM Trainers/Elden Ring Nightreign Relic Editor [GBrain].exe",
+        "gcm_url": "GCM/GCM Trainers/Elden Ring Nightreign Relic Editor [GBrain].zip",
         "version": "2026.3.17"
     },
     {
@@ -139,7 +139,7 @@
         "origin": "other",
         "author": "Merika",
         "official_url": "https://www.merika.dev/trainers/fh5",
-        "gcm_url": "GCM/GCM Trainers/Forza Horizon 5 Trainer [Merika].exe",
+        "gcm_url": "GCM/GCM Trainers/Forza Horizon 5 Trainer [Merika].zip",
         "version": "2025.7.21"
     },
     {
@@ -1338,7 +1338,7 @@
         "author": "蚊子炸虾",
         "custom_name_en": "Save Editor",
         "custom_name_zh": "存档编辑器",
-        "gcm_url": "GCM/GCM Trainers/Phasmophobia Save Editor [WenZiZhaXia].exe",
+        "gcm_url": "GCM/GCM Trainers/Phasmophobia Save Editor [WenZiZhaXia].zip",
         "version": "2026.3.15"
     },
     {
@@ -3001,7 +3001,7 @@
         "origin": "other",
         "author": "Abgetrennter",
         "official_url": "https://github.com/Abgetrennter/Ra3-trainer-refine",
-        "gcm_url": "GCM/GCM Trainers/Command & Conquer_Red Alert 3 Trainer [Abgetrennter].exe",
+        "gcm_url": "GCM/GCM Trainers/Command & Conquer_Red Alert 3 Trainer [Abgetrennter].zip",
         "version": "2026.5.29"
     },
     {
@@ -3160,7 +3160,7 @@
         "origin": "other",
         "author": "jx666",
         "gcm_url": "GCM/GCM Trainers/Sex, Secrets & Used Tech Trainer [jx666].zip",
-        "version": "2026.6.1"
+        "version": "2026.6.25"
     },
     {
         "game_name": "Zwei II Plus",
@@ -3221,7 +3221,7 @@
         "author": "hex",
         "official_url": "https://www.nexusmods.com/assassinscreedvalhalla/mods/390",
         "gcm_url": "GCM/GCM Trainers/Assassin's Creed Valhalla Trainer [hex].exe",
-        "version": "2026.4.6"
+        "version": "2026.6.15"
     },
     {
         "game_name": "Atelier Escha & Logy: Alchemists of the Dusk Sky DX",
@@ -3484,9 +3484,9 @@
         "game_name": "The Legend of Tianding",
         "origin": "other",
         "author": "王小滔",
-        "official_url": "https://game.ok5168.com/index/KingModifier/105.html",
+        "official_url": "https://game.ok5168.com/index/KingModifier/382.html",
         "gcm_url": "GCM/GCM Trainers/The Legend of Tianding Trainer [WangXiaoTao].exe",
-        "version": "2024.8.19"
+        "version": "2026.5.26"
     },
     {
         "game_name": "Kingdom Two Crowns",
@@ -3523,5 +3523,138 @@
         "author": "yjb",
         "gcm_url": "GCM/GCM Trainers/Princess Maker 2 Refine Trainer [yjb].ct",
         "version": "2026.6.18"
+    },
+    {
+        "game_name": "Assassin's Creed III Remastered",
+        "origin": "other",
+        "author": "hex",
+        "official_url": "https://www.nexusmods.com/assassinscreediiiremastered/mods/110",
+        "gcm_url": "GCM/GCM Trainers/Assassin's Creed III Remastered Trainer [hex].exe",
+        "version": "2025.4.24"
+    },
+    {
+        "game_name": "Before I Go",
+        "origin": "ct_other",
+        "author": "LIOBOSS",
+        "official_url": "https://fearlessrevolution.com/viewtopic.php?t=39256",
+        "gcm_url": "GCM/GCM Trainers/Before I Go Trainer [LIOBOSS].ct",
+        "version": "2026.5.1"
+    },
+    {
+        "game_name": "Dust Front RTS",
+        "origin": "ct_other",
+        "author": "梦里种了一只蘑菇",
+        "official_url": "https://www.bilibili.com/opus/1215731209484632101",
+        "gcm_url": "GCM/GCM Trainers/Dust Front RTS Trainer [MengLiZhongLeYiZhiMoGu].ct",
+        "version": "2026.6.21"
+    },
+    {
+        "game_name": "Final Echo",
+        "origin": "ct_other",
+        "gcm_url": "GCM/GCM Trainers/Final Echo Trainer.ct",
+        "version": "2026.6.26"
+    },
+    {
+        "game_name": "Metal Slug Tactics",
+        "origin": "ct_other",
+        "author": "DhaosCollider",
+        "official_url": "https://fearlessrevolution.com/viewtopic.php?t=32557",
+        "gcm_url": "GCM/GCM Trainers/Metal Slug Tactics Trainer [DhaosCollider].zip",
+        "version": "2024.11.6"
+    },
+    {
+        "game_name": "No Man's Sky",
+        "origin": "other",
+        "author": "vectorcmdr",
+        "custom_name_en": "Save Editor",
+        "custom_name_zh": "存档编辑器",
+        "official_url": "https://github.com/vectorcmdr/NMSE",
+        "gcm_url": "GCM/GCM Trainers/No Man's Sky Save Editor [vectorcmdr].zip",
+        "version": "2026.6.4"
+    },
+    {
+        "game_name": "Succubus Successor: Delilah's Juicy Journey",
+        "origin": "other",
+        "author": "jx666",
+        "gcm_url": "GCM/GCM Trainers/Succubus Successor_Delilah's Juicy Journey Trainer [jx666].zip",
+        "version": "2026.6.26"
+    },
+    {
+        "game_name": "Vigil: The Longest Night",
+        "origin": "ct_other",
+        "author": "Patka",
+        "official_url": "https://fearlessrevolution.com/viewtopic.php?t=33926",
+        "gcm_url": "GCM/GCM Trainers/Vigil_The Longest Night Trainer [Patka].ct",
+        "version": "2026.1.12"
+    },
+    {
+        "game_name": "none",
+        "origin": "other",
+        "author": "Draff",
+        "custom_name_en": "Xbox Achievement Unlocker",
+        "custom_name_zh": "Xbox 成就解锁器",
+        "official_url": "https://github.com/Fumo-Unlockers/Xbox-Achievement-Unlocker",
+        "gcm_url": "GCM/GCM Trainers/Xbox Achievement Unlocker [Draff].exe",
+        "version": "2026.6.14"
+    },
+    {
+        "game_name": "none",
+        "origin": "other",
+        "author": "gibbed",
+        "custom_name_en": "Steam Achievement Manager",
+        "custom_name_zh": "Steam 成就管理器",
+        "official_url": "https://github.com/gibbed/SteamAchievementManager",
+        "gcm_url": "GCM/GCM Trainers/Steam Achievement Manager [gibbed].zip",
+        "extension": "SAM.Picker.exe",
+        "version": "2026.3.19"
+    },
+    {
+        "game_name": "Zombie Army Trilogy",
+        "origin": "other",
+        "author": "MrAntiFun",
+        "official_url": "https://mrantifun.net/threads/zombie-army-trilogy-trainer.3595/",
+        "gcm_url": "GCM/GCM Trainers/Zombie Army Trilogy Trainer [MrAntiFun].exe",
+        "version": "2016.4.12"
+    },
+    {
+        "game_name": "Black Jacket",
+        "origin": "other",
+        "author": "ppapodir",
+        "official_url": "https://bbs.3dmgame.com/thread-6673079-1-1.html",
+        "gcm_url": "GCM/GCM Trainers/Black Jacket Trainer [ppapodir].exe",
+        "version": "2026.5.14"
+    },
+    {
+        "game_name": "The Lost Village",
+        "origin": "ct_other",
+        "author": "缤纷颜色",
+        "official_url": "https://www.bilibili.com/video/BV12X6hYuER6",
+        "gcm_url": "GCM/GCM Trainers/The Lost Village Trainer [BinFenYanSe].ct",
+        "version": "2024.12.29"
+    },
+    {
+        "game_name": "The King is Watching",
+        "origin": "ct_other",
+        "author": "peak12489",
+        "official_url": "https://bbs.3dmgame.com/thread-6610723-1-1.html",
+        "gcm_url": "GCM/GCM Trainers/The King is Watching Trainer [peak12489].ct",
+        "version": "2025.9.1"
+    },
+    {
+        "game_name": "none",
+        "origin": "other",
+        "author": "立秋",
+        "custom_name_en": "LiQiu Trainer Box",
+        "custom_name_zh": "立秋修改器盒子",
+        "gcm_url": "GCM/GCM Trainers/LiQiu Trainer Box [LiQiu].exe",
+        "version": "2026.6.26"
+    },
+    {
+        "game_name": "Magicraft",
+        "origin": "ct_other",
+        "author": "3DM",
+        "official_url": "https://bbs.3dmgame.com/thread-6674888-1-1.html",
+        "gcm_url": "GCM/GCM Trainers/Magicraft Trainer [3DM].ct",
+        "version": "2026.5.23"
     }
 ]

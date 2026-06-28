@@ -1,13 +1,12 @@
 beautifulsoup4
 cloudscraper
-fuzzywuzzy
 packaging
-pinyin
 polib
 psutil
 PyQt6==6.9.1
+pypinyin
 python-dotenv
-python-Levenshtein
+rapidfuzz
 requests
 tendo
 zhon

@@ -220,6 +220,9 @@ msgstr "正在翻譯搜尋結果..."
 msgid "No search results found."
 msgstr "未找到相關修改器。"
 
+msgid "Search keyword is too short, please enter at least 2 characters."
+msgstr "搜尋關鍵詞過短，請輸入至少 2 個字元。"
+
 msgid "An error occurred while searching for trainers: "
 msgstr "搜尋修改器時出錯："
 

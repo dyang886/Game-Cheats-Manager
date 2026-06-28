@@ -5,9 +5,9 @@ import traceback
 from urllib.parse import urljoin
 
 from bs4 import BeautifulSoup
-from fuzzywuzzy import fuzz
 
 from config import *
+from search_index import MIN_QUERY_LEN, QueryMatcher, sanitize, translation_index
 from threads.download_base_thread import DownloadBaseThread
 
 
@@ -20,6 +20,13 @@ class DownloadDisplayThread(DownloadBaseThread):
     def run(self):
         try:
             DownloadBaseThread.trainer_urls = []
+
+            # Reject 1-char latin queries; 2-char still works via acronym/whole-word matching
+            if not is_chinese(self.keyword) and len(sanitize(self.keyword)) < MIN_QUERY_LEN:
+                self.message.emit(tr("Search keyword is too short, please enter at least 2 characters."), "failure")
+                self.finished.emit(1)
+                return
+
             keywordList = self.translate_keyword(self.keyword)
             if not keywordList:
                 self.message.emit(tr("Failed to translate, please update translation data."), "failure")
@@ -41,7 +48,7 @@ class DownloadDisplayThread(DownloadBaseThread):
             # Filter and prioritize trainers from the main site
             filtered_trainer_urls = {}
             for trainer in DownloadBaseThread.trainer_urls:
-                norm_name = self.sanitize(trainer["game_name"])
+                norm_name = sanitize(trainer["game_name"])
 
                 # Add trainer if not already present or replace only if from fling_main and current is from fling_archive
                 if norm_name not in filtered_trainer_urls:
@@ -116,36 +123,23 @@ class DownloadDisplayThread(DownloadBaseThread):
             self.finished.emit(1)
 
     def translate_keyword(self, keyword):
-        translations = [keyword]
         self.message.emit(tr("Translating keywords..."), None)
 
-        # Load trainer translations from the JSON database
-        trainer_details = self.load_json_content("translations.json")
-        if trainer_details:
-            for trainer in trainer_details:
-                sanitized_keyword = self.sanitize(keyword)
-                if is_chinese(keyword):
-                    if sanitized_keyword in self.sanitize(trainer.get("zh_CN", "")):
-                        translations.append(trainer.get("en_US", ""))
-                else:
-                    if sanitized_keyword in self.sanitize(trainer.get("en_US", "")):
-                        translations.append(trainer.get("zh_CN", ""))
-        else:
+        # Pick up any updated translation data once, at the start of the search
+        translation_index.refresh()
+        if not translation_index.has_data():
             return []
 
-        translations = list(filter(None, set(translations)))
+        translations = translation_index.expand_keyword(keyword)
         print("\nKeyword translations:", translations, "\n")
         return translations
 
     def keyword_match(self, keywordList, targetString):
-        def is_match(sanitized_keyword, sanitized_targetString):
-            similarity_threshold = 80
-            similarity = fuzz.partial_ratio(sanitized_keyword, sanitized_targetString)
-            return similarity >= similarity_threshold
-
-        sanitized_targetString = self.sanitize(targetString)
-
-        return any(is_match(self.sanitize(kw), sanitized_targetString) for kw in keywordList if len(kw) >= 2 and len(sanitized_targetString) >= 2)
+        # Build the matcher once per keyword list (same object is reused across sources)
+        if getattr(self, "_matcher_for", None) is not keywordList:
+            self._matcher = QueryMatcher(keywordList, self.keyword)
+            self._matcher_for = keywordList
+        return self._matcher.matches(targetString)
 
     def search_from_fling_archive(self, keywordList):
         if settings["flingDownloadServer"] == "official":

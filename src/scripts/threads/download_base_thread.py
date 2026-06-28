@@ -1,8 +1,6 @@
 import json
 import os
 import queue
-import re
-import string
 import threading
 import time
 from concurrent.futures import ThreadPoolExecutor
@@ -11,13 +9,12 @@ import uuid
 import warnings
 
 import cloudscraper
-from fuzzywuzzy import process
 from PyQt6.QtCore import QThread, pyqtSignal
 import requests
 from urllib3.exceptions import InsecureRequestWarning
-import zhon
 
 from config import *
+from search_index import translation_index
 
 _PARALLEL_THRESHOLD = 2 * 1024 * 1024  # skip parallel for files < 2 MB
 
@@ -273,67 +270,18 @@ class DownloadBaseThread(QThread):
         return False
 
     @staticmethod
-    def arabic_to_roman(num):
-        if num == 0:
-            return '0'
-
-        numeral_map = [
-            (1000, 'M'), (900, 'CM'), (500, 'D'), (400, 'CD'),
-            (100, 'C'), (90, 'XC'), (50, 'L'), (40, 'XL'),
-            (10, 'X'), (9, 'IX'), (5, 'V'), (4, 'IV'), (1, 'I')
-        ]
-        roman = ''
-
-        while num > 0:
-            for i, r in numeral_map:
-                while num >= i:
-                    roman += r
-                    num -= i
-
-        return roman
-
-    def sanitize(self, text):
-        text = re.sub(r'\d+', lambda x: self.arabic_to_roman(int(x.group())), text)
-        all_punctuation = (string.punctuation + zhon.hanzi.punctuation).replace('&', '')
-        return ''.join(char for char in text if char not in all_punctuation and not char.isspace()).lower()
-
-    @staticmethod
     def symbol_replacement(text):
         return text.replace(': ', ' - ').replace(':', '-').replace("/", "_").replace("?", "")
 
     def find_best_trainer_match(self, target_name, target_language, threshold=85):
-        trainer_details = self.load_json_content("translations.json")
-        if not trainer_details:
-            raise ValueError("translations.json doesn't exist in the database path.")
-
         # Ignore cases where input trainer name and target language are the same
         if is_chinese(target_name) and target_language == 'zh':
             return None
         elif not is_chinese(target_name) and target_language == 'en':
             return None
 
-        # Handle cases where input trainer name and target language are different
-        sanitized_to_original_en = {}  # Key: sanitized English, Value: Chinese
-        sanitized_to_original_zh = {}  # Key: sanitized Chinese, Value: English
-        for trainer in trainer_details:
-            if 'en_US' in trainer and 'zh_CN' in trainer:
-                sanitized_en = self.sanitize(trainer['en_US'])
-                sanitized_zh = self.sanitize(trainer['zh_CN'])
-                sanitized_to_original_en[sanitized_en] = trainer['zh_CN']
-                sanitized_to_original_zh[sanitized_zh] = trainer['en_US']
-
-        # Determine the mapping and target based on the desired language
-        sanitized_target = self.sanitize(target_name)
-        if target_language == "zh":
-            sanitized_to_original = sanitized_to_original_en
-        elif target_language == "en":
-            sanitized_to_original = sanitized_to_original_zh
-
-        best_match, score = process.extractOne(sanitized_target, sanitized_to_original.keys())
-        if score >= threshold:
-            return sanitized_to_original[best_match]
-
-        return None
+        # Exact (cached dict) lookup first, fuzzy fallback within the index
+        return translation_index.translate(target_name, target_language, threshold)
 
     def translate_trainer(self, trainer):
         """
