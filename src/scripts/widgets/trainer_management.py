@@ -7,7 +7,7 @@ from PyQt6.QtGui import QIcon, QPixmap
 from PyQt6.QtCore import Qt, QTimer
 
 from config import *
-from widgets.custom_widgets import AlertWidget, CustomButton
+from widgets.custom_widgets import AlertWidget, CustomButton, apply_native_title_bar_theme
 from threads.other_threads import WeModCustomization
 
 
@@ -16,6 +16,7 @@ class TrainerManagementDialog(QDialog):
         super().__init__(parent)
         self.setWindowTitle(tr("Trainer Management"))
         self.setWindowIcon(QIcon(resource_path("assets/logo.ico")))
+        apply_native_title_bar_theme(self)
         self.setMinimumWidth(650)
         self.active_alerts = []
 

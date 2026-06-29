@@ -7,7 +7,7 @@ from PyQt6.QtGui import QIcon, QPixmap
 from PyQt6.QtWidgets import QCheckBox, QComboBox, QDialog, QFileDialog, QHBoxLayout, QLabel, QLineEdit, QMessageBox, QProgressBar, QSizePolicy, QTextEdit, QVBoxLayout
 
 from config import *
-from widgets.custom_widgets import CustomButton
+from widgets.custom_widgets import CustomButton, apply_native_title_bar_theme
 from threads.other_threads import VersionFetchWorker, TrainerUploadWorker
 
 
@@ -18,6 +18,7 @@ class AnnouncementDialog(QDialog):
 
         self.setWindowTitle(tr("Announcement"))
         self.setWindowIcon(QIcon(resource_path("assets/logo.ico")))
+        apply_native_title_bar_theme(self)
         self.setMinimumWidth(850)
 
         layout = QVBoxLayout()
@@ -82,6 +83,7 @@ class CopyRightWarning(QDialog):
         super().__init__(parent)
         self.setWindowTitle(tr("Warning"))
         self.setWindowIcon(QIcon(resource_path("assets/logo.ico")))
+        apply_native_title_bar_theme(self)
         layout = QVBoxLayout()
         layout.setSpacing(30)
         layout.setContentsMargins(20, 30, 20, 20)
@@ -151,6 +153,7 @@ class SettingsDialog(QDialog):
         super().__init__(parent)
         self.setWindowTitle(tr("Settings"))
         self.setWindowIcon(QIcon(resource_path("assets/setting.ico")))
+        apply_native_title_bar_theme(self)
         settingsLayout = QVBoxLayout()
         settingsLayout.setSpacing(15)
         self.setLayout(settingsLayout)
@@ -295,6 +298,7 @@ class AboutDialog(QDialog):
         super().__init__(parent)
         self.setWindowTitle(tr("About"))
         self.setWindowIcon(QIcon(resource_path("assets/logo.ico")))
+        apply_native_title_bar_theme(self)
         aboutLayout = QVBoxLayout()
         aboutLayout.setSpacing(30)
         aboutLayout.setContentsMargins(40, 20, 40, 30)
@@ -431,6 +435,7 @@ class TrainerUploadDialog(QDialog):
         self.worker = None
         self.setWindowTitle(tr("Upload Trainer"))
         self.setWindowIcon(QIcon(resource_path("assets/logo.ico")))
+        apply_native_title_bar_theme(self)
         self.setMinimumWidth(500)
 
         layout = QVBoxLayout()
