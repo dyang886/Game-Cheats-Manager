@@ -24,7 +24,7 @@ public:
 
     void cleanUp() override
     {
-        // Note: MonoBridge.dll and GCMInjection.dll are not freed
+        // Note: MonoBridge.dll and Mono.dll are not freed
         TrainerBase::cleanUp();
 
         if (loggingBuffer)
@@ -100,7 +100,7 @@ public:
                 return false;
             }
 
-            if (!loadAssembly("GCMINJECTION_DLL"))
+            if (!loadAssembly("MONO_DLL"))
             {
                 std::cerr << "[!] Failed to load injected assembly.\n";
                 return false;
@@ -376,7 +376,7 @@ public:
     }
 
     /** Loads a C# assembly from an embedded resource into the Mono runtime
-     * @param resourceName Name of the resource (e.g., "GCMINJECTION_DLL")
+     * @param resourceName Name of the resource (e.g., "MONO_DLL")
      * @return True if successful, false otherwise
      */
     bool loadAssembly(const std::string &resourceName)

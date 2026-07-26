@@ -175,7 +175,7 @@ public:
     //=====================================================================
     //
     // Use this type for Unity games to call C# methods directly.
-    // This requires a separate C# DLL (e.g., "GCMInjection.dll")
+    // This requires a separate C# DLL (e.g., "Mono.dll")
     // to be injected into the game's Mono runtime.
     //
     // Base Functions:

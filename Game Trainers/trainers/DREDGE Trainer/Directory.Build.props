@@ -1,8 +1,8 @@
 <Project>
   <PropertyGroup>
-    <GCMInjectionBuildRoot>$(MSBuildThisFileDirectory)..\..\build\trainers\DREDGE Trainer\GCMInjection\</GCMInjectionBuildRoot>
-    <BaseOutputPath>$(GCMInjectionBuildRoot)bin\</BaseOutputPath>
-    <BaseIntermediateOutputPath>$(GCMInjectionBuildRoot)obj\</BaseIntermediateOutputPath>
+    <MonoBuildRoot>$(MSBuildThisFileDirectory)..\..\build\trainers\DREDGE Trainer\Mono\</MonoBuildRoot>
+    <BaseOutputPath>$(MonoBuildRoot)bin\</BaseOutputPath>
+    <BaseIntermediateOutputPath>$(MonoBuildRoot)obj\</BaseIntermediateOutputPath>
     <MSBuildProjectExtensionsPath>$(BaseIntermediateOutputPath)</MSBuildProjectExtensionsPath>
   </PropertyGroup>
 </Project>

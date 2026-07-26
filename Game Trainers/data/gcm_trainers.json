@@ -422,9 +422,9 @@
     {
         "game_name": "Dark Souls III",
         "origin": "ct_other",
-        "author": "inuNorii",
+        "author": "The Grand Archives",
         "official_url": "https://github.com/The-Grand-Archives/Dark-Souls-III-CT-TGA",
-        "gcm_url": "GCM/GCM Trainers/Dark Souls III Trainer [inuNorii].ct",
+        "gcm_url": "GCM/GCM Trainers/Dark Souls III Trainer [The Grand Archives].ct",
         "version": "2024.3.6"
     },
     {
@@ -1512,7 +1512,7 @@
         "author": "Qiuzy",
         "official_url": "https://steamcommunity.com/sharedfiles/filedetails/?id=3103837169, https://www.bilibili.com/video/BV1GDBoYSEW4/",
         "gcm_url": "GCM/GCM Trainers/Volcano Princess Trainer [Qiuzy].ct",
-        "version": "2025.4.27"
+        "version": "2026.4.19"
     },
     {
         "game_name": "NINJA GAIDEN Σ",
@@ -1852,7 +1852,7 @@
         "author": "坏猫i",
         "official_url": "https://zmjy.1lsp.cn/?post=1",
         "gcm_url": "GCM/GCM Trainers/The Killing Antidote Trainer [HuaiMaoi].zip",
-        "version": "2024.5.17"
+        "version": "2026.5.19"
     },
     {
         "game_name": "Touhou Mystia's Izakaya",
@@ -2413,9 +2413,9 @@
     {
         "game_name": "Phoenotopia: Awakening",
         "origin": "ct_other",
-        "author": "ndck76",
+        "author": "ndck1",
         "official_url": "https://fearlessrevolution.com/viewtopic.php?t=15005",
-        "gcm_url": "GCM/GCM Trainers/Phoenotopia_Awakening Trainer [ndck76].ct",
+        "gcm_url": "GCM/GCM Trainers/Phoenotopia_Awakening Trainer [ndck1].ct",
         "version": "2021.4.13"
     },
     {
@@ -4020,7 +4020,7 @@
         "author": "NidasBot",
         "official_url": "https://fearlessrevolution.com/viewtopic.php?t=40001",
         "gcm_url": "GCM/GCM Trainers/Granblue Fantasy_Relink Trainer [NidasBot].zip",
-        "version": "2026.7.15"
+        "version": "2026.7.19"
     },
     {
         "game_name": "Momodora: Reverie Under the Moonlight",
@@ -4091,5 +4091,116 @@
         "official_url": "https://www.nexusmods.com/miside/mods/339",
         "gcm_url": "GCM/GCM Trainers/MiSide Trainer [Scars].zip",
         "version": "2025.2.23"
+    },
+    {
+        "game_name": "NBA 2K15",
+        "origin": "other",
+        "author": "limnono",
+        "gcm_url": "GCM/GCM Trainers/NBA 2K15 Trainer [limnono].zip",
+        "version": "2014.11.12"
+    },
+    {
+        "game_name": "DragonSword: Awakening",
+        "origin": "ct_other",
+        "author": "3DM",
+        "official_url": "https://bbs.3dmgame.com/thread-6687448-1-1.html",
+        "gcm_url": "GCM/GCM Trainers/DragonSword_Awakening Trainer [3DM].ct",
+        "version": "2026.7.24"
+    },
+    {
+        "game_name": "Edge of the Abyss Awaken",
+        "origin": "ct_other",
+        "author": "ndck1",
+        "official_url": "https://fearlessrevolution.com/viewtopic.php?t=19600",
+        "gcm_url": "GCM/GCM Trainers/Edge of the Abyss Awaken Trainer [ndck1].ct",
+        "version": "2022.10.22"
+    },
+    {
+        "game_name": "Forza Horizon 6",
+        "origin": "other",
+        "author": "Shina",
+        "custom_name_en": "Luna Trainer",
+        "custom_name_zh": "Luna 修改器",
+        "official_url": "https://goluna.app",
+        "gcm_url": "GCM/GCM Trainers/Forza Horizon 6 Luna Trainer [Shina].exe",
+        "version": "2026.7.23"
+    },
+    {
+        "game_name": "Metro Exodus",
+        "origin": "other",
+        "author": "hex",
+        "official_url": "https://www.nexusmods.com/metroexodus/mods/110",
+        "gcm_url": "GCM/GCM Trainers/Metro Exodus Trainer [hex].exe",
+        "version": "2025.8.24"
+    },
+    {
+        "game_name": "NBA 2K15",
+        "origin": "other",
+        "author": "游侠网",
+        "official_url": "https://patch.ali213.net/showpatch/33231.html",
+        "gcm_url": "GCM/GCM Trainers/NBA 2K15 Trainer [游侠网].exe",
+        "version": "2014.10.11"
+    },
+    {
+        "game_name": "Onee Chanbara ORIGIN",
+        "origin": "other",
+        "author": "Fullcodes",
+        "gcm_url": "GCM/GCM Trainers/Onee Chanbara ORIGIN Trainer [Fullcodes].exe",
+        "version": "2022.10.2"
+    },
+    {
+        "game_name": "Palworld",
+        "origin": "other",
+        "author": "Pylar",
+        "custom_name_en": "Save Editor",
+        "custom_name_zh": "存档编辑器",
+        "official_url": "https://github.com/deafdudecomputers/PalworldSaveTools",
+        "gcm_url": "GCM/GCM Trainers/Palworld Save Editor [Pylar].zip",
+        "version": "2026.7.23"
+    },
+    {
+        "game_name": "Sudden Strike 4",
+        "origin": "other",
+        "author": "MrAntiFun",
+        "official_url": "https://mrantifun.net/threads/sudden-strike-4-trainer.13679/",
+        "gcm_url": "GCM/GCM Trainers/Sudden Strike 4 Trainer [MrAntiFun].exe",
+        "version": "2019.7.14"
+    },
+    {
+        "game_name": "Digimon Story Time Stranger",
+        "origin": "ct_other",
+        "author": "鸣叶月",
+        "gcm_url": "GCM/GCM Trainers/Digimon Story Time Stranger Trainer [MingYeYue].ct",
+        "version": "2025.10.7"
+    },
+    {
+        "game_name": "Crusaders Quest: Hero Town",
+        "origin": "ct_other",
+        "author": "ppapodir",
+        "official_url": "https://bbs.3dmgame.com/thread-6665664-1-1.html",
+        "gcm_url": "GCM/GCM Trainers/Crusaders Quest_Hero Town Trainer [ppapodir].ct",
+        "version": "2026.4.20"
+    },
+    {
+        "game_name": "NBA 2K15",
+        "origin": "ct_other",
+        "author": "游龙附凤",
+        "official_url": "https://bbs.3dmgame.com/thread-4497179-1-1.html",
+        "gcm_url": "GCM/GCM Trainers/NBA 2K15 Trainer [YouLongFuFeng].ct",
+        "version": "2014.10.28"
+    },
+    {
+        "game_name": "ENDER LILIES: Quietus of the Knights",
+        "origin": "ct_other",
+        "gcm_url": "GCM/GCM Trainers/ENDER LILIES_Quietus of the Knights Trainer.ct",
+        "version": "2023.7.12"
+    },
+    {
+        "game_name": "Destiny of Immortal",
+        "origin": "ct_other",
+        "author": "happerlee",
+        "official_url": "https://bbs.3dmgame.com/thread-6684200-1-1.html",
+        "gcm_url": "GCM/GCM Trainers/Destiny of Immortal Trainer [happerlee].ct",
+        "version": "2026.7.15"
     }
 ]

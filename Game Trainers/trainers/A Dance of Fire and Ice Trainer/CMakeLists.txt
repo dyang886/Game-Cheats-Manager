@@ -1,6 +1,6 @@
-set(GAME_NAME "DREDGE")
-set(TRAINER_NAME "DREDGE Trainer")
-set(TRAINER_ARCH "x86")
+set(GAME_NAME "A_Dance_of_Fire_and_Ice")
+set(TRAINER_NAME "A Dance of Fire and Ice Trainer")
+set(TRAINER_ARCH "x64")
 
 set(CSHARP_TARGET "${GAME_NAME}_Mono")
 set(CSHARP_SOURCE "${CMAKE_CURRENT_SOURCE_DIR}/Mono.cs")
@@ -14,10 +14,7 @@ set(SUBSET_FONT_TARGET "${GAME_NAME}_SubsetFont")
 set(FONT_SUBSET_OUTPUT "${CMAKE_CURRENT_SOURCE_DIR}/NotoSansSC-Subset.ttf")
 set(FONT_SUBSET_SCRIPT "${CMAKE_SOURCE_DIR}/scripts/font_processor.py")
 set(FONT_FILE "${CMAKE_SOURCE_DIR}/scripts/NotoSansSC-Regular.ttf")
-set(TRANSLATION_FILES 
-    "${CMAKE_CURRENT_SOURCE_DIR}/translations.json"
-    "${CMAKE_CURRENT_SOURCE_DIR}/translation_extra.txt"
-)
+set(TRANSLATION_FILES "${CMAKE_CURRENT_SOURCE_DIR}/translations.json")
 
 # Run python script to generate the subsetted font
 add_custom_command(
@@ -67,7 +64,10 @@ set_target_properties(${GAME_NAME} PROPERTIES
 if(WIN32)
     set(RESOURCE_FILE "${CMAKE_CURRENT_SOURCE_DIR}/resources.rc")
     target_sources(${GAME_NAME} PRIVATE ${RESOURCE_FILE})
-    set_source_files_properties(${RESOURCE_FILE} PROPERTIES LANGUAGE RC)
+    set_source_files_properties(${RESOURCE_FILE} PROPERTIES
+        LANGUAGE RC
+        OBJECT_DEPENDS "${CSHARP_DLL}"
+    )
 endif()
 
 # Move trainer executable to build/bin/ and embed manifest

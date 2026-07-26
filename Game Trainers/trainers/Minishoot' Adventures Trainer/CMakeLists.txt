@@ -2,12 +2,12 @@ set(GAME_NAME "Minishoot_Adventures")
 set(TRAINER_NAME "Minishoot' Adventures Trainer")
 set(TRAINER_ARCH "x64")
 
-set(CSHARP_TARGET "${GAME_NAME}_GCMInjection")
-set(CSHARP_SOURCE "${CMAKE_CURRENT_SOURCE_DIR}/GCMInjection.cs")
+set(CSHARP_TARGET "${GAME_NAME}_Mono")
+set(CSHARP_SOURCE "${CMAKE_CURRENT_SOURCE_DIR}/Mono.cs")
 set(CSHARP_PROPS "${CMAKE_CURRENT_SOURCE_DIR}/Directory.Build.props")
-set(CSHARP_DLL "${CMAKE_CURRENT_SOURCE_DIR}/GCMInjection.dll")
-set(CSHARP_TEMP_DIR "${CMAKE_CURRENT_BINARY_DIR}/GCMInjection")
-set(CSHARP_TEMP_OUTPUT "${CSHARP_TEMP_DIR}/GCMInjection.dll")
+set(CSHARP_DLL "${CMAKE_CURRENT_SOURCE_DIR}/Mono.dll")
+set(CSHARP_TEMP_DIR "${CMAKE_CURRENT_BINARY_DIR}/Mono")
+set(CSHARP_TEMP_OUTPUT "${CSHARP_TEMP_DIR}/Mono.dll")
 
 set(VENV_PYTHON "${CMAKE_SOURCE_DIR}/.venv/Scripts/python.exe")
 set(SUBSET_FONT_TARGET "${GAME_NAME}_SubsetFont")
@@ -29,23 +29,23 @@ add_custom_target(${SUBSET_FONT_TARGET} ALL
     DEPENDS ${FONT_SUBSET_OUTPUT}
 )
 
-# Compile GCMInjection.cs to the build directory
+# Compile Mono.cs to the build directory
 add_custom_command(
     OUTPUT ${CSHARP_TEMP_OUTPUT}
-    COMMAND "dotnet" build "${CMAKE_CURRENT_SOURCE_DIR}/GCMInjection.csproj" -c Release -o "${CSHARP_TEMP_DIR}"
-    DEPENDS ${CSHARP_SOURCE} "${CMAKE_CURRENT_SOURCE_DIR}/GCMInjection.csproj" ${CSHARP_PROPS}
-    COMMENT "Compiling GCMInjection.cs to temporary output in ${CSHARP_TEMP_DIR}"
+    COMMAND "dotnet" build "${CMAKE_CURRENT_SOURCE_DIR}/Mono.csproj" -c Release -o "${CSHARP_TEMP_DIR}"
+    DEPENDS ${CSHARP_SOURCE} "${CMAKE_CURRENT_SOURCE_DIR}/Mono.csproj" ${CSHARP_PROPS}
+    COMMENT "Compiling Mono.cs to temporary output in ${CSHARP_TEMP_DIR}"
     VERBATIM
 )
 
-# Move GCMInjection.dll to the trainer folder
+# Move Mono.dll to the trainer folder
 add_custom_command(
     OUTPUT ${CSHARP_DLL}
     COMMAND ${CMAKE_COMMAND} -E copy_if_different
         ${CSHARP_TEMP_OUTPUT}
         ${CSHARP_DLL}
     DEPENDS ${CSHARP_TEMP_OUTPUT}
-    COMMENT "Moving GCMInjection.dll to ${CMAKE_CURRENT_SOURCE_DIR}"
+    COMMENT "Moving Mono.dll to ${CMAKE_CURRENT_SOURCE_DIR}"
 )
 
 add_custom_target(${CSHARP_TARGET} ALL

@@ -1,0 +1,30 @@
+{
+    "en_US": {
+        "English": "English",
+        "Please run the game first.": "Please run the game first.",
+        "Failed to activate.": "Failed to activate.",
+        "Failed to activate / deactivate.": "Failed to activate / deactivate.",
+        "Process Name:": "Process Name:",
+        "Process ID:": "Process ID:",
+        "A Dance of Fire and Ice Trainer": "A Dance of Fire and Ice Trainer",
+        "Apply": "Apply",
+        "Auto Play": "Auto Play",
+        "No Death": "No Death",
+        "Game Speed Multiplier": "Game Speed Multiplier",
+        "Finish Level Perfectly": "Finish Level Perfectly"
+    },
+    "zh_CN": {
+        "简体中文": "简体中文",
+        "Please run the game first.": "请先运行游戏。",
+        "Failed to activate.": "激活失败。",
+        "Failed to activate / deactivate.": "激活 / 停用失败。",
+        "Process Name:": "进程名称：",
+        "Process ID:": "进程 ID:",
+        "A Dance of Fire and Ice Trainer": "《冰与火之舞》修改器",
+        "Apply": "应用",
+        "Auto Play": "自动游玩",
+        "No Death": "无死亡",
+        "Game Speed Multiplier": "游戏速度倍率",
+        "Finish Level Perfectly": "完美通关当前关卡"
+    }
+}

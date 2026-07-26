@@ -8,7 +8,7 @@ docs/
 *.sln
 *.ps1
 MonoBridge.dll
-GCMInjection.dll
+Mono.dll
 IL2CPP.dll
 UE.dll
 trainers/**/*.ttf
