@@ -14,12 +14,20 @@
       <HintPath>F:/SteamLibrary/steamapps/common/A Dance of Fire and Ice/A Dance of Fire and Ice_Data/Managed/UnityEngine.CoreModule.dll</HintPath>
       <Private>false</Private>
     </Reference>
+    <Reference Include="UnityEngine.AudioModule">
+      <HintPath>F:/SteamLibrary/steamapps/common/A Dance of Fire and Ice/A Dance of Fire and Ice_Data/Managed/UnityEngine.AudioModule.dll</HintPath>
+      <Private>false</Private>
+    </Reference>
     <Reference Include="Assembly-CSharp">
       <HintPath>F:/SteamLibrary/steamapps/common/A Dance of Fire and Ice/A Dance of Fire and Ice_Data/Managed/Assembly-CSharp.dll</HintPath>
       <Private>false</Private>
     </Reference>
     <Reference Include="Assembly-CSharp-firstpass">
       <HintPath>F:/SteamLibrary/steamapps/common/A Dance of Fire and Ice/A Dance of Fire and Ice_Data/Managed/Assembly-CSharp-firstpass.dll</HintPath>
+      <Private>false</Private>
+    </Reference>
+    <Reference Include="RDTools">
+      <HintPath>F:/SteamLibrary/steamapps/common/A Dance of Fire and Ice/A Dance of Fire and Ice_Data/Managed/RDTools.dll</HintPath>
       <Private>false</Private>
     </Reference>
   </ItemGroup>

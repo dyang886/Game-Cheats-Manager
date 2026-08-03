@@ -8,6 +8,7 @@ import sys
 import tempfile
 
 import polib
+from packaging.version import InvalidVersion, Version
 import zhon.cedict as chinese_characters
 from pypinyin import lazy_pinyin
 
@@ -15,6 +16,23 @@ from secret_config import *
 
 
 APP_VERSION = "2.5.0-beta.8"
+
+
+def parse_version(version):
+    if not isinstance(version, str):
+        return None
+
+    try:
+        return Version(version.strip())
+    except InvalidVersion:
+        return None
+
+
+def is_newer_version(latest_version, current_version=APP_VERSION):
+    latest = parse_version(latest_version)
+    current = parse_version(current_version)
+    return latest is not None and current is not None and latest > current
+
 
 # All resources in development mode are relative to `src` folder
 def resource_path(relative_path):

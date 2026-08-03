@@ -1,5 +1,11 @@
 [
     {
+        "game_name": "A Dance of Fire and Ice",
+        "origin": "gcm",
+        "gcm_url": "GCM/GCM Trainers/A Dance of Fire and Ice Trainer.exe",
+        "version": "2026.7.28"
+    },
+    {
         "game_name": "Arrow A Row",
         "origin": "gcm",
         "gcm_url": "GCM/GCM Trainers/Arrow A Row Trainer.exe",
@@ -522,8 +528,8 @@
         "origin": "ct_other",
         "author": "Patka",
         "official_url": "https://fearlessrevolution.com/viewtopic.php?t=38072",
-        "gcm_url": "GCM/GCM Trainers/R.I.P. - Reincarnation Insurance Program Trainer [Patka].ct",
-        "version": "2026.3.16"
+        "gcm_url": "GCM/GCM Trainers/R.I.P. - Reincarnation Insurance Program Trainer [Patka].zip",
+        "version": "2026.6.23"
     },
     {
         "game_name": "Risou no Hikikomori Seikatsu: Oyako no Shinmitsu Doukyo",
@@ -1649,8 +1655,9 @@
         "game_name": "Silent Hill: Homecoming",
         "origin": "other",
         "author": "allEnL",
+        "official_url": "https://patch.ali213.net/showpatch/5999.html",
         "gcm_url": "GCM/GCM Trainers/Silent Hill_Homecoming Trainer [allEnL].zip",
-        "version": "2003.3.6"
+        "version": "2008.12.12"
     },
     {
         "game_name": "Ride The Dragon: The Awakening of the Dragon Tamer",
@@ -4202,5 +4209,159 @@
         "official_url": "https://bbs.3dmgame.com/thread-6684200-1-1.html",
         "gcm_url": "GCM/GCM Trainers/Destiny of Immortal Trainer [happerlee].ct",
         "version": "2026.7.15"
+    },
+    {
+        "game_name": "Hotline Miami 2: Wrong Number",
+        "origin": "ct_other",
+        "author": "Musky22",
+        "official_url": "https://fearlessrevolution.com/viewtopic.php?p=301172&sid=0491b7ec6b2a8afb360ca34548e3428b#p301172",
+        "gcm_url": "GCM/GCM Trainers/Hotline Miami 2_Wrong Number Trainer [Musky22].ct",
+        "version": "2023.6.16"
+    },
+    {
+        "game_name": "60 Seconds!",
+        "origin": "other",
+        "author": "MrAntiFun",
+        "official_url": "https://mrantifun.net/threads/60-seconds-trainer.4558/",
+        "gcm_url": "GCM/GCM Trainers/60 Seconds! Trainer [MrAntiFun].exe",
+        "version": "2016.5.31"
+    },
+    {
+        "game_name": "Bills Must Be Paid",
+        "origin": "other",
+        "author": "jx666",
+        "gcm_url": "GCM/GCM Trainers/Bills Must Be Paid Trainer [jx666].zip",
+        "version": "2026.7.31"
+    },
+    {
+        "game_name": "Digimon Story Time Stranger",
+        "origin": "ct_other",
+        "author": "Aetherial",
+        "official_url": "https://www.nexusmods.com/digimonstorytimestranger/mods/1",
+        "gcm_url": "GCM/GCM Trainers/Digimon Story Time Stranger Trainer [Aetherial].ct",
+        "version": "2025.10.11"
+    },
+    {
+        "game_name": "Rogue Legacy 2",
+        "origin": "other",
+        "author": "qass",
+        "official_url": "https://bbs.3dmgame.com/thread-6297637-1-1.html",
+        "gcm_url": "GCM/GCM Trainers/Rogue Legacy 2 Trainer [qass].exe",
+        "version": "2022.5.4"
+    },
+    {
+        "game_name": "Rubinite",
+        "origin": "other",
+        "author": "JIN9965",
+        "gcm_url": "GCM/GCM Trainers/Rubinite Trainer [JIN9965].zip",
+        "version": "2026.7.30"
+    },
+    {
+        "game_name": "Shift At Midnight",
+        "origin": "other",
+        "author": "jx666",
+        "gcm_url": "GCM/GCM Trainers/Shift At Midnight Trainer [jx666].zip",
+        "version": "2026.7.29"
+    },
+    {
+        "game_name": "Tamer: King of Dinosaurs",
+        "origin": "other",
+        "author": "jx666",
+        "gcm_url": "GCM/GCM Trainers/Tamer_King of Dinosaurs Trainer [jx666].zip",
+        "version": "2026.7.26"
+    },
+    {
+        "game_name": "Warriors Orochi Z",
+        "origin": "other",
+        "author": "allEnL",
+        "custom_name_en": "CHT Version Trainer",
+        "custom_name_zh": "繁体中文版修改器",
+        "official_url": "https://patch.ali213.net/showpatch/6920.html",
+        "gcm_url": "GCM/GCM Trainers/Warriors Orochi Z CHT Version Trainer [allEnL].zip",
+        "version": "2009.12.26"
+    },
+    {
+        "game_name": "Warriors Orochi Z",
+        "origin": "other",
+        "author": "闇之幻影",
+        "custom_name_en": "CHT Version Trainer",
+        "custom_name_zh": "繁体中文版修改器",
+        "official_url": "https://bbs.3dmgame.com/thread-1084878-1-1.html",
+        "gcm_url": "GCM/GCM Trainers/Warriors Orochi Z CHT Version Trainer [AnZhiHuanYing].zip",
+        "version": "2010.1.21"
+    },
+    {
+        "game_name": "Warriors Orochi Z",
+        "origin": "other",
+        "author": "闇之幻影",
+        "custom_name_en": "JPN Version Trainer",
+        "custom_name_zh": "日文版修改器",
+        "official_url": "https://bbs.3dmgame.com/thread-1084878-1-1.html",
+        "gcm_url": "GCM/GCM Trainers/Warriors Orochi Z JPN Version Trainer [AnZhiHuanYing].zip",
+        "version": "2010.1.21"
+    },
+    {
+        "game_name": "Legacy of Shadows",
+        "origin": "ct_other",
+        "author": "acasfq",
+        "official_url": "https://bbs.3dmgame.com/thread-6650163-1-1.html",
+        "gcm_url": "GCM/GCM Trainers/Legacy of Shadows Trainer [acasfq].ct",
+        "version": "2026.7.26"
+    },
+    {
+        "game_name": "Lies of P",
+        "origin": "ct_other",
+        "author": "Etzikun",
+        "official_url": "https://fearlessrevolution.com/viewtopic.php?t=27450",
+        "gcm_url": "GCM/GCM Trainers/Lies of P Trainer [Etzikun].ct",
+        "version": "2024.4.14"
+    },
+    {
+        "game_name": "Command & Conquer: Red Alert 3",
+        "origin": "other",
+        "author": "大象",
+        "official_url": "https://dl.3dmgame.com/patch/10223.html",
+        "gcm_url": "GCM/GCM Trainers/Command & Conquer_Red Alert 3 Trainer [DaXiang].exe",
+        "version": "2010.4.10"
+    },
+    {
+        "game_name": "AWAKEN - Astral Blade",
+        "origin": "other",
+        "author": "ギナ",
+        "official_url": "https://space.bilibili.com/31947",
+        "gcm_url": "GCM/GCM Trainers/AWAKEN - Astral Blade Trainer [Gina].zip",
+        "version": "2024.11.2"
+    },
+    {
+        "game_name": "Darkwood",
+        "origin": "other",
+        "author": "peizhaochen",
+        "official_url": "https://patch.ali213.net/showpatch/76621.html",
+        "gcm_url": "GCM/GCM Trainers/Darkwood Trainer [peizhaochen].exe",
+        "version": "2017.9.12"
+    },
+    {
+        "game_name": "Dark Souls: Remastered",
+        "origin": "ct_other",
+        "author": "3DM",
+        "official_url": "https://bbs.3dmgame.com/thread-6580344-1-1.html",
+        "gcm_url": "GCM/GCM Trainers/Dark Souls_Remastered Trainer [3DM].ct",
+        "version": "2025.5.3"
+    },
+    {
+        "game_name": "Dark Souls III",
+        "origin": "ct_other",
+        "author": "KoKo君",
+        "official_url": "https://bbs.3dmgame.com/thread-5253197-1-1.html",
+        "gcm_url": "GCM/GCM Trainers/Dark Souls III Trainer [KoKoJun].ct",
+        "version": "2019.10.11"
+    },
+    {
+        "game_name": "Madou Koukaku ~Yami no Tsuki Megami wa Doukoku de Utau~",
+        "origin": "ct_other",
+        "author": "吃瓜群众",
+        "official_url": "https://tieba.baidu.com/p/6496058113",
+        "gcm_url": "GCM/GCM Trainers/Madou Koukaku Trainer [ChiGuaQunZhong].ct",
+        "version": "2020.2.17"
     }
 ]

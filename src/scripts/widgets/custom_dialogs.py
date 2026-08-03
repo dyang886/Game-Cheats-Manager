@@ -411,7 +411,7 @@ class AboutDialog(QDialog):
     def update_version_labels(self, latest_version):
         current_version = APP_VERSION
 
-        if latest_version > current_version:
+        if is_newer_version(latest_version, current_version):
             self.currentVersionNumberLabel.setStyleSheet("color: red;")
             self.newestVersionNumberLabel.setStyleSheet("color: green;")
             self.updateButton.setVisible(1)

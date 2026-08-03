@@ -13,7 +13,7 @@
 
 // Version info
 static constexpr const char *TRAINER_NAME = "A Dance of Fire and Ice Trainer";
-static constexpr const char *GAME_VERSION = "TBD";
+static constexpr const char *GAME_VERSION = "3.3.1";
 static constexpr const char *TRAINER_VERSION = "1.0";
 
 static Fl_Window *g_main_window = nullptr;
@@ -47,8 +47,8 @@ void toggle_callback(Fl_Widget *, void *data)
 
         if (optionName == "ToggleAutoPlay")
             status = trainer->toggleAutoPlay(isEnabled);
-        else if (optionName == "ToggleNoDeath")
-            status = trainer->toggleNoDeath(isEnabled);
+        else if (optionName == "ToggleGodMode")
+            status = trainer->toggleGodMode(isEnabled);
         else if (optionName == "SetGameSpeedMultiplier")
             status = trainer->setGameSpeedMultiplier(isEnabled, std::stof(val));
         else
@@ -92,11 +92,12 @@ void apply_callback(Fl_Widget *widget, void *data)
     auto *oldBuf = std::cerr.rdbuf(errCapture.rdbuf());
 
     bool status = true;
+    std::string message;
 
     try
     {
         if (optionName == "FinishLevelPerfectly")
-            status = trainer->finishLevelPerfectly();
+            status = trainer->finishLevelPerfectly(message);
         else
             status = false;
     }
@@ -109,10 +110,15 @@ void apply_callback(Fl_Widget *widget, void *data)
 
     if (!status)
     {
-        std::string msg = t("Failed to activate.");
-        std::string details = errCapture.str();
-        if (!details.empty())
-            msg += std::string("\n") + details;
+        // The injected assembly reports why it refused; anything else falls back to the generic
+        // message plus whatever was written to std::cerr.
+        std::string msg = message.empty() ? t("Failed to activate.") : t(message);
+        if (message.empty())
+        {
+            const std::string details = errCapture.str();
+            if (!details.empty())
+                msg += std::string("\n") + details;
+        }
         fl_alert("%s", msg.c_str());
     }
 }
@@ -157,7 +163,7 @@ int main(int argc, char **argv)
     load_translations("TRANSLATION_JSON");
 
     int win_w = 800;
-    int win_h = 480;
+    int win_h = 600;
     int screen_w = Fl::w();
     int screen_h = Fl::h();
     int win_x = (screen_w - win_w) / 2;
@@ -176,6 +182,11 @@ int main(int argc, char **argv)
     font_handle = AddFontMemResourceEx((void *)font_data, font_mem_size, nullptr, &num_fonts);
     Fl::set_font(FL_FREE_FONT, "Noto Sans SC");
     fl_font(FL_FREE_FONT, font_size);
+
+    DWORD info_img_size = 0;
+    const unsigned char *info_img_data = load_resource("INFO_IMG", info_img_size);
+    Fl_PNG_Image *info_img = new Fl_PNG_Image(nullptr, info_img_data, (int)info_img_size);
+    info_img->scale(20, 20, 1, 0);
 
     // ------------------------------------------------------------------
     // Top Row: Language Selection
@@ -252,16 +263,17 @@ int main(int argc, char **argv)
     int options_w = g_main_window->w() - options_x;
     int options_h = g_main_window->h() - lang_flex_height;
     Fl_Flex *options_flex = new Fl_Flex(options_x, options_y, options_w, options_h, Fl_Flex::VERTICAL);
-    options_flex->margin(30, 20, 20, 20);
+    options_flex->margin(80, 20, 20, 20);
     options_flex->gap(8);
 
     Fl_Box *spacerTop = new Fl_Box(0, 0, 0, 0);
 
     place_toggle_widget(options_flex, &trainer, "ToggleAutoPlay", "Auto Play");
 
-    place_toggle_widget(options_flex, &trainer, "ToggleNoDeath", "No Death");
+    place_toggle_widget(options_flex, &trainer, "ToggleGodMode", "God Mode");
 
-    place_toggle_widget(options_flex, &trainer, "SetGameSpeedMultiplier", "Game Speed Multiplier", nullptr, "1", "0.01", "100", FL_FLOAT_INPUT);
+    Fl_Box *speed_info_hover = create_info_hover("Restart Level", info_img);
+    place_toggle_widget(options_flex, &trainer, "SetGameSpeedMultiplier", "Game Speed Multiplier", nullptr, "1", "0.01", "100", FL_FLOAT_INPUT, speed_info_hover);
 
     place_apply_widget(options_flex, &trainer, "FinishLevelPerfectly", "Finish Level Perfectly");
 

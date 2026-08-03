@@ -73,10 +73,10 @@ class VersionFetchWorker(QThread):
 
             data = response.json()
             latest_version = data.get('latest_version')
-            if latest_version:
-                self.versionFetched.emit(latest_version)
+            if latest_version and parse_version(latest_version) is not None:
+                self.versionFetched.emit(latest_version.strip())
             else:
-                print(f"Error: 'latest_version' not found in response. Response: {data}")
+                print(f"Error: Missing or invalid 'latest_version' in response. Response: {data}")
                 self.fetchFailed.emit()
 
         except Exception:

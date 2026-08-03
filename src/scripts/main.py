@@ -305,7 +305,7 @@ class GameCheatsManager(QMainWindow):
         # Keep a reference to prevent garbage collection
         self._active_toast = None
 
-        if success and latest_version > APP_VERSION:
+        if success and is_newer_version(latest_version):
             title = tr('Update Available')
             message = tr('New version found: {old_version} ➜ {new_version}').format(
                 old_version=APP_VERSION,

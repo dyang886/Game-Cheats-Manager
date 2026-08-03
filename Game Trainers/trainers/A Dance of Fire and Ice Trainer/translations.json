@@ -4,13 +4,16 @@
         "Please run the game first.": "Please run the game first.",
         "Failed to activate.": "Failed to activate.",
         "Failed to activate / deactivate.": "Failed to activate / deactivate.",
+        "Please activate this inside a level.": "Please activate this inside a level.",
+        "The current level is already over.": "The current level is already over.",
         "Process Name:": "Process Name:",
         "Process ID:": "Process ID:",
         "A Dance of Fire and Ice Trainer": "A Dance of Fire and Ice Trainer",
         "Apply": "Apply",
         "Auto Play": "Auto Play",
-        "No Death": "No Death",
+        "God Mode": "God Mode",
         "Game Speed Multiplier": "Game Speed Multiplier",
+        "Restart Level": "Restart the level for this to take effect",
         "Finish Level Perfectly": "Finish Level Perfectly"
     },
     "zh_CN": {
@@ -18,13 +21,16 @@
         "Please run the game first.": "请先运行游戏。",
         "Failed to activate.": "激活失败。",
         "Failed to activate / deactivate.": "激活 / 停用失败。",
+        "Please activate this inside a level.": "请在关卡内使用此功能。",
+        "The current level is already over.": "当前关卡已经结束。",
         "Process Name:": "进程名称：",
         "Process ID:": "进程 ID:",
         "A Dance of Fire and Ice Trainer": "《冰与火之舞》修改器",
         "Apply": "应用",
         "Auto Play": "自动游玩",
-        "No Death": "无死亡",
+        "God Mode": "无敌模式",
         "Game Speed Multiplier": "游戏速度倍率",
-        "Finish Level Perfectly": "完美通关当前关卡"
+        "Restart Level": "重开关卡后此选项才会生效",
+        "Finish Level Perfectly": "完美通关"
     }
 }

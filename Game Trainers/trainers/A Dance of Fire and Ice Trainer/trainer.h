@@ -19,12 +19,12 @@ public:
         return invokeMethod("", "GCMInjection", "ToggleAutoPlay", {enable});
     }
 
-    bool toggleNoDeath(bool enable)
+    bool toggleGodMode(bool enable)
     {
         if (!initializeDllInjection())
             return false;
 
-        return invokeMethod("", "GCMInjection", "ToggleNoDeath", {enable});
+        return invokeMethod("", "GCMInjection", "ToggleGodMode", {enable});
     }
 
     bool setGameSpeedMultiplier(bool enable, float value)
@@ -35,11 +35,26 @@ public:
         return invokeMethod("", "GCMInjection", "SetGameSpeedMultiplier", {enable, value});
     }
 
-    bool finishLevelPerfectly()
+    /// Apply actions reply with "OK", or with a message for the user. The message is a translation
+    /// key owned by the injected assembly, so the caller only has to run it through t().
+    bool finishLevelPerfectly(std::string &message)
     {
+        return invokeApply("FinishLevelPerfectly", message);
+    }
+
+private:
+    bool invokeApply(const std::string &methodName, std::string &message)
+    {
+        message.clear();
+
         if (!initializeDllInjection())
             return false;
 
-        return invokeMethod("", "GCMInjection", "FinishLevelPerfectly", {});
+        const std::string response = invokeMethodReturn("", "GCMInjection", methodName, {});
+        if (response == "OK")
+            return true;
+
+        message = response;
+        return false;
     }
 };
