@@ -96,7 +96,9 @@ void apply_callback(Fl_Widget *widget, void *data)
 
     try
     {
-        if (optionName == "FinishLevelPerfectly")
+        if (optionName == "FinishLevel")
+            status = trainer->finishLevel(message);
+        else if (optionName == "FinishLevelPerfectly")
             status = trainer->finishLevelPerfectly(message);
         else
             status = false;
@@ -274,6 +276,8 @@ int main(int argc, char **argv)
 
     Fl_Box *speed_info_hover = create_info_hover("Restart Level", info_img);
     place_toggle_widget(options_flex, &trainer, "SetGameSpeedMultiplier", "Game Speed Multiplier", nullptr, "1", "0.01", "100", FL_FLOAT_INPUT, speed_info_hover);
+
+    place_apply_widget(options_flex, &trainer, "FinishLevel", "Finish Level 100%");
 
     place_apply_widget(options_flex, &trainer, "FinishLevelPerfectly", "Finish Level Perfectly");
 

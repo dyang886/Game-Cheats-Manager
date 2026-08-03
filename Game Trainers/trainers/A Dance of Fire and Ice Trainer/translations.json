@@ -14,6 +14,7 @@
         "God Mode": "God Mode",
         "Game Speed Multiplier": "Game Speed Multiplier",
         "Restart Level": "Restart the level for this to take effect",
+        "Finish Level 100%": "Finish Level 100%",
         "Finish Level Perfectly": "Finish Level Perfectly"
     },
     "zh_CN": {
@@ -31,6 +32,7 @@
         "God Mode": "无敌模式",
         "Game Speed Multiplier": "游戏速度倍率",
         "Restart Level": "重开关卡后此选项才会生效",
+        "Finish Level 100%": "100% 通关",
         "Finish Level Perfectly": "完美通关"
     }
 }

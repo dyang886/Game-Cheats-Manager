@@ -187,39 +187,16 @@ public static class GCMInjection
         });
     }
 
+    /// <summary>Clears the level at 100% completion, leaving the accuracy the player actually earned.</summary>
+    public static void FinishLevel()
+    {
+        RunOnMainThread(delegate { CompleteCurrentLevel(purePerfect: false); });
+    }
+
+    /// <summary>Clears the level at 100% completion and rewrites the run as a pure perfect clear.</summary>
     public static void FinishLevelPerfectly()
     {
-        RunOnMainThread(delegate
-        {
-            scrController controller = ADOBase.controller;
-            if (controller == null || !controller.gameworld)
-            {
-                Fail("Please activate this inside a level.");
-                return;
-            }
-
-            if (controller.currentState == States.Won || controller.currentState == States.Fail ||
-                controller.currentState == States.Fail2)
-            {
-                Fail("The current level is already over.");
-                return;
-            }
-
-            CancelPressToStartWait(controller);
-            TeleportToEndPortal(controller);
-            MarkRunAsPurePerfect(controller);
-
-            // Deliberately not scrController.BeatLevel(): that calls OnLandOnPortal and then
-            // PortalTravelAction back to back, which skips straight past the results screen into the
-            // level transition. Landing on the end portal normally only calls OnLandOnPortal, and
-            // Won_Update fires the transition once the player presses a key.
-            controller.OnLandOnPortal(controller.planetRed, Portal.EndOfLevel, null);
-            GrantTaroMedals(controller);
-            SavePurePerfectResult(controller);
-
-            Log("Finished the current level as a pure perfect run.");
-            Succeed();
-        });
+        RunOnMainThread(delegate { CompleteCurrentLevel(purePerfect: true); });
     }
 
     // ============================================================
@@ -390,6 +367,106 @@ public static class GCMInjection
     }
 
     /// <summary>
+    /// Ends the level on the end portal. Shared by both finish actions; purePerfect additionally
+    /// rewrites the run as a flawless clear and asserts the stats that go with it.
+    /// </summary>
+    private static void CompleteCurrentLevel(bool purePerfect)
+    {
+        scrController controller = ADOBase.controller;
+        if (controller == null || !controller.gameworld)
+        {
+            Fail("Please activate this inside a level.");
+            return;
+        }
+
+        if (controller.currentState == States.Won || controller.currentState == States.Fail ||
+            controller.currentState == States.Fail2)
+        {
+            Fail("The current level is already over.");
+            return;
+        }
+
+        CancelPressToStartWait(controller);
+        TeleportToEndPortal(controller);
+
+        if (purePerfect)
+            MarkRunAsPurePerfect(controller);
+        else
+            MarkRunAsComplete(controller);
+
+        // Deliberately not scrController.BeatLevel(): that calls OnLandOnPortal and then
+        // PortalTravelAction back to back, which skips straight past the results screen into the
+        // level transition. Landing on the end portal normally only calls OnLandOnPortal, and
+        // Won_Update fires the transition once the player presses a key.
+        controller.OnLandOnPortal(controller.planetRed, Portal.EndOfLevel, null);
+
+        if (purePerfect)
+        {
+            GrantTaroMedals(controller);
+            SavePurePerfectResult(controller);
+        }
+        else
+        {
+            SaveLevelCompletion(controller);
+        }
+
+        Log(purePerfect ? "Finished the current level as a pure perfect run." : "Finished the current level.");
+        Succeed();
+    }
+
+    /// <summary>
+    /// Makes the run read as having reached the last tile, which is what puts completion at 100%:
+    /// percentComplete is derived from currentSeqID inside CalculatePercentAcc, and
+    /// EndscreenLanterns only lights the completion lantern at percentComplete >= 1. The level is
+    /// over right after this, and scrController.Awake resets currentSeqID on the next load.
+    /// </summary>
+    private static void MarkRunAsComplete(scrController controller)
+    {
+        if (ADOBase.lm != null && ADOBase.lm.listFloors != null && ADOBase.lm.listFloors.Count > 0)
+            controller.currentSeqID = ADOBase.lm.listFloors.Count - 1;
+
+        foreach (scrMarginTracker tracker in scrMistakesManager.marginTrackers)
+        {
+            if (tracker == null)
+                continue;
+
+            // OnLandOnPortal calls RegisterDeadTiles(currentSeqID) for any player that is not alive,
+            // which would count every tile the teleport skipped as dead. Parking the marker on the
+            // final tile makes that a no-op.
+            tracker.deadTilesStartFloor = controller.currentSeqID;
+
+            tracker.CalculatePercentAcc();
+        }
+    }
+
+    /// <summary>
+    /// Records the clear for a plain finish, mirroring the completion write Save and SaveCustom make
+    /// on a win. Accuracy is deliberately left alone: it is whatever the player actually earned, and
+    /// Save already stores it when it beats the record. Writing completion here covers the runs where
+    /// Save bails out first - an autoplayed one, or God Mode with logged deaths.
+    /// </summary>
+    private static void SaveLevelCompletion(scrController controller)
+    {
+        if (ADOBase.isCLSLevel)
+        {
+            if (ADOBase.customLevel == null || ADOBase.customLevel.levelData == null)
+                return;
+
+            Persistence.SetCustomWorldCompletion(ADOBase.customLevel.levelData.Hash, 1f);
+        }
+        else
+        {
+            if (!ADOBase.isOfficialLevel || !controller.isbosslevel || controller.isPuzzleRoom ||
+                GCS.practiceMode || GCS.d_booth)
+                return;
+
+            Persistence.SetPercentCompletion(scrController.currentWorld, 1f, scrController.coopMode);
+        }
+
+        Persistence.Save(instant: true);
+    }
+
+    /// <summary>
     /// Rewrites the accuracy trackers so the run reads as a full pure perfect clear: every logged
     /// hit becomes HitMargin.Perfect, the list is padded out to the level's hittable tile count so
     /// the stored accuracy matches a real full run, and death / checkpoint bookkeeping is cleared.
@@ -400,12 +477,7 @@ public static class GCMInjection
     {
         int hittableTiles = CountHittableTiles();
 
-        // percentComplete is derived from currentSeqID inside CalculatePercentAcc, and
-        // EndscreenLanterns only lights the completion lantern at percentComplete >= 1, so the run
-        // has to read as having reached the last tile. The level is over right after this, and
-        // scrController.Awake resets currentSeqID on the next load.
-        if (ADOBase.lm != null && ADOBase.lm.listFloors != null && ADOBase.lm.listFloors.Count > 0)
-            controller.currentSeqID = ADOBase.lm.listFloors.Count - 1;
+        MarkRunAsComplete(controller);
 
         foreach (scrMarginTracker tracker in scrMistakesManager.marginTrackers)
         {
@@ -426,11 +498,6 @@ public static class GCMInjection
             tracker.deadTilesBeforeCheckpoint = 0;
             tracker.deaths = 0;
             tracker.deathsBeforeCheckpoint = 0;
-
-            // OnLandOnPortal calls RegisterDeadTiles(currentSeqID) for any player that is not alive,
-            // which would count everything from here to the last tile as dead. Parking the marker on
-            // the final tile makes that a no-op.
-            tracker.deadTilesStartFloor = controller.currentSeqID;
 
             tracker.CalculatePercentAcc();
         }

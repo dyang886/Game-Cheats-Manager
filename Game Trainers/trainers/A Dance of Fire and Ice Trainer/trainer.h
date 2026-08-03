@@ -37,6 +37,11 @@ public:
 
     /// Apply actions reply with "OK", or with a message for the user. The message is a translation
     /// key owned by the injected assembly, so the caller only has to run it through t().
+    bool finishLevel(std::string &message)
+    {
+        return invokeApply("FinishLevel", message);
+    }
+
     bool finishLevelPerfectly(std::string &message)
     {
         return invokeApply("FinishLevelPerfectly", message);
