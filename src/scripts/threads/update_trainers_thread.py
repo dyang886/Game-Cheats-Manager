@@ -74,6 +74,8 @@ class UpdateTrainers(DownloadBaseThread):
                         }
                         if entry.get('extension'):
                             update_info["extension"] = entry['extension']
+                        if entry.get('custom_name'):
+                            update_info["custom_name"] = entry['custom_name']
                         return update_info
                     return None
             return None

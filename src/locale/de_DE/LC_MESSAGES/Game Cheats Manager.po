@@ -100,26 +100,41 @@ msgstr "Update-Prüfung fehlgeschlagen"
 msgid "Failed to check for software update. You can navigate to `Options` ➜ `About` to check for updates manually."
 msgstr "Die Suche nach einem Software-Update ist fehlgeschlagen. Du kannst unter `Optionen` ➜ `Über` manuell nach Updates suchen."
 
+msgid "Attention"
+msgstr "Achtung"
+
+msgid "Cheat Engine is already being downloaded, please wait for it to finish."
+msgstr "Cheat Engine wird bereits heruntergeladen, bitte warte, bis der Vorgang abgeschlossen ist."
+
 msgid "Cheat Engine Required"
 msgstr "Cheat Engine erforderlich"
 
-msgid "Cheat Engine may not be installed on your system."
-msgstr "Cheat Engine ist möglicherweise nicht auf Ihrem System installiert."
+msgid ".ct/.cetrainer files can only be launched through Cheat Engine, but no Cheat Engine installation is currently set."
+msgstr ".ct/.cetrainer-Dateien können nur über Cheat Engine gestartet werden, aber derzeit ist kein Cheat Engine-Installationspfad festgelegt."
 
-msgid ".ct/.cetrainer files require Cheat Engine to run."
-msgstr ".ct- und .cetrainer-Dateien benötigen Cheat Engine, um ausgeführt zu werden."
+msgid "If you already have Cheat Engine installed, select its installation path under '{trainer_management} → Cheat Engine'."
+msgstr "Wenn Cheat Engine bereits installiert ist, wähle den Installationspfad unter '{trainer_management} → Cheat Engine' aus."
 
-msgid "Please download and install Cheat Engine, then make sure to open the file with Cheat Engine."
-msgstr "Bitte laden Sie Cheat Engine herunter und installieren Sie es. Stellen Sie anschließend sicher, dass die Datei mit Cheat Engine geöffnet wird."
+msgid "Otherwise, would you like to download Cheat Engine now?"
+msgstr "Möchtest du Cheat Engine andernfalls jetzt herunterladen?"
 
-msgid "Note: The official Cheat Engine installer contains promotional software bundles. Make sure to skip them during installation."
-msgstr "Hinweis: Das offizielle Installationsprogramm von Cheat Engine enthält gebündelte Werbesoftware. Achten Sie darauf, diese Zusatzangebote während der Installation abzulehnen."
+msgid "Yes"
+msgstr "Ja"
 
-msgid "Download from:"
-msgstr "Download unter:"
+msgid "No"
+msgstr "Nein"
 
-msgid "Don't show again"
-msgstr "Nicht mehr anzeigen"
+msgid "Success"
+msgstr "Erfolg"
+
+msgid "Cheat Engine has already been downloaded in GCM, its installation path has been updated."
+msgstr "Cheat Engine wurde bereits in GCM heruntergeladen, der Installationspfad wurde aktualisiert."
+
+msgid "Error"
+msgstr "Fehler"
+
+msgid "Could not find Cheat Engine in the trainer database, please update GCM data and try again."
+msgstr "Cheat Engine konnte nicht in der Trainer-Datenbank gefunden werden, bitte aktualisiere die GCM-Daten und versuche es erneut."
 
 msgid "Delete trainer"
 msgstr "Trainer löschen"
@@ -132,9 +147,6 @@ msgstr "Bestätigen"
 
 msgid "Cancel"
 msgstr "Abbrechen"
-
-msgid "Error"
-msgstr "Fehler"
 
 msgid "Trainer is currently in use, please close any programs using the file and try again."
 msgstr "Der Trainer wird gerade verwendet. Bitte schließe alle Programme, die auf die Datei zugreifen, und versuche es erneut."
@@ -175,12 +187,6 @@ msgstr "Ursprüngliche Trainer löschen"
 msgid "Do you want to delete the original trainer files?"
 msgstr "Möchtest du die ursprünglichen Trainer-Dateien löschen?"
 
-msgid "Yes"
-msgstr "Ja"
-
-msgid "No"
-msgstr "Nein"
-
 msgid "Failed to delete original trainer: "
 msgstr "Ursprünglicher Trainer konnte nicht gelöscht werden: "
 
@@ -192,9 +198,6 @@ msgstr "Um die Trainer-Download-Pfade zur Windows-Defender-Whitelist hinzuzufüg
 
 msgid "Would you like to continue?"
 msgstr "Möchtest du fortfahren?"
-
-msgid "Success"
-msgstr "Erfolg"
 
 msgid "Successfully added paths to Windows Defender whitelist."
 msgstr "Pfade wurden erfolgreich zur Windows-Defender-Whitelist hinzugefügt."
@@ -240,9 +243,6 @@ msgstr "Suche von GCM erfolgreich!"
 
 msgid "Could not initialize the temporary download folder, please try turning your antivirus software off."
 msgstr "Der temporäre Download-Ordner konnte nicht initialisiert werden. Bitte versuche, deine Antivirensoftware zu deaktivieren."
-
-msgid "Attention"
-msgstr "Achtung"
 
 msgid ""
 "This trainer requires additional setup before use. Please check the opened folder for instructions.\n"
@@ -408,6 +408,9 @@ msgstr "GitHub: "
 
 msgid "Bilibili: "
 msgstr "Bilibili: "
+
+msgid "Don't show again"
+msgstr "Nicht mehr anzeigen"
 
 msgid "Theme:"
 msgstr "Design:"

@@ -535,14 +535,17 @@ class TrainerManagementDialog(QDialog):
             self.checkCEInstallStatus()
 
     def resetCEPath(self):
-        self.ceInstallLineEdit.setText(ce_install_path)
-        settings["cePath"] = os.path.normpath(ce_install_path)
+        # Cheat Engine downloaded in GCM takes priority over a system installation
+        defaultPath = findCEInstallPath()
+        settings["cePath"] = os.path.normpath(defaultPath) if defaultPath else ""
+        self.ceInstallLineEdit.setText(settings["cePath"])
         apply_settings(settings)
         self.checkCEInstallStatus()
 
     def checkCEInstallStatus(self):
-        cePath = os.path.join(self.ceInstallLineEdit.text(), 'Cheat Engine.exe')
-        if os.path.exists(cePath):
+        installPath = self.ceInstallLineEdit.text()
+        cePath = os.path.join(installPath, CE_EXECUTABLE) if installPath else ""
+        if cePath and os.path.isfile(cePath):
             self.installStatus.setText(tr("Cheat Engine is installed"))
             self.installStatus.setStyleSheet("color: green;")
             self.ceApplyButton.setEnabled(True)

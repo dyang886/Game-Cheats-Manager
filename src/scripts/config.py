@@ -6,6 +6,7 @@ import os
 import re
 import sys
 import tempfile
+import uuid
 
 import polib
 from packaging.version import InvalidVersion, Version
@@ -15,7 +16,7 @@ from pypinyin import lazy_pinyin
 from secret_config import *
 
 
-APP_VERSION = "2.5.0-beta.8"
+APP_VERSION = "2.5.0-beta.9"
 
 
 def parse_version(version):
@@ -66,6 +67,9 @@ def apply_settings(settings):
 
 
 def load_settings():
+    # Bound early so helpers that resolve defaults (e.g. `findCEInstallPath`) can read stored settings
+    global settings
+
     locale.setlocale(locale.LC_ALL, '')
     system_locale = locale.getlocale()[0]
     # print(f"System locale: {system_locale}")
@@ -88,9 +92,17 @@ def load_settings():
     }
     app_locale = locale_mapping.get(system_locale, 'en_US')
 
+    try:
+        with open(SETTINGS_FILE, "r", encoding="utf-8") as f:
+            settings = json.load(f)
+    except Exception as e:
+        print("Error loading settings json" + str(e))
+        settings = {}
+
     default_settings = {
         "downloadPath": os.path.join(os.environ["APPDATA"], "GCM Trainers"),
         "language": app_locale,
+        "uid": str(uuid.uuid4()),
         "theme": "dark",
         "safePath": True,
         "enSearchResults": False,
@@ -98,7 +110,6 @@ def load_settings():
         "checkAppUpdate": True,
         "launchAppOnStartup": False,
         "showWarning": True,
-        "showCEPrompt": True,
         "autoUpdateTranslations": True,
         "lastSeenAnnouncementId": "",
 
@@ -114,19 +125,12 @@ def load_settings():
         "autoUpdateXiaoXingData": True,
         "autoUpdateXiaoXingTrainers": True,
         "weModPath": wemod_install_path,
-        "cePath": ce_install_path,
+        "cePath": findCEInstallPath(),
         "enableCT": True,
         "autoUpdateCTData": True,
         "autoUpdateCTTrainers": True,
         "cevoPath": "",
     }
-
-    try:
-        with open(SETTINGS_FILE, "r", encoding="utf-8") as f:
-            settings = json.load(f)
-    except Exception as e:
-        print("Error loading settings json" + str(e))
-        settings = default_settings
 
     for key, value in default_settings.items():
         settings.setdefault(key, value)
@@ -135,6 +139,16 @@ def load_settings():
         json.dump(settings, f, indent=4)
 
     return settings
+
+
+def get_client_params():
+    return {
+        'app': 'GCM',
+        'uid': settings.get('uid'),
+        'appVersion': APP_VERSION,
+        'platform': sys.platform,
+        'language': settings.get('language'),
+    }
 
 
 def get_translator():
@@ -191,7 +205,21 @@ def findWeModInstallPath():
     return os.path.join(os.environ["LOCALAPPDATA"], "WeMod")
 
 
-def findCEInstallPath():
+def findCEInstallPath(gcm=False):
+    # Cheat Engine downloaded through GCM lives in the trainer download path like any other entry
+    download_path = settings.get("downloadPath", "")
+    if download_path and os.path.isdir(download_path):
+        try:
+            for entry in sorted(os.scandir(download_path), key=lambda dirent: dirent.name):
+                if entry.is_dir() and os.path.isfile(os.path.join(entry.path, CE_EXECUTABLE)):
+                    return os.path.normpath(entry.path)
+        except OSError as e:
+            print(f"Error scanning for Cheat Engine in download path: {str(e)}")
+
+    if gcm:
+        return ""
+
+    # Fall back to a system installation, preferring the newest version
     base_path = r'C:\Program Files'
     latest_version = []
     latest_path = ""
@@ -214,6 +242,16 @@ def findCEInstallPath():
     return latest_path
 
 
+def getCEExecutable():
+    cePath = settings.get("cePath", "")
+    if cePath:
+        ceExecutable = os.path.join(cePath, CE_EXECUTABLE)
+        if os.path.isfile(ceExecutable):
+            return ceExecutable
+
+    return ""
+
+
 setting_path = os.path.join(os.environ["APPDATA"], "GCM Settings")
 os.makedirs(setting_path, exist_ok=True)
 
@@ -225,7 +263,7 @@ VERSION_TEMP_DIR = os.path.join(tempfile.gettempdir(), "GameCheatsManagerTemp", 
 WEMOD_TEMP_DIR = os.path.join(tempfile.gettempdir(), "GameCheatsManagerTemp", "wemod")
 
 wemod_install_path = findWeModInstallPath()
-ce_install_path = findCEInstallPath()
+CE_EXECUTABLE = "Cheat Engine.exe"
 
 settings = load_settings()
 tr = get_translator()

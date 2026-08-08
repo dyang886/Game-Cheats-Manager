@@ -14,7 +14,7 @@
 // Version info
 static constexpr const char *TRAINER_NAME = "A Dance of Fire and Ice Trainer";
 static constexpr const char *GAME_VERSION = "3.3.1";
-static constexpr const char *TRAINER_VERSION = "1.0";
+static constexpr const char *TRAINER_VERSION = "2.0";
 
 static Fl_Window *g_main_window = nullptr;
 

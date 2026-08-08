@@ -6,11 +6,15 @@ import subprocess
 import time
 import traceback
 
+from PyQt6.QtCore import pyqtSignal
+
 from config import *
 from threads.download_base_thread import DownloadBaseThread
 
 
 class DownloadTrainersThread(DownloadBaseThread):
+    ceInstalled = pyqtSignal(str)
+
     def __init__(self, index, trainers, trainerDownloadPath, update_entry, parent=None):
         super().__init__(parent)
         self.index = index
@@ -95,6 +99,8 @@ class DownloadTrainersThread(DownloadBaseThread):
                 return
 
             if result:
+                if self.is_cheat_engine_package(selected_trainer):
+                    self.report_cheat_engine_install()
                 self.message.emit(tr("Download success!"), "success")
                 time.sleep(self.download_finish_delay)
                 self.finished.emit(0)
@@ -104,6 +110,13 @@ class DownloadTrainersThread(DownloadBaseThread):
             self.message.emit(tr("An error occurred while downloading trainer: ") + str(e), "failure")
             time.sleep(self.download_finish_delay)
             self.finished.emit(1)
+
+    def report_cheat_engine_install(self):
+        for item in self.src_dst:
+            destination = item["dst"]
+            if os.path.isdir(destination) and os.path.isfile(os.path.join(destination, CE_EXECUTABLE)):
+                self.ceInstalled.emit(os.path.normpath(destination))
+                return
 
     @staticmethod
     def format_request_error(error):

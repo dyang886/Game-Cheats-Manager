@@ -64,7 +64,8 @@ class VersionFetchWorker(QThread):
             'x-api-key': CLIENT_API_KEY
         }
         params = {
-            'appName': self.app_name
+            'appName': self.app_name,
+            **get_client_params()
         }
 
         try:
@@ -515,6 +516,7 @@ class WeModCustomization(QThread):
             'patchMethod': self.patchMethod,
             'enableDev': 'true' if enable_dev else 'false',
             'clientVersion': APP_VERSION,
+            **get_client_params()
         }
         response = None
         try:

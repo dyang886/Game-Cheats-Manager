@@ -192,7 +192,8 @@ class DownloadBaseThread(QThread):
             'x-api-key': CLIENT_API_KEY
         }
         params = {
-            'filePath': file_path_on_s3
+            'filePath': file_path_on_s3,
+            **get_client_params()
         }
 
         try:
@@ -244,7 +245,8 @@ class DownloadBaseThread(QThread):
     def symbol_replacement(text):
         return text.replace(': ', ' - ').replace(':', '-').replace("/", "_").replace("?", "")
 
-    def find_best_trainer_match(self, target_name, target_language, threshold=85):
+    @staticmethod
+    def find_best_trainer_match(target_name, target_language, threshold=85):
         # Ignore cases where input trainer name and target language are the same
         if is_chinese(target_name) and target_language == 'zh':
             return None
@@ -254,7 +256,8 @@ class DownloadBaseThread(QThread):
         # Exact (cached dict) lookup first, fuzzy fallback within the index
         return translation_index.translate(target_name, target_language, threshold)
 
-    def translate_trainer(self, trainer):
+    @staticmethod
+    def translate_trainer(trainer):
         """
         Dynamically builds the trainer name based on author, origin, and custom names.
         Expects a dictionary: {"game_name": ..., "origin": ..., "author": ..., "custom_name": ..., "custom_name_en": ..., "custom_name_zh": ...}
@@ -311,7 +314,7 @@ class DownloadBaseThread(QThread):
                     trainerName = f"{prefix} {display_name}".strip() if prefix else display_name
             else:
                 # 3a. Translate Game Name
-                best_match = self.find_best_trainer_match(game_name, lang_key)
+                best_match = DownloadBaseThread.find_best_trainer_match(game_name, lang_key)
                 translated_game_name = best_match or game_name
 
                 # 4. Construct Final Name
@@ -329,6 +332,42 @@ class DownloadBaseThread(QThread):
             return None
 
         return trainerName
+
+    @staticmethod
+    def is_cheat_engine_package(trainer):
+        """Cheat Engine ships as a regular GCM entry, identified by its custom name."""
+        if str(trainer.get("game_name", "")).lower() != "none":
+            return False
+
+        custom_name = trainer.get("custom_name") or ""
+        return custom_name.strip().lower() == "cheat engine"
+
+    @staticmethod
+    def find_cheat_engine_entry():
+        """Build a downloadable entry for Cheat Engine straight from the GCM database."""
+        GCMData = DownloadBaseThread.load_json_content("gcm_trainers.json")
+        if not GCMData:
+            return None
+
+        for trainer in GCMData:
+            if DownloadBaseThread.is_cheat_engine_package(trainer):
+                entry = {
+                    "game_name": trainer.get("game_name"),
+                    "trainer_name": None,
+                    "origin": trainer.get("origin", "other"),
+                    "author": trainer.get("author", ""),
+                    "custom_name": trainer.get("custom_name", ""),
+                    "custom_name_en": trainer.get("custom_name_en", ""),
+                    "custom_name_zh": trainer.get("custom_name_zh", ""),
+                    "url": trainer.get("gcm_url"),
+                    "version": trainer.get("version", ""),
+                    "extension": trainer.get("extension", "")
+                }
+                # Entries built outside a search still need their display name
+                entry["trainer_name"] = DownloadBaseThread.translate_trainer(entry)
+                return entry if entry["trainer_name"] else None
+
+        return None
 
     @staticmethod
     def load_json_content(file_name, from_database=True):

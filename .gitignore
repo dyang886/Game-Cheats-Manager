@@ -6,7 +6,7 @@ secret_config.py
 *.mo
 dist/
 compile.ps1
-utility.py
+update_translations.py
 ResourceHacker.ini
 elevate.manifest
 cpp/

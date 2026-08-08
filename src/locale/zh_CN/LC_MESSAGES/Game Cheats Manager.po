@@ -100,26 +100,41 @@ msgstr "检查更新失败"
 msgid "Failed to check for software update. You can navigate to `Options` ➜ `About` to check for updates manually."
 msgstr "无法检查软件更新，请移至 `选项` ➜ `关于` 以手动检查更新。"
 
+msgid "Attention"
+msgstr "警告"
+
+msgid "Cheat Engine is already being downloaded, please wait for it to finish."
+msgstr "Cheat Engine 正在下载中，请等待下载完成。"
+
 msgid "Cheat Engine Required"
 msgstr "需要安装 Cheat Engine"
 
-msgid "Cheat Engine may not be installed on your system."
-msgstr "您的系统上可能尚未安装 Cheat Engine。"
+msgid ".ct/.cetrainer files can only be launched through Cheat Engine, but no Cheat Engine installation is currently set."
+msgstr ".ct/.cetrainer 文件只能通过 Cheat Engine 启动，但当前尚未设置 Cheat Engine 安装路径。"
 
-msgid ".ct/.cetrainer files require Cheat Engine to run."
-msgstr ".ct 和 .cetrainer 文件需要依赖 Cheat Engine 才能运行。"
+msgid "If you already have Cheat Engine installed, select its installation path under '{trainer_management} → Cheat Engine'."
+msgstr "如果已经安装了 Cheat Engine，请在 '{trainer_management} → Cheat Engine' 中选择其安装路径。"
 
-msgid "Please download and install Cheat Engine, then make sure to open the file with Cheat Engine."
-msgstr "请下载并安装 Cheat Engine，然后请确保使用 Cheat Engine 打开该文件。"
+msgid "Otherwise, would you like to download Cheat Engine now?"
+msgstr "否则，是否立即下载 Cheat Engine？"
 
-msgid "Note: The official Cheat Engine installer contains promotional software bundles. Make sure to skip them during installation."
-msgstr "注意：Cheat Engine 官方安装程序内包含捆绑的推广软件。在安装过程中请注意跳过/拒绝这些捆绑内容。"
+msgid "Yes"
+msgstr "是"
 
-msgid "Download from:"
-msgstr "下载地址："
+msgid "No"
+msgstr "否"
 
-msgid "Don't show again"
-msgstr "不再显示"
+msgid "Success"
+msgstr "成功"
+
+msgid "Cheat Engine has already been downloaded in GCM, its installation path has been updated."
+msgstr "GCM 中已下载 Cheat Engine，安装路径已更新。"
+
+msgid "Error"
+msgstr "错误"
+
+msgid "Could not find Cheat Engine in the trainer database, please update GCM data and try again."
+msgstr "未能在修改器数据库中找到 Cheat Engine，请更新 GCM 数据后重试。"
 
 msgid "Delete trainer"
 msgstr "删除修改器"
@@ -132,9 +147,6 @@ msgstr "确认"
 
 msgid "Cancel"
 msgstr "取消"
-
-msgid "Error"
-msgstr "错误"
 
 msgid "Trainer is currently in use, please close any programs using the file and try again."
 msgstr "修改器当前正在使用中，请关闭使用该文件的所有程序，然后重试。"
@@ -175,12 +187,6 @@ msgstr "删除原始修改器"
 msgid "Do you want to delete the original trainer files?"
 msgstr "是否要删除原始修改器文件？"
 
-msgid "Yes"
-msgstr "是"
-
-msgid "No"
-msgstr "否"
-
 msgid "Failed to delete original trainer: "
 msgstr "无法删除原始修改器："
 
@@ -192,9 +198,6 @@ msgstr "若要将修改器下载路径添加到 Windows Defender 白名单中，
 
 msgid "Would you like to continue?"
 msgstr "是否要继续？"
-
-msgid "Success"
-msgstr "成功"
 
 msgid "Successfully added paths to Windows Defender whitelist."
 msgstr "已成功将路径添加到 Windows Defender 白名单。"
@@ -240,9 +243,6 @@ msgstr "GCM 搜索成功！"
 
 msgid "Could not initialize the temporary download folder, please try turning your antivirus software off."
 msgstr "无法初始化临时下载文件夹，请尝试关闭您的杀毒软件。"
-
-msgid "Attention"
-msgstr "警告"
 
 msgid ""
 "This trainer requires additional setup before use. Please check the opened folder for instructions.\n"
@@ -408,6 +408,9 @@ msgstr "GitHub："
 
 msgid "Bilibili: "
 msgstr "B站作者主页："
+
+msgid "Don't show again"
+msgstr "不再显示"
 
 msgid "Theme:"
 msgstr "主题："

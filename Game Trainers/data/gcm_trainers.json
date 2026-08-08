@@ -3,7 +3,7 @@
         "game_name": "A Dance of Fire and Ice",
         "origin": "gcm",
         "gcm_url": "GCM/GCM Trainers/A Dance of Fire and Ice Trainer.exe",
-        "version": "2026.7.28"
+        "version": "2026.8.3"
     },
     {
         "game_name": "Arrow A Row",
@@ -113,6 +113,16 @@
         "origin": "gcm",
         "gcm_url": "GCM/GCM Trainers/Wizard of Legend 2 Trainer.exe",
         "version": "2025.11.27"
+    },
+    {
+        "game_name": "none",
+        "origin": "other",
+        "author": "Dark Byte",
+        "custom_name": "Cheat Engine",
+        "official_url": "https://www.cheatengine.org",
+        "gcm_url": "GCM/GCM Trainers/Cheat Engine [Dark Byte].zip",
+        "extension": "Cheat Engine.exe",
+        "version": "2026.5.29"
     },
     {
         "game_name": "Core Keeper",
@@ -4261,6 +4271,7 @@
         "origin": "other",
         "author": "jx666",
         "gcm_url": "GCM/GCM Trainers/Shift At Midnight Trainer [jx666].zip",
+        "extension": "none",
         "version": "2026.7.29"
     },
     {

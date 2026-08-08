@@ -9,7 +9,6 @@ import subprocess
 import sys
 import tempfile
 import webbrowser
-import winreg
 
 from PyQt6.QtCore import Qt, QTimer
 from PyQt6.QtGui import QAction, QColor, QFont, QFontDatabase, QIcon, QPainter, QPixmap
@@ -63,6 +62,7 @@ class GameCheatsManager(QMainWindow):
         self.downloadProgressBar = None
         self.downloadProgressLabel = None
         self.currentlyDownloading = False
+        self.downloadingCE = False  # Cheat Engine download queued or in progress
         self.currentlyUpdatingTrainers = False
         self.currentlyUpdatingGCM = False
         self.currentlyUpdatingFling = False
@@ -514,57 +514,54 @@ class GameCheatsManager(QMainWindow):
 
         return os.path.join(junction_dir, original_exe_name)
 
-    def is_cheat_engine_available(self, ext):
-        # 1. Check Windows 10/11 UserChoice (When user selects "Always use this app")
-        try:
-            with winreg.OpenKey(winreg.HKEY_CURRENT_USER, rf"Software\Microsoft\Windows\CurrentVersion\Explorer\FileExts\{ext}\UserChoice") as key:
-                prog_id, _ = winreg.QueryValueEx(key, "ProgId")
-
-            with winreg.OpenKey(winreg.HKEY_CLASSES_ROOT, rf"{prog_id}\shell\open\command") as cmd_key:
-                command, _ = winreg.QueryValueEx(cmd_key, "")
-
-            if command and "cheatengine" in command.lower().replace(" ", ""):
-                return True
-        except (FileNotFoundError, OSError):
-            pass
-
-        # 2. Check Standard ProgID
-        try:
-            with winreg.OpenKey(winreg.HKEY_CLASSES_ROOT, ext) as key:
-                prog_id, _ = winreg.QueryValueEx(key, "")
-
-            with winreg.OpenKey(winreg.HKEY_CLASSES_ROOT, rf"{prog_id}\shell\open\command") as cmd_key:
-                command, _ = winreg.QueryValueEx(cmd_key, "")
-
-            if command and "cheatengine" in command.lower().replace(" ", ""):
-                return True
-        except (FileNotFoundError, OSError):
-            pass
-
-        return False
-
     def prompt_cheat_engine_install(self):
-        msg_box = QMessageBox(self)
-        msg_box.setIcon(QMessageBox.Icon.Warning)
-        msg_box.setWindowTitle(tr("Cheat Engine Required"))
-        msg_box.setText(
-            tr("Cheat Engine may not be installed on your system.") + "<br><br>" +
-            tr(".ct/.cetrainer files require Cheat Engine to run.") + " " +
-            tr("Please download and install Cheat Engine, then make sure to open the file with Cheat Engine.") + "<br><br>" +
-            tr("Note: The official Cheat Engine installer contains promotional software bundles. Make sure to skip them during installation.") + "<br><br>" +
-            tr("Download from:") + ' <a href="https://www.cheatengine.org">https://www.cheatengine.org</a>'
+        if self.downloadingCE:
+            QMessageBox.information(self, tr("Attention"), tr("Cheat Engine is already being downloaded, please wait for it to finish."))
+            return
+
+        msg_box = QMessageBox(
+            QMessageBox.Icon.Question,
+            tr("Cheat Engine Required"),
+            tr(".ct/.cetrainer files can only be launched through Cheat Engine, but no Cheat Engine installation is currently set.") + "\n\n" +
+            tr("If you already have Cheat Engine installed, select its installation path under '{trainer_management} → Cheat Engine'.").format(trainer_management=tr("Trainer Management")) + "\n\n" +
+            tr("Otherwise, would you like to download Cheat Engine now?"),
+            QMessageBox.StandardButton.Yes | QMessageBox.StandardButton.No,
+            self
         )
-        msg_box.setTextFormat(Qt.TextFormat.RichText)
-        msg_box.setStandardButtons(QMessageBox.StandardButton.Ok)
-        ok_button = msg_box.button(QMessageBox.StandardButton.Ok)
-        ok_button.setText("OK")
-        dontShowCheckbox = QCheckBox(tr("Don't show again"))
-        dontShowCheckbox.setStyleSheet("margin-top: 10px;")
-        msg_box.setCheckBox(dontShowCheckbox)
-        msg_box.exec()
-        if dontShowCheckbox.isChecked():
-            settings["showCEPrompt"] = False
-            apply_settings(settings)
+
+        yes_button = msg_box.button(QMessageBox.StandardButton.Yes)
+        yes_button.setText(tr("Yes"))
+        no_button = msg_box.button(QMessageBox.StandardButton.No)
+        no_button.setText(tr("No"))
+        reply = msg_box.exec()
+
+        if reply == QMessageBox.StandardButton.Yes:
+            self.download_cheat_engine()
+
+    def download_cheat_engine(self):
+        # A copy downloaded earlier is adopted instead of downloaded again
+        existingPath = findCEInstallPath(gcm=True)
+        if existingPath:
+            self.on_cheat_engine_installed(existingPath)
+            QMessageBox.information(self, tr("Success"), tr("Cheat Engine has already been downloaded in GCM, its installation path has been updated."))
+            return
+
+        ce_entry = DownloadBaseThread.find_cheat_engine_entry()
+        if not ce_entry or not ce_entry.get("url"):
+            QMessageBox.critical(self, tr("Error"), tr("Could not find Cheat Engine in the trainer database, please update GCM data and try again."))
+            return
+
+        # Appended so the indexes of any listed search results stay valid
+        DownloadBaseThread.trainer_urls.append(ce_entry)
+        self.enqueue_download(len(DownloadBaseThread.trainer_urls) - 1, self.trainers, self.trainerDownloadPath, None)
+
+    def on_cheat_engine_installed(self, cePath):
+        settings["cePath"] = os.path.normpath(cePath)
+        apply_settings(settings)
+
+        if self.trainer_manage_window is not None and self.trainer_manage_window.isVisible():
+            self.trainer_manage_window.ceInstallLineEdit.setText(settings["cePath"])
+            self.trainer_manage_window.checkCEInstallStatus()
 
     def launch_trainer(self):
         try:
@@ -578,6 +575,21 @@ class GameCheatsManager(QMainWindow):
                     os.startfile(originalPath)
                     return
 
+                trainerExt = os.path.splitext(originalPath)[1].lower()
+
+                # Cheat tables are always opened with the configured Cheat Engine installation
+                if trainerExt in [".ct", ".cetrainer"]:
+                    ceExecutable = getCEExecutable()
+                    if not ceExecutable:
+                        self.prompt_cheat_engine_install()
+                        return
+
+                    print(f"Cheat table launch path: {originalPath}")
+                    ctypes.windll.shell32.ShellExecuteW(
+                        None, "runas", ceExecutable, f'"{originalPath}"', os.path.dirname(ceExecutable), 1
+                    )
+                    return
+
                 # Get a safe ASCII path to prevent legacy trainers from crashing
                 if settings["safePath"]:
                     trainerPath = self.get_ascii_launch_path(originalPath)
@@ -585,11 +597,6 @@ class GameCheatsManager(QMainWindow):
                     trainerPath = originalPath
                 print(f"Trainer launch path: {trainerPath}")
                 trainerDir = os.path.dirname(trainerPath)
-                trainerExt = os.path.splitext(originalPath)[1].lower()
-
-                # Check if Cheat Engine is installed before launching .ct/.cetrainer files
-                if trainerExt in [".ct", ".cetrainer"] and settings["showCEPrompt"] and not self.is_cheat_engine_available(trainerExt):
-                    self.prompt_cheat_engine_install()
 
                 # Use "runas" for exe files (run as admin), "open" for other files (use default app)
                 verb = "runas" if trainerExt == ".exe" else "open"
@@ -768,7 +775,18 @@ class GameCheatsManager(QMainWindow):
     def on_trainer_update(self, update_entry):
         self.enqueue_download(None, None, self.trainerDownloadPath, update_entry)
 
+    def is_ce_download(self, index, update_entry):
+        trainer = update_entry
+        if trainer is None and index is not None and index < len(DownloadBaseThread.trainer_urls):
+            trainer = DownloadBaseThread.trainer_urls[index]
+
+        return trainer is not None and DownloadBaseThread.is_cheat_engine_package(trainer)
+
     def enqueue_download(self, index, trainers, trainerDownloadPath, update_entry):
+        # Cheat Engine can also be downloaded by searching for it or by a trainer update
+        if self.is_ce_download(index, update_entry):
+            self.downloadingCE = True
+
         self.downloadQueue.put((index, trainers, trainerDownloadPath, update_entry))
         if not self.currentlyDownloading:
             self.start_next_download()
@@ -785,6 +803,9 @@ class GameCheatsManager(QMainWindow):
             download_thread = DownloadTrainersThread(index, trainers, trainerDownloadPath, update_entry, self)
             download_thread.message.connect(self.on_message, Qt.ConnectionType.BlockingQueuedConnection)
             download_thread.messageBox.connect(self.on_message_box)
+            download_thread.ceInstalled.connect(self.on_cheat_engine_installed)
+            if self.is_ce_download(index, update_entry):
+                download_thread.finished.connect(self.on_cheat_engine_finished)
             download_thread.progress.connect(self.on_download_progress)
             download_thread.finished.connect(self.on_download_finished)
             download_thread.start()
@@ -896,6 +917,9 @@ class GameCheatsManager(QMainWindow):
 
         self.searchable = True
         self.enable_download_widgets()
+
+    def on_cheat_engine_finished(self, status):
+        self.downloadingCE = False
 
     def on_download_finished(self, status):
         self.downloadable = False
