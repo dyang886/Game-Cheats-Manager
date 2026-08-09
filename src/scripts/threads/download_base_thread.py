@@ -40,7 +40,9 @@ class DownloadBaseThread(QThread):
         super().__init__(parent)
         self.downloaded_file_path = ""
 
-    def request_download(self, url, download_path, verify=True, use_cloudScraper=False, raise_errors=False):
+    def request_download(self, url, download_path, verify=True, use_cloudScraper=False, raise_errors=False, atomic=False):
+        """Set atomic=True when overwriting a file that may be read concurrently (e.g. the
+        database JSONs), so readers never observe a truncated or partially written file."""
         try:
             if use_cloudScraper:
                 scraper = cloudscraper.create_scraper()
@@ -62,9 +64,9 @@ class DownloadBaseThread(QThread):
             num_workers = min(total_size // (1024 * 1024), 6)
         else:
             num_workers = 1
-        return self.download_queued(req, url, file_path, total_size, verify, num_workers, raise_errors)
+        return self.download_queued(req, url, file_path, total_size, verify, num_workers, raise_errors, atomic)
 
-    def download_queued(self, initial_req, url, file_path, total_size, verify, num_workers, raise_errors=False):
+    def download_queued(self, initial_req, url, file_path, total_size, verify, num_workers, raise_errors=False, atomic=False):
         total_units = min(total_size // (1024 * 1024), 24) if num_workers > 1 else 1
         print(f"[Queue] starting: {total_units} units, {num_workers} workers, {total_size / (1024 * 1024):.1f} MB", flush=True)
 
@@ -79,9 +81,12 @@ class DownloadBaseThread(QThread):
         else:
             unit_queue.put((0, None, None))
 
+        # When atomic, download into a sibling temp file
+        write_path = os.path.join(os.path.dirname(file_path), f".gcm-{uuid.uuid4().hex[:8]}.part") if atomic else file_path
+
         # Pre-allocate file so workers can seek and write directly at their byte offsets
         try:
-            with open(file_path, 'wb') as f:
+            with open(write_path, 'wb') as f:
                 f.truncate(total_size)
         except Exception as e:
             print(f"[Queue] failed to create file: {e}", flush=True)
@@ -100,11 +105,17 @@ class DownloadBaseThread(QThread):
         def emit_progress():
             self.progress.emit([(total_downloaded[0], total_size)])
 
+        def discard_partial():
+            try:
+                os.remove(write_path)
+            except OSError as e:
+                print(f"[Queue] failed to remove partial file {write_path}: {e}", flush=True)
+
         emit_progress()
 
         def worker(worker_idx):
             session = requests.Session() if num_workers > 1 else None
-            f = open(file_path, 'r+b')
+            f = open(write_path, 'r+b')
             try:
                 while not stop_event.is_set():
                     try:
@@ -155,11 +166,21 @@ class DownloadBaseThread(QThread):
 
         if stop_event.is_set() or completed_units[0] < total_units:
             print(f"[Queue] download failed: {total_failures[0]} total failures", flush=True)
-            if os.path.exists(file_path):
-                os.remove(file_path)
+            discard_partial()
             if raise_errors and last_error[0] is not None:
                 raise last_error[0]
             return ""
+
+        # Same-directory rename, so readers see either the old file or the new one
+        if atomic:
+            try:
+                os.replace(write_path, file_path)
+            except Exception as e:
+                print(f"[Queue] failed to replace {file_path}: {e}", flush=True)
+                discard_partial()
+                if raise_errors:
+                    raise
+                return ""
 
         emit_progress()
         self.downloaded_file_path = file_path

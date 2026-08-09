@@ -130,7 +130,7 @@ class FetchGCMData(DownloadBaseThread):
             self.message.emit(statusWidgetName, tr("Updating data from GCM"))
             url = "GCM/Data/gcm_trainers.json"
             signed_url = self.get_signed_download_url(url)
-            file_path = signed_url and self.request_download(signed_url, DATABASE_PATH)
+            file_path = signed_url and self.request_download(signed_url, DATABASE_PATH, atomic=True)
             if not file_path:
                 self.update.emit(statusWidgetName, update_failed, "error")
                 time.sleep(2)
@@ -163,7 +163,7 @@ class FetchFlingData(DownloadBaseThread):
             self.message.emit(statusWidgetName, update_message1)
             url = "GCM/Data/fling_archive.json"
             signed_url = self.get_signed_download_url(url)
-            file_path = signed_url and self.request_download(signed_url, DATABASE_PATH)
+            file_path = signed_url and self.request_download(signed_url, DATABASE_PATH, atomic=True)
             if not file_path:
                 self.update.emit(statusWidgetName, update_failed1, "error")
                 time.sleep(2)
@@ -171,7 +171,7 @@ class FetchFlingData(DownloadBaseThread):
             self.update.emit(statusWidgetName, update_message2, "load")
             url = "GCM/Data/fling_main.json"
             signed_url = self.get_signed_download_url(url)
-            file_path = signed_url and self.request_download(signed_url, DATABASE_PATH)
+            file_path = signed_url and self.request_download(signed_url, DATABASE_PATH, atomic=True)
             if not file_path:
                 self.update.emit(statusWidgetName, update_failed2, "error")
                 time.sleep(2)
@@ -199,7 +199,7 @@ class FetchXiaoXingData(DownloadBaseThread):
             self.message.emit(statusWidgetName, tr("Updating data from XiaoXing"))
             url = "GCM/Data/xiaoxing.json"
             signed_url = self.get_signed_download_url(url)
-            file_path = signed_url and self.request_download(signed_url, DATABASE_PATH)
+            file_path = signed_url and self.request_download(signed_url, DATABASE_PATH, atomic=True)
             if not file_path:
                 self.update.emit(statusWidgetName, update_failed, "error")
                 time.sleep(2)
@@ -227,7 +227,7 @@ class FetchCTData(DownloadBaseThread):
             self.message.emit(statusWidgetName, tr("Updating data from CT"))
             url = "GCM/Data/cheat_table.json"
             signed_url = self.get_signed_download_url(url)
-            file_path = signed_url and self.request_download(signed_url, DATABASE_PATH)
+            file_path = signed_url and self.request_download(signed_url, DATABASE_PATH, atomic=True)
             if not file_path:
                 self.update.emit(statusWidgetName, update_failed, "error")
                 time.sleep(2)
@@ -255,7 +255,7 @@ class FetchTrainerTranslations(DownloadBaseThread):
             self.message.emit(statusWidgetName, tr("Fetching trainer translations"))
             url = "GCM/Data/translations.json"
             signed_url = self.get_signed_download_url(url)
-            file_path = signed_url and self.request_download(signed_url, DATABASE_PATH)
+            file_path = signed_url and self.request_download(signed_url, DATABASE_PATH, atomic=True)
             if not file_path:
                 self.update.emit(statusWidgetName, fetch_error, "error")
                 time.sleep(2)
