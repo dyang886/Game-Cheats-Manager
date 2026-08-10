@@ -19,7 +19,7 @@ void apply_callback(Fl_Widget *widget, void *data)
 
     if (!trainer->isProcessRunning())
     {
-        fl_alert(t("Please run the game first."));
+        trainer_alert(t("Please run the game first."));
         return;
     }
 
@@ -40,7 +40,7 @@ void apply_callback(Fl_Widget *widget, void *data)
     // Finalize
     if (!status)
     {
-        fl_alert(t("Failed to activate."));
+        trainer_alert(t("Failed to activate."));
     }
 }
 
@@ -55,7 +55,7 @@ void toggle_callback(Fl_Widget *widget, void *data)
 
     if (!trainer->isProcessRunning())
     {
-        fl_alert(t("Please run the game first."));
+        trainer_alert(t("Please run the game first."));
         button->value(0);
         return;
     }
@@ -76,7 +76,7 @@ void toggle_callback(Fl_Widget *widget, void *data)
     // Finalize
     if (!status)
     {
-        fl_alert(t("Failed to activate/deactivate."));
+        trainer_alert(t("Failed to activate/deactivate."));
         button->value(0);
     }
 
@@ -86,6 +86,7 @@ void toggle_callback(Fl_Widget *widget, void *data)
 
 static void main_window_close_callback(Fl_Widget *w, void *)
 {
+    turn_off_all_toggles();
     RemoveFontMemResourceEx(font_handle);
     Fl::delete_widget(w);
 }

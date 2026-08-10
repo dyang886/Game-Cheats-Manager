@@ -3,6 +3,7 @@
 #include <shlobj.h>
 #include <cstdlib>
 #include <FL/Fl_Table.H>
+#include <FL/fl_ask.H>
 
 using json = nlohmann::json;
 
@@ -65,6 +66,19 @@ struct WidgetPair
     Fl_Widget *button; // Fl_Check_Button* or Fl_Button*
     Fl_Input *input;   // nullptr if input not created
 };
+
+// Every option toggle created by place_toggle_widget, in creation order
+std::vector<Fl_Check_Button *> option_toggles;
+
+// True only while turn_off_all_toggles() is running
+bool trainer_closing = false;
+
+/// fl_alert that stays quiet while the trainer is shutting down
+void trainer_alert(const std::string &message)
+{
+    if (!trainer_closing)
+        fl_alert("%s", message.c_str());
+}
 
 // Structure to hold callback data for info buttons
 struct InfoCallbackData
@@ -616,7 +630,7 @@ void info_callback(Fl_Widget *widget, void *data)
 
     if (!trainer->isProcessRunning())
     {
-        fl_alert(t("Please run the game first."));
+        trainer_alert(t("Please run the game first."));
         return;
     }
 
@@ -772,11 +786,29 @@ Fl_Check_Button *place_toggle_widget(
 
     ToggleData *toggle_data = new ToggleData{trainer, optionName, check_button, input};
     check_button->callback(toggle_callback, toggle_data);
+    option_toggles.push_back(check_button);
 
     toggle_flex->end();
     parent_flex->fixed(toggle_flex, UI_OPTION_HEIGHT);
 
     return check_button;
+}
+
+// Switches every toggle option back off through its own toggle callback.
+void turn_off_all_toggles()
+{
+    trainer_closing = true;
+
+    for (Fl_Check_Button *check_button : option_toggles)
+    {
+        if (!check_button->value())
+            continue;
+
+        check_button->value(0);
+        check_button->do_callback();
+    }
+
+    trainer_closing = false;
 }
 
 Fl_Button *place_apply_widget(
