@@ -12,6 +12,12 @@
         "version": "2025.11.27"
     },
     {
+        "game_name": "Big Walk",
+        "origin": "gcm",
+        "gcm_url": "GCM/GCM Trainers/Big Walk Trainer.exe",
+        "version": "2026.8.10"
+    },
+    {
         "game_name": "Crab Champions",
         "origin": "gcm",
         "gcm_url": "GCM/GCM Trainers/Crab Champions Trainer.exe",

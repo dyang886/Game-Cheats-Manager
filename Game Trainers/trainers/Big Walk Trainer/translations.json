@@ -1,0 +1,30 @@
+{
+    "en_US": {
+        "English": "English",
+        "Please run the game first.": "Please run the game first.",
+        "Failed to activate.": "Failed to activate.",
+        "Failed to activate / deactivate.": "Failed to activate / deactivate.",
+        "Process Name:": "Process Name:",
+        "Process ID:": "Process ID:",
+        "Big Walk Trainer": "Big Walk Trainer",
+        "Apply": "Apply",
+        "Always Day": "Always Day",
+        "No Tripping": "No Tripping",
+        "Movement Speed Multiplier": "Movement Speed Multiplier",
+        "Jump Height Multiplier": "Jump Height Multiplier"
+    },
+    "zh_CN": {
+        "简体中文": "简体中文",
+        "Please run the game first.": "请先运行游戏。",
+        "Failed to activate.": "激活失败。",
+        "Failed to activate / deactivate.": "激活 / 停用失败。",
+        "Process Name:": "进程名称：",
+        "Process ID:": "进程 ID:",
+        "Big Walk Trainer": "《大步走》修改器",
+        "Apply": "应用",
+        "Always Day": "永远白天",
+        "No Tripping": "不会摔倒",
+        "Movement Speed Multiplier": "移动速度倍率",
+        "Jump Height Multiplier": "跳跃高度倍率"
+    }
+}
