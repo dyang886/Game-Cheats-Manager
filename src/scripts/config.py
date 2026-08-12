@@ -104,13 +104,11 @@ def load_settings():
         "language": app_locale,
         "uid": str(uuid.uuid4()),
         "theme": "dark",
-        "safePath": True,
         "enSearchResults": False,
         "sortByOrigin": True,
         "checkAppUpdate": True,
         "launchAppOnStartup": False,
         "showWarning": True,
-        "autoUpdateTranslations": True,
         "lastSeenAnnouncementId": "",
 
         # Trainer management configs
@@ -129,7 +127,13 @@ def load_settings():
         "enableCT": True,
         "autoUpdateCTData": True,
         "autoUpdateCTTrainers": True,
+        "launchCTAsAdmin": False,
         "cevoPath": "",
+
+        # Global trainer configs
+        "autoUpdateTranslations": True,
+        "launchAsAdmin": True,
+        "safePath": True,
     }
 
     for key, value in default_settings.items():
@@ -312,3 +316,6 @@ binmay_path = resource_path("dependency/binmay.exe")
 emptyMidi_path = resource_path("dependency/TrainerBGM.mid")
 elevator_path = resource_path("dependency/Elevate.exe")
 updater_path = resource_path("Updater.exe")
+
+ARCHIVE_EXTENSIONS = (".zip", ".rar", ".7z")
+DEFAULT_TRAINER_EXTENSIONS = (".exe", ".ct", ".cetrainer")

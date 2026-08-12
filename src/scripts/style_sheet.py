@@ -21,6 +21,13 @@ white = """
         background-color: #e6e6e6;
     }}
 
+    QToolTip {{
+        background-color: #ffffff;
+        color: #000000;
+        border: 1px solid #c0c0c0;
+        padding: 4px;
+    }}
+
     QMenu {{
         background-color: #ffffff;
         border: 2px solid #000000;
@@ -303,6 +310,13 @@ black = """
 
     QMenuBar::item:selected {{
         background-color: #484848;
+    }}
+
+    QToolTip {{
+        background-color: #1c1c1c;
+        color: #ffffff;
+        border: 1px solid #484848;
+        padding: 4px;
     }}
 
     QMenu {{

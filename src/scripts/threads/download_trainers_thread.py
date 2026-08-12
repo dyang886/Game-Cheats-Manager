@@ -261,7 +261,7 @@ class DownloadTrainersThread(DownloadBaseThread):
             return False
 
         # Extract compressed file and rename
-        if os.path.splitext(trainerTemp)[1] in [".zip", ".rar"]:
+        if os.path.splitext(trainerTemp)[1].lower() in ARCHIVE_EXTENSIONS:
             self.message.emit(tr("Decompressing..."), None)
             try:
                 command = [unzip_path, "x", "-y", trainerTemp, f"-o{DOWNLOAD_TEMP_DIR}"]
@@ -442,15 +442,22 @@ class DownloadTrainersThread(DownloadBaseThread):
 
         return False
 
-    def handle_multi_version_archive(self, extractedContentPath, trainerName_display):
+    def handle_multi_version_archive(self, extractedContentPath, trainerName_display, selected_trainer):
         temp_contents = os.listdir(extractedContentPath)
+        custom_ext = selected_trainer.get("extension", "").strip()
+        if custom_ext.lower() == "none":
+            return False
 
-        # Check if there are any executables (.exe, .ct, .cetrainer, .png) in the root folder
-        has_executable_in_root = any(
-            file.lower().endswith((".exe", ".ct", ".cetrainer", ".png"))
-            for file in temp_contents
-            if os.path.isfile(os.path.join(extractedContentPath, file))
-        )
+        # Check if there is any trainer file in the root folder
+        if "." in custom_ext:
+            has_executable_in_root = os.path.isfile(os.path.join(extractedContentPath, custom_ext))
+        else:
+            target_exts = ("." + custom_ext.lower(),) if custom_ext else DEFAULT_TRAINER_EXTENSIONS
+            has_executable_in_root = any(
+                file.lower().endswith(target_exts)
+                for file in temp_contents
+                if os.path.isfile(os.path.join(extractedContentPath, file))
+            )
 
         folders = [item for item in temp_contents if os.path.isdir(os.path.join(extractedContentPath, item)) and item != "gcm-instructions"]
 
@@ -585,7 +592,7 @@ class DownloadTrainersThread(DownloadBaseThread):
 
         # Extract compressed file if not single exe
         extracted = False
-        if os.path.splitext(trainerTemp)[1] in [".zip", ".rar"]:
+        if os.path.splitext(trainerTemp)[1].lower() in ARCHIVE_EXTENSIONS:
             extracted = True
             self.message.emit(tr("Decompressing..."), None)
             try:
@@ -610,7 +617,7 @@ class DownloadTrainersThread(DownloadBaseThread):
                 self.instructionDst = os.path.join(self.trainerDownloadPath, trainerName_display, "gcm-instructions")
 
             # If the archive contains multiple version folders, split them up into multiple dest folders
-            if not self.handle_multi_version_archive(extractedContentPath, trainerName_display):
+            if not self.handle_multi_version_archive(extractedContentPath, trainerName_display, selected_trainer):
                 destination_path = os.path.join(self.trainerDownloadPath, trainerName_display)
                 self.src_dst.append({"src": extractedContentPath, "dst": destination_path})
         else:

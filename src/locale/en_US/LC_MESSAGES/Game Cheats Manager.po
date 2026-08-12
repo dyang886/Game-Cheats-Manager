@@ -424,17 +424,11 @@ msgstr "Launch app on system startup"
 msgid "Check for software update at startup"
 msgstr "Check for software update at startup"
 
-msgid "Use safe launch path (may fix trainers unable to launch)"
-msgstr "Use safe launch path (may fix trainers unable to launch)"
-
 msgid "Always show search results in English"
 msgstr "Always show search results in English"
 
 msgid "Sort search results by origin"
 msgstr "Sort search results by origin"
-
-msgid "Update trainer translations automatically"
-msgstr "Update trainer translations automatically"
 
 msgid "Apply"
 msgstr "Apply"
@@ -535,8 +529,26 @@ msgstr "Update GCM data automatically"
 msgid "Update GCM and Community trainers automatically"
 msgstr "Update GCM and Community trainers automatically"
 
+msgid "Global Settings"
+msgstr "Global Settings"
+
+msgid "Update trainer translations automatically"
+msgstr "Update trainer translations automatically"
+
+msgid "Launch trainers as administrator"
+msgstr "Launch trainers as administrator"
+
+msgid "Use safe launch path"
+msgstr "Use safe launch path"
+
+msgid "May fix trainers unable to launch"
+msgstr "May fix trainers unable to launch"
+
 msgid "Remove trainer background music"
 msgstr "Remove trainer background music"
+
+msgid "Only works when downloading"
+msgstr "Only works when downloading"
 
 msgid "Update FLiNG data automatically"
 msgstr "Update FLiNG data automatically"
@@ -549,6 +561,9 @@ msgstr "Enable search for XiaoXing trainers"
 
 msgid "Unlock all functions"
 msgstr "Unlock all functions"
+
+msgid "Only works when downloading, and only for some trainers"
+msgstr "Only works when downloading, and only for some trainers"
 
 msgid "Update XiaoXing data automatically"
 msgstr "Update XiaoXing data automatically"
@@ -576,6 +591,9 @@ msgstr "Update Cheat Table data automatically"
 
 msgid "Update Cheat Tables automatically"
 msgstr "Update Cheat Tables automatically"
+
+msgid "Launch Cheat Tables as administrator"
+msgstr "Launch Cheat Tables as administrator"
 
 msgid "Wand installation path:"
 msgstr "Wand installation path:"

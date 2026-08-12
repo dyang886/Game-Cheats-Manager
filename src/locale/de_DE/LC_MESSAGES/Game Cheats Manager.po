@@ -424,17 +424,11 @@ msgstr "App beim Systemstart ausführen"
 msgid "Check for software update at startup"
 msgstr "Beim Start nach Software-Updates suchen"
 
-msgid "Use safe launch path (may fix trainers unable to launch)"
-msgstr "Sicheren Startpfad verwenden (kann Probleme beim Starten von Trainern beheben)"
-
 msgid "Always show search results in English"
 msgstr "Suchergebnisse immer auf Englisch anzeigen"
 
 msgid "Sort search results by origin"
 msgstr "Suchergebnisse nach Herkunft sortieren"
-
-msgid "Update trainer translations automatically"
-msgstr "Trainer-Übersetzungen automatisch aktualisieren"
 
 msgid "Apply"
 msgstr "Anwenden"
@@ -535,8 +529,26 @@ msgstr "GCM-Daten automatisch aktualisieren"
 msgid "Update GCM and Community trainers automatically"
 msgstr "GCM- und Community-Trainer automatisch aktualisieren"
 
+msgid "Global Settings"
+msgstr "Globale Einstellungen"
+
+msgid "Update trainer translations automatically"
+msgstr "Trainer-Übersetzungen automatisch aktualisieren"
+
+msgid "Launch trainers as administrator"
+msgstr "Trainer als Administrator starten"
+
+msgid "Use safe launch path"
+msgstr "Sicheren Startpfad verwenden"
+
+msgid "May fix trainers unable to launch"
+msgstr "Kann Probleme beim Starten von Trainern beheben"
+
 msgid "Remove trainer background music"
 msgstr "Trainer-Hintergrundmusik entfernen"
+
+msgid "Only works when downloading"
+msgstr "Wirkt nur beim Herunterladen"
 
 msgid "Update FLiNG data automatically"
 msgstr "FLiNG-Daten automatisch aktualisieren"
@@ -549,6 +561,9 @@ msgstr "Suche nach XiaoXing-Trainern aktivieren"
 
 msgid "Unlock all functions"
 msgstr "Alle Funktionen freischalten"
+
+msgid "Only works when downloading, and only for some trainers"
+msgstr "Wirkt nur beim Herunterladen und nur bei einigen Trainern"
 
 msgid "Update XiaoXing data automatically"
 msgstr "XiaoXing-Daten automatisch aktualisieren"
@@ -576,6 +591,9 @@ msgstr "Cheat-Table-Daten automatisch aktualisieren"
 
 msgid "Update Cheat Tables automatically"
 msgstr "Cheat Tables automatisch aktualisieren"
+
+msgid "Launch Cheat Tables as administrator"
+msgstr "Cheat Tables als Administrator starten"
 
 msgid "Wand installation path:"
 msgstr "Wand-Installationspfad:"

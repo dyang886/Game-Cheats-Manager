@@ -51,7 +51,7 @@ class GameCheatsManager(QMainWindow):
         self.bilibiliLink = "https://space.bilibili.com/256673766"
 
         # Variable management
-        self.trainerSearchEntryPrompt = tr("Search for installed trainers")
+        self.installedSearchEntryPrompt = tr("Search for installed trainers")
         self.downloadSearchEntryPrompt = tr("Enter keywords to download trainers")
         self.trainerDownloadPath = os.path.normpath(settings["downloadPath"])
 
@@ -153,26 +153,26 @@ class GameCheatsManager(QMainWindow):
         mainLayout.addLayout(trainersLayout, 0, 0)
 
         # Search installed trainers
-        trainerSearchLayout = QHBoxLayout()
-        trainerSearchLayout.setSpacing(10)
-        trainerSearchLayout.setContentsMargins(20, 0, 20, 0)
-        trainersLayout.addLayout(trainerSearchLayout)
+        installedSearchLayout = QHBoxLayout()
+        installedSearchLayout.setSpacing(10)
+        installedSearchLayout.setContentsMargins(20, 0, 20, 0)
+        trainersLayout.addLayout(installedSearchLayout)
 
         searchSvg = '<svg xmlns="http://www.w3.org/2000/svg" height="10" viewBox="0 0 512 512"><path fill="gray" d="M416 208c0 45.9-14.9 88.3-40 122.7L502.6 457.4c12.5 12.5 12.5 32.8 0 45.3s-32.8 12.5-45.3 0L330.7 376c-34.4 25.2-76.8 40-122.7 40C93.1 416 0 322.9 0 208S93.1 0 208 0S416 93.1 416 208zM208 352a144 144 0 1 0 0-288 144 144 0 1 0 0 288z"/></svg>'
         searchSvgWidget = QSvgWidget()
         searchSvgWidget.renderer().load(searchSvg.encode('utf-8'))
         searchSvgWidget.setFixedSize(22, 22)
-        trainerSearchLayout.addWidget(searchSvgWidget)
+        installedSearchLayout.addWidget(searchSvgWidget)
 
-        self.trainerSearchEntry = QLineEdit()
-        trainerSearchLayout.addWidget(self.trainerSearchEntry)
-        self.trainerSearchEntry.setPlaceholderText(self.trainerSearchEntryPrompt)
-        self.trainerSearchEntry.textChanged.connect(self.update_list)
+        self.installedSearchEntry = QLineEdit()
+        installedSearchLayout.addWidget(self.installedSearchEntry)
+        self.installedSearchEntry.setPlaceholderText(self.installedSearchEntryPrompt)
+        self.installedSearchEntry.textChanged.connect(self.update_list)
 
         # Display installed trainers
-        self.flingListBox = MultilingualListWidget()
-        self.flingListBox.itemActivated.connect(self.launch_trainer)
-        trainersLayout.addWidget(self.flingListBox)
+        self.installedListBox = MultilingualListWidget()
+        self.installedListBox.itemActivated.connect(self.launch_trainer)
+        trainersLayout.addWidget(self.installedListBox)
 
         # Launch and delete buttons
         bottomLayout = QHBoxLayout()
@@ -370,44 +370,43 @@ class GameCheatsManager(QMainWindow):
     def disable_all_widgets(self):
         self.downloadSearchEntry.setEnabled(False)
         self.fileDialogButton.setEnabled(False)
-        self.trainerSearchEntry.setEnabled(False)
+        self.installedSearchEntry.setEnabled(False)
         self.launchButton.setEnabled(False)
         self.deleteButton.setEnabled(False)
 
     def enable_all_widgets(self):
         self.downloadSearchEntry.setEnabled(True)
         self.fileDialogButton.setEnabled(True)
-        self.trainerSearchEntry.setEnabled(True)
+        self.installedSearchEntry.setEnabled(True)
         self.launchButton.setEnabled(True)
         self.deleteButton.setEnabled(True)
 
     def update_list(self):
-        search_text = self.trainerSearchEntry.text().lower()
+        search_text = self.installedSearchEntry.text().lower()
         if search_text == "":
             self.show_cheats()
             return
 
-        self.flingListBox.clear()
+        self.installedListBox.clear()
         for trainerName in self.trainers.keys():
             if search_text in trainerName.lower():
-                self.flingListBox.addItem(trainerName)
+                self.installedListBox.addItem(trainerName)
 
     def show_cheats(self):
-        self.flingListBox.clear()
+        self.installedListBox.clear()
         self.trainers = {}
         sort_key_func = sort_trainers_key if settings["sortByOrigin"] else sort_trainers_key_ignore_prefix
         entries = sorted(
             os.scandir(self.trainerDownloadPath),
             key=lambda dirent: sort_key_func(dirent.name)
         )
-        default_extensions = [".exe", ".ct", ".cetrainer"]
 
         for trainer in entries:
             trainerPath = os.path.normpath(trainer.path)
             if os.path.isfile(trainerPath):
                 trainerName, trainerExt = os.path.splitext(os.path.basename(trainerPath))
-                if trainerExt.lower() in default_extensions and os.path.getsize(trainerPath) != 0:
-                    self.flingListBox.addItem(trainerName)
+                if trainerExt.lower() in DEFAULT_TRAINER_EXTENSIONS and os.path.getsize(trainerPath) != 0:
+                    self.installedListBox.addItem(trainerName)
                     self.trainers[trainerName] = trainerPath
             else:
                 exe_exclusions = ["flashplayer_22.0.0.210_ax_debug.exe"]
@@ -415,25 +414,25 @@ class GameCheatsManager(QMainWindow):
 
                 # Check gcm_info.json for custom extension
                 gcm_info_path = os.path.join(trainerPath, "gcm_info.json")
-                custom_ext = None
+                custom_ext = ""
                 if os.path.exists(gcm_info_path):
                     with open(gcm_info_path, 'r', encoding='utf-8') as f:
-                        custom_ext = json.load(f).get("extension")
+                        custom_ext = json.load(f).get("extension", "").strip()
 
                 # Determine target extensions: use custom if specified, otherwise defaults
-                if custom_ext == "none":
-                    self.flingListBox.addItem(trainerName)
+                if custom_ext.lower() == "none":
+                    self.installedListBox.addItem(trainerName)
                     self.trainers[trainerName] = trainerPath
                     continue
 
                 matched_path = None
-                if custom_ext and "." in custom_ext:
+                if "." in custom_ext:
                     # Full filename specified — resolve directly
                     candidate = os.path.normpath(os.path.join(trainerPath, custom_ext))
                     if os.path.isfile(candidate):
                         matched_path = candidate
                 else:
-                    target_exts = ["." + custom_ext] if custom_ext else default_extensions
+                    target_exts = ("." + custom_ext.lower(),) if custom_ext else DEFAULT_TRAINER_EXTENSIONS
                     for ext in target_exts:
                         for file in os.scandir(trainerPath):
                             if file.is_file() and os.path.splitext(file.name)[1].lower() == ext and file.name not in exe_exclusions:
@@ -443,10 +442,10 @@ class GameCheatsManager(QMainWindow):
                             break
 
                 if matched_path:
-                    self.flingListBox.addItem(trainerName)
+                    self.installedListBox.addItem(trainerName)
                     self.trainers[trainerName] = matched_path
                 elif os.path.exists(gcm_info_path):
-                    self.flingListBox.addItem(trainerName)
+                    self.installedListBox.addItem(trainerName)
                     self.trainers[trainerName] = trainerPath
 
     def cleanup_launch_junctions(self):
@@ -565,9 +564,9 @@ class GameCheatsManager(QMainWindow):
 
     def launch_trainer(self):
         try:
-            selection = self.flingListBox.currentRow()
+            selection = self.installedListBox.currentRow()
             if selection != -1:
-                trainerName = self.flingListBox.item(selection).text()
+                trainerName = self.installedListBox.item(selection).text()
                 originalPath = os.path.normpath(self.trainers[trainerName])
 
                 # Folder-only trainer (no launchable file) — open the folder
@@ -585,8 +584,9 @@ class GameCheatsManager(QMainWindow):
                         return
 
                     print(f"Cheat table launch path: {originalPath}")
+                    verb = "runas" if settings["launchCTAsAdmin"] else "open"
                     ctypes.windll.shell32.ShellExecuteW(
-                        None, "runas", ceExecutable, f'"{originalPath}"', os.path.dirname(ceExecutable), 1
+                        None, verb, ceExecutable, f'"{originalPath}"', os.path.dirname(ceExecutable), 1
                     )
                     return
 
@@ -599,7 +599,7 @@ class GameCheatsManager(QMainWindow):
                 trainerDir = os.path.dirname(trainerPath)
 
                 # Use "runas" for exe files (run as admin), "open" for other files (use default app)
-                verb = "runas" if trainerExt == ".exe" else "open"
+                verb = "runas" if settings["launchAsAdmin"] and trainerExt == ".exe" else "open"
                 ctypes.windll.shell32.ShellExecuteW(
                     None, verb, trainerPath, None, trainerDir, 1
                 )
@@ -607,9 +607,9 @@ class GameCheatsManager(QMainWindow):
             print(str(e))
 
     def delete_trainer(self):
-        index = self.flingListBox.currentRow()
+        index = self.installedListBox.currentRow()
         if index != -1:
-            trainerName = self.flingListBox.item(index).text()
+            trainerName = self.installedListBox.item(index).text()
             trainerPath = self.trainers[trainerName]
 
             msg_box = QMessageBox(
@@ -637,7 +637,7 @@ class GameCheatsManager(QMainWindow):
                             shutil.rmtree(parent_dir)
                         else:
                             os.remove(trainerPath)
-                    self.flingListBox.takeItem(index)
+                    self.installedListBox.takeItem(index)
                     self.show_cheats()
                 except PermissionError as e:
                     QMessageBox.critical(self, tr("Error"), tr("Trainer is currently in use, please close any programs using the file and try again."))
@@ -967,7 +967,7 @@ class GameCheatsManager(QMainWindow):
             self.settings_window.show()
 
     def import_files(self):
-        file_names, _ = QFileDialog.getOpenFileNames(self, tr("Select trainers you want to import"), "", "Trainer Files (*.exe *.ct)")
+        file_names, _ = QFileDialog.getOpenFileNames(self, tr("Select trainers you want to import"), "", "Trainer Files (*.exe *.ct *.cetrainer)")
         if file_names:
             for file_name in file_names:
                 try:

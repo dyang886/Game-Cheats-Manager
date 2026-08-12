@@ -424,17 +424,11 @@ msgstr "开机自启"
 msgid "Check for software update at startup"
 msgstr "软件启动时检查更新"
 
-msgid "Use safe launch path (may fix trainers unable to launch)"
-msgstr "使用安全启动路径（可能修复修改器无法启动的问题）"
-
 msgid "Always show search results in English"
 msgstr "始终以英文显示搜索结果"
 
 msgid "Sort search results by origin"
 msgstr "按修改器来源排序"
-
-msgid "Update trainer translations automatically"
-msgstr "自动更新修改器翻译数据"
 
 msgid "Apply"
 msgstr "应用"
@@ -535,8 +529,26 @@ msgstr "自动更新 GCM 数据"
 msgid "Update GCM and Community trainers automatically"
 msgstr "自动更新 GCM 及社区修改器"
 
+msgid "Global Settings"
+msgstr "全局设置"
+
+msgid "Update trainer translations automatically"
+msgstr "自动更新修改器翻译数据"
+
+msgid "Launch trainers as administrator"
+msgstr "以管理员身份启动修改器"
+
+msgid "Use safe launch path"
+msgstr "使用安全启动路径"
+
+msgid "May fix trainers unable to launch"
+msgstr "可能修复修改器无法启动的问题"
+
 msgid "Remove trainer background music"
 msgstr "删除修改器背景音乐"
+
+msgid "Only works when downloading"
+msgstr "下载时生效"
 
 msgid "Update FLiNG data automatically"
 msgstr "自动更新风灵月影数据"
@@ -549,6 +561,9 @@ msgstr "允许搜索小幸修改器"
 
 msgid "Unlock all functions"
 msgstr "解锁所有功能"
+
+msgid "Only works when downloading, and only for some trainers"
+msgstr "下载时生效，仅对部分修改器生效"
 
 msgid "Update XiaoXing data automatically"
 msgstr "自动更新小幸数据"
@@ -576,6 +591,9 @@ msgstr "自动更新 CT 表数据"
 
 msgid "Update Cheat Tables automatically"
 msgstr "自动更新 CT 表"
+
+msgid "Launch Cheat Tables as administrator"
+msgstr "以管理员身份启动 CT 表"
 
 msgid "Wand installation path:"
 msgstr "Wand 安装路径："

@@ -1,9 +1,38 @@
+import math
+
 from PyQt6.QtCore import QEasingCurve, QPropertyAnimation, QRect, QRectF, Qt, QTimer, pyqtSignal
 from PyQt6.QtGui import QColor, QFont, QFontDatabase, QPainter, QPainterPath, QPen, QPixmap
-from PyQt6.QtWidgets import QApplication, QFrame, QGraphicsDropShadowEffect, QHBoxLayout, QLabel, QListWidget, QListWidgetItem, QProxyStyle, QPushButton, QSizePolicy, QStyle, QVBoxLayout, QWidget
+from PyQt6.QtWidgets import QApplication, QComboBox, QFrame, QGraphicsDropShadowEffect, QHBoxLayout, QLabel, QListWidget, QListWidgetItem, QProxyStyle, QPushButton, QSizePolicy, QStyle, QVBoxLayout, QWidget
 from zhon.cedict import simp, trad
 
 from config import *
+
+
+def create_image_label(relative_path, size, alignment=None, tooltip=None, fixed_size=False):
+    """HiDPI aware QLabel with a scaled QPixmap from a relative path."""
+    label = QLabel()
+    ratio = label.devicePixelRatioF()
+    scaled = round(size * ratio)
+
+    pixmap = QPixmap(resource_path(relative_path)).scaled(
+        scaled, scaled, Qt.AspectRatioMode.KeepAspectRatio, Qt.TransformationMode.SmoothTransformation
+    )
+    pixmap.setDevicePixelRatio(ratio)
+    label.setPixmap(pixmap)
+
+    # setPixmap can adjust the ratio, so reserve what Qt ends up painting or it gets clipped
+    painted = label.pixmap()
+    needed = math.ceil(max(painted.width(), painted.height()) / painted.devicePixelRatio())
+    if fixed_size:
+        label.setFixedSize(needed, needed)
+    else:
+        label.setMinimumSize(needed, needed)
+
+    if alignment is not None:
+        label.setAlignment(alignment)
+    if tooltip:
+        label.setToolTip(tooltip)
+    return label
 
 
 class LargerActionIconStyle(QProxyStyle):
@@ -19,8 +48,7 @@ class ToastNotification(QWidget):
     def __init__(self, title, message, notification_type="info"):
         super().__init__()
         theme = settings.get("theme", "dark")
-        header_logo_path = resource_path("assets/logo.ico")
-        body_logo_path = resource_path("assets/logo.png")
+        logo_path = "assets/logo.png"
 
         self.setWindowFlags(
             Qt.WindowType.FramelessWindowHint |
@@ -56,9 +84,7 @@ class ToastNotification(QWidget):
         header_layout = QHBoxLayout()
         header_layout.setSpacing(8)
 
-        self.lbl_logo = QLabel()
-        pixmap = QPixmap(header_logo_path).scaled(16, 16, Qt.AspectRatioMode.KeepAspectRatio, Qt.TransformationMode.SmoothTransformation)
-        self.lbl_logo.setPixmap(pixmap)
+        self.lbl_logo = create_image_label(logo_path, 16)
 
         self.lbl_app_name = QLabel("Game Cheats Manager")
         self.lbl_app_name.setObjectName("AppNameText")
@@ -74,11 +100,7 @@ class ToastNotification(QWidget):
         body_layout.setSpacing(12)
 
         # Body Logo (Left)
-        self.lbl_body_logo = QLabel()
-        self.lbl_body_logo.setFixedSize(64, 64)
-        body_pixmap = QPixmap(body_logo_path).scaled(64, 64, Qt.AspectRatioMode.KeepAspectRatio, Qt.TransformationMode.SmoothTransformation)
-        self.lbl_body_logo.setPixmap(body_pixmap)
-        self.lbl_body_logo.setAlignment(Qt.AlignmentFlag.AlignCenter)
+        self.lbl_body_logo = create_image_label(logo_path, 64, alignment=Qt.AlignmentFlag.AlignCenter, fixed_size=True)
         body_layout.addWidget(self.lbl_body_logo, alignment=Qt.AlignmentFlag.AlignVCenter)
 
         # Text Vertical Layout (Right)
@@ -310,27 +332,52 @@ class StatusMessageWidget(QWidget):
             self.messageLabel.setStyleSheet("QLabel { color: red; }")
 
 
+_multilingual_fonts = {}
+_simplified_chars = set(simp)
+_traditional_only_chars = set(trad) - _simplified_chars
+
+
+def multilingual_font(text):
+    """Font able to render `text`, which may be in a language other than the current UI's."""
+    if not _multilingual_fonts:
+        for lang in ("en_US", "zh_CN", "zh_TW"):
+            families = QFontDatabase.applicationFontFamilies(QFontDatabase.addApplicationFont(font_config[lang]))
+            _multilingual_fonts[lang] = QFont(families[0], 10)
+
+    # Most characters belong to both scripts, so only the traditional-only ones are decisive
+    if any(char in _traditional_only_chars for char in text):
+        return _multilingual_fonts["zh_TW"]
+    if any(char in _simplified_chars for char in text):
+        return _multilingual_fonts["zh_CN"]
+    return _multilingual_fonts["en_US"]
+
+
+class MultilingualComboBox(QComboBox):
+    def __init__(self, parent=None):
+        super().__init__(parent)
+        self.currentIndexChanged.connect(self.apply_current_font)
+
+    def addItem(self, *args, **kwargs):
+        super().addItem(*args, **kwargs)
+        index = self.count() - 1
+        self.setItemData(index, multilingual_font(self.itemText(index)), Qt.ItemDataRole.FontRole)
+
+    def addItems(self, texts):
+        for text in texts:
+            self.addItem(text)
+
+    def apply_current_font(self):
+        self.setFont(multilingual_font(self.currentText()))
+
+
 class MultilingualListWidget(QListWidget):
     _BOUNDED_PROP = "_bounded_to_viewport"
-
-    def __init__(self):
-        super().__init__()
-        self.english_font = QFont(QFontDatabase.applicationFontFamilies(QFontDatabase.addApplicationFont(font_config['en_US']))[0], 10)
-        self.chinese_simplified_font = QFont(QFontDatabase.applicationFontFamilies(QFontDatabase.addApplicationFont(font_config['zh_CN']))[0], 10)
-        self.chinese_traditional_font = QFont(QFontDatabase.applicationFontFamilies(QFontDatabase.addApplicationFont(font_config['zh_TW']))[0], 10)
 
     def addItem(self, item):
         if isinstance(item, str):
             item = QListWidgetItem(item)
 
-        text = item.text()
-        if self.is_chinese_simplified(text):
-            item.setFont(self.chinese_simplified_font)
-        elif self.is_chinese_traditional(text):
-            item.setFont(self.chinese_traditional_font)
-        else:
-            item.setFont(self.english_font)
-
+        item.setFont(multilingual_font(item.text()))
         super().addItem(item)
 
     def setBoundedItemWidget(self, item, widget):
@@ -353,14 +400,6 @@ class MultilingualListWidget(QListWidget):
         max_w = max(0, self.viewport().width() - 6)  # leave breathing room on the right
         widget.setFixedWidth(max_w)
         item.setSizeHint(widget.sizeHint())
-
-    @staticmethod
-    def is_chinese_simplified(text):
-        return any(char in simp for char in text)
-
-    @staticmethod
-    def is_chinese_traditional(text):
-        return any(char in trad for char in text)
 
 
 class SegmentedProgressBar(QWidget):

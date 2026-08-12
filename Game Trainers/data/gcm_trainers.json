@@ -769,10 +769,12 @@
     {
         "game_name": "Assassin's Creed",
         "origin": "ct_other",
+        "author": "宖道",
         "custom_name_en": "Inventory Editor",
         "custom_name_zh": "物品编辑器",
-        "gcm_url": "GCM/GCM Trainers/Assassin's Creed Inventory Editor.ct",
-        "version": "2026.2.27"
+        "official_url": "https://tieba.baidu.com/p/8932283591",
+        "gcm_url": "GCM/GCM Trainers/Assassin's Creed Inventory Editor [HongDao].ct",
+        "version": "2026.4.11"
     },
     {
         "game_name": "Legend of Heroes: Three Kingdoms",
@@ -818,7 +820,7 @@
         "author": "Kilnham",
         "official_url": "https://fearlessrevolution.com/viewtopic.php?t=34980",
         "gcm_url": "GCM/GCM Trainers/Call to Arms - Gates of Hell_Ostfront Trainer [Kilnham].ct",
-        "version": "2026.2.17"
+        "version": "2026.8.4"
     },
     {
         "game_name": "Ebenezer and the Invisible World",
@@ -3458,9 +3460,9 @@
         "game_name": "Elden Ring",
         "origin": "other",
         "author": "Hexinton",
-        "official_url": "https://www.nexusmods.com/eldenring/mods/48, https://www.nexusmods.com/eldenring/mods/8205",
+        "official_url": "https://www.nexusmods.com/eldenring/mods/48, https://www.nexusmods.com/eldenring/mods/74, https://www.nexusmods.com/eldenring/mods/8205",
         "gcm_url": "GCM/GCM Trainers/Elden Ring Trainer [Hexinton].zip",
-        "version": "2026.1.19"
+        "version": "2026.6.19"
     },
     {
         "game_name": "OVERKILL's The Walking Dead",
@@ -4380,5 +4382,132 @@
         "official_url": "https://tieba.baidu.com/p/6496058113",
         "gcm_url": "GCM/GCM Trainers/Madou Koukaku Trainer [ChiGuaQunZhong].ct",
         "version": "2020.2.17"
+    },
+    {
+        "game_name": "CYAN BRAIN",
+        "origin": "ct_other",
+        "author": "FLEXY",
+        "official_url": "https://fearlessrevolution.com/viewtopic.php?t=37952",
+        "gcm_url": "GCM/GCM Trainers/CYAN BRAIN Trainer [FLEXY].ct",
+        "version": "2026.1.15"
+    },
+    {
+        "game_name": "Dying Light 2 Stay Human",
+        "origin": "ct_other",
+        "author": "Synsteric",
+        "official_url": "https://www.nexusmods.com/dyinglight2/mods/1551",
+        "gcm_url": "GCM/GCM Trainers/Dying Light 2 Stay Human Trainer [Synsteric].ct",
+        "version": "2026.6.13"
+    },
+    {
+        "game_name": "Enter the Gungeon",
+        "origin": "other",
+        "author": "camellia2077",
+        "official_url": "https://github.com/camellia2077/ETG-Gameplay-Dashboard",
+        "gcm_url": "GCM/GCM Trainers/Enter the Gungeon Trainer [camellia2077].zip",
+        "extension": "none",
+        "version": "2026.8.8"
+    },
+    {
+        "game_name": "Handyman Fantasy",
+        "origin": "ct_other",
+        "author": "faqqq",
+        "gcm_url": "GCM/GCM Trainers/Handyman Fantasy Trainer [faqqq].ct",
+        "version": "2026.8.3"
+    },
+    {
+        "game_name": "Long Yin Li Zhi Zhuan",
+        "origin": "ct_other",
+        "author": "本宫亮亮",
+        "official_url": "https://github.com/tantk/longyin-cheats, https://space.bilibili.com/2015539784",
+        "gcm_url": "GCM/GCM Trainers/Long Yin Li Zhi Zhuan Trainer [BenGongLiangLiang].ct",
+        "version": "2026.6.4"
+    },
+    {
+        "game_name": "MOUSE: P.I. For Hire",
+        "origin": "ct_other",
+        "author": "LIOBOSS",
+        "official_url": "https://fearlessrevolution.com/viewtopic.php?t=39083",
+        "gcm_url": "GCM/GCM Trainers/MOUSE_P.I. For Hire Trainer [LIOBOSS].zip",
+        "version": "2026.4.17"
+    },
+    {
+        "game_name": "Monster Hunter: World",
+        "origin": "ct_other",
+        "author": "Marcus101RR",
+        "official_url": "https://www.nexusmods.com/monsterhunterworld/mods/2161",
+        "gcm_url": "GCM/GCM Trainers/Monster Hunter_World Trainer [Marcus101RR].zip",
+        "version": "2026.1.25"
+    },
+    {
+        "game_name": "News Tower",
+        "origin": "ct_other",
+        "author": "Destinate",
+        "official_url": "https://fearlessrevolution.com/viewtopic.php?t=37437",
+        "gcm_url": "GCM/GCM Trainers/News Tower Trainer [Destinate].zip",
+        "version": "2025.12.7"
+    },
+    {
+        "game_name": "POSTAL 2",
+        "origin": "other",
+        "author": "KaiFF",
+        "official_url": "https://www.playground.ru/postal_2/cheat/postal_2_paradise_lost_trejner_trainer_5_5000_steam_kaiff-810986",
+        "gcm_url": "GCM/GCM Trainers/POSTAL 2 Trainer [KaiFF].exe",
+        "version": "2015.5.26"
+    },
+    {
+        "game_name": "Grim Dawn",
+        "origin": "other",
+        "author": "iNvIcTUs oRCuS",
+        "official_url": "https://megagames.com/trainers/grim-dawn-original-definitive-edition-v1215-22-trainer-invictus-orcus",
+        "gcm_url": "GCM/GCM Trainers/Grim Dawn Trainer [iNvIcTUs oRCuS].exe",
+        "version": "2025.2.4"
+    },
+    {
+        "game_name": "River Town Factory",
+        "origin": "other",
+        "author": "Y.A.K.E",
+        "official_url": "https://www.getce.cn/show/229.html",
+        "gcm_url": "GCM/GCM Trainers/River Town Factory Trainer [Y.A.K.E].exe",
+        "version": "2023.9.27"
+    },
+    {
+        "game_name": "Metal Slug X",
+        "origin": "other",
+        "author": "gkdls",
+        "gcm_url": "GCM/GCM Trainers/Metal Slug X Trainer [gkdls].zip",
+        "extension": "Metal Slug X Trainer.exe",
+        "version": "2026.8.5"
+    },
+    {
+        "game_name": "METAL GEAR RISING: REVENGEANCE",
+        "origin": "ct_other",
+        "author": "UnIoN",
+        "official_url": "https://dl.3dmgame.com/patch/42298.html",
+        "gcm_url": "GCM/GCM Trainers/METAL GEAR RISING_REVENGEANCE Trainer [UnIoN].ct",
+        "version": "2014.1.15"
+    },
+    {
+        "game_name": "Bejeweled 3",
+        "origin": "other",
+        "author": "ZK",
+        "gcm_url": "GCM/GCM Trainers/Bejeweled 3 Trainer [ZK].exe",
+        "version": "2026.8.5"
+    },
+    {
+        "game_name": "Beast of Reincarnation",
+        "origin": "ct_other",
+        "author": "Patka",
+        "official_url": "https://fearlessrevolution.com/viewtopic.php?t=40294",
+        "gcm_url": "GCM/GCM Trainers/Beast of Reincarnation Trainer [Patka].zip",
+        "version": "2026.8.2"
+    },
+    {
+        "game_name": "Three Kingdoms: Alias",
+        "origin": "other",
+        "author": "扬州小华",
+        "official_url": "https://bbs.3dmgame.com/thread-6686862-1-1.html",
+        "gcm_url": "GCM/GCM Trainers/Three Kingdoms_Alias Trainer [YangZhouXiaoHua].exe",
+        "version": "2026.7.22"
     }
 ]

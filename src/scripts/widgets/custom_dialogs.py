@@ -3,11 +3,11 @@ import sys
 import winreg as reg
 
 from PyQt6.QtCore import Qt
-from PyQt6.QtGui import QIcon, QPixmap
+from PyQt6.QtGui import QIcon
 from PyQt6.QtWidgets import QCheckBox, QComboBox, QDialog, QFileDialog, QHBoxLayout, QLabel, QLineEdit, QMessageBox, QProgressBar, QSizePolicy, QTextEdit, QVBoxLayout
 
 from config import *
-from widgets.custom_widgets import CustomButton
+from widgets.custom_widgets import CustomButton, MultilingualComboBox, create_image_label
 from threads.other_threads import VersionFetchWorker, TrainerUploadWorker
 
 
@@ -90,10 +90,7 @@ class CopyRightWarning(QDialog):
         warningLayout = QHBoxLayout()
         layout.addLayout(warningLayout)
 
-        WarningPixmap = QPixmap(resource_path("assets/warning.png"))
-        scaledWarningPixmap = WarningPixmap.scaled(120, 120, Qt.AspectRatioMode.KeepAspectRatio, Qt.TransformationMode.SmoothTransformation)
-        warningSign = QLabel()
-        warningSign.setPixmap(scaledWarningPixmap)
+        warningSign = create_image_label("assets/warning.png", 120)
         warningLayout.addWidget(warningSign)
 
         warningFont = self.font()
@@ -179,7 +176,7 @@ class SettingsDialog(QDialog):
         languageLabel = QLabel(tr("Language:"))
         languageLabel.setSizePolicy(QSizePolicy.Policy.Fixed, QSizePolicy.Policy.Fixed)
         languageLayout.addWidget(languageLabel)
-        self.languageCombo = QComboBox()
+        self.languageCombo = MultilingualComboBox()
         self.languageCombo.addItems(language_options.keys())
         self.languageCombo.setCurrentText(self.find_settings_key(settings["language"], language_options))
         languageLayout.addWidget(self.languageCombo)
@@ -194,11 +191,6 @@ class SettingsDialog(QDialog):
         self.checkAppUpdateCheckbox.setChecked(settings["checkAppUpdate"])
         settingsWidgetsLayout.addWidget(self.checkAppUpdateCheckbox)
 
-        # Legacy compatibility mode (Safe ASCII Launch)
-        self.safePathCheckbox = QCheckBox(tr("Use safe launch path (may fix trainers unable to launch)"))
-        self.safePathCheckbox.setChecked(settings["safePath"])
-        settingsWidgetsLayout.addWidget(self.safePathCheckbox)
-
         # Always show english
         self.alwaysEnCheckbox = QCheckBox(tr("Always show search results in English"))
         self.alwaysEnCheckbox.setChecked(settings["enSearchResults"])
@@ -208,11 +200,6 @@ class SettingsDialog(QDialog):
         self.sortByOriginCheckbox = QCheckBox(tr("Sort search results by origin"))
         self.sortByOriginCheckbox.setChecked(settings["sortByOrigin"])
         settingsWidgetsLayout.addWidget(self.sortByOriginCheckbox)
-
-        # Auto update translation json
-        self.autoUpdateTranslationsCheckbox = QCheckBox(tr("Update trainer translations automatically"))
-        self.autoUpdateTranslationsCheckbox.setChecked(settings["autoUpdateTranslations"])
-        settingsWidgetsLayout.addWidget(self.autoUpdateTranslationsCheckbox)
 
         # Apply button
         applyButtonLayout = QHBoxLayout()
@@ -249,12 +236,10 @@ class SettingsDialog(QDialog):
 
         settings["theme"] = theme_options[self.themeCombo.currentText()]
         settings["language"] = language_options[self.languageCombo.currentText()]
-        settings["safePath"] = self.safePathCheckbox.isChecked()
         settings["enSearchResults"] = self.alwaysEnCheckbox.isChecked()
         settings["sortByOrigin"] = self.sortByOriginCheckbox.isChecked()
         settings["checkAppUpdate"] = self.checkAppUpdateCheckbox.isChecked()
         settings["launchAppOnStartup"] = self.launchAppOnStarupCheckbox.isChecked()
-        settings["autoUpdateTranslations"] = self.autoUpdateTranslationsCheckbox.isChecked()
         apply_settings(settings)
 
         if sys.argv[0].endswith('.exe'):
@@ -305,11 +290,7 @@ class AboutDialog(QDialog):
         aboutLayout.addLayout(appLayout)
 
         # App logo
-        logoPixmap = QPixmap(resource_path("assets/logo.png"))
-        scaledLogoPixmap = logoPixmap.scaled(120, 120, Qt.AspectRatioMode.KeepAspectRatio, Qt.TransformationMode.SmoothTransformation)
-        logoLabel = QLabel()
-        logoLabel.setAlignment(Qt.AlignmentFlag.AlignCenter)
-        logoLabel.setPixmap(scaledLogoPixmap)
+        logoLabel = create_image_label("assets/logo.png", 120, alignment=Qt.AlignmentFlag.AlignCenter)
         if settings["theme"] == "light":
             logoLabel.setStyleSheet("""
                 border: 2px solid black;
