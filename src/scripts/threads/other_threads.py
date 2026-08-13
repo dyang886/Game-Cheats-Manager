@@ -1,3 +1,4 @@
+import mmap
 import os
 import psutil
 import re
@@ -352,10 +353,12 @@ class WeModCustomization(QThread):
     # Custom WeMod version download: https://storage-cdn.wemod.com/app/releases/stable/WeMod-11.6.0.exe
     # Custom Wand version download: https://storage-cdn.wemod.com/app/releases/stable/Wand-12.0.3.exe
     message = pyqtSignal(str, str)
+    confirmClose = pyqtSignal()
     finished = pyqtSignal()
 
     def __init__(self, weModVersions, weModInstallPath, selectedWeModVersion, patchMethod, parent=None):
         super().__init__(parent)
+        self.close_confirmed = False  # set by the main thread while `confirmClose` blocks
         self.weModVersions = weModVersions
         self.weModInstallPath = weModInstallPath
         self.selectedWeModVersion = selectedWeModVersion
@@ -376,13 +379,19 @@ class WeModCustomization(QThread):
             else:
                 weModExeName = "WeMod.exe"
                 weModExe = weModExe_WeMod
-            weModExe_bak = os.path.join(self.selectedWeModPath, f"{weModExeName}.bak")
 
             # Terminate if WeMod is running
             if self.is_program_running(weModExeName):
-                self.message.emit(tr("Wand is currently running,\nplease close the application first"), "error")
-                self.finished.emit()
-                return
+                self.confirmClose.emit()  # blocks until the user answers
+                if not self.close_confirmed:
+                    self.message.emit(tr("Wand is currently running,\nplease close the application first"), "error")
+                    self.finished.emit()
+                    return
+
+                if not self.close_program(weModExeName):
+                    self.message.emit(tr("Could not close Wand,\nplease close the application manually"), "error")
+                    self.finished.emit()
+                    return
 
             # ===========================================================================
             # Unlock WeMod Pro
@@ -391,9 +400,7 @@ class WeModCustomization(QThread):
 
                 try:
                     # 1. Remove asar integrity check
-                    shutil.copyfile(weModExe, weModExe_bak)
-                    self.replace_hex_in_file(weModExe_bak, weModExe, '00001101', '00000101')
-                    os.remove(weModExe_bak)
+                    self.disable_asar_integrity(weModExe)
 
                     # 2. Patch app.asar
                     os.makedirs(WEMOD_TEMP_DIR, exist_ok=True)
@@ -488,6 +495,22 @@ class WeModCustomization(QThread):
                 pass
         return False
 
+    def close_program(self, program_name, timeout=10):
+        for proc in psutil.process_iter():
+            try:
+                if program_name == proc.name():
+                    proc.kill()
+            except (psutil.NoSuchProcess, psutil.AccessDenied, psutil.ZombieProcess):
+                pass
+
+        deadline = time.time() + timeout
+        while time.time() < deadline:
+            if not self.is_program_running(program_name):
+                return True
+            time.sleep(0.2)
+
+        return False
+
     def apply_patch(self, file_path, pattern, replacement):
         try:
             with open(file_path, 'r+', encoding='utf-8') as file:
@@ -499,12 +522,34 @@ class WeModCustomization(QThread):
         except Exception as e:
             self.message.emit(tr("Failed to patch file:") + f"\n{file_path}", "error")
 
-    def replace_hex_in_file(self, input_file, output_file, search_hex, replace_hex):
-        try:
-            command = [binmay_path, '-i', input_file, '-o', output_file, '-s', f"t:{search_hex}", '-r', f"t:{replace_hex}"]
-            subprocess.run(command, check=True, creationflags=subprocess.CREATE_NO_WINDOW)
-        except Exception as e:
-            self.message.emit(tr("Failed to patch file:") + f"\n{input_file}", "error")
+    def disable_asar_integrity(self, exe_path):
+        """
+        Turn off Electron's asar integrity fuse so a patched app.asar loads.
+        Electron embeds its fuses as [32-byte sentinel][version][fuse count][N fuse chars], each char "0" or "1
+        """
+        FUSE_SENTINEL = b"dL7pKGdnNz796PbbjQWNKmHXBZaB9tsX"
+        FUSE_ASAR_INTEGRITY_INDEX = 4  # EnableEmbeddedAsarIntegrityValidation in the v1 fuse order
+        FUSE_DISABLED = ord("0")
+
+        with open(exe_path, 'r+b') as file:
+            with mmap.mmap(file.fileno(), 0) as mapped:
+                sentinel = mapped.find(FUSE_SENTINEL)
+                if sentinel == -1:
+                    raise Exception("Electron fuse sentinel not found")
+
+                wire_start = sentinel + len(FUSE_SENTINEL) + 2
+                wire_length = mapped[sentinel + len(FUSE_SENTINEL) + 1]
+                if wire_length <= FUSE_ASAR_INTEGRITY_INDEX:
+                    raise Exception(f"Electron fuse wire holds only {wire_length} fuses")
+
+                position = wire_start + FUSE_ASAR_INTEGRITY_INDEX
+                if mapped[position] == FUSE_DISABLED:
+                    print("Asar integrity validation is already disabled")
+                    return False
+
+                mapped[position] = FUSE_DISABLED
+                print("Disabled asar integrity validation")
+                return True
 
     def load_patterns(self, enable_dev):
         if not PATCH_PATTERNS_ENDPOINT or not CLIENT_API_KEY:

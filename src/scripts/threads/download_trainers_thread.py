@@ -156,6 +156,97 @@ class DownloadTrainersThread(DownloadBaseThread):
 
         return message
 
+    def handle_multi_version_archive(self, extractedContentPath, trainerName_display, selected_trainer):
+        # An extension points at one trainer file, so it can never describe a multi-version package
+        if selected_trainer.get("extension", "").strip():
+            return False
+
+        # Instructions at the root belong to the package as a whole, not to a single version
+        if os.path.isdir(os.path.join(extractedContentPath, "gcm-instructions")):
+            return False
+
+        # A multi-version package holds its version folders and nothing else
+        temp_contents = sorted(os.listdir(extractedContentPath))
+        if not temp_contents or not all(os.path.isdir(os.path.join(extractedContentPath, item)) for item in temp_contents):
+            return False
+
+        for folder_name in temp_contents:
+            source_path = os.path.join(extractedContentPath, folder_name)
+            # Add folder name as suffix
+            safe_folder_name = self.symbol_replacement(folder_name.strip())
+            destination_path = os.path.join(self.trainerDownloadPath, f"{trainerName_display} {safe_folder_name}")
+            self.src_dst.append({"src": source_path, "dst": destination_path})
+
+            # Each version may ship its own instructions; the first one found is the one opened
+            if not self.instructionDst and os.path.isdir(os.path.join(source_path, "gcm-instructions")):
+                self.instructionDst = os.path.join(destination_path, "gcm-instructions")
+
+        return True
+
+    def download_default(self, selected_trainer):
+        if self.update_entry:
+            trainerName_display = selected_trainer["trainer_name"]
+            self.message.emit(tr("Updating ") + trainerName_display + "...", None)
+        else:
+            trainerName_display = self.symbol_replacement(selected_trainer["trainer_name"])
+            # Trainer duplication check
+            for trainerPath in self.trainers.keys():
+                if self.symbol_replacement(selected_trainer["trainer_name"]) == os.path.splitext(os.path.basename(trainerPath))[0]:
+                    self.message.emit(tr("Trainer already exists, aborted download."), "failure")
+                    time.sleep(self.download_finish_delay)
+                    self.finished.emit(1)
+                    return False
+
+        self.message.emit(tr("Downloading..."), "download")
+        extractedContentPath = os.path.join(DOWNLOAD_TEMP_DIR, "extracted")
+        try:
+            signed_url = self.get_signed_download_url(selected_trainer['url'], raise_errors=True)
+            trainerTemp = self.request_download(signed_url, DOWNLOAD_TEMP_DIR, raise_errors=True)
+            if not trainerTemp:
+                raise Exception(tr("Internet request failed."))
+
+        except Exception as e:
+            self.message.emit(self.format_request_error(e), "failure")
+            time.sleep(self.download_finish_delay)
+            self.finished.emit(1)
+            return False
+
+        # Extract compressed file if not single exe
+        extracted = False
+        if os.path.splitext(trainerTemp)[1].lower() in ARCHIVE_EXTENSIONS:
+            extracted = True
+            self.message.emit(tr("Decompressing..."), None)
+            try:
+                command = [unzip_path, "x", "-y", trainerTemp, f"-o{extractedContentPath}"]
+                subprocess.run(command, check=True, creationflags=subprocess.CREATE_NO_WINDOW)
+
+            except Exception as e:
+                self.message.emit(tr("An error occurred while extracting downloaded trainer: ") + str(e), "failure")
+                time.sleep(self.download_finish_delay)
+                self.finished.emit(1)
+                return False
+
+            os.remove(trainerTemp)
+
+        if self.update_entry:
+            shutil.rmtree(selected_trainer['trainer_dir'])
+
+        if extracted:
+            # Set instruction destination if gcm-instructions folder present at root
+            instructionsFolder = os.path.join(extractedContentPath, "gcm-instructions")
+            if os.path.isdir(instructionsFolder):
+                self.instructionDst = os.path.join(self.trainerDownloadPath, trainerName_display, "gcm-instructions")
+
+            # If the archive contains multiple version folders, split them up into multiple dest folders
+            if not self.handle_multi_version_archive(extractedContentPath, trainerName_display, selected_trainer):
+                destination_path = os.path.join(self.trainerDownloadPath, trainerName_display)
+                self.src_dst.append({"src": extractedContentPath, "dst": destination_path})
+        else:
+            destination_path = os.path.join(self.trainerDownloadPath, trainerName_display)
+            self.src_dst.append({"src": trainerTemp, "dst": os.path.join(destination_path, os.path.basename(trainerTemp))})
+
+        return True
+
     def modify_fling_settings(self, removeBgMusic):
         # replace bg music in Documents folder
         username = os.getlogin()
@@ -352,142 +443,27 @@ class DownloadTrainersThread(DownloadBaseThread):
 
         return True
 
-    def download_xiaoxing(self, selected_trainer):
-        if self.update_entry:
-            trainerName_display = selected_trainer["trainer_name"]
-            self.message.emit(tr("Updating ") + trainerName_display + "...", None)
-        else:
-            trainerName_display = self.symbol_replacement(selected_trainer["trainer_name"])
-            # Trainer duplication check
-            for trainerPath in self.trainers.keys():
-                if self.symbol_replacement(selected_trainer["trainer_name"]) == os.path.splitext(os.path.basename(trainerPath))[0]:
-                    self.message.emit(tr("Trainer already exists, aborted download."), "failure")
-                    time.sleep(self.download_finish_delay)
-                    self.finished.emit(1)
-                    return False
+    @staticmethod
+    def apply_binary_patch(data, patch):
+        """Masked search and replace over every occurrence"""
+        def parse_pattern(pattern_str):
+            """"8B??E8" -> (b"\\x8b\\x00\\xe8", [True, False, True]); `??` marks a wildcard byte."""
+            tokens = [pattern_str[i:i+2] for i in range(0, len(pattern_str), 2)]
+            values = bytes(0 if token == '??' else int(token, 16) for token in tokens)
+            mask = [token != '??' for token in tokens]
+            return values, mask
 
-        self.message.emit(tr("Downloading..."), "download")
-        extractedContentPath = os.path.join(DOWNLOAD_TEMP_DIR, "extracted")
-        try:
-            signed_url = self.get_signed_download_url(selected_trainer['url'], raise_errors=True)
-            trainerTemp = self.request_download(signed_url, DOWNLOAD_TEMP_DIR, raise_errors=True)
-            if not trainerTemp:
-                raise Exception(tr("Internet request failed."))
+        search, search_mask = parse_pattern(patch['search'])
+        replace, replace_mask = parse_pattern(patch['replace'])
 
-        except Exception as e:
-            self.message.emit(self.format_request_error(e), "failure")
-            time.sleep(self.download_finish_delay)
-            self.finished.emit(1)
-            return False
+        expression = b"".join(re.escape(bytes([byte])) if keep else b"." for byte, keep in zip(search, search_mask))
+        patched = bytearray(data)
+        for match in re.finditer(expression, data, re.DOTALL):
+            for offset, (byte, write) in enumerate(zip(replace, replace_mask)):
+                if write:
+                    patched[match.start() + offset] = byte
 
-        # Extract compressed file
-        self.message.emit(tr("Decompressing..."), None)
-        try:
-            command = [unzip_path, "x", "-y", trainerTemp, f"-o{extractedContentPath}"]
-            subprocess.run(command, check=True, creationflags=subprocess.CREATE_NO_WINDOW)
-
-        except Exception as e:
-            self.message.emit(tr("An error occurred while extracting downloaded trainer: ") + str(e), "failure")
-            time.sleep(self.download_finish_delay)
-            self.finished.emit(1)
-            return False
-
-        os.remove(trainerTemp)
-        if self.update_entry:
-            shutil.rmtree(selected_trainer['trainer_dir'])
-
-        if not self.handle_xiaoxing_special_cases(selected_trainer, extractedContentPath):
-            destination_path = os.path.join(self.trainerDownloadPath, trainerName_display)
-            self.src_dst.append({"src": extractedContentPath, "dst": destination_path})
-
-        if settings["unlockXiaoXing"]:
-            self.unlock_xiaoxing(selected_trainer)
-
-        return True
-
-    def handle_xiaoxing_special_cases(self, selected_trainer, extractedContentPath):
-        # Multiple version case (check if there are only folders and no `.exe` files)
-        # Cases: ['Baldur's Gate 3']
-        temp_contents = os.listdir(extractedContentPath)
-        has_exe = any(file.lower().endswith(".exe") for file in temp_contents if os.path.isfile(os.path.join(extractedContentPath, file)))
-        only_folders = all(os.path.isdir(os.path.join(extractedContentPath, item)) for item in temp_contents)
-
-        if not has_exe and only_folders:
-            for folder_name in temp_contents:
-                source_path = os.path.join(extractedContentPath, folder_name)
-                destination_path = os.path.join(self.trainerDownloadPath, self.symbol_replacement(f"{selected_trainer['trainer_name']} {folder_name}"))
-                self.src_dst.append({"src": source_path, "dst": destination_path})
-            return True
-
-        # Double extraction case (check if there is no `.exe` and a `.rar` file exists)
-        # Cases: ['Sword and Fairy 6']
-        rar_file = next(
-            (file for file in temp_contents if file.lower().endswith(".rar") and os.path.isfile(os.path.join(extractedContentPath, file))),
-            None
-        )
-
-        if not has_exe and rar_file:
-            destination_path = os.path.join(self.trainerDownloadPath, self.symbol_replacement(selected_trainer["trainer_name"]))
-            file_path = os.path.join(extractedContentPath, rar_file)
-            try:
-                command = [unzip_path, "x", "-y", f"-p123", file_path, f"-o{extractedContentPath}"]
-                subprocess.run(command, check=True, creationflags=subprocess.CREATE_NO_WINDOW)
-                os.remove(file_path)
-                self.src_dst.append({"src": extractedContentPath, "dst": destination_path})
-            except Exception as e:
-                self.message.emit(tr("An error occurred while extracting downloaded trainer: ") + str(e), "failure")
-                time.sleep(self.download_finish_delay)
-                self.finished.emit(1)
-            return True
-
-        return False
-
-    def handle_multi_version_archive(self, extractedContentPath, trainerName_display, selected_trainer):
-        temp_contents = os.listdir(extractedContentPath)
-        custom_ext = selected_trainer.get("extension", "").strip()
-        if custom_ext.lower() == "none":
-            return False
-
-        # Check if there is any trainer file in the root folder
-        if "." in custom_ext:
-            has_executable_in_root = os.path.isfile(os.path.join(extractedContentPath, custom_ext))
-        else:
-            target_exts = ("." + custom_ext.lower(),) if custom_ext else DEFAULT_TRAINER_EXTENSIONS
-            has_executable_in_root = any(
-                file.lower().endswith(target_exts)
-                for file in temp_contents
-                if os.path.isfile(os.path.join(extractedContentPath, file))
-            )
-
-        folders = [item for item in temp_contents if os.path.isdir(os.path.join(extractedContentPath, item)) and item != "gcm-instructions"]
-
-        # If gcm-instructions exists at root, this is a single trainer package, not multi-version
-        if os.path.isdir(os.path.join(extractedContentPath, "gcm-instructions")):
-            return False
-
-        if not has_executable_in_root and len(folders) > 0:
-            for folder_name in folders:
-                source_path = os.path.join(extractedContentPath, folder_name)
-                # Add folder name as suffix
-                safe_folder_name = self.symbol_replacement(folder_name.strip())
-                destination_path = os.path.join(self.trainerDownloadPath, f"{trainerName_display} {safe_folder_name}")
-                self.src_dst.append({"src": source_path, "dst": destination_path})
-            return True
-
-        return False
-
-    def process_pattern_to_hex_and_mask(self, pattern_str):
-        hex_bytes = []
-        mask_bytes = []
-        for i in range(0, len(pattern_str), 2):
-            byte = pattern_str[i:i+2]
-            if byte == '??':
-                hex_bytes.append('00')
-                mask_bytes.append('00')
-            else:
-                hex_bytes.append(byte)
-                mask_bytes.append('ff')
-        return " ".join(hex_bytes), " ".join(mask_bytes)
+        return bytes(patched)
 
     def unlock_xiaoxing(self, selected_trainer):
         exe_exclusions = ["flashplayer_22.0.0.210_ax_debug.exe"]
@@ -519,50 +495,33 @@ class DownloadTrainersThread(DownloadBaseThread):
         self.message.emit(tr("Patching..."), None)
         for item in self.src_dst:
             source_dir = item["src"]
-            temp_contents = os.listdir(source_dir)
-
-            exe_file = next((file for file in temp_contents if os.path.isfile(os.path.join(source_dir, file)) and file.lower().endswith(".exe") and file not in exe_exclusions), None)
+            if os.path.isdir(source_dir):
+                temp_contents = os.listdir(source_dir)
+                exe_file = next((file for file in temp_contents if os.path.isfile(os.path.join(source_dir, file)) and file.lower().endswith(".exe") and file not in exe_exclusions), None)
+            else:
+                source_dir, exe_file = os.path.split(source_dir)
+                if not exe_file.lower().endswith(".exe") or exe_file in exe_exclusions:
+                    exe_file = None
 
             if exe_file:
                 original_file = os.path.join(source_dir, exe_file)
-                input_file = f"{original_file}.patch_in"
-                output_file = f"{original_file}.patch_out"
-                backup_file = f"{original_file}.bak"
+                try:
+                    with open(original_file, "rb") as trainer_file:
+                        patched_data = trainer_file.read()
 
-                shutil.copyfile(original_file, backup_file)
-                shutil.copyfile(original_file, input_file)
+                    for i, patch in enumerate(patches_to_apply):
+                        print(f"Applying patch {i + 1}/{len(patches_to_apply)} for: {game_name}")
+                        patched_data = self.apply_binary_patch(patched_data, patch)
 
-                patch_success = True
-                for i, patch in enumerate(patches_to_apply):
-                    print(f"Applying patch {i + 1}/{len(patches_to_apply)} for: {game_name}")
+                    # Written only once every patch succeeded, so a failure leaves the file as is
+                    with open(original_file, "wb") as trainer_file:
+                        trainer_file.write(patched_data)
+                    print(f"Successfully applied all patches to: {exe_file}\n")
 
-                    search_hex, search_mask = self.process_pattern_to_hex_and_mask(patch['search'])
-                    replace_hex, replace_mask = self.process_pattern_to_hex_and_mask(patch['replace'])
+                except Exception as e:
+                    print(f"An error occurred during XiaoXing patching: {e}")
 
-                    try:
-                        command = [binmay_path, '-i', input_file, '-o', output_file, '-s', search_hex, '-S', search_mask, '-r', replace_hex, '-R', replace_mask]
-                        subprocess.run(command, check=True, capture_output=True, text=True, creationflags=subprocess.CREATE_NO_WINDOW)
-
-                        # The output of this patch becomes the input for the next
-                        os.remove(input_file)
-                        os.rename(output_file, input_file)
-
-                    except Exception as e:
-                        print(f"An error occurred during XiaoXing patching: {e}")
-                        shutil.copyfile(backup_file, original_file)
-                        patch_success = False
-                        break
-
-                # Cleanup temporary files
-                if os.path.exists(input_file):
-                    if patch_success:
-                        os.remove(original_file)
-                        os.rename(input_file, original_file)
-                        print(f"Successfully applied all patches to: {exe_file}\n")
-                    else:
-                        os.remove(input_file)
-
-    def download_default(self, selected_trainer):
+    def download_xiaoxing(self, selected_trainer):
         if self.update_entry:
             trainerName_display = selected_trainer["trainer_name"]
             self.message.emit(tr("Updating ") + trainerName_display + "...", None)
@@ -611,11 +570,6 @@ class DownloadTrainersThread(DownloadBaseThread):
             shutil.rmtree(selected_trainer['trainer_dir'])
 
         if extracted:
-            # Set instruction destination if gcm-instructions folder present at root
-            instructionsFolder = os.path.join(extractedContentPath, "gcm-instructions")
-            if os.path.isdir(instructionsFolder):
-                self.instructionDst = os.path.join(self.trainerDownloadPath, trainerName_display, "gcm-instructions")
-
             # If the archive contains multiple version folders, split them up into multiple dest folders
             if not self.handle_multi_version_archive(extractedContentPath, trainerName_display, selected_trainer):
                 destination_path = os.path.join(self.trainerDownloadPath, trainerName_display)
@@ -623,5 +577,8 @@ class DownloadTrainersThread(DownloadBaseThread):
         else:
             destination_path = os.path.join(self.trainerDownloadPath, trainerName_display)
             self.src_dst.append({"src": trainerTemp, "dst": os.path.join(destination_path, os.path.basename(trainerTemp))})
+
+        if settings["unlockXiaoXing"]:
+            self.unlock_xiaoxing(selected_trainer)
 
         return True

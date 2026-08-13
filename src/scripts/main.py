@@ -1,6 +1,7 @@
 import ctypes
 from ctypes import wintypes
 import hashlib
+import json
 import os
 from queue import Queue
 import shutil
@@ -18,13 +19,15 @@ from PyQt6.QtSvg import QSvgRenderer
 from PyQt6.QtSvgWidgets import QSvgWidget
 
 import style_sheet
-from widgets.custom_dialogs import *
-from widgets.custom_widgets import *
-from widgets.trainer_management import *
-from threads.download_display_thread import *
-from threads.download_trainers_thread import *
-from threads.other_threads import *
-from threads.update_trainers_thread import *
+from config import *
+from widgets.custom_dialogs import AboutDialog, AnnouncementDialog, CopyRightWarning, SettingsDialog, TrainerUploadDialog
+from widgets.custom_widgets import CustomButton, LargerActionIconStyle, MultilingualListWidget, SegmentedProgressBar, StatusMessageWidget, ToastNotification
+from widgets.trainer_management import TrainerManagementDialog
+from threads.download_base_thread import DownloadBaseThread
+from threads.download_display_thread import DownloadDisplayThread
+from threads.download_trainers_thread import DownloadTrainersThread
+from threads.other_threads import AnnouncementFetchWorker, FetchCTData, FetchFlingData, FetchGCMData, FetchTrainerTranslations, FetchXiaoXingData, PathChangeThread, VersionFetchWorker
+from threads.update_trainers_thread import UpdateTrainers
 
 
 class GameCheatsManager(QMainWindow):
@@ -339,6 +342,11 @@ class GameCheatsManager(QMainWindow):
         elif settings["theme"] == "light":
             style = style_sheet.white
 
+        # Ties the native title bar to the app theme; it otherwise follows the Windows theme
+        QApplication.styleHints().setColorScheme(
+            Qt.ColorScheme.Dark if settings["theme"] == "dark" else Qt.ColorScheme.Light
+        )
+
         style = style.format(
             check_mark=checkMark_path,
             drop_down_arrow=dropDownArrow_path,
@@ -427,7 +435,7 @@ class GameCheatsManager(QMainWindow):
 
                 matched_path = None
                 if "." in custom_ext:
-                    # Full filename specified — resolve directly
+                    # A file name, optionally nested (e.g. "bin/Trainer.exe") — resolve directly
                     candidate = os.path.normpath(os.path.join(trainerPath, custom_ext))
                     if os.path.isfile(candidate):
                         matched_path = candidate

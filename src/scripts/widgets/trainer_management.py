@@ -623,8 +623,26 @@ class TrainerManagementDialog(QDialog):
 
         self.apply_thread = WeModCustomization(self.weModVersions, weModInstallPath, selectedWeModVersion, patchMethod, self)
         self.apply_thread.message.connect(self.show_alert, Qt.ConnectionType.BlockingQueuedConnection)
+        self.apply_thread.confirmClose.connect(self.confirmCloseWeMod, Qt.ConnectionType.BlockingQueuedConnection)
         self.apply_thread.finished.connect(self.on_finished)
         self.apply_thread.start()
+
+    def confirmCloseWeMod(self):
+        msg_box = QMessageBox(
+            QMessageBox.Icon.Question,
+            tr("Attention"),
+            tr("Wand is currently running and must be closed before patching.") +
+            "\n\n" + tr("Would you like to close it now?"),
+            QMessageBox.StandardButton.Yes | QMessageBox.StandardButton.No,
+            self
+        )
+
+        yes_button = msg_box.button(QMessageBox.StandardButton.Yes)
+        yes_button.setText(tr("Yes"))
+        no_button = msg_box.button(QMessageBox.StandardButton.No)
+        no_button.setText(tr("No"))
+
+        self.apply_thread.close_confirmed = msg_box.exec() == QMessageBox.StandardButton.Yes
 
     def applyCheatEngineCustomization(self):
         self.ceApplyButton.setDisabled(True)

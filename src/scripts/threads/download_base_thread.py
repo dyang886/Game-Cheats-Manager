@@ -6,22 +6,17 @@ import time
 from concurrent.futures import ThreadPoolExecutor
 from urllib.parse import urlparse, unquote
 import uuid
-import warnings
 
-import cloudscraper
 from PyQt6.QtCore import QThread, pyqtSignal
 import requests
-from urllib3.exceptions import InsecureRequestWarning
 
 from config import *
 from search_index import translation_index
 
 _PARALLEL_THRESHOLD = 2 * 1024 * 1024  # skip parallel for files < 2 MB
-_API_TIMEOUT = (3, 15)
-_DOWNLOAD_TIMEOUT = (3, 30)
-_RANGE_DOWNLOAD_TIMEOUT = (3, 60)
-
-warnings.simplefilter("ignore", InsecureRequestWarning)
+_API_TIMEOUT = (5, 15)
+_DOWNLOAD_TIMEOUT = (5, 30)
+_RANGE_DOWNLOAD_TIMEOUT = (5, 60)
 
 
 class DownloadBaseThread(QThread):
@@ -40,15 +35,11 @@ class DownloadBaseThread(QThread):
         super().__init__(parent)
         self.downloaded_file_path = ""
 
-    def request_download(self, url, download_path, verify=True, use_cloudScraper=False, raise_errors=False, atomic=False):
+    def request_download(self, url, download_path, raise_errors=False, atomic=False):
         """Set atomic=True when overwriting a file that may be read concurrently (e.g. the
         database JSONs), so readers never observe a truncated or partially written file."""
         try:
-            if use_cloudScraper:
-                scraper = cloudscraper.create_scraper()
-                req = scraper.get(url, headers=self.headers, verify=verify, stream=True, timeout=_DOWNLOAD_TIMEOUT)
-            else:
-                req = requests.get(url, headers=self.headers, verify=verify, stream=True, timeout=_DOWNLOAD_TIMEOUT)
+            req = requests.get(url, headers=self.headers, stream=True, timeout=_DOWNLOAD_TIMEOUT)
             req.raise_for_status()
         except Exception as e:
             print(f"Error requesting {url}: {str(e)}")
@@ -56,20 +47,23 @@ class DownloadBaseThread(QThread):
                 raise
             return ""
 
-        file_path = os.path.join(download_path, self.find_download_fname(req))
+        # Headers of this first response decide the file name, the size, and how it is fetched.
+        file_path = os.path.join(download_path, os.path.basename(self.find_download_fname(req)))
         total_size = int(req.headers.get('content-length', 0))
         supports_ranges = req.headers.get('accept-ranges', '').lower() == 'bytes'
 
-        if not use_cloudScraper and supports_ranges and total_size >= _PARALLEL_THRESHOLD:
+        # One worker per MB, capped, and only when the server claims to serve byte ranges
+        if supports_ranges and total_size >= _PARALLEL_THRESHOLD:
             num_workers = min(total_size // (1024 * 1024), 6)
         else:
             num_workers = 1
-        return self.download_queued(req, url, file_path, total_size, verify, num_workers, raise_errors, atomic)
+        return self.download_queued(req, url, file_path, total_size, num_workers, raise_errors, atomic)
 
-    def download_queued(self, initial_req, url, file_path, total_size, verify, num_workers, raise_errors=False, atomic=False):
+    def download_queued(self, initial_req, url, file_path, total_size, num_workers, raise_errors=False, atomic=False):
         total_units = min(total_size // (1024 * 1024), 24) if num_workers > 1 else 1
         print(f"[Queue] starting: {total_units} units, {num_workers} workers, {total_size / (1024 * 1024):.1f} MB", flush=True)
 
+        # Split the file into byte ranges workers pull from, or one unit that streams it whole
         unit_queue = queue.Queue()
         if num_workers > 1:
             unit_size = total_size // total_units
@@ -77,7 +71,8 @@ class DownloadBaseThread(QThread):
                 start = i * unit_size
                 end = (i + 1) * unit_size - 1 if i < total_units - 1 else total_size - 1
                 unit_queue.put((i, start, end))
-            initial_req.close()
+            if initial_req is not None:
+                initial_req.close()  # its body is unused, every unit fetches its own range instead
         else:
             unit_queue.put((0, None, None))
 
@@ -92,15 +87,31 @@ class DownloadBaseThread(QThread):
             print(f"[Queue] failed to create file: {e}", flush=True)
             return ""
 
+        # Shared across workers, so every read and write of these goes through downloaded_lock
         total_downloaded = [0]
         completed_units = [0]
         total_failures = [0]
         last_error = [None]
+        ranges_ignored = [False]
         MAX_FAILURES = total_units + 10
         stop_event = threading.Event()
         downloaded_lock = threading.Lock()
         last_emit = [0.0]
         EMIT_INTERVAL = 0.05
+
+        # The initial response is good for one read, so a retry has to ask for the file again
+        first_stream = [initial_req]
+
+        def open_full_stream():
+            resp = requests.get(url, headers=self.headers, stream=True, timeout=_DOWNLOAD_TIMEOUT)
+            resp.raise_for_status()
+            return resp
+
+        def abandon_ranges():
+            """Worth redoing the download without ranges only while nothing has succeeded yet."""
+            if completed_units[0] == 0:
+                ranges_ignored[0] = True
+                stop_event.set()
 
         def emit_progress():
             self.progress.emit([(total_downloaded[0], total_size)])
@@ -113,10 +124,11 @@ class DownloadBaseThread(QThread):
 
         emit_progress()
 
-        def worker(worker_idx):
+        def worker():
             session = requests.Session() if num_workers > 1 else None
             f = open(write_path, 'r+b')
             try:
+                # Workers race for units rather than owning a fixed share, so a slow one holds nobody up
                 while not stop_event.is_set():
                     try:
                         unit_idx, start, end = unit_queue.get_nowait()
@@ -124,31 +136,51 @@ class DownloadBaseThread(QThread):
                         break
 
                     bytes_this_unit = 0
+                    expected_bytes = (end - start + 1) if start is not None else total_size
                     try:
                         if start is not None:
-                            resp = session.get(url, headers={**self.headers, 'Range': f'bytes={start}-{end}'}, verify=verify, stream=True, timeout=_RANGE_DOWNLOAD_TIMEOUT)
+                            resp = session.get(url, headers={**self.headers, 'Range': f'bytes={start}-{end}'}, stream=True, timeout=_RANGE_DOWNLOAD_TIMEOUT)
                             resp.raise_for_status()
+                            # 200 means the range was ignored and the whole file is coming
+                            if resp.status_code != 206:
+                                abandon_ranges()
+                                raise Exception(f"expected 206 for range {start}-{end}, got {resp.status_code}")
+                        elif first_stream[0] is not None:
+                            resp, first_stream[0] = first_stream[0], None
                         else:
-                            resp = initial_req
+                            resp = open_full_stream()
+
+                        # Every unit writes at its own offset, which is why the file is pre-allocated
                         f.seek(start if start is not None else 0)
                         for piece in resp.iter_content(chunk_size=65536):
                             if piece:
+                                # A status code is only a claim, so hold each unit to its byte count
+                                if expected_bytes and bytes_this_unit + len(piece) > expected_bytes:
+                                    if start is not None:
+                                        abandon_ranges()
+                                    raise Exception(f"unit {unit_idx} overran its {expected_bytes} byte slice")
                                 f.write(piece)
                                 bytes_this_unit += len(piece)
                                 with downloaded_lock:
                                     total_downloaded[0] += len(piece)
                                     now = time.monotonic()
-                                    if now - last_emit[0] >= EMIT_INTERVAL:
+                                    if now - last_emit[0] >= EMIT_INTERVAL:  # throttle UI updates
                                         last_emit[0] = now
                                         emit_progress()
+
+                        # A short slice would otherwise leave a silent hole in the file
+                        if expected_bytes and bytes_this_unit != expected_bytes:
+                            raise Exception(f"unit {unit_idx} got {bytes_this_unit} of {expected_bytes} bytes")
                         with downloaded_lock:
                             completed_units[0] += 1
+
                     except Exception as e:
                         with downloaded_lock:
-                            total_downloaded[0] -= bytes_this_unit
+                            total_downloaded[0] -= bytes_this_unit  # uncount it, the unit is redone
                             total_failures[0] += 1
                             last_error[0] = e
                             failures = total_failures[0]
+                        # Failures are pooled, so one hopeless unit cannot retry forever
                         if failures >= MAX_FAILURES:
                             stop_event.set()
                             print(f"[Queue] unit {unit_idx} failed, aborting ({failures}/{MAX_FAILURES} total failures): {e}", flush=True)
@@ -161,8 +193,14 @@ class DownloadBaseThread(QThread):
                     session.close()
 
         with ThreadPoolExecutor(max_workers=num_workers) as executor:
-            for i in range(num_workers):
-                executor.submit(worker, i)
+            for _ in range(num_workers):
+                executor.submit(worker)
+
+        # Ranges were advertised but not honoured, so redo the whole thing in one stream
+        if ranges_ignored[0]:
+            print("[Queue] server ignored range requests, retrying as a single stream", flush=True)
+            discard_partial()
+            return self.download_queued(None, url, file_path, total_size, 1, raise_errors, atomic)
 
         if stop_event.is_set() or completed_units[0] < total_units:
             print(f"[Queue] download failed: {total_failures[0]} total failures", flush=True)

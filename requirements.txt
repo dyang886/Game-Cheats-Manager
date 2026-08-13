@@ -1,4 +1,3 @@
-cloudscraper
 packaging
 polib
 psutil

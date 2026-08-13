@@ -340,6 +340,13 @@ msgstr ""
 "Wand 正在執行中，\n"
 "請先關閉該應用程式"
 
+msgid ""
+"Could not close Wand,\n"
+"please close the application manually"
+msgstr ""
+"無法關閉 Wand，\n"
+"請手動關閉該應用程式"
+
 msgid "Failed to patch file:"
 msgstr "修補文件失敗："
 
@@ -630,6 +637,12 @@ msgstr "已安裝 Cheat Engine"
 
 msgid "Wand not installed"
 msgstr "未安裝 Wand"
+
+msgid "Wand is currently running and must be closed before patching."
+msgstr "Wand 正在執行中，需要先關閉才能進行修改。"
+
+msgid "Would you like to close it now?"
+msgstr "是否立即關閉？"
 
 msgid "To proceed with adding translation files, administrator rights are needed. A User Account Control (UAC) prompt will appear for permission."
 msgstr "若要添加翻譯文件，需要管理員權限。請留意將彈出的使用者帳戶控制（UAC）提示。"

@@ -340,6 +340,13 @@ msgstr ""
 "Wand is currently running,\n"
 "please close the application first"
 
+msgid ""
+"Could not close Wand,\n"
+"please close the application manually"
+msgstr ""
+"Could not close Wand,\n"
+"please close the application manually"
+
 msgid "Failed to patch file:"
 msgstr "Failed to patch file:"
 
@@ -630,6 +637,12 @@ msgstr "Cheat Engine is installed"
 
 msgid "Wand not installed"
 msgstr "Wand not installed"
+
+msgid "Wand is currently running and must be closed before patching."
+msgstr "Wand is currently running and must be closed before patching."
+
+msgid "Would you like to close it now?"
+msgstr "Would you like to close it now?"
 
 msgid "To proceed with adding translation files, administrator rights are needed. A User Account Control (UAC) prompt will appear for permission."
 msgstr "To proceed with adding translation files, administrator rights are needed. A User Account Control (UAC) prompt will appear for permission."
