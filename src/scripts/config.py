@@ -16,7 +16,7 @@ from pypinyin import lazy_pinyin
 from secret_config import *
 
 
-APP_VERSION = "2.5.0-beta.9"
+APP_VERSION = "2.5.0"
 
 
 def parse_version(version):

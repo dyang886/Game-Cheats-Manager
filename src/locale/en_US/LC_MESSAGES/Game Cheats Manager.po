@@ -479,11 +479,11 @@ msgstr "What game does it work for"
 msgid "Trainer Source (Optional):"
 msgstr "Trainer Source (Optional):"
 
-msgid "Original URL or author"
-msgstr "Original URL or author"
+msgid "Original URL and author"
+msgstr "Original URL and author"
 
-msgid "If you made the trainer, please provide your author name"
-msgstr "If you made the trainer, please provide your author name"
+msgid "Please try to fill this in if you can. If you made the trainer, please provide your author name"
+msgstr "Please try to fill this in if you can. If you made the trainer, please provide your author name"
 
 msgid "Trainer File:"
 msgstr "Trainer File:"
@@ -494,8 +494,8 @@ msgstr "Select a trainer file"
 msgid "If the trainer consists of multiple files, please compress them into a single archive (zip/rar/7z) before uploading"
 msgstr "If the trainer consists of multiple files, please compress them into a single archive (zip/rar/7z) before uploading"
 
-msgid "Additional Notes:"
-msgstr "Additional Notes:"
+msgid "Additional Notes (Optional):"
+msgstr "Additional Notes (Optional):"
 
 msgid "Anything else to add..."
 msgstr "Anything else to add..."
@@ -503,8 +503,8 @@ msgstr "Anything else to add..."
 msgid "Please make sure the trainer you are about to upload is tested to be safe and functional."
 msgstr "Please make sure the trainer you are about to upload is tested to be safe and functional."
 
-msgid "For more info about trainer uploading, please join the QQ group to discuss: 186859946."
-msgstr "For more info about trainer uploading, please join the QQ group to discuss: 186859946."
+msgid "Beyond trainers, you can upload other types of files, such as mods, tools, guides, or any other game-related resources. Please ensure instructions are provided for how to use them."
+msgstr "Beyond trainers, you can upload other types of files, such as mods, tools, guides, or any other game-related resources. Please ensure instructions are provided for how to use them."
 
 msgid "Upload"
 msgstr "Upload"

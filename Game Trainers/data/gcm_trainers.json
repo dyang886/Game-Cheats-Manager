@@ -864,12 +864,13 @@
         "author": "简简单单2022",
         "official_url": "https://bbs.3dmgame.com/thread-6653672-1-1.html",
         "gcm_url": "GCM/GCM Trainers/Long Yin Li Zhi Zhuan Trainer [JianJianDanDan2022].ct",
-        "version": "2026.6.12"
+        "version": "2026.7.28"
     },
     {
         "game_name": "Loot of Baal",
         "origin": "ct_other",
-        "gcm_url": "GCM/GCM Trainers/Loot of Baal Trainer.ct",
+        "author": "wzslrb",
+        "gcm_url": "GCM/GCM Trainers/Loot of Baal Trainer [wzslrb].ct",
         "version": "2026.3.4"
     },
     {
@@ -891,13 +892,15 @@
         "game_name": "Swag and Sorcery",
         "origin": "ct_other",
         "gcm_url": "GCM/GCM Trainers/Swag and Sorcery Trainer.ct",
-        "version": "2026.3.4"
+        "version": "2026.2.28"
     },
     {
         "game_name": "Dead Cells",
         "origin": "ct_other",
-        "gcm_url": "GCM/GCM Trainers/Dead Cells Trainer.ct",
-        "version": "2026.3.4"
+        "author": "xx宁静致远",
+        "official_url": "https://bbs.3dmgame.com/thread-6434466-1-1.html",
+        "gcm_url": "GCM/GCM Trainers/Dead Cells Trainer [xxNingJingZhiYuan].ct",
+        "version": "2023.11.12"
     },
     {
         "game_name": "Momodora: Moonlit Farewell",
@@ -1443,7 +1446,7 @@
         "official_url": "https://bbs.3dmgame.com/thread-6658860-1-1.html, https://www.bilibili.com/video/BV1mTPvzuEx1",
         "gcm_url": "GCM/GCM Trainers/Long Yin Li Zhi Zhuan Save Editor [Mizuof].zip",
         "extension": "html",
-        "version": "2026.3.23"
+        "version": "2026.5.20"
     },
     {
         "game_name": "Forza Horizon 4",
@@ -1711,7 +1714,7 @@
         "author": "简简单单2022",
         "official_url": "https://bbs.3dmgame.com/thread-6660842-1-1.html",
         "gcm_url": "GCM/GCM Trainers/Crimson Desert Trainer [JianJianDanDan2022].ct",
-        "version": "2026.7.4"
+        "version": "2026.7.28"
     },
     {
         "game_name": "Cubic Cosmos",

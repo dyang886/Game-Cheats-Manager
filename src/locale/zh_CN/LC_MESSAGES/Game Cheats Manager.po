@@ -479,11 +479,11 @@ msgstr "适用于哪款游戏"
 msgid "Trainer Source (Optional):"
 msgstr "修改器来源（选填）："
 
-msgid "Original URL or author"
-msgstr "原始链接或作者"
+msgid "Original URL and author"
+msgstr "原始链接和作者"
 
-msgid "If you made the trainer, please provide your author name"
-msgstr "如果修改器为自制，请提供你的作者名"
+msgid "Please try to fill this in if you can. If you made the trainer, please provide your author name"
+msgstr "如果可以，请尽量填写。如果修改器为自制，请提供你的作者名"
 
 msgid "Trainer File:"
 msgstr "修改器文件："
@@ -494,8 +494,8 @@ msgstr "选择修改器文件"
 msgid "If the trainer consists of multiple files, please compress them into a single archive (zip/rar/7z) before uploading"
 msgstr "如果修改器包含多个文件，请在上传前将其压缩为单个压缩包 (zip/rar/7z)"
 
-msgid "Additional Notes:"
-msgstr "备注："
+msgid "Additional Notes (Optional):"
+msgstr "备注（选填）："
 
 msgid "Anything else to add..."
 msgstr "其他补充说明..."
@@ -503,8 +503,8 @@ msgstr "其他补充说明..."
 msgid "Please make sure the trainer you are about to upload is tested to be safe and functional."
 msgstr "请确保您上传的修改器已经过测试，安全且可正常使用。"
 
-msgid "For more info about trainer uploading, please join the QQ group to discuss: 186859946."
-msgstr "如需了解更多关于上传修改器的信息，请加入QQ群讨论：186859946。"
+msgid "Beyond trainers, you can upload other types of files, such as mods, tools, guides, or any other game-related resources. Please ensure instructions are provided for how to use them."
+msgstr "除修改器外，您还可以上传其他类型的文件，例如模组、工具、攻略或任何其他与游戏相关的资源。请确保附上相应的使用说明。"
 
 msgid "Upload"
 msgstr "上传"

@@ -4,7 +4,7 @@ import winreg as reg
 
 from PyQt6.QtCore import Qt
 from PyQt6.QtGui import QIcon
-from PyQt6.QtWidgets import QCheckBox, QComboBox, QDialog, QFileDialog, QHBoxLayout, QLabel, QLineEdit, QMessageBox, QProgressBar, QSizePolicy, QTextEdit, QVBoxLayout
+from PyQt6.QtWidgets import QCheckBox, QComboBox, QDialog, QFileDialog, QHBoxLayout, QLabel, QLayout, QLineEdit, QMessageBox, QProgressBar, QSizePolicy, QTextEdit, QVBoxLayout
 
 from config import *
 from widgets.custom_widgets import CustomButton, MultilingualComboBox, create_image_label
@@ -407,6 +407,9 @@ class AboutDialog(QDialog):
 
 
 class TrainerUploadDialog(QDialog):
+    _SECTION_SPACING = 20
+    _FIELD_SPACING = 5
+
     def __init__(self, parent=None):
         super().__init__(parent)
         self.worker = None
@@ -415,59 +418,34 @@ class TrainerUploadDialog(QDialog):
         self.setMinimumWidth(500)
 
         layout = QVBoxLayout()
-        layout.setSpacing(20)
+        layout.setSpacing(self._SECTION_SPACING)
         layout.setContentsMargins(30, 30, 30, 30)
         self.setLayout(layout)
 
         # Contact Info
-        contactLayout = QVBoxLayout()
-        contactLayout.setSpacing(5)
-        contactLayout.addWidget(QLabel(tr("Contact Info (Optional):")))
         self.contactEdit = QLineEdit()
         self.contactEdit.setPlaceholderText(tr("Email"))
-        contactLayout.addWidget(self.contactEdit)
-
-        contact_info_label = QLabel(tr("If you provide your Game-Zone Labs account email and your trainer is approved, a badge will be added to your account"))
-        contact_info_font = contact_info_label.font()
-        contact_info_font.setPointSize(9)
-        contact_info_label.setFont(contact_info_font)
-        contact_info_label.setStyleSheet("color: gray;")
-        contact_info_label.setWordWrap(True)
-        contactLayout.addWidget(contact_info_label)
-        layout.addLayout(contactLayout)
+        layout.addLayout(self.field_group(
+            tr("Contact Info (Optional):"),
+            self.contactEdit,
+            tr("If you provide your Game-Zone Labs account email and your trainer is approved, a badge will be added to your account")
+        ))
 
         # Trainer Name
-        nameLayout = QVBoxLayout()
-        nameLayout.setSpacing(5)
-        nameLayout.addWidget(QLabel(tr("Trainer Name:")))
         self.nameEdit = QLineEdit()
         self.nameEdit.setPlaceholderText(tr("What game does it work for"))
-        nameLayout.addWidget(self.nameEdit)
-        layout.addLayout(nameLayout)
+        layout.addLayout(self.field_group(tr("Trainer Name:"), self.nameEdit))
 
         # Trainer Source
-        sourceLayout = QVBoxLayout()
-        sourceLayout.setSpacing(5)
-        sourceLayout.addWidget(QLabel(tr("Trainer Source (Optional):")))
         self.sourceEdit = QLineEdit()
-        self.sourceEdit.setPlaceholderText(tr("Original URL or author"))
-        sourceLayout.addWidget(self.sourceEdit)
-
-        source_info_label = QLabel(tr("If you made the trainer, please provide your author name"))
-        source_info_font = source_info_label.font()
-        source_info_font.setPointSize(9)
-        source_info_label.setFont(source_info_font)
-        source_info_label.setStyleSheet("color: gray;")
-        source_info_label.setWordWrap(True)
-        sourceLayout.addWidget(source_info_label)
-        layout.addLayout(sourceLayout)
+        self.sourceEdit.setPlaceholderText(tr("Original URL and author"))
+        layout.addLayout(self.field_group(
+            tr("Trainer Source (Optional):"),
+            self.sourceEdit,
+            tr("Please try to fill this in if you can. If you made the trainer, please provide your author name")
+        ))
 
         # Trainer File Selection
-        fileLabelLayout = QVBoxLayout()
-        fileLabelLayout.setSpacing(5)
-        fileLabelLayout.addWidget(QLabel(tr("Trainer File:")))
-
-        fileSelectLayout = QHBoxLayout()
         self.fileEdit = QLineEdit()
         self.fileEdit.setReadOnly(True)
         self.fileEdit.setPlaceholderText(tr("Select a trainer file") + "...")
@@ -475,49 +453,36 @@ class TrainerUploadDialog(QDialog):
         self.browseButton = CustomButton("...")
         self.browseButton.clicked.connect(self.browse_file)
 
+        fileSelectLayout = QHBoxLayout()
+        fileSelectLayout.setSpacing(self._FIELD_SPACING)
         fileSelectLayout.addWidget(self.fileEdit)
         fileSelectLayout.addWidget(self.browseButton)
-        fileLabelLayout.addLayout(fileSelectLayout)
 
-        info_label = QLabel(tr("If the trainer consists of multiple files, please compress them into a single archive (zip/rar/7z) before uploading"))
-        info_font = info_label.font()
-        info_font.setPointSize(9)
-        info_label.setFont(info_font)
-        info_label.setStyleSheet("color: gray;")
-        info_label.setWordWrap(True)
-        fileLabelLayout.addWidget(info_label)
-        layout.addLayout(fileLabelLayout)
+        layout.addLayout(self.field_group(
+            tr("Trainer File:"),
+            fileSelectLayout,
+            tr("If the trainer consists of multiple files, please compress them into a single archive (zip/rar/7z) before uploading")
+        ))
 
         # Notes
-        notesLayout = QVBoxLayout()
-        notesLayout.setSpacing(5)
-        notesLayout.addWidget(QLabel(tr("Additional Notes:")))
         self.notesEdit = QTextEdit()
         self.notesEdit.setPlaceholderText(tr("Anything else to add..."))
-        self.notesEdit.setMaximumHeight(100)
-        self.notesEdit.setSizePolicy(QSizePolicy.Policy.Expanding, QSizePolicy.Policy.Fixed)
-        notesLayout.addWidget(self.notesEdit)
-
-        notes_info_label = QLabel(
+        self.notesEdit.setMinimumHeight(100)
+        self.notesEdit.setSizePolicy(QSizePolicy.Policy.Expanding, QSizePolicy.Policy.Expanding)
+        layout.addLayout(self.field_group(
+            tr("Additional Notes (Optional):"),
+            self.notesEdit,
             tr("Please make sure the trainer you are about to upload is tested to be safe and functional.") + "\n" +
-            tr("For more info about trainer uploading, please join the QQ group to discuss: 186859946.")
-        )
-        notes_info_font = notes_info_label.font()
-        notes_info_font.setPointSize(9)
-        notes_info_label.setFont(notes_info_font)
-        notes_info_label.setStyleSheet("color: gray;")
-        notes_info_label.setWordWrap(True)
-        notesLayout.addWidget(notes_info_label)
-        layout.addLayout(notesLayout)
+            tr("Beyond trainers, you can upload other types of files, such as mods, tools, guides, or any other game-related resources. Please ensure instructions are provided for how to use them."),
+            stretch=1
+        ), 1)
 
-        # Progress Bar
+        # Progress Bar, hidden until an upload starts so it costs no space until then
         self.progressBar = QProgressBar()
         self.progressBar.setRange(0, 100)
         self.progressBar.setValue(0)
         self.progressBar.setVisible(False)
         layout.addWidget(self.progressBar)
-
-        layout.addStretch()
 
         # Buttons
         buttonLayout = QHBoxLayout()
@@ -529,6 +494,35 @@ class TrainerUploadDialog(QDialog):
 
         buttonLayout.addWidget(self.uploadButton)
         layout.addLayout(buttonLayout)
+
+        self.fit_height()
+        self.resize(self.minimumWidth(), self.minimumHeight())
+
+    def field_group(self, title, field, hint=None, stretch=0):
+        """A label, its input and an optional gray hint"""
+        group = QVBoxLayout()
+        group.setSpacing(self._FIELD_SPACING)
+        group.addWidget(QLabel(title))
+
+        if isinstance(field, QLayout):
+            group.addLayout(field, stretch)
+        else:
+            group.addWidget(field, stretch)
+
+        if hint:
+            hintLabel = QLabel(hint)
+            hintFont = hintLabel.font()
+            hintFont.setPointSize(9)
+            hintLabel.setFont(hintFont)
+            hintLabel.setStyleSheet("color: gray;")
+            hintLabel.setWordWrap(True)
+            group.addWidget(hintLabel)
+
+        return group
+
+    def fit_height(self):
+        """Keep the dialog tall enough for its content"""
+        self.setMinimumHeight(self.layout().minimumHeightForWidth(self.minimumWidth()))
 
     def browse_file(self):
         default_dir = settings.get("downloadPath", "")
@@ -559,6 +553,7 @@ class TrainerUploadDialog(QDialog):
         self.set_ui_locked(True)
         self.progressBar.setValue(0)
         self.progressBar.setVisible(True)
+        self.fit_height()
 
         self.worker = TrainerUploadWorker(
             file_path,
@@ -576,6 +571,7 @@ class TrainerUploadDialog(QDialog):
 
     def handle_upload_finished(self, success, message):
         self.progressBar.setVisible(False)
+        self.fit_height()
         self.set_ui_locked(False)
 
         if success:

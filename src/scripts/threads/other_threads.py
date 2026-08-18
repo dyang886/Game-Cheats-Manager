@@ -560,7 +560,6 @@ class WeModCustomization(QThread):
         params = {
             'patchMethod': self.patchMethod,
             'enableDev': 'true' if enable_dev else 'false',
-            'clientVersion': APP_VERSION,
             **get_client_params()
         }
         response = None

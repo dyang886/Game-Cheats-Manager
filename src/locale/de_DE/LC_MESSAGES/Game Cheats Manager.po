@@ -479,11 +479,11 @@ msgstr "Für welches Spiel ist er gedacht"
 msgid "Trainer Source (Optional):"
 msgstr "Trainer-Quelle (Optional):"
 
-msgid "Original URL or author"
-msgstr "Original-URL oder Autor"
+msgid "Original URL and author"
+msgstr "Original-URL und Autor"
 
-msgid "If you made the trainer, please provide your author name"
-msgstr "Wenn du den Trainer selbst erstellt hast, gib bitte deinen Autorennamen an"
+msgid "Please try to fill this in if you can. If you made the trainer, please provide your author name"
+msgstr "Bitte fülle dies nach Möglichkeit aus. Wenn du den Trainer selbst erstellt hast, gib bitte deinen Autorennamen an"
 
 msgid "Trainer File:"
 msgstr "Trainer-Datei:"
@@ -494,8 +494,8 @@ msgstr "Trainer-Datei auswählen"
 msgid "If the trainer consists of multiple files, please compress them into a single archive (zip/rar/7z) before uploading"
 msgstr "Falls der Trainer aus mehreren Dateien besteht, komprimieren Sie diese bitte vor dem Hochladen in ein einzelnes Archiv (zip/rar/7z)"
 
-msgid "Additional Notes:"
-msgstr "Zusätzliche Anmerkungen:"
+msgid "Additional Notes (Optional):"
+msgstr "Zusätzliche Anmerkungen (Optional):"
 
 msgid "Anything else to add..."
 msgstr "Sonstige Ergänzungen..."
@@ -503,8 +503,8 @@ msgstr "Sonstige Ergänzungen..."
 msgid "Please make sure the trainer you are about to upload is tested to be safe and functional."
 msgstr "Bitte stellen Sie sicher, dass der Trainer, den Sie hochladen möchten, getestet, sicher und funktionsfähig ist."
 
-msgid "For more info about trainer uploading, please join the QQ group to discuss: 186859946."
-msgstr "Für weitere Informationen zum Hochladen von Trainern tritt bitte der QQ-Gruppe bei: 186859946."
+msgid "Beyond trainers, you can upload other types of files, such as mods, tools, guides, or any other game-related resources. Please ensure instructions are provided for how to use them."
+msgstr "Neben Trainern kannst du auch andere Arten von Dateien hochladen, etwa Mods, Tools, Anleitungen oder sonstige spielbezogene Ressourcen. Bitte stelle sicher, dass eine Anleitung zur Verwendung beiliegt."
 
 msgid "Upload"
 msgstr "Hochladen"

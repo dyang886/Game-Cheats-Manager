@@ -288,11 +288,12 @@ class DownloadBaseThread(QThread):
         }
         params = {
             'filePath': file_path_on_s3,
-            'metadata': metadata_json
+            'metadata': metadata_json,
+            **get_client_params()
         }
 
         try:
-            response = requests.get(SIGNED_URL_UPLOAD_ENDPOINT, headers=headers, params=params, timeout=15)
+            response = requests.get(SIGNED_URL_UPLOAD_ENDPOINT, headers=headers, params=params, timeout=_API_TIMEOUT)
             response.raise_for_status()
             return response.json()
 

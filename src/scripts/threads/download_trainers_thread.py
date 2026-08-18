@@ -14,6 +14,7 @@ from threads.download_base_thread import DownloadBaseThread
 
 class DownloadTrainersThread(DownloadBaseThread):
     ceInstalled = pyqtSignal(str)
+    installed = pyqtSignal(list)  # names of the trainer folders this download created
 
     def __init__(self, index, trainers, trainerDownloadPath, update_entry, parent=None):
         super().__init__(parent)
@@ -101,6 +102,7 @@ class DownloadTrainersThread(DownloadBaseThread):
             if result:
                 if self.is_cheat_engine_package(selected_trainer):
                     self.report_cheat_engine_install()
+                self.installed.emit(self.installed_trainer_names())
                 self.message.emit(tr("Download success!"), "success")
                 time.sleep(self.download_finish_delay)
                 self.finished.emit(0)
@@ -155,6 +157,15 @@ class DownloadTrainersThread(DownloadBaseThread):
             )
 
         return message
+
+    def installed_trainer_names(self):
+        names = []
+        for item in self.src_dst:
+            relative = os.path.relpath(item["dst"], self.trainerDownloadPath)
+            name = os.path.splitext(relative.split(os.sep)[0])[0]
+            if name not in names:
+                names.append(name)
+        return names
 
     def handle_multi_version_archive(self, extractedContentPath, trainerName_display, selected_trainer):
         # An extension points at one trainer file, so it can never describe a multi-version package

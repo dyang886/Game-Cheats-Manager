@@ -66,6 +66,7 @@ class GameCheatsManager(QMainWindow):
         self.downloadProgressLabel = None
         self.currentlyDownloading = False
         self.downloadingCE = False  # Cheat Engine download queued or in progress
+        self.lastInstalledTrainers = []  # highlighted in the installed list once the download ends
         self.currentlyUpdatingTrainers = False
         self.currentlyUpdatingGCM = False
         self.currentlyUpdatingFling = False
@@ -815,6 +816,7 @@ class GameCheatsManager(QMainWindow):
             if self.is_ce_download(index, update_entry):
                 download_thread.finished.connect(self.on_cheat_engine_finished)
             download_thread.progress.connect(self.on_download_progress)
+            download_thread.installed.connect(self.on_trainers_installed)
             download_thread.finished.connect(self.on_download_finished)
             download_thread.start()
         else:
@@ -929,11 +931,18 @@ class GameCheatsManager(QMainWindow):
     def on_cheat_engine_finished(self, status):
         self.downloadingCE = False
 
+    def on_trainers_installed(self, trainerNames):
+        self.lastInstalledTrainers = trainerNames
+
     def on_download_finished(self, status):
         self.downloadable = False
         self.searchable = True
         self.enable_download_widgets()
         self.show_cheats()
+        # Point out what just arrived, since the list is sorted and it can land anywhere
+        if self.lastInstalledTrainers:
+            self.installedListBox.flash_items(self.lastInstalledTrainers)
+            self.lastInstalledTrainers = []
         self.currentlyDownloading = False
         self.start_next_download()
 

@@ -1,8 +1,8 @@
 import math
 
-from PyQt6.QtCore import QEasingCurve, QPropertyAnimation, QRect, QRectF, Qt, QTimer, pyqtSignal
+from PyQt6.QtCore import QEasingCurve, QPropertyAnimation, QRect, QRectF, Qt, QTimer, QVariantAnimation, pyqtSignal
 from PyQt6.QtGui import QColor, QFont, QFontDatabase, QPainter, QPainterPath, QPen, QPixmap
-from PyQt6.QtWidgets import QApplication, QComboBox, QFrame, QGraphicsDropShadowEffect, QHBoxLayout, QLabel, QListWidget, QListWidgetItem, QProxyStyle, QPushButton, QSizePolicy, QStyle, QVBoxLayout, QWidget
+from PyQt6.QtWidgets import QApplication, QComboBox, QFrame, QGraphicsDropShadowEffect, QHBoxLayout, QLabel, QListWidget, QListWidgetItem, QProxyStyle, QPushButton, QSizePolicy, QStyle, QStyledItemDelegate, QVBoxLayout, QWidget
 from zhon.cedict import simp, trad
 
 from config import *
@@ -370,8 +370,58 @@ class MultilingualComboBox(QComboBox):
         self.setFont(multilingual_font(self.currentText()))
 
 
+class FlashHighlightDelegate(QStyledItemDelegate):
+    """Washes chosen rows with the accent color, fading out over time. Painted on top of
+    the item because the QListWidget::item style rules override any background set on it."""
+
+    def __init__(self, parent=None):
+        super().__init__(parent)
+        self.rows = set()
+        self.alpha = 0
+
+    def paint(self, painter, option, index):
+        super().paint(painter, option, index)
+        if self.alpha and index.row() in self.rows:
+            color = QColor("#0080e3")
+            color.setAlpha(self.alpha)
+            painter.fillRect(option.rect, color)
+
+
 class MultilingualListWidget(QListWidget):
     _BOUNDED_PROP = "_bounded_to_viewport"
+    _FLASH_ALPHA = 110
+    _FLASH_DURATION = 1800
+
+    def flash_items(self, names, scroll_to_first=True):
+        """Briefly highlight the named rows, scrolling the first one into view."""
+        rows = [i for i in range(self.count()) if self.item(i).text() in names]
+        if not rows:
+            return
+
+        if scroll_to_first:
+            self.scrollToItem(self.item(rows[0]), QListWidget.ScrollHint.PositionAtCenter)
+
+        if not isinstance(self.itemDelegate(), FlashHighlightDelegate):
+            self.setItemDelegate(FlashHighlightDelegate(self))
+        delegate = self.itemDelegate()
+        delegate.rows = set(rows)
+
+        if getattr(self, "_flash_animation", None):
+            self._flash_animation.stop()
+        animation = QVariantAnimation(self)
+        animation.setDuration(self._FLASH_DURATION)
+        animation.setStartValue(self._FLASH_ALPHA)
+        animation.setEndValue(0)
+        animation.setEasingCurve(QEasingCurve.Type.InQuad)  # holds, then fades away quickly
+
+        def apply(value):
+            delegate.alpha = int(value)
+            self.viewport().update()
+
+        animation.valueChanged.connect(apply)
+        animation.finished.connect(lambda: delegate.rows.clear())
+        self._flash_animation = animation
+        animation.start()
 
     def addItem(self, item):
         if isinstance(item, str):
