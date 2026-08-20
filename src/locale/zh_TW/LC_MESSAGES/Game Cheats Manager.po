@@ -82,8 +82,8 @@ msgstr "修改器下載路徑："
 msgid "Failure"
 msgstr "失敗"
 
-msgid "Failed to update application."
-msgstr "軟體更新失敗。"
+msgid "Failed to update application"
+msgstr "軟體更新失敗"
 
 msgid "Update Available"
 msgstr "可用更新"
@@ -287,6 +287,9 @@ msgstr "刪除修改器背景音樂..."
 msgid "Patching..."
 msgstr "打補丁中..."
 
+msgid "Preparing update"
+msgstr "正在準備更新"
+
 msgid "Update from GCM failed"
 msgstr "更新 GCM 資料失敗"
 
@@ -461,44 +464,44 @@ msgstr "立即更新"
 msgid "Failed to load"
 msgstr "載入失敗"
 
-msgid "Contact Info (Optional):"
-msgstr "聯絡方式（選填）："
-
 msgid "Email"
 msgstr "電子郵箱"
+
+msgid "Contact Info (Optional):"
+msgstr "聯絡方式（選填）："
 
 msgid "If you provide your Game-Zone Labs account email and your trainer is approved, a badge will be added to your account"
 msgstr "如果您填寫 Game-Zone Labs 帳號郵箱，且上傳的修改器通過審核，您的帳號將獲得一枚徽章"
 
-msgid "Trainer Name:"
-msgstr "修改器名稱："
-
 msgid "What game does it work for"
 msgstr "適用於哪款遊戲"
 
-msgid "Trainer Source (Optional):"
-msgstr "修改器來源（選填）："
+msgid "Trainer Name:"
+msgstr "修改器名稱："
 
 msgid "Original URL and author"
 msgstr "原始連結和作者"
 
+msgid "Trainer Source (Optional):"
+msgstr "修改器來源（選填）："
+
 msgid "Please try to fill this in if you can. If you made the trainer, please provide your author name"
 msgstr "如果可以，請盡量填寫。如果修改器為自製，請提供你的作者名"
-
-msgid "Trainer File:"
-msgstr "修改器檔案："
 
 msgid "Select a trainer file"
 msgstr "選擇修改器檔案"
 
+msgid "Trainer File:"
+msgstr "修改器檔案："
+
 msgid "If the trainer consists of multiple files, please compress them into a single archive (zip/rar/7z) before uploading"
 msgstr "如果修改器包含多個檔案，請在上傳前將其壓縮為單個壓縮檔 (zip/rar/7z)"
 
-msgid "Additional Notes (Optional):"
-msgstr "備註（選填）："
-
 msgid "Anything else to add..."
 msgstr "其他補充說明..."
+
+msgid "Additional Notes (Optional):"
+msgstr "備註（選填）："
 
 msgid "Please make sure the trainer you are about to upload is tested to be safe and functional."
 msgstr "請確保您上傳的修改器已經過測試，安全且可正常使用。"

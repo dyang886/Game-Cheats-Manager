@@ -82,8 +82,8 @@ msgstr "Trainer-Download-Pfad:"
 msgid "Failure"
 msgstr "Fehler"
 
-msgid "Failed to update application."
-msgstr "Anwendung konnte nicht aktualisiert werden."
+msgid "Failed to update application"
+msgstr "Anwendung konnte nicht aktualisiert werden"
 
 msgid "Update Available"
 msgstr "Update verfügbar"
@@ -287,6 +287,9 @@ msgstr "Hintergrundmusik des Trainers wird entfernt..."
 msgid "Patching..."
 msgstr "Patchen..."
 
+msgid "Preparing update"
+msgstr "Update wird vorbereitet"
+
 msgid "Update from GCM failed"
 msgstr "Update von GCM fehlgeschlagen"
 
@@ -461,44 +464,44 @@ msgstr "Jetzt aktualisieren"
 msgid "Failed to load"
 msgstr "Laden fehlgeschlagen"
 
-msgid "Contact Info (Optional):"
-msgstr "Kontaktdaten (Optional):"
-
 msgid "Email"
 msgstr "E-Mail"
+
+msgid "Contact Info (Optional):"
+msgstr "Kontaktdaten (Optional):"
 
 msgid "If you provide your Game-Zone Labs account email and your trainer is approved, a badge will be added to your account"
 msgstr "Wenn Sie Ihre Game-Zone Labs-Konto-E-Mail angeben und Ihr Trainer genehmigt wird, erhalten Sie ein Abzeichen auf Ihrem Konto"
 
-msgid "Trainer Name:"
-msgstr "Trainer-Name:"
-
 msgid "What game does it work for"
 msgstr "Für welches Spiel ist er gedacht"
 
-msgid "Trainer Source (Optional):"
-msgstr "Trainer-Quelle (Optional):"
+msgid "Trainer Name:"
+msgstr "Trainer-Name:"
 
 msgid "Original URL and author"
 msgstr "Original-URL und Autor"
 
+msgid "Trainer Source (Optional):"
+msgstr "Trainer-Quelle (Optional):"
+
 msgid "Please try to fill this in if you can. If you made the trainer, please provide your author name"
 msgstr "Bitte fülle dies nach Möglichkeit aus. Wenn du den Trainer selbst erstellt hast, gib bitte deinen Autorennamen an"
-
-msgid "Trainer File:"
-msgstr "Trainer-Datei:"
 
 msgid "Select a trainer file"
 msgstr "Trainer-Datei auswählen"
 
+msgid "Trainer File:"
+msgstr "Trainer-Datei:"
+
 msgid "If the trainer consists of multiple files, please compress them into a single archive (zip/rar/7z) before uploading"
 msgstr "Falls der Trainer aus mehreren Dateien besteht, komprimieren Sie diese bitte vor dem Hochladen in ein einzelnes Archiv (zip/rar/7z)"
 
-msgid "Additional Notes (Optional):"
-msgstr "Zusätzliche Anmerkungen (Optional):"
-
 msgid "Anything else to add..."
 msgstr "Sonstige Ergänzungen..."
+
+msgid "Additional Notes (Optional):"
+msgstr "Zusätzliche Anmerkungen (Optional):"
 
 msgid "Please make sure the trainer you are about to upload is tested to be safe and functional."
 msgstr "Bitte stellen Sie sicher, dass der Trainer, den Sie hochladen möchten, getestet, sicher und funktionsfähig ist."

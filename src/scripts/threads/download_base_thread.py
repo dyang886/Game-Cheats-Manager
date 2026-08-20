@@ -14,7 +14,6 @@ from config import *
 from search_index import translation_index
 
 _PARALLEL_THRESHOLD = 2 * 1024 * 1024  # skip parallel for files < 2 MB
-_API_TIMEOUT = (5, 15)
 _DOWNLOAD_TIMEOUT = (5, 30)
 _RANGE_DOWNLOAD_TIMEOUT = (5, 60)
 
@@ -247,16 +246,12 @@ class DownloadBaseThread(QThread):
             print("Error: API endpoint or Client API Key is not configured.")
             return None
 
-        headers = {
-            'x-api-key': CLIENT_API_KEY
-        }
         params = {
-            'filePath': file_path_on_s3,
-            **get_client_params()
+            'filePath': file_path_on_s3
         }
 
         try:
-            response = requests.get(SIGNED_URL_DOWNLOAD_ENDPOINT, headers=headers, params=params, timeout=_API_TIMEOUT)
+            response = signed_get(SIGNED_URL_DOWNLOAD_ENDPOINT, params, API_TIMEOUT)
             response.raise_for_status()
 
             data = response.json()
@@ -283,17 +278,13 @@ class DownloadBaseThread(QThread):
         file_path, file_ext = os.path.splitext(file_path_on_s3)
         file_path_on_s3 = os.path.join("trainers", f"{os.path.basename(file_path)}_{uuid.uuid4().hex}{file_ext}").replace("\\", "/")
 
-        headers = {
-            'x-api-key': CLIENT_API_KEY
-        }
         params = {
             'filePath': file_path_on_s3,
-            'metadata': metadata_json,
-            **get_client_params()
+            'metadata': metadata_json
         }
 
         try:
-            response = requests.get(SIGNED_URL_UPLOAD_ENDPOINT, headers=headers, params=params, timeout=_API_TIMEOUT)
+            response = signed_get(SIGNED_URL_UPLOAD_ENDPOINT, params, API_TIMEOUT)
             response.raise_for_status()
             return response.json()
 

@@ -82,8 +82,8 @@ msgstr "修改器下载路径："
 msgid "Failure"
 msgstr "失败"
 
-msgid "Failed to update application."
-msgstr "软件更新失败。"
+msgid "Failed to update application"
+msgstr "软件更新失败"
 
 msgid "Update Available"
 msgstr "可用更新"
@@ -287,6 +287,9 @@ msgstr "删除修改器背景音乐中..."
 msgid "Patching..."
 msgstr "打补丁中..."
 
+msgid "Preparing update"
+msgstr "正在准备更新"
+
 msgid "Update from GCM failed"
 msgstr "更新 GCM 数据失败"
 
@@ -461,44 +464,44 @@ msgstr "立即更新"
 msgid "Failed to load"
 msgstr "加载失败"
 
-msgid "Contact Info (Optional):"
-msgstr "联系方式（选填）："
-
 msgid "Email"
 msgstr "电子邮箱"
+
+msgid "Contact Info (Optional):"
+msgstr "联系方式（选填）："
 
 msgid "If you provide your Game-Zone Labs account email and your trainer is approved, a badge will be added to your account"
 msgstr "如果您填写 Game-Zone 实验室 账号邮箱，且上传的修改器通过审核，您的账号将获得一枚徽章"
 
-msgid "Trainer Name:"
-msgstr "修改器名称："
-
 msgid "What game does it work for"
 msgstr "适用于哪款游戏"
 
-msgid "Trainer Source (Optional):"
-msgstr "修改器来源（选填）："
+msgid "Trainer Name:"
+msgstr "修改器名称："
 
 msgid "Original URL and author"
 msgstr "原始链接和作者"
 
+msgid "Trainer Source (Optional):"
+msgstr "修改器来源（选填）："
+
 msgid "Please try to fill this in if you can. If you made the trainer, please provide your author name"
 msgstr "如果可以，请尽量填写。如果修改器为自制，请提供你的作者名"
-
-msgid "Trainer File:"
-msgstr "修改器文件："
 
 msgid "Select a trainer file"
 msgstr "选择修改器文件"
 
+msgid "Trainer File:"
+msgstr "修改器文件："
+
 msgid "If the trainer consists of multiple files, please compress them into a single archive (zip/rar/7z) before uploading"
 msgstr "如果修改器包含多个文件，请在上传前将其压缩为单个压缩包 (zip/rar/7z)"
 
-msgid "Additional Notes (Optional):"
-msgstr "备注（选填）："
-
 msgid "Anything else to add..."
 msgstr "其他补充说明..."
+
+msgid "Additional Notes (Optional):"
+msgstr "备注（选填）："
 
 msgid "Please make sure the trainer you are about to upload is tested to be safe and functional."
 msgstr "请确保您上传的修改器已经过测试，安全且可正常使用。"

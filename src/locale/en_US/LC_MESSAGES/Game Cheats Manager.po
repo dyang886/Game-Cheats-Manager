@@ -82,8 +82,8 @@ msgstr "Trainer download path:"
 msgid "Failure"
 msgstr "Failure"
 
-msgid "Failed to update application."
-msgstr "Failed to update application."
+msgid "Failed to update application"
+msgstr "Failed to update application"
 
 msgid "Update Available"
 msgstr "Update Available"
@@ -287,6 +287,9 @@ msgstr "Removing trainer background music..."
 msgid "Patching..."
 msgstr "Patching..."
 
+msgid "Preparing update"
+msgstr "Preparing update"
+
 msgid "Update from GCM failed"
 msgstr "Update from GCM failed"
 
@@ -461,44 +464,44 @@ msgstr "Update Now"
 msgid "Failed to load"
 msgstr "Failed to load"
 
-msgid "Contact Info (Optional):"
-msgstr "Contact Info (Optional):"
-
 msgid "Email"
 msgstr "Email"
+
+msgid "Contact Info (Optional):"
+msgstr "Contact Info (Optional):"
 
 msgid "If you provide your Game-Zone Labs account email and your trainer is approved, a badge will be added to your account"
 msgstr "If you provide your Game-Zone Labs account email and your trainer is approved, a badge will be added to your account"
 
-msgid "Trainer Name:"
-msgstr "Trainer Name:"
-
 msgid "What game does it work for"
 msgstr "What game does it work for"
 
-msgid "Trainer Source (Optional):"
-msgstr "Trainer Source (Optional):"
+msgid "Trainer Name:"
+msgstr "Trainer Name:"
 
 msgid "Original URL and author"
 msgstr "Original URL and author"
 
+msgid "Trainer Source (Optional):"
+msgstr "Trainer Source (Optional):"
+
 msgid "Please try to fill this in if you can. If you made the trainer, please provide your author name"
 msgstr "Please try to fill this in if you can. If you made the trainer, please provide your author name"
-
-msgid "Trainer File:"
-msgstr "Trainer File:"
 
 msgid "Select a trainer file"
 msgstr "Select a trainer file"
 
+msgid "Trainer File:"
+msgstr "Trainer File:"
+
 msgid "If the trainer consists of multiple files, please compress them into a single archive (zip/rar/7z) before uploading"
 msgstr "If the trainer consists of multiple files, please compress them into a single archive (zip/rar/7z) before uploading"
 
-msgid "Additional Notes (Optional):"
-msgstr "Additional Notes (Optional):"
-
 msgid "Anything else to add..."
 msgstr "Anything else to add..."
+
+msgid "Additional Notes (Optional):"
+msgstr "Additional Notes (Optional):"
 
 msgid "Please make sure the trainer you are about to upload is tested to be safe and functional."
 msgstr "Please make sure the trainer you are about to upload is tested to be safe and functional."

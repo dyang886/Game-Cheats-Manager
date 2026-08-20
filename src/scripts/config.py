@@ -6,14 +6,20 @@ import os
 import re
 import sys
 import tempfile
-import uuid
 
 import polib
 from packaging.version import InvalidVersion, Version
 import zhon.cedict as chinese_characters
 from pypinyin import lazy_pinyin
 
-from secret_config import *
+try:
+    from secret_config import *
+except ImportError:
+    SIGNED_URL_DOWNLOAD_ENDPOINT = SIGNED_URL_UPLOAD_ENDPOINT = ''
+    VERSION_CHECKER_ENDPOINT = PATCH_PATTERNS_ENDPOINT = CLIENT_API_KEY = ''
+
+    def signed_get(url, params, timeout):
+        raise RuntimeError('Request signing is unavailable in this build')
 
 
 APP_VERSION = "2.5.0"
@@ -102,7 +108,6 @@ def load_settings():
     default_settings = {
         "downloadPath": os.path.join(os.environ["APPDATA"], "GCM Trainers"),
         "language": app_locale,
-        "uid": str(uuid.uuid4()),
         "theme": "dark",
         "enSearchResults": False,
         "sortByOrigin": True,
@@ -143,16 +148,6 @@ def load_settings():
         json.dump(settings, f, indent=4)
 
     return settings
-
-
-def get_client_params():
-    return {
-        'app': 'GCM',
-        'uid': settings.get('uid'),
-        'appVersion': APP_VERSION,
-        'platform': sys.platform,
-        'language': settings.get('language'),
-    }
 
 
 def get_translator():
@@ -318,3 +313,4 @@ updater_path = resource_path("Updater.exe")
 
 ARCHIVE_EXTENSIONS = (".zip", ".rar", ".7z")
 DEFAULT_TRAINER_EXTENSIONS = (".exe", ".ct", ".cetrainer")
+API_TIMEOUT = (5, 15)  # (connect, read) for every API call

@@ -26,7 +26,7 @@ from widgets.trainer_management import TrainerManagementDialog
 from threads.download_base_thread import DownloadBaseThread
 from threads.download_display_thread import DownloadDisplayThread
 from threads.download_trainers_thread import DownloadTrainersThread
-from threads.other_threads import AnnouncementFetchWorker, FetchCTData, FetchFlingData, FetchGCMData, FetchTrainerTranslations, FetchXiaoXingData, PathChangeThread, VersionFetchWorker
+from threads.other_threads import AnnouncementFetchWorker, FetchCTData, FetchFlingData, FetchGCMData, FetchTrainerTranslations, FetchXiaoXingData, PathChangeThread, UpdateWorker, VersionFetchWorker
 from threads.update_trainers_thread import UpdateTrainers
 
 
@@ -73,6 +73,7 @@ class GameCheatsManager(QMainWindow):
         self.currentlyUpdatingXiaoXing = False
         self.currentlyUpdatingCT = False
         self.currentlyUpdatingTrans = False
+        self.currentlyUpdatingApp = False
 
         # Window references
         self.settings_window = None
@@ -294,16 +295,29 @@ class GameCheatsManager(QMainWindow):
         self.announcementFetcher.quit()
 
     def start_update(self, version):
+        if self.currentlyUpdatingApp:
+            return
+
+        self.currentlyUpdatingApp = True
+        s3_path = f'GCM/Game Cheats Manager Setup {version}.exe'
+        self.updateWorker = UpdateWorker(s3_path, self)
+        self.updateWorker.message.connect(self.on_status_load)
+        self.updateWorker.update.connect(self.on_status_update)
+        self.updateWorker.urlFetched.connect(lambda url: self.launch_updater(s3_path, url))
+        self.updateWorker.finished.connect(self.on_interval_finished)
+        self.updateWorker.start()
+
+    def launch_updater(self, s3_path, signed_url):
         try:
             pid = str(os.getpid())
-            s3_path = f'GCM/Game Cheats Manager Setup {version}.exe'
-            params = f'--pid {pid} --s3-path "{s3_path}" --theme {settings["theme"]} --language {settings["language"]}'
+            params = (f'--pid {pid} --s3-path "{s3_path}" --url "{signed_url}"'
+                      f' --theme {settings["theme"]} --language {settings["language"]}')
             result = ctypes.windll.shell32.ShellExecuteW(0, "runas", updater_path, params, None, 1)
             if result <= 32:
                 raise OSError(f"ShellExecuteW failed with code {result}")
 
         except OSError:
-            QMessageBox.critical(self, tr("Failure"), tr("Failed to update application."))
+            QMessageBox.critical(self, tr("Failure"), tr("Failed to update application"))
 
     def send_notification(self, success, latest_version=0):
         # Keep a reference to prevent garbage collection
@@ -969,6 +983,8 @@ class GameCheatsManager(QMainWindow):
             self.currentlyUpdatingCT = False
         elif widgetName == "translations":
             self.currentlyUpdatingTrans = False
+        elif widgetName == "appUpdate":
+            self.currentlyUpdatingApp = False
         elif widgetName == "trainerUpdate":
             self.currentlyUpdatingTrainers = False
 

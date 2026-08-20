@@ -47,6 +47,36 @@ class AnnouncementFetchWorker(QThread):
             self.fetchFailed.emit()
 
 
+class UpdateWorker(DownloadBaseThread):
+    message = pyqtSignal(str, str)
+    update = pyqtSignal(str, str, str)
+    urlFetched = pyqtSignal(str)
+    finished = pyqtSignal(str)
+
+    def __init__(self, s3_path, parent=None):
+        super().__init__(parent)
+        self.s3_path = s3_path
+
+    def run(self):
+        statusWidgetName = "appUpdate"
+        update_failed = tr("Failed to update application")
+        try:
+            self.message.emit(statusWidgetName, tr("Preparing update"))
+            signed_url = self.get_signed_download_url(self.s3_path)
+            if signed_url:
+                self.urlFetched.emit(signed_url)
+            else:
+                self.update.emit(statusWidgetName, update_failed, "error")
+                time.sleep(2)
+
+        except Exception:
+            traceback.print_exc()
+            self.update.emit(statusWidgetName, update_failed, "error")
+            time.sleep(2)
+
+        self.finished.emit(statusWidgetName)
+
+
 class VersionFetchWorker(QThread):
     versionFetched = pyqtSignal(str)
     fetchFailed = pyqtSignal()
@@ -61,16 +91,12 @@ class VersionFetchWorker(QThread):
             self.fetchFailed.emit()
             return
 
-        headers = {
-            'x-api-key': CLIENT_API_KEY
-        }
         params = {
-            'appName': self.app_name,
-            **get_client_params()
+            'appName': self.app_name
         }
 
         try:
-            response = requests.get(VERSION_CHECKER_ENDPOINT, headers=headers, params=params, timeout=15)
+            response = signed_get(VERSION_CHECKER_ENDPOINT, params, API_TIMEOUT)
             response.raise_for_status()
 
             data = response.json()
@@ -556,15 +582,13 @@ class WeModCustomization(QThread):
             print("Error: patch-patterns endpoint or API key is not configured.")
             return None
 
-        headers = {'x-api-key': CLIENT_API_KEY}
         params = {
             'patchMethod': self.patchMethod,
-            'enableDev': 'true' if enable_dev else 'false',
-            **get_client_params()
+            'enableDev': 'true' if enable_dev else 'false'
         }
         response = None
         try:
-            response = requests.get(PATCH_PATTERNS_ENDPOINT, headers=headers, params=params, timeout=15)
+            response = signed_get(PATCH_PATTERNS_ENDPOINT, params, API_TIMEOUT)
             response.raise_for_status()
             return response.json()
         except Exception as e:
