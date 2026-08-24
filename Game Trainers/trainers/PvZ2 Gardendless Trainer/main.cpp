@@ -13,8 +13,8 @@
 
 // Version info
 static constexpr const char *TRAINER_NAME = "PvZ2 Gardendless Trainer";
-static constexpr const char *GAME_VERSION = "0.7.1";
-static constexpr const char *TRAINER_VERSION = "3.0";
+static constexpr const char *GAME_VERSION = "0.13.0";
+static constexpr const char *TRAINER_VERSION = "4.0";
 
 // Forward declarations for custom widgets
 static Fl_Input *g_game_path_input = nullptr;
@@ -76,6 +76,8 @@ void apply_callback(Fl_Widget *widget, void *data)
         status = trainer->addCoins(val);
     else if (optionName == "AddGems")
         status = trainer->addGems(val);
+    else if (optionName == "AddTickets")
+        status = trainer->addTickets(val);
     else if (optionName == "AddWorldKeys")
         status = trainer->addWorldKeys(val);
 
@@ -171,7 +173,7 @@ static void update_window_title()
 {
     if (!g_main_window)
         return;
-    std::string title = std::string(t(TRAINER_NAME)) + " | Game v" + GAME_VERSION + " | Trainer v" + TRAINER_VERSION;
+    std::string title = std::string(t(TRAINER_NAME)) + " | Game ver." + GAME_VERSION + " | Trainer ver." + TRAINER_VERSION;
     g_main_window->copy_label(title.c_str());
 }
 
@@ -378,6 +380,8 @@ int main(int argc, char **argv)
     place_apply_widget(options_flex, &trainer, "AddCoins", "Add Coins", nullptr, "99999", "-999999999", "999999999");
 
     place_apply_widget(options_flex, &trainer, "AddGems", "Add Gems", nullptr, "999", "-999999999", "999999999");
+
+    place_apply_widget(options_flex, &trainer, "AddTickets", "Add Tickets", nullptr, "99", "-999999999", "999999999");
 
     place_apply_widget(options_flex, &trainer, "AddSprouts", "Add Sprouts", nullptr, "999", "-999999999", "999999999");
 

@@ -121,7 +121,8 @@ public:
             "  if (isNaN(val) || val < 0) return 'fail: Invalid amount.';"
             "  const cards = cls('Cards').component;"
             "  if (!cards || !cards.seedChooser) return 'fail: Please use this on the plant selection screen.';"
-            "  const allCFs = cc.director.getScene().getComponentsInChildren(cls('CardFeatureTotal'));"
+            "  const CardFeature = cls('CardFeature') || cls('CardFeatureTotal');"
+            "  const allCFs = CardFeature ? cc.director.getScene().getComponentsInChildren(CardFeature) : null;"
             "  if (!allCFs || !allCFs.length) return 'fail: No plant cards found.';"
             "  let c = 0;"
             "  allCFs.forEach(cf => {"
@@ -261,6 +262,20 @@ public:
             "  const c = cls('GemCount');"
             "  if (!c || !c.component) return 'fail: Gem counter not available.';"
             "  c.component.addGemCount(" +
+            amount +
+            ");"
+            "  return 'ok';"
+            "})()");
+    }
+
+    bool addTickets(const std::string &amount)
+    {
+        return executeJS(
+            "(() => {"
+            "  const cls = (n) => cc.js.getClassByName(n);"
+            "  const c = cls('TicketCount');"
+            "  if (!c || !c.component) return 'fail: Ticket counter not available.';"
+            "  c.component.addTicketCount(" +
             amount +
             ");"
             "  return 'ok';"

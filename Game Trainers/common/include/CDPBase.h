@@ -17,8 +17,14 @@
 #include <nlohmann/json.hpp>
 
 #pragma comment(lib, "winhttp.lib")
+#pragma comment(lib, "ws2_32.lib")
 
 using json = nlohmann::json;
+
+/// DevTools listens on the IPv4 loopback only. Connecting by name resolves to ::1 first,
+/// so the first probe burns ~2s falling back to IPv4 — on the UI thread, since the status
+/// timer polls from there. Addressing 127.0.0.1 directly keeps every probe sub-millisecond.
+static constexpr const wchar_t *CDP_HOST = L"127.0.0.1";
 
 /// How the game process receives the remote debugging port argument.
 enum class CDPLaunchMethod
@@ -55,7 +61,7 @@ public:
 
     std::wstring getProcessName() const
     {
-        return L"localhost:" + std::to_wstring(cdpPort_);
+        return std::wstring(CDP_HOST) + L":" + std::to_wstring(cdpPort_);
     }
 
     DWORD getProcessId() const
@@ -109,8 +115,8 @@ public:
 
         if (!lastCheckResult_)
         {
-            // During the startup grace period (e.g. waiting for Steam to finish loading
-            // the game), skip failure counting so the trainer doesn't give up early.
+            // During the startup grace period (waiting for the game to boot far enough to
+            // open its debugging port), skip failure counting so we don't give up early.
             if (startupGraceSecs_ > 0)
             {
                 auto secsSinceLaunch = std::chrono::duration_cast<std::chrono::seconds>(
@@ -202,12 +208,13 @@ public:
 
         if (ok)
         {
-            if (launchMethod_ == CDPLaunchMethod::SteamLaunchUrl)
-            {
-                launchTime_ = std::chrono::steady_clock::now();
-                startupGraceSecs_ = 90;
-            }
-            else
+            // Every launch method needs a grace period: the debugging port only opens once
+            // the game has unpacked its bundle and created the web view, which for a large
+            // single-file build is well past the 3-strike failure budget below.
+            launchTime_ = std::chrono::steady_clock::now();
+            startupGraceSecs_ = (launchMethod_ == CDPLaunchMethod::SteamLaunchUrl) ? 90 : 120;
+
+            if (launchMethod_ != CDPLaunchMethod::SteamLaunchUrl)
             {
                 CloseHandle(pi.hProcess);
                 CloseHandle(pi.hThread);
@@ -351,6 +358,14 @@ private:
 
     int findFreePort(int startPort)
     {
+        // Nothing else in a trainer touches Winsock, so socket() would fail with
+        // WSANOTINITIALISED and every port would look unusable.
+        WSADATA wsaData = {};
+        bool wsaOk = (WSAStartup(MAKEWORD(2, 2), &wsaData) == 0);
+        if (!wsaOk)
+            return startPort;
+
+        int chosen = startPort;
         for (int port = startPort; port < startPort + 100; ++port)
         {
             SOCKET sock = socket(AF_INET, SOCK_STREAM, IPPROTO_TCP);
@@ -366,9 +381,14 @@ private:
             closesocket(sock);
 
             if (result == 0)
-                return port;
+            {
+                chosen = port;
+                break;
+            }
         }
-        return startPort;
+
+        WSACleanup();
+        return chosen;
     }
 
     // ============================================================
@@ -381,13 +401,15 @@ private:
         if (!hSession)
             return false;
 
-        DWORD connectTimeout = 200;
-        DWORD ioTimeout = 300;
+        DWORD connectTimeout = 500;
+        DWORD ioTimeout = 1000;
+        DWORD connectRetries = 1;
+        WinHttpSetOption(hSession, WINHTTP_OPTION_CONNECT_RETRIES, &connectRetries, sizeof(connectRetries));
         WinHttpSetOption(hSession, WINHTTP_OPTION_CONNECT_TIMEOUT, &connectTimeout, sizeof(connectTimeout));
         WinHttpSetOption(hSession, WINHTTP_OPTION_RECEIVE_TIMEOUT, &ioTimeout, sizeof(ioTimeout));
         WinHttpSetOption(hSession, WINHTTP_OPTION_SEND_TIMEOUT, &ioTimeout, sizeof(ioTimeout));
 
-        HINTERNET hConnect = WinHttpConnect(hSession, L"localhost", (INTERNET_PORT)cdpPort_, 0);
+        HINTERNET hConnect = WinHttpConnect(hSession, CDP_HOST, (INTERNET_PORT)cdpPort_, 0);
         if (!hConnect)
         {
             WinHttpCloseHandle(hSession);
@@ -426,12 +448,12 @@ private:
         if (!hSession)
             return "";
 
-        DWORD timeout = 500;
+        DWORD timeout = 2000;
         WinHttpSetOption(hSession, WINHTTP_OPTION_CONNECT_TIMEOUT, &timeout, sizeof(timeout));
         WinHttpSetOption(hSession, WINHTTP_OPTION_RECEIVE_TIMEOUT, &timeout, sizeof(timeout));
         WinHttpSetOption(hSession, WINHTTP_OPTION_SEND_TIMEOUT, &timeout, sizeof(timeout));
 
-        HINTERNET hConnect = WinHttpConnect(hSession, L"localhost", (INTERNET_PORT)cdpPort_, 0);
+        HINTERNET hConnect = WinHttpConnect(hSession, CDP_HOST, (INTERNET_PORT)cdpPort_, 0);
         if (!hConnect)
         {
             WinHttpCloseHandle(hSession);
@@ -562,13 +584,13 @@ private:
         if (!wsSession_)
             return false;
 
-        DWORD connectTimeout = 500;
+        DWORD connectTimeout = 2000;
         DWORD sendRecvTimeout = 3000;
         WinHttpSetOption(wsSession_, WINHTTP_OPTION_CONNECT_TIMEOUT, &connectTimeout, sizeof(connectTimeout));
         WinHttpSetOption(wsSession_, WINHTTP_OPTION_RECEIVE_TIMEOUT, &sendRecvTimeout, sizeof(sendRecvTimeout));
         WinHttpSetOption(wsSession_, WINHTTP_OPTION_SEND_TIMEOUT, &sendRecvTimeout, sizeof(sendRecvTimeout));
 
-        wsConnect_ = WinHttpConnect(wsSession_, L"localhost", (INTERNET_PORT)cdpPort_, 0);
+        wsConnect_ = WinHttpConnect(wsSession_, CDP_HOST, (INTERNET_PORT)cdpPort_, 0);
         if (!wsConnect_)
         {
             wsDisconnect();
