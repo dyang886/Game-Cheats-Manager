@@ -106,7 +106,7 @@
         "origin": "gcm",
         "official_url": "https://pvzge.com/",
         "gcm_url": "GCM/GCM Trainers/PvZ2 Gardendless Trainer.exe",
-        "version": "2026.8.24"
+        "version": "2026.8.26"
     },
     {
         "game_name": "Zao Meng Xi You: Wu Shuang",
@@ -300,7 +300,7 @@
         "author": "flarejune",
         "official_url": "https://www.bilibili.com/video/BV1pv6BB5End/",
         "gcm_url": "GCM/GCM Trainers/Nioh 3 Trainer [flarejune].exe",
-        "version": "2026.6.12"
+        "version": "2026.8.23"
     },
     {
         "game_name": "Nioh 3",
@@ -337,9 +337,9 @@
         "game_name": "Prototype",
         "origin": "other",
         "author": "LinGon",
-        "official_url": "https://www.crsky.com/soft/459459.html",
+        "official_url": "https://www.trainerscity.com/en/pc/12963-Prototype-v1.0.0.1-Trainer+16",
         "gcm_url": "GCM/GCM Trainers/Prototype Trainer [LinGon].zip",
-        "version": "2026.2.25"
+        "version": "2010.8.17"
     },
     {
         "game_name": "Warcraft III: Reign of Chaos",
@@ -925,8 +925,9 @@
         "game_name": "Back to the Dawn",
         "origin": "ct_other",
         "author": "ppapodir",
+        "official_url": "https://bbs.3dmgame.com/thread-6608478-1-1.html",
         "gcm_url": "GCM/GCM Trainers/Back to the Dawn Trainer [ppapodir].ct",
-        "version": "2026.3.4"
+        "version": "2025.8.10"
     },
     {
         "game_name": "A Simple Life with My Unobtrusive Sister",
@@ -1252,7 +1253,7 @@
         "origin": "other",
         "author": "peizhaochen",
         "official_url": "https://patch.ali213.net/showpatch/88085.html",
-        "gcm_url": "GCM/GCM Trainers/Guns, Gore and Cannoli 2 Trainer [YouXiaWang].exe",
+        "gcm_url": "GCM/GCM Trainers/Guns, Gore and Cannoli 2 Trainer [peizhaochen].exe",
         "version": "2018.3.5"
     },
     {
@@ -1838,10 +1839,10 @@
         "version": "2026.3.17"
     },
     {
-        "game_name": "Hentai Kanojo",
+        "game_name": "Steamy Livestreams with My Girlfriend",
         "origin": "other",
         "author": "jx666",
-        "gcm_url": "GCM/GCM Trainers/Hentai Kanojo Trainer [jx666].zip",
+        "gcm_url": "GCM/GCM Trainers/Steamy Livestreams with My Girlfriend Trainer [jx666].zip",
         "version": "2026.3.28"
     },
     {
@@ -4554,10 +4555,10 @@
         "version": "2021.12.12"
     },
     {
-        "game_name": "Hentai Kanojo",
+        "game_name": "Steamy Livestreams with My Girlfriend",
         "origin": "ct_other",
         "author": "FireFly",
-        "gcm_url": "GCM/GCM Trainers/Hentai Kanojo Trainer [FireFly].ct",
+        "gcm_url": "GCM/GCM Trainers/Steamy Livestreams with My Girlfriend Trainer [FireFly].ct",
         "version": "2026.8.13"
     },
     {
@@ -4724,5 +4725,243 @@
         "official_url": "https://github.com/DevilXD/TwitchDropsMiner",
         "gcm_url": "GCM/GCM Trainers/Twitch Drops Miner [DevilXD].zip",
         "version": "2026.7.30"
+    },
+    {
+        "game_name": "Tom Clancy's Ghost Recon Wildlands",
+        "origin": "other",
+        "author": "SyphLR",
+        "official_url": "https://www.nexusmods.com/ghostreconwildlands/mods/96",
+        "gcm_url": "GCM/GCM Trainers/Tom Clancy's Ghost Recon Wildlands Trainer [SyphLR].zip",
+        "version": "2026.8.19"
+    },
+    {
+        "game_name": "Batman: Arkham Knight",
+        "origin": "ct_other",
+        "author": "雨夜de肖邦",
+        "official_url": "https://www.bilibili.com/video/BV1TKTJziE8D",
+        "gcm_url": "GCM/GCM Trainers/Batman_Arkham Knight Trainer [YuYedeXiaoBang].ct",
+        "version": "2025.6.4"
+    },
+    {
+        "game_name": "Command & Conquer: Yuri's Revenge",
+        "origin": "other",
+        "author": "lsposd",
+        "official_url": "https://www.bilibili.com/video/BV1RZLS66ENY",
+        "gcm_url": "GCM/GCM Trainers/Command & Conquer_Yuri's Revenge Trainer [lsposd].exe",
+        "version": "2026.8.6"
+    },
+    {
+        "game_name": "Crashlands",
+        "origin": "other",
+        "author": "双星神夜空",
+        "official_url": "https://www.cnblogs.com/onepersonwholive/p/12312322.html",
+        "gcm_url": "GCM/GCM Trainers/Crashlands Trainer [ShuangXingShenYeKong].exe",
+        "version": "2024.6.15"
+    },
+    {
+        "game_name": "Dying Light: The Beast",
+        "origin": "ct_other",
+        "author": "Synsteric",
+        "official_url": "https://www.nexusmods.com/dyinglightthebeast/mods/451",
+        "gcm_url": "GCM/GCM Trainers/Dying Light_The Beast Trainer [Synsteric].ct",
+        "version": "2026.6.14"
+    },
+    {
+        "game_name": "Darksiders III",
+        "origin": "ct_other",
+        "author": "mul0",
+        "official_url": "https://fearlessrevolution.com/viewtopic.php?t=27555",
+        "gcm_url": "GCM/GCM Trainers/Darksiders III Trainer [mul0].ct",
+        "version": "2024.2.1"
+    },
+    {
+        "game_name": "Dust Front RTS",
+        "origin": "ct_other",
+        "author": "happerlee",
+        "official_url": "https://bbs.3dmgame.com/thread-6681067-1-1.html",
+        "gcm_url": "GCM/GCM Trainers/Dust Front RTS Trainer [happerlee].ct",
+        "version": "2026.7.3"
+    },
+    {
+        "game_name": "Dying Light: The Beast",
+        "origin": "ct_other",
+        "author": "Zodiac_Gemini",
+        "official_url": "https://www.playground.ru/dying_light_the_beast/cheat/dying_light_the_beast_tablitsa_100_dlya_cheat_engine_ot_zodiac_teleportatsiya_redaktor_urona_vremeni_urovnya_navykov-1794881",
+        "gcm_url": "GCM/GCM Trainers/Dying Light_The Beast Trainer [Zodiac_Gemini].ct",
+        "version": "2025.10.16"
+    },
+    {
+        "game_name": "FOUNTAINS",
+        "origin": "ct_other",
+        "author": "LIOBOSS",
+        "official_url": "https://fearlessrevolution.com/viewtopic.php?p=385819#p385819",
+        "gcm_url": "GCM/GCM Trainers/FOUNTAINS Trainer [LIOBOSS].ct",
+        "version": "2024.12.26"
+    },
+    {
+        "game_name": "Galactic Vault",
+        "origin": "ct_other",
+        "author": "Recreation",
+        "gcm_url": "GCM/GCM Trainers/Galactic Vault Trainer [Recreation].ct",
+        "version": "2026.8.24"
+    },
+    {
+        "game_name": "How to Fish",
+        "origin": "ct_other",
+        "author": "Prona",
+        "gcm_url": "GCM/GCM Trainers/How to Fish Trainer [Prona].ct",
+        "version": "2026.8.24"
+    },
+    {
+        "game_name": "How to Fish",
+        "origin": "other",
+        "author": "fredwangwang",
+        "official_url": "https://github.com/fredwangwang/how-to-fish-trainer",
+        "gcm_url": "GCM/GCM Trainers/How to Fish Trainer [fredwangwang].exe",
+        "version": "2026.8.24"
+    },
+    {
+        "game_name": "Kenshi",
+        "origin": "other",
+        "author": "peizhaochen",
+        "official_url": "https://patch.ali213.net/showpatch/124251.html",
+        "gcm_url": "GCM/GCM Trainers/Kenshi Trainer [peizhaochen].exe",
+        "version": "2019.7.18"
+    },
+    {
+        "game_name": "Metro: Last Light Redux",
+        "origin": "other",
+        "author": "hex",
+        "official_url": "https://www.nexusmods.com/metrolastlightredux/mods/24",
+        "gcm_url": "GCM/GCM Trainers/Metro_Last Light Redux Trainer [hex].exe",
+        "version": "2025.8.3"
+    },
+    {
+        "game_name": "Persona 5 Royal",
+        "origin": "other",
+        "author": "云雾敛",
+        "official_url": "https://www.caimogu.cc/post/289328.html",
+        "gcm_url": "GCM/GCM Trainers/Persona 5 Royal Trainer [YunWuLian].exe",
+        "version": "2024.9.6"
+    },
+    {
+        "game_name": "ReCore: Definitive Edition",
+        "origin": "other",
+        "author": "FutureX",
+        "official_url": "https://megagames.com/trainers/recore-definitive-edition-v1174682-7-trainer-futurex",
+        "gcm_url": "GCM/GCM Trainers/ReCore_Definitive Edition Trainer [FutureX].exe",
+        "version": "2018.6.21"
+    },
+    {
+        "game_name": "Star Trek: Voyager - Across the Unknown",
+        "origin": "ct_other",
+        "author": "eggs",
+        "official_url": "https://fearlessrevolution.com/viewtopic.php?t=38309",
+        "gcm_url": "GCM/GCM Trainers/Star Trek_Voyager - Across the Unknown Trainer [eggs].ct",
+        "version": "2026.4.26"
+    },
+    {
+        "game_name": "Serious Sam Fusion 2017",
+        "origin": "ct_other",
+        "author": "Milky520",
+        "gcm_url": "GCM/GCM Trainers/Serious Sam Fusion 2017 Trainer [Milky520].ct",
+        "version": "2026.8.24"
+    },
+    {
+        "game_name": "Slay the Spire",
+        "origin": "ct_other",
+        "author": "AlexS",
+        "official_url": "https://www.playground.ru/slay_the_spire/cheat/slay_the_spire_tablitsa_dlya_cheat_engine_upd_06_02_2023_alexs-1193702",
+        "gcm_url": "GCM/GCM Trainers/Slay the Spire Trainer [AlexS].ct",
+        "version": "2023.2.6"
+    },
+    {
+        "game_name": "STARDUST: Wish of Witch",
+        "origin": "ct_other",
+        "author": "feirnova",
+        "official_url": "https://bbs.3dmgame.com/thread-6677629-1-1.html",
+        "gcm_url": "GCM/GCM Trainers/STARDUST_Wish of Witch Trainer [feirnova].ct",
+        "version": "2026.6.5"
+    },
+    {
+        "game_name": "Survival Log",
+        "origin": "ct_other",
+        "author": "BabyGroot",
+        "official_url": "https://fearlessrevolution.com/viewtopic.php?t=40419",
+        "gcm_url": "GCM/GCM Trainers/Survival Log Trainer [BabyGroot].zip",
+        "version": "2026.8.22"
+    },
+    {
+        "game_name": "The Sinking City 2",
+        "origin": "ct_other",
+        "author": "LIOBOSS",
+        "official_url": "https://fearlessrevolution.com/viewtopic.php?t=40425",
+        "gcm_url": "GCM/GCM Trainers/The Sinking City 2 Trainer [LIOBOSS].ct",
+        "version": "2026.8.16"
+    },
+    {
+        "game_name": "Sekiro: Shadows Die Twice",
+        "origin": "other",
+        "gcm_url": "GCM/GCM Trainers/Sekiro_Shadows Die Twice Trainer.zip",
+        "version": "2026.8.22"
+    },
+    {
+        "game_name": "Legacy of Shadows",
+        "origin": "other",
+        "author": "c313313",
+        "custom_name_en": "Save Editor",
+        "custom_name_zh": "存档编辑器",
+        "official_url": "https://bbs.3dmgame.com/thread-6688547-1-1.html",
+        "gcm_url": "GCM/GCM Trainers/Legacy of Shadows Save Editor [c313313].zip",
+        "version": "2026.7.29"
+    },
+    {
+        "game_name": "Mouri Motonari: Chikai no Sanshi",
+        "origin": "other",
+        "author": "银河漫步",
+        "official_url": "https://www.cheatmaker.org/showtopic-2095.aspx",
+        "gcm_url": "GCM/GCM Trainers/Mouri Motonari_Chikai no Sanshi Trainer [YinHeManBu].exe",
+        "version": "2025.4.28"
+    },
+    {
+        "game_name": "Unity MapleStory",
+        "origin": "other",
+        "custom_name_en": "Save Editor",
+        "custom_name_zh": "存档编辑器",
+        "gcm_url": "GCM/GCM Trainers/Unity MapleStory Save Editor.exe",
+        "version": "2026.8.25"
+    },
+    {
+        "game_name": "Forza Horizon 4",
+        "origin": "other",
+        "author": "ArmY of 0n3",
+        "official_url": "https://fearlessrevolution.com/viewtopic.php?t=15629",
+        "gcm_url": "GCM/GCM Trainers/Forza Horizon 4 Trainer [ArmY of 0n3].exe",
+        "version": "2021.9.2"
+    },
+    {
+        "game_name": "Fu Jia Tian Xia 4",
+        "origin": "other",
+        "author": "沙漠之鹰",
+        "custom_name_en": "Save Editor",
+        "custom_name_zh": "存档编辑器",
+        "gcm_url": "GCM/GCM Trainers/Fu Jia Tian Xia 4 Save Editor [ShaMoZhiYing].exe",
+        "version": "2006.2.19"
+    },
+    {
+        "game_name": "Sengoku Rance",
+        "origin": "other",
+        "author": "snowrabbit2000",
+        "official_url": "https://dl.3dmgame.com/patch/16576.html",
+        "gcm_url": "GCM/GCM Trainers/Sengoku Rance Trainer [snowrabbit2000].exe",
+        "version": "2011.10.4"
+    },
+    {
+        "game_name": "Stardom 3",
+        "origin": "other",
+        "author": "明志略",
+        "official_url": "https://steamcommunity.com/app/1611410/discussions/0/3270183784614366968/",
+        "gcm_url": "GCM/GCM Trainers/Stardom 3 Trainer [MingZhiLue].exe",
+        "version": "2022.4.13"
     }
 ]

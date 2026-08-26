@@ -13,6 +13,7 @@ IL2CPP.dll
 UE.dll
 trainers/**/*.ttf
 scripts/process_user_trainers.py
+scripts/manage_s3_files.py
 data/user_trainers.json
 data/user_trainers.xlsx
 data/completed_trainers.txt
