@@ -22,7 +22,7 @@ except ImportError:
         raise RuntimeError('Request signing is unavailable in this build')
 
 
-APP_VERSION = "2.5.0"
+APP_VERSION = "2.5.1-beta.1"
 
 
 def parse_version(version):
@@ -305,7 +305,6 @@ upArrow_path = resource_path("assets/up.png").replace("\\", "/")
 downArrow_path = resource_path("assets/down.png").replace("\\", "/")
 leftArrow_path = resource_path("assets/left.png").replace("\\", "/")
 rightArrow_path = resource_path("assets/right.png").replace("\\", "/")
-resourceHacker_path = resource_path("dependency/ResourceHacker.exe")
 unzip_path = resource_path("dependency/7z/7z.exe")
 emptyMidi_path = resource_path("dependency/TrainerBGM.mid")
 elevator_path = resource_path("dependency/Elevate.exe")

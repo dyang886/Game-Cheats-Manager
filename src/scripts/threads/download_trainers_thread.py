@@ -1,3 +1,4 @@
+import ctypes
 import os
 import re
 import shutil
@@ -5,6 +6,7 @@ import stat
 import subprocess
 import time
 import traceback
+from ctypes import wintypes
 
 from PyQt6.QtCore import pyqtSignal
 
@@ -24,6 +26,7 @@ class DownloadTrainersThread(DownloadBaseThread):
         self.update_entry = update_entry
         self.download_finish_delay = 0.5
         self.update_error_delay = 3
+        self.bgMusicMessageSent = False
 
     def run(self):
         try:
@@ -79,10 +82,6 @@ class DownloadTrainersThread(DownloadBaseThread):
 
                         with open(os.path.join(dst_dir, "gcm_info.json"), "w", encoding="utf-8") as info_file:
                             json.dump(info_dict, info_file, ensure_ascii=False, indent=4)
-
-                rhLog = os.path.join(DOWNLOAD_TEMP_DIR, "rh.log")
-                if os.path.exists(rhLog):
-                    os.remove(rhLog)
 
                 if self.instructionDst and not self.update_entry:
                     self.messageBox.emit("info", tr("Attention"), tr("This trainer requires additional setup before use. Please check the opened folder for instructions.\nThe instructions are always stored in the 'gcm-instructions' folder."))
@@ -259,79 +258,170 @@ class DownloadTrainersThread(DownloadBaseThread):
         return True
 
     def modify_fling_settings(self, removeBgMusic):
-        # replace bg music in Documents folder
-        username = os.getlogin()
-        flingSettings_path = f"C:/Users/{username}/Documents/FLiNGTrainer"
-        bgMusic_path = os.path.join(flingSettings_path, "TrainerBGM.mid")
-        if os.path.exists(bgMusic_path):
-            if settings["removeFlingBgMusic"]:
-                shutil.copyfile(emptyMidi_path, bgMusic_path)
-            else:
-                os.remove(bgMusic_path)
+        def modify_midi(settingsDir):
+            bgMusicPath = os.path.join(settingsDir, "TrainerBGM.mid")
+            if not os.path.isfile(bgMusicPath):
+                return
 
-        # change fling settings to disable startup music
-        settingFiles = [
-            os.path.join(flingSettings_path, "FLiNGTSettings.ini"),
-            os.path.join(flingSettings_path, "TrainerSettings.ini")
+            if removeBgMusic:
+                shutil.copyfile(emptyMidi_path, bgMusicPath)
+            else:
+                os.remove(bgMusicPath)
+
+        def modify_ini_files(settingsDir):
+            settingFormats = {
+                "FLiNGTSettings.ini": "OnLoadMusic = {}",
+                "TrainerSettings.ini": "OnLoadMusic={}"
+            }
+            settingValue = "False" if removeBgMusic else "True"
+
+            for fileName, settingFormat in settingFormats.items():
+                settingPath = os.path.join(settingsDir, fileName)
+                if not os.path.isfile(settingPath):
+                    continue
+
+                with open(settingPath, "r", encoding="utf-8", newline="") as file:
+                    lines = file.readlines()
+
+                with open(settingPath, "w", encoding="utf-8", newline="") as file:
+                    for line in lines:
+                        if line.strip().startswith("OnLoadMusic"):
+                            if line.endswith("\r\n"):
+                                lineEnding = "\r\n"
+                            elif line.endswith("\n"):
+                                lineEnding = "\n"
+                            else:
+                                lineEnding = ""
+                            file.write(settingFormat.format(settingValue) + lineEnding)
+                        else:
+                            file.write(line)
+
+        userProfile = os.environ.get("USERPROFILE", os.path.expanduser("~"))
+        localAppData = os.environ.get(
+            "LOCALAPPDATA",
+            os.path.join(userProfile, "AppData", "Local")
+        )
+        flingSettingsDirs = [
+            os.path.join(userProfile, "Documents", "FLiNGTrainer"),
+            os.path.join(localAppData, "FLiNGTrainer")
         ]
 
-        for settingFile in settingFiles:
-            if not os.path.exists(settingFile):
-                continue
-            with open(settingFile, 'r', encoding='utf-8') as file:
-                lines = file.readlines()
+        for settingsDir in flingSettingsDirs:
+            modify_midi(settingsDir)
+            modify_ini_files(settingsDir)
 
-            # Update the OnLoadMusic setting
-            with open(settingFile, 'w', encoding='utf-8') as file:
-                for line in lines:
-                    if line.strip().startswith('OnLoadMusic'):
-                        if os.path.basename(settingFile) == "FLiNGTSettings.ini":
-                            if removeBgMusic:
-                                file.write('OnLoadMusic = False\n')
-                            else:
-                                file.write('OnLoadMusic = True\n')
-                        elif os.path.basename(settingFile) == "TrainerSettings.ini":
-                            if removeBgMusic:
-                                file.write('OnLoadMusic=False\n')
-                            else:
-                                file.write('OnLoadMusic=True\n')
-                    else:
-                        file.write(line)
+    def remove_bgMusic(self, source_exe):
+        LOAD_LIBRARY_AS_DATAFILE = 0x00000002
+        LOAD_LIBRARY_AS_IMAGE_RESOURCE = 0x00000020
+        ERROR_RESOURCE_TYPE_NOT_FOUND = 1813
+        resourceTypes = ("MID", "MIDI")
 
-    def remove_bgMusic(self, source_exe, resource_type_list):
-        # Base case
-        if not resource_type_list:
-            return
+        kernel32 = ctypes.WinDLL("kernel32", use_last_error=True)
+        enumNameCallbackType = ctypes.WINFUNCTYPE(wintypes.BOOL, wintypes.HMODULE, ctypes.c_void_p, ctypes.c_void_p, wintypes.LPARAM)
+        enumLanguageCallbackType = ctypes.WINFUNCTYPE(wintypes.BOOL, wintypes.HMODULE, ctypes.c_void_p, ctypes.c_void_p, wintypes.WORD, wintypes.LPARAM)
 
-        resource_type = resource_type_list.pop(0)
+        kernel32.LoadLibraryExW.argtypes = [wintypes.LPCWSTR, wintypes.HANDLE, wintypes.DWORD]
+        kernel32.LoadLibraryExW.restype = wintypes.HMODULE
+        kernel32.FreeLibrary.argtypes = [wintypes.HMODULE]
+        kernel32.FreeLibrary.restype = wintypes.BOOL
+        kernel32.EnumResourceNamesW.argtypes = [wintypes.HMODULE, ctypes.c_void_p, enumNameCallbackType, wintypes.LPARAM]
+        kernel32.EnumResourceNamesW.restype = wintypes.BOOL
+        kernel32.EnumResourceLanguagesW.argtypes = [wintypes.HMODULE, ctypes.c_void_p, ctypes.c_void_p, enumLanguageCallbackType, wintypes.LPARAM]
+        kernel32.EnumResourceLanguagesW.restype = wintypes.BOOL
+        kernel32.BeginUpdateResourceW.argtypes = [wintypes.LPCWSTR, wintypes.BOOL]
+        kernel32.BeginUpdateResourceW.restype = wintypes.HANDLE
+        kernel32.UpdateResourceW.argtypes = [wintypes.HANDLE, ctypes.c_void_p, ctypes.c_void_p, wintypes.WORD, ctypes.c_void_p, wintypes.DWORD]
+        kernel32.UpdateResourceW.restype = wintypes.BOOL
+        kernel32.EndUpdateResourceW.argtypes = [wintypes.HANDLE, wintypes.BOOL]
+        kernel32.EndUpdateResourceW.restype = wintypes.BOOL
 
-        # Define paths and files
-        tempLog = os.path.join(DOWNLOAD_TEMP_DIR, "rh.log")
+        def resource_value(pointer):
+            address = pointer or 0
+            if address <= 0xFFFF:
+                return address
+            return ctypes.wstring_at(address)
 
-        # Remove background music from executable
-        command = [resourceHacker_path, "-open", source_exe, "-save", source_exe,
-                   "-action", "delete", "-mask", f"{resource_type},,", "-log", tempLog]
-        subprocess.run(command, creationflags=subprocess.CREATE_NO_WINDOW)
+        def resource_pointer(value):
+            if isinstance(value, int):
+                return ctypes.c_void_p(value), None
 
-        # Read the log file
-        with open(tempLog, 'r', encoding='utf-16-le') as file:
-            log_content = file.read()
+            stringPointer = ctypes.c_wchar_p(value)
+            return ctypes.cast(stringPointer, ctypes.c_void_p), stringPointer
 
-        # Check for deleted resource in log
-        pattern = r"Deleted:\s*(\w+),(\d+),(\d+)"
-        match = re.search(pattern, log_content)
+        def find_resources(filePath):
+            resources = []
+            module = kernel32.LoadLibraryExW(filePath, None, LOAD_LIBRARY_AS_DATAFILE | LOAD_LIBRARY_AS_IMAGE_RESOURCE)
+            if not module:
+                raise ctypes.WinError(ctypes.get_last_error())
 
-        if match:
-            # Resource was deleted; prepare to add the empty midi
-            resource_id = match.group(2)
-            locale_id = match.group(3)
-            resource = ",".join([resource_type, resource_id, locale_id])
-            command = [resourceHacker_path, "-open", source_exe, "-save", source_exe,
-                       "-action", "addoverwrite", "-res", emptyMidi_path, "-mask", resource]
-            subprocess.run(command, creationflags=subprocess.CREATE_NO_WINDOW)
-        else:
-            # Try the next resource type if any remain
-            self.remove_bgMusic(source_exe, resource_type_list)
+            try:
+                for resourceType in resourceTypes:
+                    resourceNames = []
+
+                    @enumNameCallbackType
+                    def collect_name(moduleHandle, typePointer, namePointer, parameter):
+                        resourceNames.append(resource_value(namePointer))
+                        return True
+
+                    typePointer, typeString = resource_pointer(resourceType)
+                    ctypes.set_last_error(0)
+                    foundNames = kernel32.EnumResourceNamesW(module, typePointer, collect_name, 0)
+                    if not foundNames:
+                        errorCode = ctypes.get_last_error()
+                        if errorCode == ERROR_RESOURCE_TYPE_NOT_FOUND:
+                            continue
+                        raise ctypes.WinError(errorCode)
+
+                    for resourceName in resourceNames:
+                        languages = []
+
+                        @enumLanguageCallbackType
+                        def collect_language(moduleHandle, typePointer, namePointer, language, parameter):
+                            languages.append(language)
+                            return True
+
+                        namePointer, nameString = resource_pointer(resourceName)
+                        if not kernel32.EnumResourceLanguagesW(module, typePointer, namePointer, collect_language, 0):
+                            raise ctypes.WinError(ctypes.get_last_error())
+
+                        resources.extend((resourceType, resourceName, language) for language in languages)
+            finally:
+                kernel32.FreeLibrary(module)
+
+            return resources
+
+        sourcePath = os.path.abspath(source_exe)
+        resources = find_resources(sourcePath)
+        if not resources:
+            return False
+
+        with open(emptyMidi_path, "rb") as file:
+            emptyMidi = file.read()
+
+        if not self.bgMusicMessageSent:
+            self.message.emit(tr("Removing trainer background music..."), None)
+            self.bgMusicMessageSent = True
+
+        midiBuffer = ctypes.create_string_buffer(emptyMidi)
+
+        updateHandle = kernel32.BeginUpdateResourceW(sourcePath, False)
+        if not updateHandle:
+            raise ctypes.WinError(ctypes.get_last_error())
+
+        try:
+            for resourceType, resourceName, language in resources:
+                typePointer, typeString = resource_pointer(resourceType)
+                namePointer, nameString = resource_pointer(resourceName)
+                if not kernel32.UpdateResourceW(updateHandle, typePointer, namePointer, language, ctypes.cast(midiBuffer, ctypes.c_void_p), len(emptyMidi)):
+                    raise ctypes.WinError(ctypes.get_last_error())
+        except Exception:
+            kernel32.EndUpdateResourceW(updateHandle, True)
+            raise
+
+        if not kernel32.EndUpdateResourceW(updateHandle, False):
+            raise ctypes.WinError(ctypes.get_last_error())
+
+        return True
 
     def download_fling(self, selected_trainer):
         if self.update_entry:
@@ -437,11 +527,10 @@ class DownloadTrainersThread(DownloadBaseThread):
 
         # remove fling trainer bg music
         if settings["removeFlingBgMusic"]:
-            self.message.emit(tr("Removing trainer background music..."), None)
             self.modify_fling_settings(True)
             for item in self.src_dst:
                 if item["src"].lower().endswith(".exe"):
-                    self.remove_bgMusic(item["src"], ["MID", "MIDI"])
+                    self.remove_bgMusic(item["src"])
         else:
             self.modify_fling_settings(False)
 
