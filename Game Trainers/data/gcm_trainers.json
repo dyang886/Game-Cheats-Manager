@@ -1095,7 +1095,7 @@
         "author": "LHY1339",
         "official_url": "https://github.com/LHY1339/cheat_ready_or_not",
         "gcm_url": "GCM/GCM Trainers/Ready or Not Trainer [LHY1339].exe",
-        "version": "2026.7.7"
+        "version": "2026.9.4"
     },
     {
         "game_name": "Backrooms: Extractions",
@@ -1111,7 +1111,7 @@
         "author": "LHY1339",
         "official_url": "https://github.com/LHY1339/cheat_escape_the_backrooms",
         "gcm_url": "GCM/GCM Trainers/Escape the Backrooms Trainer [LHY1339].exe",
-        "version": "2026.6.16"
+        "version": "2026.9.1"
     },
     {
         "game_name": "Castlevania Advance Collection",
@@ -1230,9 +1230,9 @@
         "game_name": "Ghostrunner",
         "origin": "ct_other",
         "author": "天乐1337",
-        "official_url": "https://www.bilibili.com/list/472721080",
-        "gcm_url": "GCM/GCM Trainers/Ghostrunner Trainer [TianLe1337].ct",
-        "version": "2025.12.25"
+        "official_url": "https://bbs.3dmgame.com/thread-6613907-1-1.html, https://bbs.3dmgame.com/thread-6613916-1-1.html",
+        "gcm_url": "GCM/GCM Trainers/Ghostrunner Trainer [TianLe1337].zip",
+        "version": "2025.10.11"
     },
     {
         "game_name": "Metro: Last Light Redux",
@@ -1485,7 +1485,7 @@
         "author": "StinVec",
         "official_url": "https://fearlessrevolution.com/viewtopic.php?p=460981#p460981, https://bbs.3dmgame.com/thread-6689574-1-1.html",
         "gcm_url": "GCM/GCM Trainers/Grim Dawn Trainer [StinVec].zip",
-        "version": "2026.8.19"
+        "version": "2026.8.25"
     },
     {
         "game_name": "Europa Universalis IV",
@@ -2161,8 +2161,8 @@
         "origin": "other",
         "author": "林无聊",
         "official_url": "http://ra2master.51wyx.net/",
-        "gcm_url": "GCM/GCM Trainers/Command & Conquer_Red Alert 2 Trainer [LinWuLiao].exe",
-        "version": "2022.11.29"
+        "gcm_url": "GCM/GCM Trainers/Command & Conquer_Red Alert 2 Trainer [LinWuLiao].zip",
+        "version": "2022.12.30"
     },
     {
         "game_name": "The Ghost's Intimate Cure",
@@ -4808,9 +4808,10 @@
     {
         "game_name": "How to Fish",
         "origin": "ct_other",
-        "author": "Prona",
-        "gcm_url": "GCM/GCM Trainers/How to Fish Trainer [Prona].ct",
-        "version": "2026.8.24"
+        "author": "pronex",
+        "official_url": "https://www.bilibili.com/video/BV1Hq846oEaP",
+        "gcm_url": "GCM/GCM Trainers/How to Fish Trainer [pronex].ct",
+        "version": "2026.8.25"
     },
     {
         "game_name": "How to Fish",
@@ -4818,7 +4819,7 @@
         "author": "fredwangwang",
         "official_url": "https://github.com/fredwangwang/how-to-fish-trainer",
         "gcm_url": "GCM/GCM Trainers/How to Fish Trainer [fredwangwang].exe",
-        "version": "2026.8.24"
+        "version": "2026.8.25"
     },
     {
         "game_name": "Kenshi",
@@ -4963,5 +4964,371 @@
         "official_url": "https://steamcommunity.com/app/1611410/discussions/0/3270183784614366968/",
         "gcm_url": "GCM/GCM Trainers/Stardom 3 Trainer [MingZhiLue].exe",
         "version": "2022.4.13"
+    },
+    {
+        "game_name": "Batman: Arkham City",
+        "origin": "other",
+        "author": "MrAntiFun",
+        "official_url": "https://mrantifun.net/threads/batman-arkham-city-trainer.233/",
+        "gcm_url": "GCM/GCM Trainers/Batman_Arkham City Trainer [MrAntiFun].exe",
+        "version": "2016.11.7"
+    },
+    {
+        "game_name": "Blur",
+        "origin": "ct_other",
+        "author": "Prismo",
+        "official_url": "https://fearlessrevolution.com/viewtopic.php?t=11812",
+        "gcm_url": "GCM/GCM Trainers/Blur Trainer [Prismo].ct",
+        "version": "2020.3.10"
+    },
+    {
+        "game_name": "Call of Duty 4: Modern Warfare",
+        "origin": "other",
+        "author": "GRIZZLY",
+        "official_url": "https://www.playground.ru/call_of_duty_4_modern_warfare/cheat/call_of_duty_4_modern_warfare_trejner_trainer_4_1_7_grizzly_playground_ru-799103",
+        "gcm_url": "GCM/GCM Trainers/Call of Duty 4_Modern Warfare Trainer [GRIZZLY].exe",
+        "version": "2012.7.23"
+    },
+    {
+        "game_name": "Dead Island 2",
+        "origin": "ct_other",
+        "author": "Debugg0x064",
+        "official_url": "https://www.nexusmods.com/deadisland2/mods/93",
+        "gcm_url": "GCM/GCM Trainers/Dead Island 2 Trainer [Debugg0x064].zip",
+        "version": "2025.11.30"
+    },
+    {
+        "game_name": "How to Fish",
+        "origin": "other",
+        "author": "夐敻",
+        "official_url": "https://www.bilibili.com/video/BV1c6hg6yE4M",
+        "gcm_url": "GCM/GCM Trainers/How to Fish Trainer [XiongXiong].zip",
+        "extension": "HowToFishTrainer.Wpf.exe",
+        "version": "2026.8.28"
+    },
+    {
+        "game_name": "Last Breath",
+        "origin": "other",
+        "author": "jx666",
+        "gcm_url": "GCM/GCM Trainers/Last Breath Trainer [jx666].zip",
+        "extension": "injector_rust x64 by jx666.exe",
+        "version": "2026.8.30"
+    },
+    {
+        "game_name": "NARUTO X BORUTO Ultimate Ninja STORM CONNECTIONS",
+        "origin": "other",
+        "author": "FutureX",
+        "official_url": "https://x.com/FuturexM36108/status/1759674107329732693",
+        "gcm_url": "GCM/GCM Trainers/NARUTO X BORUTO Ultimate Ninja STORM CONNECTIONS Trainer [FutureX].exe",
+        "version": "2024.2.19"
+    },
+    {
+        "game_name": "Need for Speed Payback",
+        "origin": "other",
+        "author": "失迷",
+        "official_url": "https://bbs.3dmgame.com/thread-5727361-1-1.html",
+        "gcm_url": "GCM/GCM Trainers/Need for Speed Payback Trainer [ShiMi].zip",
+        "version": "2018.4.5"
+    },
+    {
+        "game_name": "Plants vs. Zombies: Fusion",
+        "origin": "other",
+        "author": "高数带我飞",
+        "official_url": "https://pvz.ehre.top",
+        "gcm_url": "GCM/GCM Trainers/Plants vs. Zombies_Fusion Trainer [GaoShuDaiWoFei].zip",
+        "version": "2026.8.17"
+    },
+    {
+        "game_name": "State of Decay 2",
+        "origin": "other",
+        "author": "爱玩修改器",
+        "official_url": "https://www.gametrainer.com.cn/trainer/stateofdecay2",
+        "gcm_url": "GCM/GCM Trainers/State of Decay 2 Trainer [AiWanXiuGaiQi].exe",
+        "version": "2024.3.28"
+    },
+    {
+        "game_name": "Diablo III",
+        "origin": "other",
+        "author": "am2002",
+        "custom_name_en": "CN Server Uncensor Patch",
+        "custom_name_zh": "国服反和谐补丁",
+        "gcm_url": "GCM/GCM Trainers/Diablo III CN Server Uncensor Patch [am2002].zip",
+        "version": "2019.1.5"
+    },
+    {
+        "game_name": "Long Live the Emperor",
+        "origin": "other",
+        "author": "啷个哩个啷",
+        "official_url": "https://bbs.3dmgame.com/thread-6678268-1-1.html",
+        "gcm_url": "GCM/GCM Trainers/Long Live the Emperor Trainer [LangGeLiGeLang].zip",
+        "version": "2026.6.8"
+    },
+    {
+        "game_name": "Yet Another Zombie Survivors",
+        "origin": "ct_other",
+        "author": "Send",
+        "official_url": "https://www.playground.ru/yet_another_zombie_survivors/cheat/yet_another_zombie_survivors_tablitsa_1_dlya_cheat_engine_ot_send_aktivatsiya_rezhima_razrabotchika-1868793",
+        "gcm_url": "GCM/GCM Trainers/Yet Another Zombie Survivors Trainer [Send].ct",
+        "version": "2026.8.23"
+    },
+    {
+        "game_name": "Yet Another Zombie Survivors",
+        "origin": "other",
+        "author": "芝士log",
+        "official_url": "https://www.bilibili.com/video/BV1678A6pERa",
+        "gcm_url": "GCM/GCM Trainers/Yet Another Zombie Survivors Trainer [ZhiShiLog].exe",
+        "version": "2026.8.20"
+    },
+    {
+        "game_name": "Sheng San Guo Shu Han Zhuan",
+        "origin": "other",
+        "author": "银河漫步",
+        "gcm_url": "GCM/GCM Trainers/Sheng San Guo Shu Han Zhuan Trainer [YinHeManBu].exe",
+        "version": "2026.8.28"
+    },
+    {
+        "game_name": "Synergy",
+        "origin": "ct_other",
+        "author": "ljz131",
+        "gcm_url": "GCM/GCM Trainers/Synergy Trainer [ljz131].ct",
+        "version": "2026.9.6"
+    },
+    {
+        "game_name": "Ruins of Dawn",
+        "origin": "ct_other",
+        "gcm_url": "GCM/GCM Trainers/Ruins of Dawn Trainer.ct",
+        "version": "2026.8.26"
+    },
+    {
+        "game_name": "AMID EVIL",
+        "origin": "ct_other",
+        "author": "Milky520",
+        "gcm_url": "GCM/GCM Trainers/AMID EVIL Trainer [Milky520].ct",
+        "version": "2026.9.3"
+    },
+    {
+        "game_name": "Battlefield 1",
+        "origin": "other",
+        "author": "FutureX",
+        "gcm_url": "GCM/GCM Trainers/Battlefield 1 Trainer [FutureX].exe",
+        "version": "2017.2.13"
+    },
+    {
+        "game_name": "Don't Starve",
+        "origin": "other",
+        "author": "mgr.inz.Player",
+        "official_url": "https://forum.cheatengine.org/viewtopic.php?t=560672",
+        "gcm_url": "GCM/GCM Trainers/Don't Starve Trainer [mgr.inz.Player].exe",
+        "version": "2013.4.30"
+    },
+    {
+        "game_name": "Keep on Mining! - Worlds",
+        "origin": "ct_other",
+        "author": "WannaTouch",
+        "official_url": "https://fearlessrevolution.com/viewtopic.php?t=38867",
+        "gcm_url": "GCM/GCM Trainers/Keep on Mining! - Worlds Trainer [WannaTouch].ct",
+        "version": "2026.4.8"
+    },
+    {
+        "game_name": "LIFE EFFECT Survival",
+        "origin": "ct_other",
+        "author": "Patka",
+        "official_url": "https://fearlessrevolution.com/viewtopic.php?t=38944",
+        "gcm_url": "GCM/GCM Trainers/LIFE EFFECT Survival Trainer [Patka].zip",
+        "version": "2026.6.30"
+    },
+    {
+        "game_name": "Little Sim World",
+        "origin": "ct_other",
+        "author": "BabyGroot",
+        "official_url": "https://fearlessrevolution.com/viewtopic.php?t=34848",
+        "gcm_url": "GCM/GCM Trainers/Little Sim World Trainer [BabyGroot].zip",
+        "version": "2025.5.3"
+    },
+    {
+        "game_name": "MENACE",
+        "origin": "ct_other",
+        "author": "eggs",
+        "official_url": "https://fearlessrevolution.com/viewtopic.php?t=38170",
+        "gcm_url": "GCM/GCM Trainers/MENACE Trainer [eggs].zip",
+        "version": "2026.3.8"
+    },
+    {
+        "game_name": "Serious Sam VR: The Last Hope",
+        "origin": "ct_other",
+        "author": "Milky520",
+        "gcm_url": "GCM/GCM Trainers/Serious Sam VR_The Last Hope Trainer [Milky520].ct",
+        "version": "2026.8.31"
+    },
+    {
+        "game_name": "Terraria",
+        "origin": "ct_other",
+        "author": "zey",
+        "official_url": "https://fearlessrevolution.com/viewtopic.php?t=38226",
+        "gcm_url": "GCM/GCM Trainers/Terraria Trainer [zey].ct",
+        "version": "2026.8.22"
+    },
+    {
+        "game_name": "Vagrus - The Riven Realms",
+        "origin": "ct_other",
+        "author": "gideon25",
+        "official_url": "https://fearlessrevolution.com/viewtopic.php?t=19330",
+        "gcm_url": "GCM/GCM Trainers/Vagrus - The Riven Realms Trainer [gideon25].zip",
+        "version": "2025.12.25"
+    },
+    {
+        "game_name": "Warcraft III: Reforged",
+        "origin": "other",
+        "author": "两杯沈梦溪",
+        "official_url": "https://github.com/dc114154qq/war3-reforged-trainer, https://www.bilibili.com/video/BV1CFj262EBS",
+        "gcm_url": "GCM/GCM Trainers/Warcraft III_Reforged Trainer [LiangBeiShenMengxi].exe",
+        "version": "2026.9.4"
+    },
+    {
+        "game_name": "Command & Conquer: Yuri's Revenge",
+        "origin": "other",
+        "author": "AdjWang",
+        "official_url": "https://github.com/AdjWang/RA2YurisRevengeTrainer",
+        "gcm_url": "GCM/GCM Trainers/Command & Conquer_Yuri's Revenge Trainer [AdjWang].zip",
+        "extension": "ra2_trainer.exe",
+        "version": "2026.6.25"
+    },
+    {
+        "game_name": "Yakuza Kiwami 2",
+        "origin": "ct_other",
+        "author": "ygf",
+        "gcm_url": "GCM/GCM Trainers/Yakuza Kiwami 2 Trainer [ygf].ct",
+        "version": "2026.9.1"
+    },
+    {
+        "game_name": "Monster Hunter Stories",
+        "origin": "other",
+        "author": "柑橘",
+        "gcm_url": "GCM/GCM Trainers/Monster Hunter Stories Trainer [GanJu].zip",
+        "version": "2026.9.2"
+    },
+    {
+        "game_name": "Last Breath",
+        "origin": "other",
+        "author": "十二月",
+        "gcm_url": "GCM/GCM Trainers/Last Breath Trainer [ShiErYue].zip",
+        "version": "2026.8.30"
+    },
+    {
+        "game_name": "The Legend of Heroes: Zero no Kiseki Kai",
+        "origin": "ct_other",
+        "author": "PP",
+        "gcm_url": "GCM/GCM Trainers/The Legend of Heroes_Zero no Kiseki Kai Trainer [PP].ct",
+        "version": "2024.2.23"
+    },
+    {
+        "game_name": "Absolum",
+        "origin": "ct_other",
+        "author": "MBRKiNG",
+        "official_url": "https://opencheattables.com/viewtopic.php?t=1576",
+        "gcm_url": "GCM/GCM Trainers/Absolum Trainer [MBRKiNG].ct",
+        "version": "2025.10.14"
+    },
+    {
+        "game_name": "Ruins of Dawn",
+        "origin": "other",
+        "author": "3DM",
+        "official_url": "https://bbs.3dmgame.com/thread-6671995-1-1.html",
+        "gcm_url": "GCM/GCM Trainers/Ruins of Dawn Trainer [3DM].exe",
+        "version": "2026.8.30"
+    },
+    {
+        "game_name": "Cubic Cosmos",
+        "origin": "ct_other",
+        "author": "3DM",
+        "official_url": "https://bbs.3dmgame.com/thread-6628506-1-1.html",
+        "gcm_url": "GCM/GCM Trainers/Cubic Cosmos Trainer [3DM].ct",
+        "version": "2025.10.19"
+    },
+    {
+        "game_name": "Ghostrunner 2",
+        "origin": "ct_other",
+        "author": "天乐1337",
+        "official_url": "https://bbs.3dmgame.com/thread-6613912-1-1.html",
+        "gcm_url": "GCM/GCM Trainers/Ghostrunner 2 Trainer [TianLe1337].ct",
+        "version": "2026.1.5"
+    },
+    {
+        "game_name": "Shadow Warrior 3: Definitive Edition",
+        "origin": "ct_other",
+        "author": "天乐1337",
+        "official_url": "https://bbs.3dmgame.com/thread-6613826-1-1.html",
+        "gcm_url": "GCM/GCM Trainers/Shadow Warrior 3_Definitive Edition Trainer [TianLe1337].ct",
+        "version": "2025.9.14"
+    },
+    {
+        "game_name": "ELEX",
+        "origin": "ct_other",
+        "author": "dl748",
+        "official_url": "https://fearlessrevolution.com/viewtopic.php?t=5190, https://bbs.3dmgame.com/thread-6250181-1-1.html",
+        "gcm_url": "GCM/GCM Trainers/ELEX Trainer [dl748].zip",
+        "version": "2017.10.30"
+    },
+    {
+        "game_name": "Empires of the Undergrowth",
+        "origin": "ct_other",
+        "author": "闲然自动",
+        "official_url": "https://space.bilibili.com/1680674287",
+        "gcm_url": "GCM/GCM Trainers/Empires of the Undergrowth Trainer [XianRanZiDong].ct",
+        "version": "2026.8.31"
+    },
+    {
+        "game_name": "Idle Slayer",
+        "origin": "ct_other",
+        "author": "Send",
+        "official_url": "https://fearlessrevolution.com/viewtopic.php?t=32321",
+        "gcm_url": "GCM/GCM Trainers/Idle Slayer Trainer [Send].ct",
+        "version": "2025.12.10"
+    },
+    {
+        "game_name": "No Man's Sky",
+        "origin": "other",
+        "author": "蓝夜深空",
+        "custom_name_en": "Model Import & Export Tool",
+        "custom_name_zh": "建模导出入工具",
+        "official_url": "https://oogc.cc/zy/down-view-69",
+        "gcm_url": "GCM/GCM Trainers/No Man's Sky Model Import & Export Tool [LanYeShenKong].exe",
+        "version": "2026.4.1"
+    },
+    {
+        "game_name": "Relief",
+        "origin": "ct_other",
+        "author": "wzslrb",
+        "official_url": "https://bbs.3dmgame.com/forum.php?mod=redirect&goto=findpost&ptid=6683309&pid=383388845",
+        "gcm_url": "GCM/GCM Trainers/Relief Trainer [wzslrb].ct",
+        "version": "2026.7.5"
+    },
+    {
+        "game_name": "STAR OCEAN THE DIVINE FORCE",
+        "origin": "ct_other",
+        "author": "asmoranomar",
+        "official_url": "https://fearlessrevolution.com/viewtopic.php?t=21861, https://bbs.3dmgame.com/thread-6415380-1-1.html",
+        "gcm_url": "GCM/GCM Trainers/STAR OCEAN THE DIVINE FORCE Trainer [asmoranomar].zip",
+        "version": "2022.11.19"
+    },
+    {
+        "game_name": "Backpack Battles",
+        "origin": "other",
+        "author": "ZK",
+        "gcm_url": "GCM/GCM Trainers/Backpack Battles Trainer [ZK].exe",
+        "version": "2026.9.6"
+    },
+    {
+        "game_name": "Shanghai Blood of War",
+        "origin": "other",
+        "author": "冷影子",
+        "gcm_url": "GCM/GCM Trainers/Shanghai Blood of War Trainer [LengYingZi].exe",
+        "version": "2026.9.5"
+    },
+    {
+        "game_name": "Generation of Chaos Desire",
+        "origin": "ct_other",
+        "gcm_url": "GCM/GCM Trainers/Generation of Chaos Desire Trainer.ct",
+        "version": "2026.9.5"
     }
 ]
