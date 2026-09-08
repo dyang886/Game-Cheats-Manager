@@ -1,0 +1,187 @@
+#
+msgid ""
+msgstr ""
+
+#: pseudocodediagram-file
+msgid "File"
+msgstr "文件"
+
+#: pseudocodediagram-lff
+msgid "Load from file"
+msgstr "從文件載入"
+
+#: pseudocodediagram-stfywto
+msgid "Select the file you wish to open"
+msgstr "選擇要打開的文件"
+
+#: pseudocodediagram-dfcc
+msgid "Diagram files (*.CEDIAG )|*.CEDIAG"
+msgstr "圖表文件（.CEDIAG）|*.CEDIAG"
+
+#: pseudocodediagram-stf
+msgid "Save to file"
+msgstr "保存到文件"
+
+#: pseudocodediagram-fitfywtstda
+msgid "Fill in the filename you wish to save this diagram as"
+msgstr "填寫要將此關係圖另存為的檔案名"
+
+#: pseudocodediagram-sdti
+msgid "Save diagram to image"
+msgstr "將圖表保存到圖像"
+
+#: pseudocodediagram-fitfywtstdi
+msgid "Fill in the filename you wish to save this diagram image"
+msgstr "填寫要保存此圖表圖像的檔案名"
+
+#: pseudocodediagram-pfpp
+msgid "PNG files (*.PNG )|*.PNG"
+msgstr "PNG文件（.PNG）|*.PNG"
+
+#: pseudocodediagram-close
+msgid "Close"
+msgstr "關閉"
+
+#: pseudocodediagram-display
+msgid "Display"
+msgstr "顯示"
+
+#: pseudocodediagram-spfu2oc
+msgid "Show path from Ultimap1/2 or Codefilter"
+msgstr "顯示來自 Ultimap1/2 或 Codefilter 的路徑"
+
+#: pseudocodediagram-spftw
+msgid "Show path from tracer window"
+msgstr "從跟蹤器窗口顯示路徑"
+
+#: pseudocodediagram-tsa
+msgid "Tracer starting at %8x (%s)"
+msgstr "跟蹤程序從 %8x 開始（%s）"
+
+#: pseudocodediagram-tp
+msgid "Tracer paths"
+msgstr "追蹤路徑"
+
+#: pseudocodediagram-wtwsbu
+msgid "Which tracer window shall be used?"
+msgstr "應使用哪種示蹤窗？"
+
+#: pseudocodediagram-ntwrv
+msgid "No tracerform with results visible"
+msgstr "無可見結果的示蹤劑"
+
+#: pseudocodediagram-v
+msgid "View"
+msgstr "查看"
+
+#: pseudocodediagram-z
+msgid "Zoom"
+msgstr "縮放"
+
+#: pseudocodediagram-zi
+msgid "Zoom in"
+msgstr "放大"
+
+#: pseudocodediagram-zo
+msgid "Zoom out"
+msgstr "縮小"
+
+#: pseudocodediagram-e
+msgid "Edit"
+msgstr "編輯"
+
+#: pseudocodediagram-nh
+msgid "new header"
+msgstr "新標題"
+
+#: pseudocodediagram-nbbc
+msgid "new block background color (0xBBGGRR)"
+msgstr "新塊背景色（0xBBGGRR）"
+
+#: pseudocodediagram-sl
+msgid "Sources list"
+msgstr "來源列表"
+
+#: pseudocodediagram-dl
+msgid "Destinations list"
+msgstr "目的地列表"
+
+#: pseudocodediagram-be
+msgid "Block editor"
+msgstr "塊編輯器"
+
+#: pseudocodediagram-ok
+msgid "OK"
+msgstr "好的"
+
+#: pseudocodediagram-cancel
+msgid "Cancel"
+msgstr "取消"
+
+#: pseudocodediagram-gts
+msgid "Go to source"
+msgstr "轉到源"
+
+#: pseudocodediagram-gtd
+msgid "Go to destination"
+msgstr "前往目的地"
+
+#: pseudocodediagram-rap
+msgid "Remove all points"
+msgstr "刪除所有點"
+
+#: pseudocodediagram-ebh
+msgid "Edit block header"
+msgstr "編輯塊標題"
+
+#: pseudocodediagram-ebc
+msgid "Edit block color"
+msgstr "編輯塊顏色"
+
+#: pseudocodediagram-ls
+msgid "List sources"
+msgstr "列出來源"
+
+#: pseudocodediagram-ld
+msgid "List destinations"
+msgstr "列出目的地"
+
+#: pseudocodediagram-eac
+msgid "Edit annotation color"
+msgstr "編輯批註顏色"
+
+#: pseudocodediagram-da
+msgid "Delete annotation"
+msgstr "刪除批註"
+
+#: pseudocodediagram-ca
+msgid "Create annotation"
+msgstr "創建批註"
+
+#: pseudocodediagram-mdi
+msgid "[Diagram info]"
+msgstr "[圖表資訊]"
+
+#: pseudocodediagram-fstart
+msgid " Function start: 0x%X"
+msgstr "函數開始：X%X"
+
+#: pseudocodediagram-fstop
+msgid " Function stop: 0x%X"
+msgstr "函數停止：X%X"
+
+#: pseudocodediagram-dbc
+msgid " Diagram blocks count: %d"
+msgstr "圖表塊計數 %d"
+
+#: pseudocodediagram-dlc
+msgid " Diagram links count: %d"
+msgstr "圖錶連結計數 %d"
+
+#: pseudocodediagram-diagram
+msgid "Diagram"
+msgstr "圖表"
+
+#: pseudocodediagram-sd
+msgid "Spawn diagram"
+msgstr "生成關係圖"
