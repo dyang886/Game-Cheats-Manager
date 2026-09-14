@@ -1,10 +1,10 @@
 import ctypes
+import filecmp
 import os
 import re
 import shutil
 import subprocess
 import time
-import traceback
 from ctypes import wintypes
 
 from PyQt6.QtCore import pyqtSignal
@@ -33,13 +33,15 @@ class DownloadTrainersThread(DownloadBaseThread):
                 if os.path.exists(DOWNLOAD_TEMP_DIR):
                     shutil.rmtree(DOWNLOAD_TEMP_DIR)
                 os.makedirs(DOWNLOAD_TEMP_DIR, exist_ok=True)
-            except Exception as e:
-                self.message.emit(tr("Could not initialize the temporary download folder, please try turning your antivirus software off."), "failure")
+            except Exception as error:
+                print(f"Could not prepare temporary download folder: {error}")
+                self.message.emit(tr("Could not prepare the temporary download folder. Check its permissions and your antivirus software."), "failure")
                 time.sleep(self.update_error_delay)
                 self.finished.emit(1)
                 return
 
             self.src_dst = []  # List content: { "src": source_path, "dst": destination_path, "version": YYYY.MM.DD }
+            self.expected_source_files = {}
             self.instructionDst = ""
             selected_trainer = None
             if not self.update_entry:
@@ -61,16 +63,18 @@ class DownloadTrainersThread(DownloadBaseThread):
 
             try:
                 self.install_prepared_trainer(selected_trainer)
-
-                if self.instructionDst and not self.update_entry:
-                    self.messageBox.emit("info", tr("Attention"), tr("This trainer requires additional setup before use. Please check the opened folder for instructions.\nThe instructions are always stored in the 'gcm-instructions' folder."))
-                    os.startfile(self.instructionDst)
-
-            except Exception as e:
-                self.message.emit(tr("An error occurred when installing trainer: ") + str(e), "failure")
+            except Exception as error:
+                self.message.emit(tr("An error occurred when installing trainer: ") + str(error), "failure")
                 time.sleep(self.download_finish_delay)
                 self.finished.emit(1)
                 return
+
+            if self.instructionDst and not self.update_entry:
+                self.messageBox.emit("info", tr("Attention"), tr("This trainer requires additional setup before use. Please check the opened folder for instructions.\nThe instructions are always stored in the 'gcm-instructions' folder."))
+                try:
+                    os.startfile(self.instructionDst)
+                except OSError as error:
+                    print(f"Could not open trainer instructions: {error}")
 
             if self.is_cheat_engine_package(selected_trainer):
                 self.report_cheat_engine_install()
@@ -79,32 +83,251 @@ class DownloadTrainersThread(DownloadBaseThread):
             time.sleep(self.download_finish_delay)
             self.finished.emit(0)
 
-        except Exception as e:
-            traceback.print_exc()
-            self.message.emit(tr("An error occurred while downloading trainer: ") + str(e), "failure")
+        except Exception as error:
+            print(f"Could not prepare trainer: {error}")
+            self.message.emit(tr("Could not prepare the downloaded trainer. Please try again and check your antivirus software."), "failure")
             time.sleep(self.download_finish_delay)
             self.finished.emit(1)
 
-    def install_prepared_trainer(self, selected_trainer):
-        """Back up an update, install it, and restore missing original files on failure."""
-        trainer_directory = self.update_entry["trainer_dir"] if self.update_entry else None
-        backup_root = os.path.join(self.trainerDownloadPath, TRAINER_BACKUP_DIRECTORY)
-        backup_directory = None
-        backup_ready = False
-        retain_backup = False
+    @staticmethod
+    def file_tree(root):
+        """Return the relative path and size of every file below root."""
+        root = os.path.abspath(root)
+        if not os.path.isdir(root):
+            raise FileNotFoundError(root)
+
+        tree = {}
+        for current_root, _, files in os.walk(root):
+            for filename in files:
+                path = os.path.join(current_root, filename)
+                relative_path = os.path.normpath(os.path.relpath(path, root))
+                tree[relative_path] = os.path.getsize(path)
+        return tree
+
+    @staticmethod
+    def extract_archive(archive_path, extraction_root, ignored_paths=()):
+        """Read the archive file tree, then extract it."""
+        archive_error = tr("The downloaded archive is invalid or incomplete. Your antivirus software may have blocked or removed it.")
+        try:
+            result = subprocess.run(
+                [unzip_path, "l", "-slt", "-ba", "-sccUTF-8", archive_path],
+                check=True,
+                capture_output=True,
+                text=True,
+                encoding="utf-8",
+                errors="replace",
+                creationflags=subprocess.CREATE_NO_WINDOW
+            )
+        except Exception as error:
+            print(f"Could not read archive file tree: {error}")
+            raise RuntimeError(archive_error) from error
+
+        ignored = {os.path.normcase(os.path.normpath(path)) for path in ignored_paths}
+        extraction_root = os.path.abspath(extraction_root)
+        tree = {}
+        record = {}
+
+        def add_record():
+            path = record.get("Path")
+            if not path:
+                return
+
+            relative_path = os.path.normpath(path.replace("/", os.sep))
+            if os.path.normcase(relative_path) in ignored:
+                return
+            if record.get("Folder") == "+" or "Size" not in record:
+                return
+            destination = os.path.abspath(os.path.join(extraction_root, relative_path))
+            tree[destination] = int(record["Size"])
+
+        for line in result.stdout.splitlines() + [""]:
+            if not line:
+                add_record()
+                record = {}
+            elif " = " in line:
+                key, value = line.split(" = ", 1)
+                record[key] = value
+
+        if not tree:
+            print("Archive file tree is empty.")
+            raise RuntimeError(archive_error)
 
         try:
+            subprocess.run(
+                [unzip_path, "x", "-y", archive_path, f"-o{extraction_root}"],
+                check=True,
+                creationflags=subprocess.CREATE_NO_WINDOW
+            )
+        except Exception as error:
+            print(f"Could not extract archive: {error}")
+            raise RuntimeError(archive_error) from error
+        return tree
+
+    @staticmethod
+    def validate_files(expected):
+        if not expected:
+            raise RuntimeError("No trainer files were available for verification.")
+        for path, size in expected.items():
+            try:
+                actual_size = os.path.getsize(path) if os.path.isfile(path) else None
+            except OSError as error:
+                raise RuntimeError(f"Could not inspect trainer file '{path}': {error}") from error
+            if actual_size != size:
+                raise RuntimeError(f"Trainer file '{path}' has {actual_size} bytes; expected {size}.")
+
+    def restore_backup(self, backup_directory, trainer_directory, expected_tree):
+        """Mirror a backup into the trainer directory and verify the restored files."""
+        if self.file_tree(backup_directory) != expected_tree:
+            raise RuntimeError(f"Trainer backup '{backup_directory}' no longer matches its verified file tree.")
+        filecmp.clear_cache()
+
+        def remove_entry(path):
+            if os.path.isdir(path) and not os.path.islink(path):
+                shutil.rmtree(path)
+            elif os.path.lexists(path):
+                os.remove(path)
+
+        if (os.path.lexists(trainer_directory)
+                and (not os.path.isdir(trainer_directory) or os.path.islink(trainer_directory))):
+            remove_entry(trainer_directory)
+        os.makedirs(trainer_directory, exist_ok=True)
+
+        # Remove files that did not exist in the backup and conflicting directories.
+        for current_root, directories, files in os.walk(trainer_directory, topdown=False):
+            for filename in files:
+                path = os.path.join(current_root, filename)
+                if os.path.normpath(os.path.relpath(path, trainer_directory)) not in expected_tree:
+                    os.remove(path)
+            for directory in directories:
+                path = os.path.join(current_root, directory)
+                relative_path = os.path.normpath(os.path.relpath(path, trainer_directory))
+                backup_path = os.path.join(backup_directory, relative_path)
+                if os.path.islink(path) or os.path.isfile(backup_path):
+                    remove_entry(path)
+                elif not os.listdir(path):
+                    os.rmdir(path)
+
+        # Copy only missing or different files, leaving identical open files untouched.
+        for relative_path, size in expected_tree.items():
+            source = os.path.join(backup_directory, relative_path)
+            destination = os.path.join(trainer_directory, relative_path)
+            if not os.path.isfile(source) or os.path.getsize(source) != size:
+                raise RuntimeError(f"Trainer backup file '{source}' failed verification.")
+            if os.path.islink(destination) or (os.path.lexists(destination) and not os.path.isfile(destination)):
+                remove_entry(destination)
+            if os.path.isfile(destination) and filecmp.cmp(source, destination, shallow=False):
+                continue
+            os.makedirs(os.path.dirname(destination), exist_ok=True)
+            shutil.copy2(source, destination)
+
+        if self.file_tree(trainer_directory) != expected_tree:
+            raise RuntimeError(f"Restored trainer '{trainer_directory}' does not match the backup file tree.")
+        filecmp.clear_cache()
+        for relative_path in expected_tree:
+            if not filecmp.cmp(
+                os.path.join(backup_directory, relative_path),
+                os.path.join(trainer_directory, relative_path),
+                shallow=False
+            ):
+                raise RuntimeError(f"Restored trainer file '{relative_path}' does not match its backup.")
+
+    def install_prepared_trainer(self, selected_trainer):
+        """Install verified content and restore a verified backup directly on failure."""
+        trainer_directory = os.path.abspath(self.update_entry["trainer_dir"]) if self.update_entry else None
+        download_root = os.path.abspath(self.trainerDownloadPath)
+        backup_root = os.path.join(download_root, TRAINER_BACKUP_DIRECTORY)
+        backup_paths = []
+        backups = {}
+        backups_ready = False
+        retained_backups = set()
+        placement_started = False
+        cleanup_roots = []
+        install_error_message = tr("Could not install the trainer files. Close any running trainer and check your antivirus software.")
+        failure_message = install_error_message
+
+        def remove_path(path):
+            if os.path.isdir(path) and not os.path.islink(path):
+                shutil.rmtree(path)
+            elif os.path.lexists(path):
+                os.remove(path)
+
+        try:
+            # Verify the prepared sources and map their tree through src_dst.
+            self.validate_files(self.expected_source_files)
+            mappings = sorted(
+                ((os.path.abspath(item["src"]), os.path.abspath(item["dst"])) for item in self.src_dst),
+                key=lambda pair: len(pair[0]),
+                reverse=True
+            )
+            expected_destinations = {}
+            for source, size in self.expected_source_files.items():
+                for source_root, destination_root in mappings:
+                    relative_path = os.path.relpath(source, source_root)
+                    if relative_path == ".":
+                        destination = destination_root
+                    elif relative_path == os.pardir or relative_path.startswith(os.pardir + os.sep):
+                        continue
+                    else:
+                        destination = os.path.abspath(os.path.join(destination_root, relative_path))
+                    expected_destinations[destination] = size
+                    break
+                else:
+                    raise RuntimeError(f"No installation mapping contains trainer file '{source}'.")
+
+            # Remember the top-level destinations to verify and clean on failure.
+            destination_roots = []
+            for _, destination in mappings:
+                relative_path = os.path.relpath(destination, download_root)
+                root = os.path.join(download_root, relative_path.split(os.sep, 1)[0])
+                if root not in destination_roots:
+                    destination_roots.append(root)
+
+            existing_directories = []
             if trainer_directory:
-                backup_directory = os.path.join(
-                    backup_root,
-                    os.path.basename(trainer_directory)
-                )
+                existing_directories.append(trainer_directory)
+            for root in destination_roots:
+                if os.path.lexists(root) and not any(
+                    os.path.normcase(root) == os.path.normcase(path) for path in existing_directories
+                ):
+                    existing_directories.append(root)
+
+            cleanup_roots = [
+                root for root in destination_roots
+                if not any(os.path.normcase(root) == os.path.normcase(path) for path in existing_directories)
+            ]
+
+            if existing_directories:
+                failure_message = tr("Could not create a complete trainer backup. The existing installation was not changed. Your antivirus software may have interfered.")
                 os.makedirs(backup_root, exist_ok=True)
-                if os.path.lexists(backup_directory):
-                    shutil.rmtree(backup_directory)
-                shutil.copytree(trainer_directory, backup_directory)
-                backup_ready = True
-                shutil.rmtree(trainer_directory)
+                for existing_directory in existing_directories:
+                    backup_directory = os.path.join(backup_root, os.path.basename(existing_directory))
+                    backup_paths.append(backup_directory)
+                    original_tree = self.file_tree(existing_directory)
+                    if os.path.lexists(backup_directory):
+                        retained_backups.add(backup_directory)
+                        print("Reusing existing trainer backup.")
+                    else:
+                        shutil.copytree(existing_directory, backup_directory)
+
+                    backup_tree = self.file_tree(backup_directory)
+                    filecmp.clear_cache()
+                    if backup_tree != original_tree or any(
+                        not filecmp.cmp(
+                            os.path.join(existing_directory, path),
+                            os.path.join(backup_directory, path),
+                            shallow=False
+                        )
+                        for path in original_tree
+                    ):
+                        raise RuntimeError(f"Trainer backup '{backup_directory}' does not match the installed trainer.")
+                    retained_backups.discard(backup_directory)
+                    backups[existing_directory] = (backup_directory, original_tree)
+
+                backups_ready = True
+                failure_message = tr("Could not remove the existing trainer. Close it if it is running, check your antivirus software, and try again.")
+                for existing_directory in existing_directories:
+                    remove_path(existing_directory)
+                failure_message = install_error_message
 
             info = {
                 "game_name": selected_trainer["game_name"],
@@ -117,6 +340,7 @@ class DownloadTrainersThread(DownloadBaseThread):
             if selected_trainer.get("extension"):
                 info["extension"] = selected_trainer["extension"]
 
+            placement_started = True
             info_directories = set()
             for item in self.src_dst:
                 if os.path.isfile(item["src"]):
@@ -124,7 +348,6 @@ class DownloadTrainersThread(DownloadBaseThread):
                     os.makedirs(destination_directory, exist_ok=True)
                 else:
                     destination_directory = item["dst"]
-
                 shutil.move(item["src"], item["dst"])
                 if os.path.normpath(destination_directory) != os.path.normpath(self.instructionDst):
                     info_directories.add(destination_directory)
@@ -133,41 +356,65 @@ class DownloadTrainersThread(DownloadBaseThread):
                 info_path = os.path.join(destination_directory, "gcm_info.json")
                 with open(info_path, "w", encoding="utf-8") as info_file:
                     json.dump(info, info_file, ensure_ascii=False, indent=4)
+                expected_destinations[os.path.abspath(info_path)] = os.path.getsize(info_path)
 
-        except Exception:
-            if backup_ready:
-                try:
-                    for source_root, directories, files in os.walk(backup_directory):
-                        relative_root = os.path.relpath(source_root, backup_directory)
-                        destination_root = trainer_directory if relative_root == "." else os.path.join(trainer_directory, relative_root)
-                        os.makedirs(destination_root, exist_ok=True)
+            self.validate_files(expected_destinations)
+            for root in destination_roots:
+                expected_tree = {}
+                for destination, size in expected_destinations.items():
+                    relative_path = os.path.normpath(os.path.relpath(destination, root))
+                    if relative_path != os.pardir and not relative_path.startswith(os.pardir + os.sep):
+                        expected_tree[relative_path] = size
+                if self.file_tree(root) != expected_tree:
+                    raise RuntimeError(f"Installed trainer '{root}' does not match its expected file tree.")
 
-                        for directory in directories:
-                            os.makedirs(os.path.join(destination_root, directory), exist_ok=True)
+        except Exception as install_error:
+            print(f"Trainer installation failed: {install_error}")
+            cleanup_errors = []
+            if placement_started:
+                for path in cleanup_roots:
+                    try:
+                        remove_path(path)
+                    except Exception as cleanup_error:
+                        cleanup_errors.append(cleanup_error)
 
-                        for filename in files:
-                            source = os.path.join(source_root, filename)
-                            destination = os.path.join(destination_root, filename)
-                            if not os.path.lexists(destination):
-                                shutil.copy2(source, destination)
+            rollback_errors = []
+            if backups_ready:
+                for existing_directory, (backup_directory, original_tree) in backups.items():
+                    try:
+                        self.restore_backup(backup_directory, existing_directory, original_tree)
+                    except Exception as error:
+                        rollback_errors.append(error)
+                        if os.path.lexists(backup_directory):
+                            retained_backups.add(backup_directory)
+                backups_ready = False
 
-                except Exception as rollback_error:
-                    retain_backup = True
-                    print(
-                        f"Could not roll back trainer installation; backup retained at "
-                        f"'{backup_directory}': {rollback_error}"
-                    )
-            raise
+            if cleanup_errors and backups and not rollback_errors:
+                rollback_errors.append(RuntimeError(f"Could not remove incomplete trainer paths: {cleanup_errors}"))
+                retained_backups.update(path for path in backup_paths if os.path.lexists(path))
+
+            if rollback_errors:
+                print(f"Could not restore trainer: {rollback_errors[0]}")
+                raise RuntimeError(
+                    tr("The previous trainer installation could not be fully restored. Check your antivirus quarantine and the '.gcm-backup' folder.")
+                ) from install_error
+            if cleanup_errors:
+                print(f"Could not remove incomplete trainer files: {cleanup_errors[0]}")
+            raise RuntimeError(failure_message) from install_error
 
         finally:
-            try:
-                if backup_directory and not retain_backup and os.path.isdir(backup_directory):
-                    shutil.rmtree(backup_directory)
+            for backup_directory in backup_paths:
+                if backup_directory not in retained_backups and os.path.isdir(backup_directory):
+                    try:
+                        shutil.rmtree(backup_directory)
+                    except OSError as error:
+                        print(f"Could not clean up trainer backup: {error}")
 
+            try:
                 if os.path.isdir(backup_root) and not os.listdir(backup_root):
                     os.rmdir(backup_root)
             except OSError as error:
-                print(f"Could not clean up trainer backups: {error}")
+                print(f"Could not clean up trainer backup: {error}")
 
     def report_cheat_engine_install(self):
         for item in self.src_dst:
@@ -271,6 +518,7 @@ class DownloadTrainersThread(DownloadBaseThread):
             trainerTemp = self.request_download(signed_url, DOWNLOAD_TEMP_DIR, raise_errors=True)
             if not trainerTemp:
                 raise Exception(tr("Internet request failed."))
+            self.expected_source_files = {os.path.abspath(trainerTemp): os.path.getsize(trainerTemp)}
 
         except Exception as e:
             self.message.emit(self.format_request_error(e), "failure")
@@ -284,8 +532,7 @@ class DownloadTrainersThread(DownloadBaseThread):
             extracted = True
             self.message.emit(tr("Decompressing..."), None)
             try:
-                command = [unzip_path, "x", "-y", trainerTemp, f"-o{extractedContentPath}"]
-                subprocess.run(command, check=True, creationflags=subprocess.CREATE_NO_WINDOW)
+                self.expected_source_files = self.extract_archive(trainerTemp, extractedContentPath)
 
             except Exception as e:
                 self.message.emit(tr("An error occurred while extracting downloaded trainer: ") + str(e), "failure")
@@ -293,7 +540,10 @@ class DownloadTrainersThread(DownloadBaseThread):
                 self.finished.emit(1)
                 return False
 
-            os.remove(trainerTemp)
+            try:
+                os.remove(trainerTemp)
+            except OSError as error:
+                print(f"Could not remove extracted archive: {error}")
 
         if extracted:
             # Set instruction destination if gcm-instructions folder present at root
@@ -495,10 +745,10 @@ class DownloadTrainersThread(DownloadBaseThread):
         self.message.emit(tr("Downloading..."), "download")
         try:
             targetUrl = self.get_signed_download_url(selected_trainer["url"], raise_errors=True)
-
             trainerTemp = self.request_download(targetUrl, DOWNLOAD_TEMP_DIR, raise_errors=True)
             if not trainerTemp:
                 raise Exception(tr("Internet request failed."))
+            self.expected_source_files = {os.path.abspath(trainerTemp): os.path.getsize(trainerTemp)}
 
         except Exception as e:
             self.message.emit(self.format_request_error(e), "failure")
@@ -510,8 +760,7 @@ class DownloadTrainersThread(DownloadBaseThread):
         if os.path.splitext(trainerTemp)[1].lower() in ARCHIVE_EXTENSIONS:
             self.message.emit(tr("Decompressing..."), None)
             try:
-                command = [unzip_path, "x", "-y", trainerTemp, f"-o{DOWNLOAD_TEMP_DIR}"]
-                subprocess.run(command, check=True, creationflags=subprocess.CREATE_NO_WINDOW)
+                self.expected_source_files = self.extract_archive(trainerTemp, DOWNLOAD_TEMP_DIR, ("info.txt",))
 
             except Exception as e:
                 self.message.emit(tr("An error occurred while extracting downloaded trainer: ") + str(e), "failure")
@@ -520,31 +769,29 @@ class DownloadTrainersThread(DownloadBaseThread):
                 return False
 
         # Locate extracted .exe file
-        cnt = 0
         extractedTrainerNames = []
         extractedAntiCheatNames = []
         for filename in os.listdir(DOWNLOAD_TEMP_DIR):
-            if "trainer" in filename.lower() and filename.endswith(".exe"):
+            if "trainer" in filename.lower() and filename.lower().endswith(".exe"):
                 extractedTrainerNames.append(filename)
-            # Count anti-cheat files
-            elif ("trainer" not in filename.lower() and filename != os.path.basename(trainerTemp)) and filename.lower() != "info.txt":
+            elif filename != os.path.basename(trainerTemp) and filename.lower() != "info.txt":
                 extractedAntiCheatNames.append(filename)
-                cnt += 1
 
-        # Warn user if anti-cheat files found
-        if cnt > 0:
+        # Install auxiliary files as instructions
+        if extractedAntiCheatNames:
             self.instructionDst = os.path.join(self.trainerDownloadPath, trainerName_display, "gcm-instructions")
             for antiCheatFile in extractedAntiCheatNames:
                 self.src_dst.append({"src": os.path.join(DOWNLOAD_TEMP_DIR, antiCheatFile), "dst": os.path.join(self.instructionDst, antiCheatFile)})
 
-        # Check if extracted trainer name is None
+        # Require at least one trainer executable
         if not extractedTrainerNames:
-            self.message.emit(tr("Could not find the downloaded trainer file, please try turning your antivirus software off."), "failure")
+            print("No trainer executable was found in downloaded files.")
+            self.message.emit(tr("Trainer files are missing or incomplete. Your antivirus software may have removed them."), "failure")
             time.sleep(self.download_finish_delay)
             self.finished.emit(1)
             return False
 
-        # Construct destination trainer name dict (may have multiple versions of a same game)
+        # Map each trainer version to its destination folder
         os.makedirs(self.trainerDownloadPath, exist_ok=True)
         if len(extractedTrainerNames) > 1:
             if self.update_entry:
@@ -584,12 +831,17 @@ class DownloadTrainersThread(DownloadBaseThread):
             self.modify_fling_settings(True)
             for item in self.src_dst:
                 if item["src"].lower().endswith(".exe"):
-                    self.remove_bgMusic(item["src"])
+                    source = os.path.abspath(item["src"])
+                    self.remove_bgMusic(source)
+                    self.expected_source_files[source] = os.path.getsize(source)
         else:
             self.modify_fling_settings(False)
 
-        if os.path.exists(trainerTemp) and os.path.basename(trainerTemp) not in extractedTrainerNames:
-            os.remove(trainerTemp)
+        if os.path.basename(trainerTemp) not in extractedTrainerNames:
+            try:
+                os.remove(trainerTemp)
+            except OSError as error:
+                print(f"Could not remove extracted archive: {error}")
 
         return True
 
@@ -666,7 +918,7 @@ class DownloadTrainersThread(DownloadBaseThread):
                     # Written only once every patch succeeded, so a failure leaves the file as is
                     with open(original_file, "wb") as trainer_file:
                         trainer_file.write(patched_data)
-                    print(f"Successfully applied all patches to: {exe_file}\n")
+                    print(f"Successfully applied all patches to: {exe_file}")
 
                 except Exception as e:
                     print(f"An error occurred during XiaoXing patching: {e}")
@@ -692,6 +944,7 @@ class DownloadTrainersThread(DownloadBaseThread):
             trainerTemp = self.request_download(signed_url, DOWNLOAD_TEMP_DIR, raise_errors=True)
             if not trainerTemp:
                 raise Exception(tr("Internet request failed."))
+            self.expected_source_files = {os.path.abspath(trainerTemp): os.path.getsize(trainerTemp)}
 
         except Exception as e:
             self.message.emit(self.format_request_error(e), "failure")
@@ -705,8 +958,7 @@ class DownloadTrainersThread(DownloadBaseThread):
             extracted = True
             self.message.emit(tr("Decompressing..."), None)
             try:
-                command = [unzip_path, "x", "-y", trainerTemp, f"-o{extractedContentPath}"]
-                subprocess.run(command, check=True, creationflags=subprocess.CREATE_NO_WINDOW)
+                self.expected_source_files = self.extract_archive(trainerTemp, extractedContentPath)
 
             except Exception as e:
                 self.message.emit(tr("An error occurred while extracting downloaded trainer: ") + str(e), "failure")
@@ -714,7 +966,10 @@ class DownloadTrainersThread(DownloadBaseThread):
                 self.finished.emit(1)
                 return False
 
-            os.remove(trainerTemp)
+            try:
+                os.remove(trainerTemp)
+            except OSError as error:
+                print(f"Could not remove extracted archive: {error}")
 
         if extracted:
             # If the archive contains multiple version folders, split them up into multiple dest folders

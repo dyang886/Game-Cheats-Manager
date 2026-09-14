@@ -2,7 +2,7 @@ import math
 
 from PyQt6.QtCore import QEasingCurve, QPropertyAnimation, QRect, QRectF, Qt, QTimer, QVariantAnimation, pyqtSignal
 from PyQt6.QtGui import QColor, QFont, QFontDatabase, QPainter, QPainterPath, QPen, QPixmap
-from PyQt6.QtWidgets import QApplication, QComboBox, QFrame, QGraphicsDropShadowEffect, QHBoxLayout, QLabel, QListWidget, QListWidgetItem, QProxyStyle, QPushButton, QSizePolicy, QStyle, QStyledItemDelegate, QVBoxLayout, QWidget
+from PyQt6.QtWidgets import QApplication, QComboBox, QFrame, QGraphicsDropShadowEffect, QHBoxLayout, QLabel, QListWidget, QListWidgetItem, QProxyStyle, QPushButton, QSizePolicy, QStyle, QStyledItemDelegate, QStyleOptionViewItem, QVBoxLayout, QWidget
 from zhon.cedict import simp, trad
 
 from config import *
@@ -387,6 +387,24 @@ class FlashHighlightDelegate(QStyledItemDelegate):
             painter.fillRect(option.rect, color)
 
 
+class WrappedMessageDelegate(QStyledItemDelegate):
+    WRAP_ROLE = int(Qt.ItemDataRole.UserRole) + 1
+
+    def wrapped_option(self, option, index):
+        wrapped = QStyleOptionViewItem(option)
+        if index.data(self.WRAP_ROLE):
+            wrapped.features |= QStyleOptionViewItem.ViewItemFeature.WrapText
+            wrapped.textElideMode = Qt.TextElideMode.ElideNone
+            wrapped.rect.setWidth(max(0, self.parent().viewport().width() - 6))
+        return wrapped
+
+    def paint(self, painter, option, index):
+        super().paint(painter, self.wrapped_option(option, index), index)
+
+    def sizeHint(self, option, index):
+        return super().sizeHint(self.wrapped_option(option, index), index)
+
+
 class MultilingualListWidget(QListWidget):
     _BOUNDED_PROP = "_bounded_to_viewport"
     _FLASH_ALPHA = 110
@@ -436,7 +454,7 @@ class MultilingualListWidget(QListWidget):
         list horizontally scrollable."""
         super().setItemWidget(item, widget)
         widget.setProperty(self._BOUNDED_PROP, True)
-        self._fit_widget_to_viewport(item, widget)
+        self.fitItemWidgetToViewport(item)
 
     def resizeEvent(self, event):
         super().resizeEvent(event)
@@ -444,12 +462,20 @@ class MultilingualListWidget(QListWidget):
             item = self.item(i)
             widget = self.itemWidget(item)
             if widget and widget.property(self._BOUNDED_PROP):
-                self._fit_widget_to_viewport(item, widget)
+                self.fitItemWidgetToViewport(item)
 
-    def _fit_widget_to_viewport(self, item, widget):
+    def fitItemWidgetToViewport(self, item):
+        widget = self.itemWidget(item)
+        if not widget:
+            return
         max_w = max(0, self.viewport().width() - 6)  # leave breathing room on the right
         widget.setFixedWidth(max_w)
-        item.setSizeHint(widget.sizeHint())
+        if widget.layout():
+            widget.layout().activate()
+        size_hint = widget.sizeHint()
+        if widget.hasHeightForWidth():
+            size_hint.setHeight(widget.heightForWidth(max_w))
+        item.setSizeHint(size_hint)
 
 
 class SegmentedProgressBar(QWidget):

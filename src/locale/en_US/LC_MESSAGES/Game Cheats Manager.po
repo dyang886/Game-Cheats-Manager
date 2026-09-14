@@ -241,8 +241,11 @@ msgstr "Search from CT success!"
 msgid "Search from GCM success!"
 msgstr "Search from GCM success!"
 
-msgid "Could not initialize the temporary download folder, please try turning your antivirus software off."
-msgstr "Could not initialize the temporary download folder, please try turning your antivirus software off."
+msgid "Could not prepare the temporary download folder. Check its permissions and your antivirus software."
+msgstr "Could not prepare the temporary download folder. Check its permissions and your antivirus software."
+
+msgid "An error occurred when installing trainer: "
+msgstr "An error occurred when installing trainer: "
 
 msgid ""
 "This trainer requires additional setup before use. Please check the opened folder for instructions.\n"
@@ -251,14 +254,26 @@ msgstr ""
 "This trainer requires additional setup before use. Please check the opened folder for instructions.\n"
 "The instructions are always stored in the 'gcm-instructions' folder."
 
-msgid "An error occurred when installing trainer: "
-msgstr "An error occurred when installing trainer: "
-
 msgid "Download success!"
 msgstr "Download success!"
 
-msgid "An error occurred while downloading trainer: "
-msgstr "An error occurred while downloading trainer: "
+msgid "Could not prepare the downloaded trainer. Please try again and check your antivirus software."
+msgstr "Could not prepare the downloaded trainer. Please try again and check your antivirus software."
+
+msgid "The downloaded archive is invalid or incomplete. Your antivirus software may have blocked or removed it."
+msgstr "The downloaded archive is invalid or incomplete. Your antivirus software may have blocked or removed it."
+
+msgid "Could not install the trainer files. Close any running trainer and check your antivirus software."
+msgstr "Could not install the trainer files. Close any running trainer and check your antivirus software."
+
+msgid "Could not create a complete trainer backup. The existing installation was not changed. Your antivirus software may have interfered."
+msgstr "Could not create a complete trainer backup. The existing installation was not changed. Your antivirus software may have interfered."
+
+msgid "Could not remove the existing trainer. Close it if it is running, check your antivirus software, and try again."
+msgstr "Could not remove the existing trainer. Close it if it is running, check your antivirus software, and try again."
+
+msgid "The previous trainer installation could not be fully restored. Check your antivirus quarantine and the '.gcm-backup' folder."
+msgstr "The previous trainer installation could not be fully restored. Check your antivirus quarantine and the '.gcm-backup' folder."
 
 msgid "Internet request failed."
 msgstr "Internet request failed."
@@ -281,8 +296,8 @@ msgstr "An error occurred while extracting downloaded trainer: "
 msgid "Removing trainer background music..."
 msgstr "Removing trainer background music..."
 
-msgid "Could not find the downloaded trainer file, please try turning your antivirus software off."
-msgstr "Could not find the downloaded trainer file, please try turning your antivirus software off."
+msgid "Trainer files are missing or incomplete. Your antivirus software may have removed them."
+msgstr "Trainer files are missing or incomplete. Your antivirus software may have removed them."
 
 msgid "Patching..."
 msgstr "Patching..."

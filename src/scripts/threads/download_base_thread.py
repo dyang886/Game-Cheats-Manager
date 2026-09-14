@@ -37,11 +37,14 @@ class DownloadBaseThread(QThread):
     def request_download(self, url, download_path, raise_errors=False, atomic=False):
         """Set atomic=True when overwriting a file that may be read concurrently (e.g. the
         database JSONs), so readers never observe a truncated or partially written file."""
+        req = None
         try:
             req = requests.get(url, headers=self.headers, stream=True, timeout=_DOWNLOAD_TIMEOUT)
             req.raise_for_status()
         except Exception as e:
-            print(f"Error requesting {url}: {str(e)}")
+            if req is not None:
+                req.close()
+            print(f"Error requesting download: {e}")
             if raise_errors:
                 raise
             return ""
@@ -72,6 +75,7 @@ class DownloadBaseThread(QThread):
                 unit_queue.put((i, start, end))
             if initial_req is not None:
                 initial_req.close()  # its body is unused, every unit fetches its own range instead
+                initial_req = None
         else:
             unit_queue.put((0, None, None))
 
@@ -103,7 +107,11 @@ class DownloadBaseThread(QThread):
 
         def open_full_stream():
             resp = requests.get(url, headers=self.headers, stream=True, timeout=_DOWNLOAD_TIMEOUT)
-            resp.raise_for_status()
+            try:
+                resp.raise_for_status()
+            except Exception:
+                resp.close()
+                raise
             return resp
 
         def abandon_ranges():
@@ -118,8 +126,10 @@ class DownloadBaseThread(QThread):
         def discard_partial():
             try:
                 os.remove(write_path)
+            except FileNotFoundError:
+                pass
             except OSError as e:
-                print(f"[Queue] failed to remove partial file {write_path}: {e}", flush=True)
+                print(f"[Queue] failed to remove partial file: {e}", flush=True)
 
         emit_progress()
 
@@ -136,6 +146,7 @@ class DownloadBaseThread(QThread):
 
                     bytes_this_unit = 0
                     expected_bytes = (end - start + 1) if start is not None else total_size
+                    resp = None
                     try:
                         if start is not None:
                             resp = session.get(url, headers={**self.headers, 'Range': f'bytes={start}-{end}'}, stream=True, timeout=_RANGE_DOWNLOAD_TIMEOUT)
@@ -186,6 +197,9 @@ class DownloadBaseThread(QThread):
                         else:
                             unit_queue.put((unit_idx, start, end))
                             print(f"[Queue] unit {unit_idx} failed, re-enqueued ({failures}/{MAX_FAILURES} total failures): {e}", flush=True)
+                    finally:
+                        if resp is not None:
+                            resp.close()
             finally:
                 f.close()
                 if session:
@@ -208,13 +222,41 @@ class DownloadBaseThread(QThread):
                 raise last_error[0]
             return ""
 
+        # All writers are closed here; make sure antivirus or another process did not
+        # remove or truncate the completed file before it is handed to the caller.
+        expected_size = total_size or total_downloaded[0]
+        try:
+            if expected_size <= 0:
+                raise OSError("downloaded file is empty")
+            if not os.path.isfile(write_path):
+                raise FileNotFoundError("downloaded file is missing")
+            actual_size = os.path.getsize(write_path)
+            if actual_size != expected_size:
+                raise OSError(f"downloaded file has {actual_size} of {expected_size} bytes")
+        except Exception as e:
+            print(f"[Queue] completed file verification failed: {e}", flush=True)
+            discard_partial()
+            return ""
+
         # Same-directory rename, so readers see either the old file or the new one
         if atomic:
+            replaced = False
             try:
                 os.replace(write_path, file_path)
+                replaced = True
+                if not os.path.isfile(file_path) or os.path.getsize(file_path) != expected_size:
+                    raise OSError("replaced file is missing or incomplete")
             except Exception as e:
-                print(f"[Queue] failed to replace {file_path}: {e}", flush=True)
-                discard_partial()
+                print(f"[Queue] failed to replace downloaded file: {e}", flush=True)
+                if replaced:
+                    try:
+                        os.remove(file_path)
+                    except FileNotFoundError:
+                        pass
+                    except OSError as cleanup_error:
+                        print(f"[Queue] failed to remove invalid file: {cleanup_error}", flush=True)
+                else:
+                    discard_partial()
                 if raise_errors:
                     raise
                 return ""

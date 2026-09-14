@@ -241,8 +241,11 @@ msgstr "Suche von CT erfolgreich!"
 msgid "Search from GCM success!"
 msgstr "Suche von GCM erfolgreich!"
 
-msgid "Could not initialize the temporary download folder, please try turning your antivirus software off."
-msgstr "Der temporäre Download-Ordner konnte nicht initialisiert werden. Bitte versuche, deine Antivirensoftware zu deaktivieren."
+msgid "Could not prepare the temporary download folder. Check its permissions and your antivirus software."
+msgstr "Der temporäre Download-Ordner konnte nicht vorbereitet werden. Überprüfen Sie seine Berechtigungen und Ihre Antivirensoftware."
+
+msgid "An error occurred when installing trainer: "
+msgstr "Beim Installieren des Trainers ist ein Fehler aufgetreten: "
 
 msgid ""
 "This trainer requires additional setup before use. Please check the opened folder for instructions.\n"
@@ -251,14 +254,26 @@ msgstr ""
 "Dieser Trainer erfordert vor der Nutzung zusätzliche Einrichtung. Bitte überprüfe den geöffneten Ordner für Anweisungen.\n"
 "Die Anweisungen befinden sich immer im Ordner 'gcm-instructions'."
 
-msgid "An error occurred when installing trainer: "
-msgstr "Beim Installieren des Trainers ist ein Fehler aufgetreten: "
-
 msgid "Download success!"
 msgstr "Download erfolgreich!"
 
-msgid "An error occurred while downloading trainer: "
-msgstr "Ein Fehler ist beim Herunterladen des Trainers aufgetreten: "
+msgid "Could not prepare the downloaded trainer. Please try again and check your antivirus software."
+msgstr "Der heruntergeladene Trainer konnte nicht vorbereitet werden. Versuchen Sie es erneut und überprüfen Sie Ihre Antivirensoftware."
+
+msgid "The downloaded archive is invalid or incomplete. Your antivirus software may have blocked or removed it."
+msgstr "Das heruntergeladene Archiv ist ungültig oder unvollständig. Möglicherweise wurde es von Ihrer Antivirensoftware blockiert oder entfernt."
+
+msgid "Could not install the trainer files. Close any running trainer and check your antivirus software."
+msgstr "Die Trainer-Dateien konnten nicht installiert werden. Schließen Sie alle laufenden Trainer und überprüfen Sie Ihre Antivirensoftware."
+
+msgid "Could not create a complete trainer backup. The existing installation was not changed. Your antivirus software may have interfered."
+msgstr "Es konnte keine vollständige Trainer-Sicherung erstellt werden. Die vorhandene Installation wurde nicht geändert. Möglicherweise hat Ihre Antivirensoftware den Vorgang beeinträchtigt."
+
+msgid "Could not remove the existing trainer. Close it if it is running, check your antivirus software, and try again."
+msgstr "Der vorhandene Trainer konnte nicht entfernt werden. Schließen Sie ihn, falls er ausgeführt wird, überprüfen Sie Ihre Antivirensoftware und versuchen Sie es erneut."
+
+msgid "The previous trainer installation could not be fully restored. Check your antivirus quarantine and the '.gcm-backup' folder."
+msgstr "Die vorherige Trainer-Installation konnte nicht vollständig wiederhergestellt werden. Überprüfen Sie die Quarantäne Ihrer Antivirensoftware und den Ordner „.gcm-backup“."
 
 msgid "Internet request failed."
 msgstr "Internet-Anfrage fehlgeschlagen."
@@ -281,8 +296,8 @@ msgstr "Ein Fehler ist beim Entpacken des heruntergeladenen Trainers aufgetreten
 msgid "Removing trainer background music..."
 msgstr "Hintergrundmusik des Trainers wird entfernt..."
 
-msgid "Could not find the downloaded trainer file, please try turning your antivirus software off."
-msgstr "Die heruntergeladene Trainer-Datei konnte nicht gefunden werden. Versuche, deine Antivirus-Software auszuschalten."
+msgid "Trainer files are missing or incomplete. Your antivirus software may have removed them."
+msgstr "Trainer-Dateien fehlen oder sind unvollständig. Möglicherweise wurden sie von Ihrer Antivirensoftware entfernt."
 
 msgid "Patching..."
 msgstr "Patchen..."

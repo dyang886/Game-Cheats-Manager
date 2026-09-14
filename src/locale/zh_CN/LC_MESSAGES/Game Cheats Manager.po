@@ -241,8 +241,11 @@ msgstr "CT 表搜索成功！"
 msgid "Search from GCM success!"
 msgstr "GCM 搜索成功！"
 
-msgid "Could not initialize the temporary download folder, please try turning your antivirus software off."
-msgstr "无法初始化临时下载文件夹，请尝试关闭您的杀毒软件。"
+msgid "Could not prepare the temporary download folder. Check its permissions and your antivirus software."
+msgstr "无法准备临时下载文件夹。请检查文件夹权限和杀毒软件。"
+
+msgid "An error occurred when installing trainer: "
+msgstr "安装修改器时出错："
 
 msgid ""
 "This trainer requires additional setup before use. Please check the opened folder for instructions.\n"
@@ -251,14 +254,26 @@ msgstr ""
 "此修改器在使用前需要额外设置。请查看已打开的文件夹以获取说明。\n"
 "相关说明始终存储在 'gcm-instructions' 文件夹中。"
 
-msgid "An error occurred when installing trainer: "
-msgstr "安装修改器时出错："
-
 msgid "Download success!"
 msgstr "下载成功！"
 
-msgid "An error occurred while downloading trainer: "
-msgstr "下载修改器时出错："
+msgid "Could not prepare the downloaded trainer. Please try again and check your antivirus software."
+msgstr "无法准备下载的修改器。请重试并检查杀毒软件。"
+
+msgid "The downloaded archive is invalid or incomplete. Your antivirus software may have blocked or removed it."
+msgstr "下载的压缩包无效或不完整，可能已被杀毒软件拦截或删除。"
+
+msgid "Could not install the trainer files. Close any running trainer and check your antivirus software."
+msgstr "无法安装修改器文件。请关闭正在运行的修改器并检查杀毒软件。"
+
+msgid "Could not create a complete trainer backup. The existing installation was not changed. Your antivirus software may have interfered."
+msgstr "无法创建完整的修改器备份。现有修改器未被更改，可能受到了杀毒软件干扰。"
+
+msgid "Could not remove the existing trainer. Close it if it is running, check your antivirus software, and try again."
+msgstr "无法删除现有修改器。请关闭正在运行的修改器，检查杀毒软件，然后重试。"
+
+msgid "The previous trainer installation could not be fully restored. Check your antivirus quarantine and the '.gcm-backup' folder."
+msgstr "无法完整恢复之前的修改器。请检查杀毒软件隔离区和“.gcm-backup”文件夹。"
 
 msgid "Internet request failed."
 msgstr "网络请求失败。"
@@ -281,8 +296,8 @@ msgstr "解压下载的修改器时出错："
 msgid "Removing trainer background music..."
 msgstr "删除修改器背景音乐中..."
 
-msgid "Could not find the downloaded trainer file, please try turning your antivirus software off."
-msgstr "找不到下载的修改器，请尝试关闭杀毒软件。"
+msgid "Trainer files are missing or incomplete. Your antivirus software may have removed them."
+msgstr "修改器文件缺失或不完整，可能已被杀毒软件删除。"
 
 msgid "Patching..."
 msgstr "打补丁中..."

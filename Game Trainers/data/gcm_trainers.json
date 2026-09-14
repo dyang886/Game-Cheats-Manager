@@ -5595,7 +5595,9 @@
         "game_name": "Jiahao",
         "origin": "other",
         "author": "zlwzk",
-        "gcm_url": "GCM/GCM Trainers/Jiahao Trainer [zlwzk].exe",
+        "custom_name_en": "Save Editor",
+        "custom_name_zh": "存档编辑器",
+        "gcm_url": "GCM/GCM Trainers/Jiahao Save Editor [zlwzk].exe",
         "version": "2026.9.10"
     }
 ]

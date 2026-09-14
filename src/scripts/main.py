@@ -21,7 +21,7 @@ from PyQt6.QtSvgWidgets import QSvgWidget
 import style_sheet
 from config import *
 from widgets.custom_dialogs import AboutDialog, AnnouncementDialog, CopyRightWarning, SettingsDialog, TrainerUploadDialog
-from widgets.custom_widgets import CustomButton, LargerActionIconStyle, MultilingualListWidget, SegmentedProgressBar, StatusMessageWidget, ToastNotification
+from widgets.custom_widgets import CustomButton, LargerActionIconStyle, MultilingualListWidget, SegmentedProgressBar, StatusMessageWidget, ToastNotification, WrappedMessageDelegate
 from widgets.trainer_management import TrainerManagementDialog
 from threads.download_base_thread import DownloadBaseThread
 from threads.download_display_thread import DownloadDisplayThread
@@ -64,6 +64,7 @@ class GameCheatsManager(QMainWindow):
         self.downloadQueue = Queue()
         self.downloadProgressBar = None
         self.downloadProgressLabel = None
+        self.downloadProgressItem = None
         self.currentlyDownloading = False
         self.downloadingCE = False  # Cheat Engine download queued or in progress
         self.lastInstalledTrainers = []  # highlighted in the installed list once the download ends
@@ -232,6 +233,7 @@ class GameCheatsManager(QMainWindow):
 
         # Display trainer search results
         self.downloadListBox = MultilingualListWidget()
+        self.downloadListBox.setItemDelegate(WrappedMessageDelegate(self.downloadListBox))
         self.downloadListBox.itemActivated.connect(self.on_download_start)
         downloadsLayout.addWidget(self.downloadListBox)
 
@@ -690,18 +692,14 @@ class GameCheatsManager(QMainWindow):
                 self.enable_all_widgets()
                 return
 
-            self.downloadListBox.addItem(tr("Migrating existing trainers..."))
-            item = self.downloadListBox.item(self.downloadListBox.count() - 1)
-            item.setFlags(Qt.ItemFlag.NoItemFlags)
+            self.on_message(tr("Migrating existing trainers..."))
             migration_thread = PathChangeThread(self.trainerDownloadPath, changedPath, self)
             migration_thread.finished.connect(self.on_migration_finished)
             migration_thread.error.connect(self.on_migration_error)
             migration_thread.start()
 
         else:
-            self.downloadListBox.addItem(tr("No path selected."))
-            item = self.downloadListBox.item(self.downloadListBox.count() - 1)
-            item.setFlags(Qt.ItemFlag.NoItemFlags)
+            self.on_message(tr("No path selected."))
             self.enable_all_widgets()
             return
 
@@ -844,6 +842,8 @@ class GameCheatsManager(QMainWindow):
         if type == "clear":
             self.downloadListBox.clear()
             self.downloadProgressBar = None
+            self.downloadProgressLabel = None
+            self.downloadProgressItem = None
         elif type == "result":
             item = QListWidgetItem(message)
             self.downloadListBox.addItem(item)
@@ -856,6 +856,8 @@ class GameCheatsManager(QMainWindow):
             headerLayout.setContentsMargins(0, 0, 0, 0)
             headerLayout.setSpacing(10)
             label = QLabel(message)
+            label.setTextFormat(Qt.TextFormat.PlainText)
+            label.setWordWrap(True)
             headerLayout.addWidget(label)
             self.downloadProgressLabel = QLabel()
             self.downloadProgressLabel.setStyleSheet("color: gray;")
@@ -866,30 +868,31 @@ class GameCheatsManager(QMainWindow):
             widgetLayout.addWidget(self.downloadProgressBar)
             item = QListWidgetItem()
             item.setFlags(noSelectFlags)
-            item.setSizeHint(widget.sizeHint())
             self.downloadListBox.addItem(item)
             self.downloadListBox.setBoundedItemWidget(item, widget)
-        elif type == "success":
-            if self.downloadProgressBar:
-                self.downloadProgressBar.setComplete()
-            self.downloadProgressBar = None
-            self.downloadProgressLabel = None
-            item = QListWidgetItem(message)
-            item.setFlags(noSelectFlags)
-            item.setForeground(QColor('green'))
-            self.downloadListBox.addItem(item)
-        elif type == "failure":
-            if self.downloadProgressBar:
-                self.downloadProgressBar.setError(True)
-            self.downloadProgressBar = None
-            self.downloadProgressLabel = None
-            item = QListWidgetItem(message)
-            item.setFlags(noSelectFlags)
-            item.setForeground(QColor('red'))
-            self.downloadListBox.addItem(item)
+            self.downloadProgressItem = item
         else:
+            color = None
+            if type == "success":
+                if self.downloadProgressBar:
+                    self.downloadProgressBar.setComplete()
+                self.downloadProgressBar = None
+                self.downloadProgressLabel = None
+                self.downloadProgressItem = None
+                color = QColor("green")
+            elif type == "failure":
+                if self.downloadProgressBar:
+                    self.downloadProgressBar.setError(True)
+                self.downloadProgressBar = None
+                self.downloadProgressLabel = None
+                self.downloadProgressItem = None
+                color = QColor("red")
+
             item = QListWidgetItem(message)
             item.setFlags(noSelectFlags)
+            item.setData(WrappedMessageDelegate.WRAP_ROLE, True)
+            if color is not None:
+                item.setForeground(color)
             self.downloadListBox.addItem(item)
 
     @staticmethod
@@ -910,6 +913,8 @@ class GameCheatsManager(QMainWindow):
                 )
             else:
                 self.downloadProgressLabel.setText(self.format_size(downloaded))
+            if self.downloadProgressItem is not None:
+                self.downloadListBox.fitItemWidgetToViewport(self.downloadProgressItem)
         if self.downloadProgressBar:
             self.downloadProgressBar.setSegmentProgress(segment_data)
 

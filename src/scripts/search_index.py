@@ -258,11 +258,14 @@ class TranslationIndex:
                 if key in name:
                     results.add(other)
 
-        # pinyin bridge to English titles: Chinese -> tolerant syllable match, romanized -> prefix
+        # pinyin bridge: Chinese -> exact short/tolerant long, romanized -> prefix
         if chinese:
-            _, tokens = pinyin_forms(keyword)
-            if len(tokens.split()) >= CH_MIN_SYLLABLES:
+            concat, tokens = pinyin_forms(keyword)
+            syllable_count = len(tokens.split())
+            if syllable_count >= CH_MIN_SYLLABLES:
                 self._bridge(results, lambda _concat, t: _syllables_contained(tokens, t))
+            elif syllable_count == 2 and concat:
+                self._bridge(results, lambda target_concat, _tokens: target_concat == concat)
         else:
             q = latin_to_fuzzy(keyword)
             if len(q) >= PINYIN_EXPAND_MIN_LEN:
