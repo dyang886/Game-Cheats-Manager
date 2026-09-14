@@ -418,13 +418,15 @@ class GameCheatsManager(QMainWindow):
     def show_cheats(self):
         self.installedListBox.clear()
         self.trainers = {}
-        sort_key_func = sort_trainers_key if settings["sortByOrigin"] else sort_trainers_key_ignore_prefix
         entries = sorted(
             os.scandir(self.trainerDownloadPath),
-            key=lambda dirent: sort_key_func(dirent.name)
+            key=trainer_sort_key(lambda dirent: dirent.name, ignore_prefix=not settings["sortByOrigin"])
         )
 
         for trainer in entries:
+            if trainer.name == TRAINER_BACKUP_DIRECTORY:
+                continue
+
             trainerPath = os.path.normpath(trainer.path)
             if os.path.isfile(trainerPath):
                 trainerName, trainerExt = os.path.splitext(os.path.basename(trainerPath))

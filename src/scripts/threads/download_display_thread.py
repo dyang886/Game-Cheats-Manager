@@ -103,8 +103,12 @@ class DownloadDisplayThread(DownloadBaseThread):
                 return
 
             # Sort based on translated names
-            sort_key_func = sort_trainers_key if settings["sortByOrigin"] else sort_trainers_key_ignore_prefix
-            DownloadBaseThread.trainer_urls.sort(key=lambda trainer: sort_key_func(trainer["trainer_name"]))
+            DownloadBaseThread.trainer_urls.sort(
+                key=trainer_sort_key(
+                    lambda trainer: trainer["trainer_name"],
+                    ignore_prefix=not settings["sortByOrigin"]
+                )
+            )
 
             self.message.emit("", "clear")
             for count, trainer in enumerate(DownloadBaseThread.trainer_urls, start=1):

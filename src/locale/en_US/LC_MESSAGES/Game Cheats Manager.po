@@ -251,8 +251,8 @@ msgstr ""
 "This trainer requires additional setup before use. Please check the opened folder for instructions.\n"
 "The instructions are always stored in the 'gcm-instructions' folder."
 
-msgid "An error occurred when moving trainer: "
-msgstr "An error occurred when moving trainer: "
+msgid "An error occurred when installing trainer: "
+msgstr "An error occurred when installing trainer: "
 
 msgid "Download success!"
 msgstr "Download success!"
@@ -278,11 +278,11 @@ msgstr "Decompressing..."
 msgid "An error occurred while extracting downloaded trainer: "
 msgstr "An error occurred while extracting downloaded trainer: "
 
-msgid "Could not find the downloaded trainer file, please try turning your antivirus software off."
-msgstr "Could not find the downloaded trainer file, please try turning your antivirus software off."
-
 msgid "Removing trainer background music..."
 msgstr "Removing trainer background music..."
+
+msgid "Could not find the downloaded trainer file, please try turning your antivirus software off."
+msgstr "Could not find the downloaded trainer file, please try turning your antivirus software off."
 
 msgid "Patching..."
 msgstr "Patching..."

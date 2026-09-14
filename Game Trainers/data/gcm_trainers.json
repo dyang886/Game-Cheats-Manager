@@ -104,7 +104,7 @@
     {
         "game_name": "PvZ2 Gardendless",
         "origin": "gcm",
-        "official_url": "https://pvzge.com/",
+        "official_url": "https://pvzge.com",
         "gcm_url": "GCM/GCM Trainers/PvZ2 Gardendless Trainer.exe",
         "version": "2026.8.26"
     },
@@ -204,7 +204,7 @@
         "game_name": "XCOM: Enemy Within",
         "origin": "other",
         "author": "MrAntiFun",
-        "official_url": "https://mrantifun.net/threads/xcom-enemy-unknown-trainer.22039/",
+        "official_url": "https://mrantifun.net/threads/xcom-enemy-unknown-trainer.22039",
         "gcm_url": "GCM/GCM Trainers/XCOM_Enemy Within Trainer [MrAntiFun].exe",
         "version": "2021.3.27"
     },
@@ -227,7 +227,7 @@
         "game_name": "Little Nightmares II",
         "origin": "other",
         "author": "游音寂影",
-        "official_url": "http://bilibeili.ysepan.com/",
+        "official_url": "http://bilibeili.ysepan.com",
         "gcm_url": "GCM/GCM Trainers/Little Nightmares II Trainer [YouYinJiYing].exe",
         "version": "2026.2.23"
     },
@@ -235,7 +235,7 @@
         "game_name": "Dungeon of the Endless",
         "origin": "other",
         "author": "MrAntiFun",
-        "official_url": "https://mrantifun.net/threads/dungeon-of-the-endless-trainer.6108/",
+        "official_url": "https://mrantifun.net/threads/dungeon-of-the-endless-trainer.6108",
         "gcm_url": "GCM/GCM Trainers/Dungeon of the Endless Trainer [MrAntiFun].exe",
         "version": "2015.11.21"
     },
@@ -266,7 +266,7 @@
         "game_name": "Blue Alert",
         "origin": "other",
         "author": "蓝警网",
-        "official_url": "https://www.stateofwar.cn/",
+        "official_url": "https://www.stateofwar.cn",
         "gcm_url": "GCM/GCM Trainers/Blue Alert Trainer [LanJingWang].zip",
         "version": "2026.2.23"
     },
@@ -274,7 +274,7 @@
         "game_name": "Craft The World",
         "origin": "other",
         "author": "MrAntiFun",
-        "official_url": "https://mrantifun.net/threads/craft-the-world-trainer.108/",
+        "official_url": "https://mrantifun.net/threads/craft-the-world-trainer.108",
         "gcm_url": "GCM/GCM Trainers/Craft The World Trainer [MrAntiFun].exe",
         "version": "2014.4.21"
     },
@@ -298,7 +298,7 @@
         "game_name": "Nioh 3",
         "origin": "other",
         "author": "flarejune",
-        "official_url": "https://www.bilibili.com/video/BV1pv6BB5End/",
+        "official_url": "https://www.bilibili.com/video/BV1pv6BB5End",
         "gcm_url": "GCM/GCM Trainers/Nioh 3 Trainer [flarejune].exe",
         "version": "2026.8.23"
     },
@@ -314,7 +314,7 @@
         "game_name": "Portal Knights",
         "origin": "other",
         "author": "FutureX",
-        "official_url": "https://trainer.futurexgame.com/2024/02/18/portal-knights-v0-7-v1-7-x-plus-10-trainer/",
+        "official_url": "https://trainer.futurexgame.com/2024/02/18/portal-knights-v0-7-v1-7-x-plus-10-trainer",
         "gcm_url": "GCM/GCM Trainers/Portal Knights Trainer [FutureX].exe",
         "version": "2024.2.18"
     },
@@ -389,7 +389,7 @@
         "game_name": "Alice In Cradle",
         "origin": "ct_other",
         "author": "桂Cinnamon",
-        "official_url": "https://www.bilibili.com/video/BV1mtcszPE48/",
+        "official_url": "https://www.bilibili.com/video/BV1mtcszPE48",
         "gcm_url": "GCM/GCM Trainers/Alice In Cradle Trainer [GuiCinnamon].ct",
         "version": "2026.2.11"
     },
@@ -421,7 +421,7 @@
         "game_name": "Call of Cthulhu",
         "origin": "other",
         "author": "MrAntiFun",
-        "official_url": "https://mrantifun.net/threads/call-of-cthulhu-trainer.17900/",
+        "official_url": "https://mrantifun.net/threads/call-of-cthulhu-trainer.17900",
         "gcm_url": "GCM/GCM Trainers/Call of Cthulhu Trainer [MrAntiFun].exe",
         "version": "2018.11.2"
     },
@@ -527,9 +527,9 @@
         "game_name": "Monster Hunter Wilds",
         "origin": "ct_other",
         "author": "Marcus101RR",
-        "official_url": "https://www.nexusmods.com/monsterhunterwilds/mods/251",
-        "gcm_url": "GCM/GCM Trainers/Monster Hunter Wilds Trainer [Marcus101RR].ct",
-        "version": "2026.4.7"
+        "official_url": "https://www.nexusmods.com/monsterhunterwilds/mods/251, https://bbs.3dmgame.com/thread-6604982-1-1.html",
+        "gcm_url": "GCM/GCM Trainers/Monster Hunter Wilds Trainer [Marcus101RR].zip",
+        "version": "2026.8.14"
     },
     {
         "game_name": "Persona 5 Royal",
@@ -690,7 +690,7 @@
         "author": "--南海-",
         "custom_name_en": "Inventory Editor",
         "custom_name_zh": "物品编辑器",
-        "official_url": "https://www.bilibili.com/video/BV136f1BfEAF/",
+        "official_url": "https://www.bilibili.com/video/BV136f1BfEAF",
         "gcm_url": "GCM/GCM Trainers/Dying Light_The Beast Trainer [NanHai].ct",
         "version": "2026.2.27"
     },
@@ -832,7 +832,7 @@
         "game_name": "FTL: Faster Than Light",
         "origin": "other",
         "author": "MrAntiFun",
-        "official_url": "https://mrantifun.net/threads/ftl-faster-than-light-trainer.228/",
+        "official_url": "https://mrantifun.net/threads/ftl-faster-than-light-trainer.228",
         "gcm_url": "GCM/GCM Trainers/FTL_Faster Than Light Trainer [MrAntiFun].exe",
         "version": "2014.4.22"
     },
@@ -908,7 +908,7 @@
         "author": "好吃的香草雪球",
         "custom_name_en": "Complete Collection Map",
         "custom_name_zh": "全收集地图",
-        "official_url": "https://xueqiumaps.cn/",
+        "official_url": "https://xueqiumaps.cn",
         "gcm_url": "GCM/GCM Trainers/Momodora_Moonlit Farewell Map [XueQiu].png",
         "extension": "png",
         "version": "2026.3.4"
@@ -1139,7 +1139,7 @@
         "game_name": "Cities: Skylines",
         "origin": "other",
         "author": "MrAntiFun",
-        "official_url": "https://mrantifun.net/threads/cities-skylines-trainer.3650/",
+        "official_url": "https://mrantifun.net/threads/cities-skylines-trainer.3650",
         "gcm_url": "GCM/GCM Trainers/Cities_Skylines Trainer [MrAntiFun].exe",
         "version": "2015.5.10"
     },
@@ -1171,7 +1171,7 @@
         "author": "Pixel32E",
         "custom_name_en": "Toolbox",
         "custom_name_zh": "工具箱",
-        "official_url": "https://www.bilibili.com/video/BV1SUfBBgEti/",
+        "official_url": "https://www.bilibili.com/video/BV1SUfBBgEti",
         "gcm_url": "GCM/GCM Trainers/Stoneshard Toolbox [Pixel32E].exe",
         "version": "2026.2.23"
     },
@@ -1260,7 +1260,7 @@
         "game_name": "Guns, Gore and Cannoli",
         "origin": "other",
         "author": "MrAntiFun",
-        "official_url": "https://mrantifun.net/threads/guns-gore-and-cannoli-trainer.4326/",
+        "official_url": "https://mrantifun.net/threads/guns-gore-and-cannoli-trainer.4326",
         "gcm_url": "GCM/GCM Trainers/Guns, Gore and Cannoli Trainer [MrAntiFun].exe",
         "version": "2018.8.15"
     },
@@ -1268,7 +1268,7 @@
         "game_name": "Guns, Gore and Cannoli 2",
         "origin": "other",
         "author": "MrAntiFun",
-        "official_url": "https://mrantifun.net/threads/guns-gore-and-cannoli-2-trainer.16674/",
+        "official_url": "https://mrantifun.net/threads/guns-gore-and-cannoli-2-trainer.16674",
         "gcm_url": "GCM/GCM Trainers/Guns, Gore and Cannoli 2 Trainer [MrAntiFun].exe",
         "version": "2018.8.2"
     },
@@ -1299,7 +1299,7 @@
         "game_name": "Warcraft III: Reign of Chaos",
         "origin": "other",
         "author": "离不开电脑",
-        "official_url": "http://56q.5d6d.com/",
+        "official_url": "http://56q.5d6d.com",
         "gcm_url": "GCM/GCM Trainers/Warcraft III_Reign of Chaos Trainer [LiBuKaiDianNao].exe",
         "version": "2026.3.10"
     },
@@ -1508,7 +1508,7 @@
         "author": "lmintlcx",
         "custom_name_en": "Toolkit",
         "custom_name_zh": "辅助工具",
-        "official_url": "https://pvz.tools/toolkit/",
+        "official_url": "https://pvz.tools/toolkit",
         "gcm_url": "GCM/GCM Trainers/Plants vs. Zombies Toolkit [lmintlcx].exe",
         "version": "2024.6.22"
     },
@@ -1538,7 +1538,7 @@
         "game_name": "Volcano Princess",
         "origin": "ct_other",
         "author": "Qiuzy",
-        "official_url": "https://steamcommunity.com/sharedfiles/filedetails/?id=3103837169, https://www.bilibili.com/video/BV1GDBoYSEW4/",
+        "official_url": "https://steamcommunity.com/sharedfiles/filedetails/?id=3103837169, https://www.bilibili.com/video/BV1GDBoYSEW4",
         "gcm_url": "GCM/GCM Trainers/Volcano Princess Trainer [Qiuzy].ct",
         "version": "2026.4.19"
     },
@@ -1600,7 +1600,7 @@
         "game_name": "Max Payne 3",
         "origin": "other",
         "author": "MrAntiFun",
-        "official_url": "https://mrantifun.net/threads/max-payne-3-trainer.904/",
+        "official_url": "https://mrantifun.net/threads/max-payne-3-trainer.904",
         "gcm_url": "GCM/GCM Trainers/Max Payne 3 Trainer [MrAntiFun].exe",
         "version": "2014.6.13"
     },
@@ -1623,7 +1623,7 @@
         "game_name": "Trepang2",
         "origin": "other",
         "author": "FutureX",
-        "official_url": "https://trainer.futurexgame.com/2024/02/19/trepang2-build2168-plus-22-trainer/",
+        "official_url": "https://trainer.futurexgame.com/2024/02/19/trepang2-build2168-plus-22-trainer",
         "gcm_url": "GCM/GCM Trainers/Trepang2 Trainer [FutureX].exe",
         "version": "2023.6.30"
     },
@@ -1739,7 +1739,7 @@
         "game_name": "Shadow Warrior 3",
         "origin": "other",
         "author": "FutureX",
-        "official_url": "https://trainer.futurexgame.com/2024/02/19/shadow-warrior-3-v1-0-plus-15-trainer/",
+        "official_url": "https://trainer.futurexgame.com/2024/02/19/shadow-warrior-3-v1-0-plus-15-trainer",
         "gcm_url": "GCM/GCM Trainers/Shadow Warrior 3 Trainer [FutureX].exe",
         "version": "2024.2.19"
     },
@@ -1747,7 +1747,7 @@
         "game_name": "Muse Dash",
         "origin": "other",
         "author": "FutureX",
-        "official_url": "https://trainer.futurexgame.com/2024/02/18/muse-dash-v20200731-plus-7-trainer/",
+        "official_url": "https://trainer.futurexgame.com/2024/02/18/muse-dash-v20200731-plus-7-trainer",
         "gcm_url": "GCM/GCM Trainers/Muse Dash Trainer [FutureX].exe",
         "version": "2024.2.18"
     },
@@ -1755,7 +1755,7 @@
         "game_name": "theHunter: Call of the Wild",
         "origin": "other",
         "author": "FutureX",
-        "official_url": "https://trainer.futurexgame.com/2024/02/19/thehunter-call-of-the-wild-v1-0-v2175916-plus-15-trainer/",
+        "official_url": "https://trainer.futurexgame.com/2024/02/19/thehunter-call-of-the-wild-v1-0-v2175916-plus-15-trainer",
         "gcm_url": "GCM/GCM Trainers/theHunter_Call of the Wild Trainer [FutureX].exe",
         "version": "2024.2.19"
     },
@@ -1771,7 +1771,7 @@
         "game_name": "Tale of Wuxia",
         "origin": "other",
         "author": "MrAntiFun",
-        "official_url": "https://mrantifun.net/threads/tale-of-wuxia-trainer.7928/",
+        "official_url": "https://mrantifun.net/threads/tale-of-wuxia-trainer.7928",
         "gcm_url": "GCM/GCM Trainers/Tale of Wuxia Trainer [MrAntiFun].exe",
         "version": "2016.5.3"
     },
@@ -1779,7 +1779,7 @@
         "game_name": "Tale of Wuxia: Prequel",
         "origin": "other",
         "author": "MrAntiFun",
-        "official_url": "https://mrantifun.net/threads/tale-of-wuxia-the-pre-sequel-trainer.14103/",
+        "official_url": "https://mrantifun.net/threads/tale-of-wuxia-the-pre-sequel-trainer.14103",
         "gcm_url": "GCM/GCM Trainers/Tale of Wuxia_Prequel Trainer [MrAntiFun].exe",
         "version": "2017.8.22"
     },
@@ -1787,7 +1787,7 @@
         "game_name": "Assassin's Creed Unity",
         "origin": "other",
         "author": "MrAntiFun",
-        "official_url": "https://mrantifun.net/threads/assassins-creed-unity-trainer.2495/",
+        "official_url": "https://mrantifun.net/threads/assassins-creed-unity-trainer.2495",
         "gcm_url": "GCM/GCM Trainers/Assassin's Creed Unity Trainer [MrAntiFun].exe",
         "version": "2018.10.8"
     },
@@ -1826,7 +1826,7 @@
         "game_name": "Darkwood",
         "origin": "other",
         "author": "MrAntiFun",
-        "official_url": "https://mrantifun.net/threads/darkwood-trainer.1582/",
+        "official_url": "https://mrantifun.net/threads/darkwood-trainer.1582",
         "gcm_url": "GCM/GCM Trainers/Darkwood Trainer [MrAntiFun].exe",
         "version": "2018.6.29"
     },
@@ -1938,7 +1938,7 @@
         "game_name": "Plants vs. Zombies: GOTY Edition",
         "origin": "other",
         "author": "我爱秘籍",
-        "official_url": "https://www.52miji.com/",
+        "official_url": "https://www.52miji.com",
         "gcm_url": "GCM/GCM Trainers/Plants vs. Zombies_GOTY Edition Trainer [WoAiMiJi].exe",
         "version": "2026.3.28"
     },
@@ -2023,7 +2023,7 @@
         "game_name": "Guild Wars 2",
         "origin": "other",
         "author": "KRX Team",
-        "official_url": "https://kxtools.xyz/",
+        "official_url": "https://kxtools.xyz",
         "gcm_url": "GCM/GCM Trainers/Guild Wars 2 Trainer [KRX Team].zip",
         "version": "2025.3.31"
     },
@@ -2066,7 +2066,7 @@
         "game_name": "StarCraft II: Legacy of the Void",
         "origin": "other",
         "author": "MrAntiFun",
-        "official_url": "https://mrantifun.net/threads/starcraft-2-legacy-of-the-void-trainer.6177/",
+        "official_url": "https://mrantifun.net/threads/starcraft-2-legacy-of-the-void-trainer.6177",
         "gcm_url": "GCM/GCM Trainers/StarCraft II_Legacy of the Void Trainer [MrAntiFun].exe",
         "version": "2015.11.26"
     },
@@ -2091,7 +2091,7 @@
         "game_name": "Total War: SHOGUN 2",
         "origin": "other",
         "author": "MrAntiFun",
-        "official_url": "https://mrantifun.net/threads/total-war-shogun-2-trainer.124/",
+        "official_url": "https://mrantifun.net/threads/total-war-shogun-2-trainer.124",
         "gcm_url": "GCM/GCM Trainers/Total War_SHOGUN 2 Trainer [MrAntiFun].exe",
         "version": "2014.4.21"
     },
@@ -2099,7 +2099,7 @@
         "game_name": "X-Morph: Defense",
         "origin": "other",
         "author": "MrAntiFun",
-        "official_url": "https://mrantifun.net/threads/xmorph-defense-trainer.14240/",
+        "official_url": "https://mrantifun.net/threads/xmorph-defense-trainer.14240",
         "gcm_url": "GCM/GCM Trainers/X-Morph_Defense Trainer [MrAntiFun].exe",
         "version": "2018.8.25"
     },
@@ -2152,7 +2152,7 @@
         "game_name": "The First Berserker: Khazan",
         "origin": "other",
         "author": "爱玩修改器",
-        "official_url": "https://www.gametrainer.com.cn/trainer/thefirstberserkerkhazan/",
+        "official_url": "https://www.gametrainer.com.cn/trainer/thefirstberserkerkhazan",
         "gcm_url": "GCM/GCM Trainers/The First Berserker_Khazan Trainer [AiWanXiuGaiQi].zip",
         "version": "2025.7.5"
     },
@@ -2160,7 +2160,7 @@
         "game_name": "Command & Conquer: Red Alert 2",
         "origin": "other",
         "author": "林无聊",
-        "official_url": "http://ra2master.51wyx.net/",
+        "official_url": "http://ra2master.51wyx.net",
         "gcm_url": "GCM/GCM Trainers/Command & Conquer_Red Alert 2 Trainer [LinWuLiao].zip",
         "version": "2022.12.30"
     },
@@ -2380,7 +2380,7 @@
         "game_name": "Company of Heroes 2",
         "origin": "other",
         "author": "MrAntiFun",
-        "official_url": "https://mrantifun.net/threads/company-of-heroes-2-trainer.22/",
+        "official_url": "https://mrantifun.net/threads/company-of-heroes-2-trainer.22",
         "gcm_url": "GCM/GCM Trainers/Company of Heroes 2 Trainer [MrAntiFun].exe",
         "version": "2017.6.20"
     },
@@ -2570,7 +2570,7 @@
         "game_name": "Dead Space 2",
         "origin": "other",
         "author": "MrAntiFun",
-        "official_url": "https://mrantifun.net/threads/dead-space-2-trainer.9149/",
+        "official_url": "https://mrantifun.net/threads/dead-space-2-trainer.9149",
         "gcm_url": "GCM/GCM Trainers/Dead Space 2 Trainer [MrAntiFun].exe",
         "version": "2016.9.7"
     },
@@ -2580,7 +2580,7 @@
         "author": "3DM",
         "official_url": "https://bbs.3dmgame.com/thread-6670329-1-1.html",
         "gcm_url": "GCM/GCM Trainers/Tales of Justice Academy_Winds Arise Trainer [3DM].ct",
-        "version": "2026.5.5"
+        "version": "2026.7.6"
     },
     {
         "game_name": "Overlord II",
@@ -2909,7 +2909,7 @@
         "game_name": "House Flipper",
         "origin": "other",
         "author": "MrAntiFun",
-        "official_url": "https://mrantifun.net/threads/house-flipper-trainer.16392/",
+        "official_url": "https://mrantifun.net/threads/house-flipper-trainer.16392",
         "gcm_url": "GCM/GCM Trainers/House Flipper Trainer [MrAntiFun].exe",
         "version": "2019.5.29"
     },
@@ -2925,7 +2925,7 @@
         "game_name": "Ultimate General: Civil War",
         "origin": "other",
         "author": "MrAntiFun",
-        "official_url": "https://mrantifun.net/threads/ultimate-general-civil-war-trainer.11514/",
+        "official_url": "https://mrantifun.net/threads/ultimate-general-civil-war-trainer.11514",
         "gcm_url": "GCM/GCM Trainers/Ultimate General_Civil War Trainer [MrAntiFun].exe",
         "version": "2019.6.13"
     },
@@ -2983,7 +2983,7 @@
         "game_name": "Assassin's Creed II",
         "origin": "other",
         "author": "MrAntiFun",
-        "official_url": "https://mrantifun.net/threads/assassins-creed-2-trainer.130/",
+        "official_url": "https://mrantifun.net/threads/assassins-creed-2-trainer.130",
         "gcm_url": "GCM/GCM Trainers/Assassin's Creed II Trainer [MrAntiFun].exe",
         "version": "2014.2.12"
     },
@@ -3013,7 +3013,7 @@
         "game_name": "Grand Theft Auto V",
         "origin": "other",
         "author": "KaBoom",
-        "official_url": "http://kaboomtrainer.com/",
+        "official_url": "http://kaboomtrainer.com",
         "gcm_url": "GCM/GCM Trainers/Grand Theft Auto V Trainer [KaBoom].zip",
         "version": "2026.4.7"
     },
@@ -3079,7 +3079,7 @@
         "game_name": "Sid Meier's Civilization V",
         "origin": "other",
         "author": "MrAntiFun",
-        "official_url": "https://mrantifun.net/threads/sid-meier-civilization-5-trainer.246/",
+        "official_url": "https://mrantifun.net/threads/sid-meier-civilization-5-trainer.246",
         "gcm_url": "GCM/GCM Trainers/Sid Meier's Civilization V Trainer [MrAntiFun].exe",
         "version": "2016.11.12"
     },
@@ -3094,7 +3094,7 @@
         "game_name": "Assassin's Creed Freedom Cry",
         "origin": "other",
         "author": "MrAntiFun",
-        "official_url": "https://mrantifun.net/threads/assassins-creed-4-black-flag-trainer.5/",
+        "official_url": "https://mrantifun.net/threads/assassins-creed-4-black-flag-trainer.5",
         "gcm_url": "GCM/GCM Trainers/Assassin's Creed Freedom Cry Trainer [MrAntiFun].exe",
         "version": "2014.3.10"
     },
@@ -3288,7 +3288,7 @@
         "game_name": "Battlefield 1",
         "origin": "other",
         "author": "MrAntiFun",
-        "official_url": "https://mrantifun.net/threads/battlefield-1-trainer.11118/",
+        "official_url": "https://mrantifun.net/threads/battlefield-1-trainer.11118",
         "gcm_url": "GCM/GCM Trainers/Battlefield 1 Trainer [MrAntiFun].exe",
         "version": "2018.1.1"
     },
@@ -3392,7 +3392,7 @@
         "game_name": "Tiny Tina's Wonderlands",
         "origin": "other",
         "author": "爱玩修改器",
-        "official_url": "https://www.gametrainer.com.cn/trainer/tinytinaswonderlands/",
+        "official_url": "https://www.gametrainer.com.cn/trainer/tinytinaswonderlands",
         "gcm_url": "GCM/GCM Trainers/Tiny Tina's Wonderlands Trainer [AiWanXiuGaiQi].zip",
         "version": "2022.9.18"
     },
@@ -3448,7 +3448,7 @@
         "game_name": "Heroes of Might and Magic III",
         "origin": "other",
         "author": "高保洪",
-        "official_url": "https://www.bilibili.com/video/BV1sDhezNEtM/",
+        "official_url": "https://www.bilibili.com/video/BV1sDhezNEtM",
         "gcm_url": "GCM/GCM Trainers/Heroes of Might and Magic III Trainer [GaoBaoHong].exe",
         "version": "2026.2.19"
     },
@@ -3466,7 +3466,7 @@
         "author": "Hexinton",
         "official_url": "https://www.nexusmods.com/eldenring/mods/48, https://www.nexusmods.com/eldenring/mods/74, https://www.nexusmods.com/eldenring/mods/8205",
         "gcm_url": "GCM/GCM Trainers/Elden Ring Trainer [Hexinton].zip",
-        "version": "2026.6.19"
+        "version": "2026.9.10"
     },
     {
         "game_name": "OVERKILL's The Walking Dead",
@@ -3480,7 +3480,7 @@
         "game_name": "Arma 3",
         "origin": "other",
         "author": "MrAntiFun",
-        "official_url": "https://mrantifun.net/threads/arma-3-trainer.88/",
+        "official_url": "https://mrantifun.net/threads/arma-3-trainer.88",
         "gcm_url": "GCM/GCM Trainers/Arma 3 Trainer [MrAntiFun].exe",
         "version": "2019.2.13"
     },
@@ -3663,7 +3663,7 @@
         "game_name": "Zombie Army Trilogy",
         "origin": "other",
         "author": "MrAntiFun",
-        "official_url": "https://mrantifun.net/threads/zombie-army-trilogy-trainer.3595/",
+        "official_url": "https://mrantifun.net/threads/zombie-army-trilogy-trainer.3595",
         "gcm_url": "GCM/GCM Trainers/Zombie Army Trilogy Trainer [MrAntiFun].exe",
         "version": "2016.4.12"
     },
@@ -3805,7 +3805,7 @@
         "game_name": "Killer is Dead",
         "origin": "other",
         "author": "MrAntiFun",
-        "official_url": "https://mrantifun.net/threads/killer-is-dead-trainer.647/",
+        "official_url": "https://mrantifun.net/threads/killer-is-dead-trainer.647",
         "gcm_url": "GCM/GCM Trainers/Killer is Dead Trainer [MrAntiFun].exe",
         "version": "2014.5.27"
     },
@@ -3820,7 +3820,7 @@
         "game_name": "Metro: Last Light Redux",
         "origin": "other",
         "author": "MrAntiFun",
-        "official_url": "https://mrantifun.net/threads/metro-last-light-redux-trainer.1704/",
+        "official_url": "https://mrantifun.net/threads/metro-last-light-redux-trainer.1704",
         "gcm_url": "GCM/GCM Trainers/Metro_Last Light Redux Trainer [MrAntiFun].exe",
         "version": "2019.1.18"
     },
@@ -3913,7 +3913,7 @@
         "game_name": "Banished",
         "origin": "other",
         "author": "MrAntiFun",
-        "official_url": "https://mrantifun.net/threads/banished-trainer.155/",
+        "official_url": "https://mrantifun.net/threads/banished-trainer.155",
         "gcm_url": "GCM/GCM Trainers/Banished Trainer [MrAntiFun].exe",
         "version": "2018.10.21"
     },
@@ -4024,7 +4024,7 @@
         "author": "chenstack",
         "custom_name_en": "Data Query & Edit Tool",
         "custom_name_zh": "数据查询修改工具",
-        "official_url": "https://www.chenstack.cn/2023/08/09/baldursgate3/",
+        "official_url": "https://www.chenstack.cn/2023/08/09/baldursgate3",
         "gcm_url": "GCM/GCM Trainers/Baldur's Gate 3 Data Query & Edit Tool [chenstack].exe",
         "version": "2026.4.6"
     },
@@ -4093,7 +4093,7 @@
         "game_name": "Watch Dogs",
         "origin": "other",
         "author": "MrAntiFun",
-        "official_url": "https://mrantifun.net/threads/watch-dogs-trainer.619/",
+        "official_url": "https://mrantifun.net/threads/watch-dogs-trainer.619",
         "gcm_url": "GCM/GCM Trainers/Watch Dogs Trainer [MrAntiFun].exe",
         "version": "2019.5.24"
     },
@@ -4191,7 +4191,7 @@
         "game_name": "Sudden Strike 4",
         "origin": "other",
         "author": "MrAntiFun",
-        "official_url": "https://mrantifun.net/threads/sudden-strike-4-trainer.13679/",
+        "official_url": "https://mrantifun.net/threads/sudden-strike-4-trainer.13679",
         "gcm_url": "GCM/GCM Trainers/Sudden Strike 4 Trainer [MrAntiFun].exe",
         "version": "2019.7.14"
     },
@@ -4244,7 +4244,7 @@
         "game_name": "60 Seconds!",
         "origin": "other",
         "author": "MrAntiFun",
-        "official_url": "https://mrantifun.net/threads/60-seconds-trainer.4558/",
+        "official_url": "https://mrantifun.net/threads/60-seconds-trainer.4558",
         "gcm_url": "GCM/GCM Trainers/60 Seconds! Trainer [MrAntiFun].exe",
         "version": "2016.5.31"
     },
@@ -4536,7 +4536,7 @@
         "author": "changcheng967",
         "official_url": "https://github.com/changcheng967/FH6-AllInOne-Trainer",
         "gcm_url": "GCM/GCM Trainers/Forza Horizon 6 Trainer [changcheng967].exe",
-        "version": "2026.8.19"
+        "version": "2026.9.8"
     },
     {
         "game_name": "FRONT MISSION 3: Remake",
@@ -4724,7 +4724,7 @@
         "custom_name_zh": "Twitch 掉宝挂机工具",
         "official_url": "https://github.com/DevilXD/TwitchDropsMiner",
         "gcm_url": "GCM/GCM Trainers/Twitch Drops Miner [DevilXD].zip",
-        "version": "2026.7.30"
+        "version": "2026.9.7"
     },
     {
         "game_name": "Tom Clancy's Ghost Recon Wildlands",
@@ -4890,7 +4890,7 @@
         "author": "BabyGroot",
         "official_url": "https://fearlessrevolution.com/viewtopic.php?t=40419",
         "gcm_url": "GCM/GCM Trainers/Survival Log Trainer [BabyGroot].zip",
-        "version": "2026.8.22"
+        "version": "2026.8.26"
     },
     {
         "game_name": "The Sinking City 2",
@@ -4961,7 +4961,7 @@
         "game_name": "Stardom 3",
         "origin": "other",
         "author": "明志略",
-        "official_url": "https://steamcommunity.com/app/1611410/discussions/0/3270183784614366968/",
+        "official_url": "https://steamcommunity.com/app/1611410/discussions/0/3270183784614366968",
         "gcm_url": "GCM/GCM Trainers/Stardom 3 Trainer [MingZhiLue].exe",
         "version": "2022.4.13"
     },
@@ -4969,7 +4969,7 @@
         "game_name": "Batman: Arkham City",
         "origin": "other",
         "author": "MrAntiFun",
-        "official_url": "https://mrantifun.net/threads/batman-arkham-city-trainer.233/",
+        "official_url": "https://mrantifun.net/threads/batman-arkham-city-trainer.233",
         "gcm_url": "GCM/GCM Trainers/Batman_Arkham City Trainer [MrAntiFun].exe",
         "version": "2016.11.7"
     },
@@ -5165,7 +5165,7 @@
         "origin": "ct_other",
         "author": "zey",
         "official_url": "https://fearlessrevolution.com/viewtopic.php?t=38226",
-        "gcm_url": "GCM/GCM Trainers/Terraria Trainer [zey].ct",
+        "gcm_url": "GCM/GCM Trainers/Terraria Trainer [zey].zip",
         "version": "2026.8.22"
     },
     {
@@ -5330,5 +5330,272 @@
         "origin": "ct_other",
         "gcm_url": "GCM/GCM Trainers/Generation of Chaos Desire Trainer.ct",
         "version": "2026.9.5"
+    },
+    {
+        "game_name": "Sanguo All Knights",
+        "origin": "other",
+        "author": "古道琴扬",
+        "custom_name_en": "Character Editor",
+        "custom_name_zh": "角色编辑器",
+        "gcm_url": "GCM/GCM Trainers/Sanguo All Knights Character Editor [GuDaoQinYang].zip",
+        "version": "2008.9.29"
+    },
+    {
+        "game_name": "Sanguo All Knights",
+        "origin": "other",
+        "author": "古道琴扬",
+        "gcm_url": "GCM/GCM Trainers/Sanguo All Knights Trainer [GuDaoQinYang].exe",
+        "version": "2008.5.27"
+    },
+    {
+        "game_name": "Sanguo All Knights",
+        "origin": "other",
+        "author": "古道琴扬",
+        "custom_name_en": "Skill Replacement Tool",
+        "custom_name_zh": "技能替换工具",
+        "gcm_url": "GCM/GCM Trainers/Sanguo All Knights Skill Replacement Tool [GuDaoQinYang].exe",
+        "version": "2008.8.18"
+    },
+    {
+        "game_name": "The Mission 1937",
+        "origin": "other",
+        "author": "VMAZ",
+        "gcm_url": "GCM/GCM Trainers/The Mission 1937 Trainer [VMAZ].exe",
+        "version": "2026.9.7"
+    },
+    {
+        "game_name": "Youmuin: The Nightmaretaker ~Akuma ni Tsukareta Otoko~",
+        "origin": "other",
+        "author": "78900lsp",
+        "custom_name_en": "Chinese Translation Patch",
+        "custom_name_zh": "汉化补丁",
+        "official_url": "https://2dfan.com/downloads/23357",
+        "gcm_url": "GCM/GCM Trainers/Youmuin_The Nightmaretaker ~Akuma ni Tsukareta Otoko~ Chinese Translation Patch [78900lsp].zip",
+        "extension": "none",
+        "version": "2026.5.17"
+    },
+    {
+        "game_name": "Another Eden Begins",
+        "origin": "ct_other",
+        "author": "Chris.O",
+        "official_url": "https://fearlessrevolution.com/viewtopic.php?t=40688",
+        "gcm_url": "GCM/GCM Trainers/Another Eden Begins Trainer [Chris.O].ct",
+        "version": "2026.9.6"
+    },
+    {
+        "game_name": "Bayonetta 2",
+        "origin": "ct_other",
+        "gcm_url": "GCM/GCM Trainers/Bayonetta 2 Trainer.ct",
+        "version": "2026.9.13"
+    },
+    {
+        "game_name": "Bayonetta 3",
+        "origin": "ct_other",
+        "gcm_url": "GCM/GCM Trainers/Bayonetta 3 Trainer.ct",
+        "version": "2026.9.13"
+    },
+    {
+        "game_name": "Blackguards",
+        "origin": "other",
+        "author": "MrAntiFun",
+        "official_url": "https://mrantifun.net/threads/blackguards-trainer.121",
+        "gcm_url": "GCM/GCM Trainers/Blackguards Trainer [MrAntiFun].exe",
+        "version": "2014.4.21"
+    },
+    {
+        "game_name": "Dead Weight",
+        "origin": "ct_other",
+        "author": "armennoik",
+        "official_url": "https://fearlessrevolution.com/viewtopic.php?p=462025#p462025",
+        "gcm_url": "GCM/GCM Trainers/Dead Weight Trainer [armennoik].zip",
+        "version": "2026.8.1"
+    },
+    {
+        "game_name": "Decktamer",
+        "origin": "ct_other",
+        "author": "鸣叶月",
+        "official_url": "https://www.bilibili.com/video/BV1b6sSziEvJ",
+        "gcm_url": "GCM/GCM Trainers/Decktamer Trainer [MingYeYue].ct",
+        "version": "2026.9.11"
+    },
+    {
+        "game_name": "Grand Theft Auto V",
+        "origin": "other",
+        "author": "DJ小良",
+        "gcm_url": "GCM/GCM Trainers/Grand Theft Auto V Trainer [DJXiaoLiang].zip",
+        "version": "2021.2.13"
+    },
+    {
+        "game_name": "Mandragora: Whispers of the Witch Tree",
+        "origin": "ct_other",
+        "author": "Gamerplay",
+        "official_url": "https://bbs.3dmgame.com/thread-6603954-1-1.html",
+        "gcm_url": "GCM/GCM Trainers/Mandragora_Whispers of the Witch Tree Trainer [Gamerplay].ct",
+        "version": "2025.10.11"
+    },
+    {
+        "game_name": "OVERKILL's The Walking Dead",
+        "origin": "other",
+        "author": "MrAntiFun",
+        "official_url": "https://mrantifun.net/threads/overkills-the-walking-dead-trainer.17947",
+        "gcm_url": "GCM/GCM Trainers/OVERKILL's The Walking Dead Trainer [MrAntiFun].exe",
+        "version": "2018.12.24"
+    },
+    {
+        "game_name": "Persona 4 Golden",
+        "origin": "ct_other",
+        "author": "Vinisph",
+        "official_url": "https://bbs.3dmgame.com/thread-6495015-1-1.html, https://bbs.3dmgame.com/thread-6521009-1-1.html",
+        "gcm_url": "GCM/GCM Trainers/Persona 4 Golden Trainer [Vinisph].zip",
+        "version": "2024.7.16"
+    },
+    {
+        "game_name": "Ranch Simulator",
+        "origin": "ct_other",
+        "author": "P0n4ick",
+        "official_url": "https://www.playground.ru/ranch_simulator/cheat/ranch_simulator_tablitsa_dlya_cheat_engine_2_v0_573_p0n4ick-1155414",
+        "gcm_url": "GCM/GCM Trainers/Ranch Simulator Trainer [P0n4ick].ct",
+        "version": "2021.11.16"
+    },
+    {
+        "game_name": "ScourgeBringer",
+        "origin": "ct_other",
+        "gcm_url": "GCM/GCM Trainers/ScourgeBringer Trainer.ct",
+        "version": "2026.9.13"
+    },
+    {
+        "game_name": "This War of Mine",
+        "origin": "other",
+        "author": "FutureX",
+        "official_url": "https://megagames.com/trainers/war-mine-v6075-13-trainer-futurex",
+        "gcm_url": "GCM/GCM Trainers/This War of Mine Trainer [FutureX].exe",
+        "version": "2022.5.10"
+    },
+    {
+        "game_name": "Utopia Must Fall",
+        "origin": "other",
+        "author": "Luneyra",
+        "official_url": "https://www.bilibili.com/video/BV1C7YZ6QEbD",
+        "gcm_url": "GCM/GCM Trainers/Utopia Must Fall Trainer [Luneyra].exe",
+        "version": "2026.9.12"
+    },
+    {
+        "game_name": "Youmuin: The Nightmaretaker ~Akuma ni Tsukareta Otoko~",
+        "origin": "other",
+        "author": "KIrito787",
+        "gcm_url": "GCM/GCM Trainers/Youmuin_The Nightmaretaker ~Akuma ni Tsukareta Otoko~ Trainer [KIrito787].exe",
+        "version": "2026.9.5"
+    },
+    {
+        "game_name": "Zombotron",
+        "origin": "other",
+        "author": "Abolfazl.k",
+        "official_url": "https://megagames.com/trainers/zombotron-v111-7-trainer-abolfazlk",
+        "gcm_url": "GCM/GCM Trainers/Zombotron Trainer [Abolfazl.k].exe",
+        "version": "2019.5.13"
+    },
+    {
+        "game_name": "Sanguo All Knights",
+        "origin": "other",
+        "author": "云飞日月",
+        "gcm_url": "GCM/GCM Trainers/Sanguo All Knights Trainer [YunFeiRiYue].exe",
+        "version": "2026.9.12"
+    },
+    {
+        "game_name": "TouHou Makuka Sai ~ Fantastic Danmaku Festival Part II",
+        "origin": "ct_other",
+        "author": "云City",
+        "official_url": "https://www.bilibili.com/opus/958945611722260513",
+        "gcm_url": "GCM/GCM Trainers/TouHou Makuka Sai ~ Fantastic Danmaku Festival Part II Trainer [YunCity].ct",
+        "version": "2024.7.28"
+    },
+    {
+        "game_name": "Call of Duty 2",
+        "origin": "other",
+        "author": "GradenT",
+        "official_url": "https://www.playground.ru/call_of_duty_2/cheat/call_of_duty_2_trejner_trainer_21_1_0_gradent_playground_ru-799382",
+        "gcm_url": "GCM/GCM Trainers/Call of Duty 2 Trainer [GradenT].exe",
+        "version": "2012.9.3"
+    },
+    {
+        "game_name": "Call of Duty 2",
+        "origin": "other",
+        "author": "Abolfazl.k",
+        "official_url": "https://megagames.com/trainers/call-duty-2-v12-4-trainer-abolfazlk",
+        "gcm_url": "GCM/GCM Trainers/Call of Duty 2 Trainer [Abolfazl.k].exe",
+        "version": "2017.6.23"
+    },
+    {
+        "game_name": "none",
+        "origin": "other",
+        "custom_name_en": "Auto Clicker",
+        "custom_name_zh": "鼠标连点器",
+        "official_url": "http://www.baidu-home.com/mouseclick/index.htm",
+        "gcm_url": "GCM/GCM Trainers/Auto Clicker.zip",
+        "version": "2017.3.22"
+    },
+    {
+        "game_name": "The Legend of Fancy Realm Remake",
+        "origin": "other",
+        "author": "罐子哥",
+        "custom_name_en": "Save Editor",
+        "custom_name_zh": "存档编辑器",
+        "official_url": "https://bbs.3dmgame.com/thread-6700310-1-1.html",
+        "gcm_url": "GCM/GCM Trainers/The Legend of Fancy Realm Remake Save Editor [GuanZiGe].exe",
+        "version": "2026.9.12"
+    },
+    {
+        "game_name": "Gamble With Your Friends",
+        "origin": "other",
+        "author": "ZZH",
+        "gcm_url": "GCM/GCM Trainers/Gamble With Your Friends Trainer [ZZH].exe",
+        "version": "2026.9.7"
+    },
+    {
+        "game_name": "Prince of Persia The Lost Crown",
+        "origin": "ct_other",
+        "author": "L-Continue",
+        "official_url": "https://bbs.3dmgame.com/thread-6586359-1-1.html",
+        "gcm_url": "GCM/GCM Trainers/Prince of Persia The Lost Crown Trainer [L-Continue].ct",
+        "version": "2025.4.20"
+    },
+    {
+        "game_name": "Warcraft III: The Frozen Throne",
+        "origin": "other",
+        "author": "飘飞之影",
+        "custom_name_en": "ID Extractor",
+        "custom_name_zh": "ID 提取器",
+        "gcm_url": "GCM/GCM Trainers/Warcraft III_The Frozen Throne ID Extractor [PiaoFeiZhiYing].exe",
+        "version": "2016.2.3"
+    },
+    {
+        "game_name": "Left 4 Dead 2",
+        "origin": "other",
+        "author": "tisn",
+        "gcm_url": "GCM/GCM Trainers/Left 4 Dead 2 Trainer [tisn].zip",
+        "version": "2012.11.14"
+    },
+    {
+        "game_name": "Left 4 Dead 2",
+        "origin": "other",
+        "author": "MrAntiFun",
+        "official_url": "https://mrantifun.net/threads/left-4-dead-2-trainer.101",
+        "gcm_url": "GCM/GCM Trainers/Left 4 Dead 2 Trainer [MrAntiFun].exe",
+        "version": "2019.5.12"
+    },
+    {
+        "game_name": "Left 4 Dead",
+        "origin": "other",
+        "author": "MrAntiFun",
+        "official_url": "https://mrantifun.net/threads/left-4-dead-trainer.6123",
+        "gcm_url": "GCM/GCM Trainers/Left 4 Dead Trainer [MrAntiFun].exe",
+        "version": "2015.11.22"
+    },
+    {
+        "game_name": "Jiahao",
+        "origin": "other",
+        "author": "zlwzk",
+        "gcm_url": "GCM/GCM Trainers/Jiahao Trainer [zlwzk].exe",
+        "version": "2026.9.10"
     }
 ]

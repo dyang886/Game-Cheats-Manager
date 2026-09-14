@@ -251,8 +251,8 @@ msgstr ""
 "此修改器在使用前需要額外設定。請查看已開啟的資料夾以獲取說明。\n"
 "相關說明始終存儲在 'gcm-instructions' 資料夾中。"
 
-msgid "An error occurred when moving trainer: "
-msgstr "移動修改器時出錯："
+msgid "An error occurred when installing trainer: "
+msgstr "安裝修改器時出錯："
 
 msgid "Download success!"
 msgstr "下載成功！"
@@ -278,11 +278,11 @@ msgstr "正在解壓..."
 msgid "An error occurred while extracting downloaded trainer: "
 msgstr "解壓下載修改器時出錯："
 
-msgid "Could not find the downloaded trainer file, please try turning your antivirus software off."
-msgstr "找不到下載的修改器，請嘗試關閉防毒軟體。"
-
 msgid "Removing trainer background music..."
 msgstr "刪除修改器背景音樂..."
+
+msgid "Could not find the downloaded trainer file, please try turning your antivirus software off."
+msgstr "找不到下載的修改器，請嘗試關閉防毒軟體。"
 
 msgid "Patching..."
 msgstr "打補丁中..."

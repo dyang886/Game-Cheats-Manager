@@ -2,7 +2,6 @@ import ctypes
 import os
 import re
 import shutil
-import stat
 import subprocess
 import time
 import traceback
@@ -57,60 +56,118 @@ class DownloadTrainersThread(DownloadBaseThread):
             elif origin in ["the_cheat_script", "ct_other", "gcm", "other"]:
                 result = self.download_default(selected_trainer)
 
+            if not result:
+                return
+
             try:
-                for item in self.src_dst:
-                    if os.path.exists(item["dst"]):
-                        os.chmod(item["dst"], stat.S_IWRITE)
-                    if os.path.isfile(item['src']):
-                        dst_dir = os.path.dirname(item["dst"])
-                        os.makedirs(dst_dir, exist_ok=True)
-                    else:
-                        dst_dir = item["dst"]
-                    shutil.move(item["src"], item["dst"])
-
-                    if dst_dir != self.instructionDst:
-                        info_dict = {
-                            "game_name": selected_trainer["game_name"],
-                            "origin": selected_trainer["origin"]
-                        }
-                        if selected_trainer.get("version"):
-                            info_dict["version"] = selected_trainer["version"]
-                        if selected_trainer["origin"] in ["other", "ct_other"]:
-                            info_dict["gcm_url"] = selected_trainer["url"]
-                        if selected_trainer.get("extension"):
-                            info_dict["extension"] = selected_trainer["extension"]
-
-                        with open(os.path.join(dst_dir, "gcm_info.json"), "w", encoding="utf-8") as info_file:
-                            json.dump(info_dict, info_file, ensure_ascii=False, indent=4)
+                self.install_prepared_trainer(selected_trainer)
 
                 if self.instructionDst and not self.update_entry:
                     self.messageBox.emit("info", tr("Attention"), tr("This trainer requires additional setup before use. Please check the opened folder for instructions.\nThe instructions are always stored in the 'gcm-instructions' folder."))
                     os.startfile(self.instructionDst)
 
-            except PermissionError as e:
-                self.message.emit(tr("Trainer is currently in use, please close any programs using the file and try again."), "failure")
-                time.sleep(self.update_error_delay)
-                self.finished.emit(1)
-                return
             except Exception as e:
-                self.message.emit(tr("An error occurred when moving trainer: ") + str(e), "failure")
+                self.message.emit(tr("An error occurred when installing trainer: ") + str(e), "failure")
                 time.sleep(self.download_finish_delay)
                 self.finished.emit(1)
                 return
 
-            if result:
-                if self.is_cheat_engine_package(selected_trainer):
-                    self.report_cheat_engine_install()
-                self.installed.emit(self.installed_trainer_names())
-                self.message.emit(tr("Download success!"), "success")
-                time.sleep(self.download_finish_delay)
-                self.finished.emit(0)
+            if self.is_cheat_engine_package(selected_trainer):
+                self.report_cheat_engine_install()
+            self.installed.emit(self.installed_trainer_names())
+            self.message.emit(tr("Download success!"), "success")
+            time.sleep(self.download_finish_delay)
+            self.finished.emit(0)
 
         except Exception as e:
             traceback.print_exc()
             self.message.emit(tr("An error occurred while downloading trainer: ") + str(e), "failure")
             time.sleep(self.download_finish_delay)
             self.finished.emit(1)
+
+    def install_prepared_trainer(self, selected_trainer):
+        """Back up an update, install it, and restore missing original files on failure."""
+        trainer_directory = self.update_entry["trainer_dir"] if self.update_entry else None
+        backup_root = os.path.join(self.trainerDownloadPath, TRAINER_BACKUP_DIRECTORY)
+        backup_directory = None
+        backup_ready = False
+        retain_backup = False
+
+        try:
+            if trainer_directory:
+                backup_directory = os.path.join(
+                    backup_root,
+                    os.path.basename(trainer_directory)
+                )
+                os.makedirs(backup_root, exist_ok=True)
+                if os.path.lexists(backup_directory):
+                    shutil.rmtree(backup_directory)
+                shutil.copytree(trainer_directory, backup_directory)
+                backup_ready = True
+                shutil.rmtree(trainer_directory)
+
+            info = {
+                "game_name": selected_trainer["game_name"],
+                "origin": selected_trainer["origin"]
+            }
+            if selected_trainer.get("version"):
+                info["version"] = selected_trainer["version"]
+            if selected_trainer["origin"] in ["other", "ct_other"]:
+                info["gcm_url"] = selected_trainer["url"]
+            if selected_trainer.get("extension"):
+                info["extension"] = selected_trainer["extension"]
+
+            info_directories = set()
+            for item in self.src_dst:
+                if os.path.isfile(item["src"]):
+                    destination_directory = os.path.dirname(item["dst"])
+                    os.makedirs(destination_directory, exist_ok=True)
+                else:
+                    destination_directory = item["dst"]
+
+                shutil.move(item["src"], item["dst"])
+                if os.path.normpath(destination_directory) != os.path.normpath(self.instructionDst):
+                    info_directories.add(destination_directory)
+
+            for destination_directory in info_directories:
+                info_path = os.path.join(destination_directory, "gcm_info.json")
+                with open(info_path, "w", encoding="utf-8") as info_file:
+                    json.dump(info, info_file, ensure_ascii=False, indent=4)
+
+        except Exception:
+            if backup_ready:
+                try:
+                    for source_root, directories, files in os.walk(backup_directory):
+                        relative_root = os.path.relpath(source_root, backup_directory)
+                        destination_root = trainer_directory if relative_root == "." else os.path.join(trainer_directory, relative_root)
+                        os.makedirs(destination_root, exist_ok=True)
+
+                        for directory in directories:
+                            os.makedirs(os.path.join(destination_root, directory), exist_ok=True)
+
+                        for filename in files:
+                            source = os.path.join(source_root, filename)
+                            destination = os.path.join(destination_root, filename)
+                            if not os.path.lexists(destination):
+                                shutil.copy2(source, destination)
+
+                except Exception as rollback_error:
+                    retain_backup = True
+                    print(
+                        f"Could not roll back trainer installation; backup retained at "
+                        f"'{backup_directory}': {rollback_error}"
+                    )
+            raise
+
+        finally:
+            try:
+                if backup_directory and not retain_backup and os.path.isdir(backup_directory):
+                    shutil.rmtree(backup_directory)
+
+                if os.path.isdir(backup_root) and not os.listdir(backup_root):
+                    os.rmdir(backup_root)
+            except OSError as error:
+                print(f"Could not clean up trainer backups: {error}")
 
     def report_cheat_engine_install(self):
         for item in self.src_dst:
@@ -237,9 +294,6 @@ class DownloadTrainersThread(DownloadBaseThread):
                 return False
 
             os.remove(trainerTemp)
-
-        if self.update_entry:
-            shutil.rmtree(selected_trainer['trainer_dir'])
 
         if extracted:
             # Set instruction destination if gcm-instructions folder present at root
@@ -534,10 +588,6 @@ class DownloadTrainersThread(DownloadBaseThread):
         else:
             self.modify_fling_settings(False)
 
-        # Delete original trainer file (could not preserve original file name due to multiple versions when updating)
-        if self.update_entry:
-            shutil.rmtree(selected_trainer['trainer_dir'])
-
         if os.path.exists(trainerTemp) and os.path.basename(trainerTemp) not in extractedTrainerNames:
             os.remove(trainerTemp)
 
@@ -665,9 +715,6 @@ class DownloadTrainersThread(DownloadBaseThread):
                 return False
 
             os.remove(trainerTemp)
-
-        if self.update_entry:
-            shutil.rmtree(selected_trainer['trainer_dir'])
 
         if extracted:
             # If the archive contains multiple version folders, split them up into multiple dest folders

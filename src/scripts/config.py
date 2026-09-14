@@ -6,6 +6,7 @@ import os
 import re
 import sys
 import tempfile
+import unicodedata
 
 import polib
 from packaging.version import InvalidVersion, Version
@@ -22,7 +23,7 @@ except ImportError:
         raise RuntimeError('Request signing is unavailable in this build')
 
 
-APP_VERSION = "2.5.1-beta.1"
+APP_VERSION = "2.5.1"
 
 
 def parse_version(version):
@@ -173,19 +174,27 @@ def is_chinese(text):
     return False
 
 
-def sort_trainers_key(name):
-    if is_chinese(name):
-        return " ".join(lazy_pinyin(name))
-    return name
-
-
-def sort_trainers_key_ignore_prefix(name):
+def trainer_sort_key(name_getter, ignore_prefix=False):
     prefix_regex = re.compile(r"^\[.*?\]\s*")
-    real_name = prefix_regex.sub("", name)
 
-    if is_chinese(real_name):
-        return " ".join(lazy_pinyin(real_name))
-    return real_name
+    def sort_key(item):
+        original_name = name_getter(item)
+        name = prefix_regex.sub("", original_name) if ignore_prefix else original_name
+        name = " ".join(lazy_pinyin(name)) if is_chinese(name) else name
+        normalized_name = unicodedata.normalize("NFKC", name)
+        tokens = []
+
+        # Stable order: punctuation/spacing/symbols, numeric runs, then text.
+        for part in re.findall(r"\d+|\D", normalized_name.casefold()):
+            if part.isdecimal():
+                tokens.append((1, int(part), len(part)))
+            else:
+                group = 0 if unicodedata.category(part)[0] in "PZS" else 2
+                tokens.append((group, part))
+
+        return tuple(tokens), normalized_name, original_name
+
+    return sort_key
 
 
 def ensure_trainer_download_path_is_valid():
@@ -210,6 +219,8 @@ def findCEInstallPath(gcm=False):
     if download_path and os.path.isdir(download_path):
         try:
             for entry in sorted(os.scandir(download_path), key=lambda dirent: dirent.name):
+                if entry.name == TRAINER_BACKUP_DIRECTORY:
+                    continue
                 if entry.is_dir() and os.path.isfile(os.path.join(entry.path, CE_EXECUTABLE)):
                     return os.path.normpath(entry.path)
         except OSError as e:
@@ -260,6 +271,7 @@ os.makedirs(DATABASE_PATH, exist_ok=True)
 DOWNLOAD_TEMP_DIR = os.path.join(tempfile.gettempdir(), "GameCheatsManagerTemp", "download")
 VERSION_TEMP_DIR = os.path.join(tempfile.gettempdir(), "GameCheatsManagerTemp", "version")
 WEMOD_TEMP_DIR = os.path.join(tempfile.gettempdir(), "GameCheatsManagerTemp", "wemod")
+TRAINER_BACKUP_DIRECTORY = ".gcm-backup"
 
 wemod_install_path = findWeModInstallPath()
 CE_EXECUTABLE = "Cheat Engine.exe"
