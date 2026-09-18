@@ -1,0 +1,40 @@
+{
+    "en_US": {
+        "English": "English",
+        "Please run the game first.": "Please run the game first.",
+        "Please load a save first.": "Please load a save first.",
+        "Please restart the game and the trainer.": "Please restart the game and the trainer.",
+        "Failed to activate.": "Failed to activate.",
+        "Failed to activate / deactivate.": "Failed to activate / deactivate.",
+        "Process Name:": "Process Name:",
+        "Process ID:": "Process ID:",
+        "Rubinite Trainer": "Rubinite Trainer",
+        "Apply": "Apply",
+        "God Mode": "God Mode",
+        "Infinite Health": "Infinite Health",
+        "Move Speed": "Move Speed",
+        "Damage Multiplier": "Damage Multiplier",
+        "Talisman Slots": "Talisman Slots",
+        "Set Blood Dust": "Set Blood Dust",
+        "Set Impure Crystal": "Set Impure Crystal"
+    },
+    "zh_CN": {
+        "简体中文": "简体中文",
+        "Please run the game first.": "请先运行游戏。",
+        "Please load a save first.": "请先载入存档。",
+        "Please restart the game and the trainer.": "请重启游戏和修改器。",
+        "Failed to activate.": "激活失败。",
+        "Failed to activate / deactivate.": "激活 / 停用失败。",
+        "Process Name:": "进程名称：",
+        "Process ID:": "进程 ID:",
+        "Rubinite Trainer": "《红眼露比》修改器",
+        "Apply": "应用",
+        "God Mode": "无敌模式",
+        "Infinite Health": "无限生命",
+        "Move Speed": "移动速度",
+        "Damage Multiplier": "伤害倍率",
+        "Talisman Slots": "护符槽位",
+        "Set Blood Dust": "设置血尘",
+        "Set Impure Crystal": "设置不纯结晶块"
+    }
+}

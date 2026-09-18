@@ -1,0 +1,8 @@
+<Project>
+  <PropertyGroup>
+    <MonoBuildRoot>$(MSBuildThisFileDirectory)..\..\build\trainers\Rubinite Trainer\Mono\</MonoBuildRoot>
+    <BaseOutputPath>$(MonoBuildRoot)bin\</BaseOutputPath>
+    <BaseIntermediateOutputPath>$(MonoBuildRoot)obj\</BaseIntermediateOutputPath>
+    <MSBuildProjectExtensionsPath>$(BaseIntermediateOutputPath)</MSBuildProjectExtensionsPath>
+  </PropertyGroup>
+</Project>
