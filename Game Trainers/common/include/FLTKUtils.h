@@ -218,8 +218,6 @@ void setupLanguage()
 
 void change_language(const std::string &lang, Fl_Group *group)
 {
-    group->hide();
-
     for (const auto &[child, key] : translatable_widgets)
     {
         auto lang_translations = translations.find(lang);
@@ -250,14 +248,15 @@ void change_language(const std::string &lang, Fl_Group *group)
                 Fl_Flex *parent_flex = dynamic_cast<Fl_Flex *>(child->parent());
                 if (parent_flex)
                 {
-                    parent_flex->fixed(child, fl_width(child->label()));
+                    int label_w = 0, label_h = 0;
+                    child->measure_label(label_w, label_h);
+                    parent_flex->fixed(child, label_w);
                 }
             }
         }
     }
 
     group->redraw();
-    group->show();
     language = lang;
     saveSettings();
 }
@@ -377,6 +376,23 @@ void set_input_values(Fl_Input *input, std::string def, std::string min, std::st
     input->callback(input_callback, (void *)constraints);
 }
 
+void invalidate_label(Fl_Widget *widget)
+{
+    if (!widget)
+        return;
+
+    Fl_Window *window = widget->window();
+    if (!window)
+        return;
+
+    int label_w = 0, label_h = 0;
+    widget->measure_label(label_w, label_h);
+
+    const int w = (label_w > widget->w() ? label_w : widget->w()) + 2;
+    const int h = (label_h > widget->h() ? label_h : widget->h()) + 2;
+    window->damage(FL_DAMAGE_ALL, widget->x(), widget->y(), w, h);
+}
+
 // Function to periodically check process status and update GUI
 void check_process_status(void *data)
 {
@@ -410,6 +426,9 @@ void check_process_status(void *data)
     process_id->copy_label(processIdStr.c_str());
     process_id->labelcolor(FL_WHITE);
     process_id->labelsize(font_size);
+
+    invalidate_label(process_exe);
+    invalidate_label(process_id);
 
     if (!running)
     {

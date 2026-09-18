@@ -3,7 +3,7 @@
 //
 // Copyright 2002 by Greg Ercolano.
 // Copyright (c) 2004 O'ksi'D
-// Copyright 2023 by Bill Spitzak and others.
+// Copyright 2023-2025 by Bill Spitzak and others.
 //
 // This library is free software. Distribution and use rights are outlined in
 // the file "COPYING" which should have been included with this file.  If this
@@ -736,11 +736,15 @@ public:
     return(row_position());
   }
   int is_selected(int r, int c);                // selected cell
+#if FL_ABI_VERSION >= 10405 // Issue #1305
+  void get_selection(int &row_top, int &col_left, int &row_bot, int &col_right) const;
+#else
   void get_selection(int &row_top, int &col_left, int &row_bot, int &col_right);
+#endif
   void set_selection(int row_top, int col_left, int row_bot, int col_right);
   int move_cursor(int R, int C, int shiftselect);
   int move_cursor(int R, int C);
-  void resize(int X, int Y, int W, int H) FL_OVERRIDE; // fltk resize() FL_OVERRIDE
+  void resize(int X, int Y, int W, int H) FL_OVERRIDE; // fltk resize() override
 
   // This crashes sortapp() during init.
   //  void box(Fl_Boxtype val) {

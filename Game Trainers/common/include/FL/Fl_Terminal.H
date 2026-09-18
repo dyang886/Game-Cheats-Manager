@@ -2,7 +2,7 @@
 // Fl_Terminal - A terminal widget for Fast Light Tool Kit (FLTK).
 //
 // Copyright 2022 by Greg Ercolano.
-// Copyright 2024 by Bill Spitzak and others.
+// Copyright 2024-2025 by Bill Spitzak and others.
 //
 // This library is free software. Distribution and use rights are outlined in
 // the file "COPYING" which should have been included with this file.  If this
@@ -829,10 +829,10 @@ public:
   /**
     Vertical scrollbar. This is public so it can be accessed directly, e.g.
 
-    - \ref Fl_Scrollbar::value(void) "scrollbar->value(void)" returns the row offset
+    - \ref Fl_Scrollbar::value()      "scrollbar->value()" returns the row offset
       from the bottom of the display, 0 being the bottom (default).
-    - \ref Fl_Scrollbar::value(int) "scrollbar->value(int)" similarly sets the row offset,
-      which should be in the range [0 .. Fl_Scrollbar::maximum()].
+    - \ref Fl_Scrollbar::value(int)   "scrollbar->value(int)" similarly sets the row
+      offset, which should be in the range [0 .. Fl_Scrollbar::maximum()].
     - \ref Fl_Scrollbar::step(double) "scrollbar->step(double)" sets the smoothness
       of scrolling, default is 0.25 for 4 steps of motion per column.
 
@@ -843,10 +843,10 @@ public:
   /**
     Horizontal scrollbar. This is public so it can be accessed directly, e.g.
 
-    - \ref Fl_Scrollbar::value(void) "hscrollbar->value(void)" returns the column offset
+    - \ref Fl_Scrollbar::value()      "hscrollbar->value()" returns the column offset
       position from the left edge of the display; 0 being the left edge (default).
-    - \ref Fl_Scrollbar::value(int) "hscrollbar->value(int)" similarly sets the column offset,
-      which should be in the range [0 .. Fl_Scrollbar::maximum()].
+    - \ref Fl_Scrollbar::value(int)   "hscrollbar->value(int)" similarly sets the column
+      offset, which should be in the range [0 .. Fl_Scrollbar::maximum()].
     - \ref Fl_Scrollbar::step(double) "hscrollbar->step(double)" sets the smoothness
       of scrolling, default is 0.25 for 4 steps of motion per column.
    */
@@ -1012,8 +1012,10 @@ private:
   void display_modified(void);
   void display_modified_clear(void);
   void clear_char_at_disp(int drow, int dcol);
+protected:
   const Utf8Char* utf8_char_at_disp(int drow, int dcol) const;
   const Utf8Char* utf8_char_at_glob(int grow, int gcol) const;
+private:
   void repeat_char(char c, int rep);
   void utf8_cache_clear(void);
   void utf8_cache_flush(void);

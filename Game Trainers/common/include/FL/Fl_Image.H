@@ -287,9 +287,14 @@ public:
    (upper-left corner) of the image offset by the \c cx
    and \c cy arguments.
 
-   In other words:  <tt>fl_push_clip(X,Y,W,H)</tt> is applied,
-   the image is drawn with its upper-left corner at <tt>X-cx,Y-cy</tt> and its own width and height,
-   <tt>fl_pop_clip</tt><tt>()</tt> is applied.
+   Another way to see what part of the image gets drawn and where, is to consider this alternative writing producing the same output:
+   \verbatim
+   fl_push_clip(X,Y,W,H);
+   this->draw(X - cx, Y - cy);
+   fl_pop_clip();
+   \endverbatim
+   Repeated calls to this member function with the same image but varying <tt>W, H, cx</tt>, or <tt>cy</tt> arguments
+   may be more efficiently processed using the above alternative writing.
    */
   virtual void draw(int X, int Y, int W, int H, int cx=0, int cy=0); // platform dependent
   /**

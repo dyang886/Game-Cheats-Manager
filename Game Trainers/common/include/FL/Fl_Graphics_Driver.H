@@ -2,7 +2,7 @@
 // Declaration of classes Fl_Graphics_Driver, Fl_Scalable_Graphics_Driver,
 // and Fl_Font_Descriptor for the Fast Light Tool Kit (FLTK).
 //
-// Copyright 2010-2024 by Bill Spitzak and others.
+// Copyright 2010-2025 by Bill Spitzak and others.
 //
 // This library is free software. Distribution and use rights are outlined in
 // the file "COPYING" which should have been included with this file.  If this
@@ -395,7 +395,7 @@ public:
   Fl_Font_Descriptor *next;
   Fl_Fontsize size; /**< font size */
   Fl_Font_Descriptor(const char* fontname, Fl_Fontsize size);
-  virtual FL_EXPORT ~Fl_Font_Descriptor() {}
+  virtual /* FL_EXPORT */ ~Fl_Font_Descriptor() {}
   int ascent, descent;
   unsigned int listbase;// base of display list, 0 = none
 };
@@ -430,6 +430,9 @@ public:
   inline int floor(int x) { return Fl_Scalable_Graphics_Driver::floor(x, scale()); }
 protected:
   int line_width_;
+#if FL_ABI_VERSION >= 10403     // Issue #1214
+  bool is_solid_;
+#endif
   virtual Fl_Region scale_clip(float f);
   void unscale_clip(Fl_Region r);
   void point(int x, int y) FL_OVERRIDE;

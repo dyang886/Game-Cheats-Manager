@@ -109,6 +109,12 @@
         "version": "2026.8.26"
     },
     {
+        "game_name": "Rubinite",
+        "origin": "gcm",
+        "gcm_url": "GCM/GCM Trainers/Rubinite Trainer.exe",
+        "version": "2026.9.17"
+    },
+    {
         "game_name": "Zao Meng Xi You: Wu Shuang",
         "origin": "gcm",
         "gcm_url": "GCM/GCM Trainers/Zao Meng Xi You_ Wu Shuang Trainer.exe",

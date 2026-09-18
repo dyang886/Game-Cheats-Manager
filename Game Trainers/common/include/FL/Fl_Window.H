@@ -1,7 +1,7 @@
 //
 // Window header file for the Fast Light Tool Kit (FLTK).
 //
-// Copyright 1998-2023 by Bill Spitzak and others.
+// Copyright 1998-2025 by Bill Spitzak and others.
 //
 // This library is free software. Distribution and use rights are outlined in
 // the file "COPYING" which should have been included with this file.  If this
@@ -118,8 +118,9 @@ protected:
     if (force) set_flag(FORCE_POSITION);
     else clear_flag(FORCE_POSITION);
   }
+
   /**
-    Returns the internal state of the window's FORCE_POSITION flag.
+    Returns the internal state of the window's \c FORCE_POSITION flag.
 
     \retval 1 if flag is set
     \retval 0 otherwise
@@ -350,11 +351,13 @@ public:
     Undoes the effect of a previous resize() or show() so that the next time
     show() is called the window manager is free to position the window.
 
-    This is for Forms compatibility only.
+    This is the same as the \e protected method Fl_Window::force_position(0).
 
-    \deprecated please use force_position(0) instead
+    \internal
+    This method was erroneously declared 'deprecated' in earlier versions.
+    This has been corrected in FLTK 1.4.3.
   */
-  void free_position()  {clear_flag(FORCE_POSITION);}
+  void free_position()  { clear_flag(FORCE_POSITION); }
 
   void size_range(int minw, int minh, int maxw=0, int maxh=0, int dw=0, int dh=0, int aspect=0);
 

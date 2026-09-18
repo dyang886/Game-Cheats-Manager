@@ -390,6 +390,10 @@ public:
   void scrollbar_size(int newSize) {
       scrollbar_size_ = newSize;
   }
+  /// Return pointer to vertical scrollbar
+  Fl_Scrollbar  *scrollbar() { return &scrollbar_; }
+  /// Return pointer to horizontal scrollbar
+  Fl_Scrollbar  *hscrollbar() { return &hscrollbar_; }
 
   // Check if the user selected text in this view.
   int text_selected();

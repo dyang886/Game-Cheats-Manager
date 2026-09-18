@@ -735,19 +735,13 @@ public:
    */
   const Fl_Text_Selection* highlight_selection() const { return &mHighlight; }
 
-  /**
-   Returns the index of the previous character.
-   \param ix index to the current character
-   */
-  int prev_char(int ix) const;
-  int prev_char_clipped(int ix) const;
+  // Returns the index of the previous character.
+  int prev_char(int pos) const;
+  int prev_char_clipped(int pos) const;
 
-  /**
-   Returns the index of the next character.
-   \param ix index to the current character
-   */
-  int next_char(int ix) const;
-  int next_char_clipped(int ix) const;
+  // Returns the index of the next character.
+  int next_char(int pos) const;
+  int next_char_clipped(int pos) const;
 
   /**
    Align an index into the buffer to the current or previous UTF-8 boundary.

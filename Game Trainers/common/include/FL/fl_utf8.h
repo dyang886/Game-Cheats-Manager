@@ -210,6 +210,9 @@ FL_EXPORT void fl_make_path_for_file( const char *path );
 /* OD: recursively create a path in the file system */
 FL_EXPORT char fl_make_path( const char *path );
 
+FL_EXPORT const char *fl_utf8_next_composed_char(const char *from, const char *end);
+
+FL_EXPORT const char *fl_utf8_previous_composed_char(const char *from, const char *begin);
 
 /** @} */
 

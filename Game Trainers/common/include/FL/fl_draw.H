@@ -1,7 +1,7 @@
 //
 // Portable drawing function header file for the Fast Light Tool Kit (FLTK).
 //
-// Copyright 1998-2023 by Bill Spitzak and others.
+// Copyright 1998-2025 by Bill Spitzak and others.
 //
 // This library is free software. Distribution and use rights are outlined in
 // the file "COPYING" which should have been included with this file.  If this
@@ -823,6 +823,9 @@ inline Fl_Fontsize fl_size() {
 /**
   Return the recommended minimum line spacing for the current font.
   You can also use the value of \p size passed to fl_font().
+
+  \see fl_font(Fl_Font face, Fl_Fontsize fsize) to load the current font
+    before this method is called.
 */
 inline int fl_height() {
   return fl_graphics_driver->height();
@@ -831,25 +834,50 @@ FL_EXPORT int fl_height(int font, int size);
 /**
   Return the recommended distance above the bottom of a fl_height() tall
   box to draw the text at so it looks centered vertically in that box.
+
+  \see fl_font(Fl_Font face, Fl_Fontsize fsize) to load the current font
+    before this method is called.
 */
 inline int fl_descent() {
   return fl_graphics_driver->descent();
 }
 /** Return the typographical width of a nul-terminated string
-    using the current font face and size.
+  using the current font face and size.
+
+  \see fl_font(Fl_Font face, Fl_Fontsize fsize) to load the current font
+    before this method is called.
 */
 FL_EXPORT double fl_width(const char *txt);
 
-/** Return the typographical width of a sequence of \p n characters
-    using the current font face and size.
+/** Return the typographical width of a sequence of \p n bytes of text
+  in UTF-8 encoding, using the current font face and size.
+
+  \p n must be chosen such that only complete UTF-8 characters are included
+  in the given text \p txt. Otherwise the result is undefined.
+
+  \param[in] txt The UTF-8 encoded text to be measured.
+  \param[in] n   Length of the string in \p bytes.
+
+  \see fl_font(Fl_Font face, Fl_Fontsize fsize) to load the current font
+    before this method is called.
 */
 inline double fl_width(const char *txt, int n) {
   return fl_graphics_driver->width(txt, n);
 }
 /** Return the typographical width of a single character
-    using the current font face and size.
+  using the current font face and size.
 
-  \note If a valid fl_gc is NOT found then it uses the first window gc,
+  \param[in] c The Unicode code point of the character to be measured.
+
+  \see fl_font(Fl_Font face, Fl_Fontsize fsize) to load the current font
+    before this method is called.
+
+  Example:
+  \code
+    auto width = fl_width(0x20ac);  // measures the width of the `€` sign.
+  \endcode
+
+  \internal If a valid fl_gc is NOT found then it uses the first window gc,
   or the screen gc if no fltk window is available when called.
 */
 inline double fl_width(unsigned int c) {
@@ -863,6 +891,7 @@ inline double fl_width(unsigned int c) {
   such that a bounding box that exactly fits around the text could be drawn with
   fl_rect(x+dx, y+dy, wo, ho). Note the dx, dy values hold the offset of the first
   "colored in" pixel of the string, from the draw origin.
+  dx and dy can be negative.
 
   Note the desired font and font size must be set with fl_font() before calling
   this function.
@@ -875,18 +904,30 @@ inline double fl_width(unsigned int c) {
   Example use:
   \code
     int dx,dy,W,H;
-    fl_font(FL_HELVETICA, 12);                   // set font face+size first
+    fl_font(FL_HELVETICA, 12);                   // set font face and size first
     fl_text_extents("Some text", dx, dy, W, H);  // get width and height of string
     printf("text's width=%d, height=%d\n", W, H);
   \endcode
+
+  \param[in]  t     text to be measured
+  \param[out] dx,dy offsets from x,y position of text (see description)
+  \param[out] w,h   width and height of bounding box
 */
-FL_EXPORT void fl_text_extents(const char *, int &dx, int &dy, int &w, int &h);
+FL_EXPORT void fl_text_extents(const char *t, int &dx, int &dy, int &w, int &h);
 
-/** Determine the minimum pixel dimensions of a sequence of \p n characters
-    (bytes) using the current fl_font().
+/** Determine the minimum pixel dimensions of a sequence of \p n bytes of
+  text using the current font face and size.
 
-  \note The string length is measured in bytes, not (UTF-8) characters.
-  \see fl_text_extents(const char*, int& dx, int& dy, int& w, int& h)
+  This is the same as fl_text_extents(const char* t, int& dx, int& dy, int& w, int& h)
+  except that the string doesn't need to be nul-terminated. The length in bytes is
+  given in the second parameter \p n.
+
+  \param[in]  t     text to be measured
+  \param[in]  n     length of text in bytes
+  \param[out] dx,dy offsets from x,y position of text (see description)
+  \param[out] w,h   width and height of bounding box
+
+  \see fl_text_extents(const char* t, int& dx, int& dy, int& w, int& h)
 */
 inline void fl_text_extents(const char *t, int n, int &dx, int &dy, int &w, int &h) {
   fl_graphics_driver->text_extents(t, n, dx, dy, w, h);
@@ -1155,13 +1196,13 @@ FL_EXPORT Fl_RGB_Image *fl_capture_window(Fl_Window *win, int x, int y, int w, i
   The image is dithered on 8-bit displays so you won't lose color
   space for programs displaying both images and pixmaps.
 
-  \param[in] data pointer to XPM image data
-  \param[in] x,y  position of top-left corner
-  \param[in] bg   background color
+  \param[in] cdata  pointer to XPM image data
+  \param[in] x,y    position of top-left corner
+  \param[in] bg     background color
 
   \returns 0 if there was any error decoding the XPM data.
 */
-FL_EXPORT int fl_draw_pixmap(const char *const *data, int x, int y, Fl_Color bg = FL_GRAY);
+FL_EXPORT int fl_draw_pixmap(const char *const *cdata, int x, int y, Fl_Color bg = FL_GRAY);
 /**
   Draw XPM image data, with the top-left corner at the given position.
   \see fl_draw_pixmap(const char* const* data, int x, int y, Fl_Color bg)
