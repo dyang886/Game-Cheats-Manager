@@ -1,0 +1,25 @@
+<Project>
+  <!--
+    Keeps MSBuild's intermediates out of the trainers' source folders.
+
+    add_trainer() already redirects them for the builds it runs, but it cannot speak for the
+    design-time builds the IDE's C# tooling starts on its own whenever it notices a Mono.csproj -
+    those run with default paths and drop an obj/ (and an empty bin/) next to the source. MSBuild
+    picks up the nearest Directory.Build.props walking up from the project, so this one file covers
+    every trainer under here, however the build was started.
+
+    Trainers predating add_trainer() carry their own Directory.Build.props, and MSBuild stops at the
+    first one it finds - so they keep their existing paths and are untouched by this.
+
+    BaseOutputPath is set here as a project property, which the -o that add_trainer() passes still
+    overrides. Passing it as a command-line -p: alongside -o is the thing that breaks: the build then
+    reports success while producing no assembly.
+  -->
+  <PropertyGroup>
+    <TrainerFolderName>$([System.IO.Path]::GetFileName('$(MSBuildProjectDirectory)'))</TrainerFolderName>
+    <TrainerMonoDir>$(MSBuildThisFileDirectory)..\build\mono-intermediate\$(TrainerFolderName)\</TrainerMonoDir>
+    <BaseIntermediateOutputPath>$(TrainerMonoDir)obj\</BaseIntermediateOutputPath>
+    <BaseOutputPath>$(TrainerMonoDir)bin\</BaseOutputPath>
+    <MSBuildProjectExtensionsPath>$(BaseIntermediateOutputPath)</MSBuildProjectExtensionsPath>
+  </PropertyGroup>
+</Project>

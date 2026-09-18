@@ -10,3 +10,4 @@ update_translations.py
 elevate.manifest
 cpp/
 docs/
+!Game Trainers/docs/

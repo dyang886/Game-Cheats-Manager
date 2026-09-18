@@ -4,9 +4,9 @@ bin/
 obj/
 .venv/
 tools/
-docs/
+docs/*
+!docs/create_trainer.md
 *.sln
-*.ps1
 MonoBridge.dll
 Mono.dll
 IL2CPP.dll

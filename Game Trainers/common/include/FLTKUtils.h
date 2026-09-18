@@ -248,6 +248,8 @@ void change_language(const std::string &lang, Fl_Group *group)
                 Fl_Flex *parent_flex = dynamic_cast<Fl_Flex *>(child->parent());
                 if (parent_flex)
                 {
+                    // measure_label() uses the label's own font; fl_width() would use whatever the
+                    // graphics state was last left in, and this runs from a callback, not draw().
                     int label_w = 0, label_h = 0;
                     child->measure_label(label_w, label_h);
                     parent_flex->fixed(child, label_w);
@@ -376,6 +378,8 @@ void set_input_values(Fl_Input *input, std::string def, std::string min, std::st
     input->callback(input_callback, (void *)constraints);
 }
 
+/// FLTK draws an FL_ALIGN_INSIDE label unclipped but redraw_label() only invalidates the widget's
+/// own box, so overflow keeps the colour it last had. Invalidate what the text actually covers.
 void invalidate_label(Fl_Widget *widget)
 {
     if (!widget)

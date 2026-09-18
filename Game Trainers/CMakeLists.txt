@@ -4,7 +4,9 @@ project(GameTrainers LANGUAGES CXX)
 
 set(CMAKE_CXX_STANDARD 20)
 set(CMAKE_CXX_STANDARD_REQUIRED ON)
-set(CMAKE_MSVC_RUNTIME_LIBRARY "MultiThreaded$<$<CONFIG:Debug>:Debug>")
+set(CMAKE_MSVC_RUNTIME_LIBRARY "MultiThreaded")
+
+include(${CMAKE_CURRENT_SOURCE_DIR}/cmake/AddTrainer.cmake)
 
 add_subdirectory(common)
 
@@ -27,12 +29,19 @@ foreach(TRAINER_CMAKE_FILE ${TRAINER_CMAKE_FILES})
     file(READ "${TRAINER_CMAKE_FILE}" TRAINER_CMAKE_CONTENT)
     string(REGEX MATCH "set\\([ \t]*TRAINER_ARCH[ \t]+\"?([^\"\r\n\)]+)\"?[ \t]*\\)" TRAINER_ARCH_MATCH "${TRAINER_CMAKE_CONTENT}")
 
-    if(NOT TRAINER_ARCH_MATCH)
-        message(WARNING "Skipping ${TRAINER_FOLDER}: missing set(TRAINER_ARCH \"x86\") or set(TRAINER_ARCH \"x64\")")
+    if(TRAINER_ARCH_MATCH)
+        set(TRAINER_ARCH "${CMAKE_MATCH_1}")
+    elseif(TRAINER_CMAKE_CONTENT MATCHES "add_trainer")
+        if(TRAINER_CMAKE_CONTENT MATCHES "ARCH[ 	]+\"?([A-Za-z0-9_]+)\"?")
+            set(TRAINER_ARCH "${CMAKE_MATCH_1}")
+        else()
+            message(WARNING "Skipping ${TRAINER_FOLDER}: add_trainer() must declare ARCH")
+            continue()
+        endif()
+    else()
+        message(WARNING "Skipping ${TRAINER_FOLDER}: no add_trainer() call and no set(TRAINER_ARCH ...)")
         continue()
     endif()
-
-    set(TRAINER_ARCH "${CMAKE_MATCH_1}")
     set(TRAINER_REQUIRED_ARCH "${TRAINER_ARCH}")
 
     if(TRAINER_ARCH STREQUAL CURRENT_PLATFORM)
