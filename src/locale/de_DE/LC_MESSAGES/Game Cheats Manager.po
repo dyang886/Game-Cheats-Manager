@@ -500,8 +500,8 @@ msgstr "Original-URL und Autor"
 msgid "Trainer Source (Optional):"
 msgstr "Trainer-Quelle (Optional):"
 
-msgid "Please try to fill this in if you can. If you made the trainer, please provide your author name"
-msgstr "Bitte fülle dies nach Möglichkeit aus. Wenn du den Trainer selbst erstellt hast, gib bitte deinen Autorennamen an"
+msgid "Please fill this in if possible to speed up the review process. If you made the trainer, please provide your author name"
+msgstr "Bitte fülle dies nach Möglichkeit aus, um die Prüfung zu beschleunigen. Wenn du den Trainer selbst erstellt hast, gib bitte deinen Autorennamen an"
 
 msgid "Select a trainer file"
 msgstr "Trainer-Datei auswählen"

@@ -442,7 +442,7 @@ class TrainerUploadDialog(QDialog):
         layout.addLayout(self.field_group(
             tr("Trainer Source (Optional):"),
             self.sourceEdit,
-            tr("Please try to fill this in if you can. If you made the trainer, please provide your author name")
+            tr("Please fill this in if possible to speed up the review process. If you made the trainer, please provide your author name")
         ))
 
         # Trainer File Selection
@@ -534,8 +534,6 @@ class TrainerUploadDialog(QDialog):
         )
         if file_path:
             self.fileEdit.setText(file_path)
-            if not self.nameEdit.text():
-                self.nameEdit.setText(os.path.basename(file_path))
 
     def start_upload(self):
         file_path = self.fileEdit.text()

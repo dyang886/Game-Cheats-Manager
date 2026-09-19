@@ -500,8 +500,8 @@ msgstr "原始連結和作者"
 msgid "Trainer Source (Optional):"
 msgstr "修改器來源（選填）："
 
-msgid "Please try to fill this in if you can. If you made the trainer, please provide your author name"
-msgstr "如果可以，請盡量填寫。如果修改器為自製，請提供你的作者名"
+msgid "Please fill this in if possible to speed up the review process. If you made the trainer, please provide your author name"
+msgstr "請盡可能填寫此項以加速審核。如果修改器為自製，請提供你的作者名"
 
 msgid "Select a trainer file"
 msgstr "選擇修改器檔案"
