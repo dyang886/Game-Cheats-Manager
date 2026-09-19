@@ -488,11 +488,11 @@ class GameCheatsManager(QMainWindow):
         except Exception as e:
             print(f"Error during junction cleanup: {e}")
 
-    def get_ascii_launch_path(self, original_exe_path):
+    def get_ascii_launch_path(self, original_path):
         # 1. Check if the entire path is already purely ASCII
         try:
-            original_exe_path.encode('ascii')
-            return original_exe_path
+            original_path.encode('ascii')
+            return original_path
         except UnicodeEncodeError:
             pass
 
@@ -501,10 +501,10 @@ class GameCheatsManager(QMainWindow):
         _GetShortPathNameW.argtypes = [wintypes.LPCWSTR, wintypes.LPWSTR, wintypes.DWORD]
         _GetShortPathNameW.restype = wintypes.DWORD
 
-        output_buf_size = _GetShortPathNameW(original_exe_path, None, 0)
+        output_buf_size = _GetShortPathNameW(original_path, None, 0)
         if output_buf_size > 0:
             output_buf = ctypes.create_unicode_buffer(output_buf_size)
-            _GetShortPathNameW(original_exe_path, output_buf, output_buf_size)
+            _GetShortPathNameW(original_path, output_buf, output_buf_size)
             short_path = output_buf.value
             try:
                 short_path.encode('ascii')
@@ -514,12 +514,12 @@ class GameCheatsManager(QMainWindow):
 
         # 3. Ultimate Fallback: Unique Directory Junction in %TEMP%
         temp_dir = tempfile.gettempdir()
-        exe_dir = os.path.dirname(original_exe_path)
-        original_exe_name = os.path.basename(original_exe_path)
+        original_dir = os.path.dirname(original_path)
+        original_name = os.path.basename(original_path)
 
         # Create a short, stable hash of the directory path to prevent collisions
         # e.g., "GCM_Launch_8a4f9b2c"
-        path_hash = hashlib.md5(exe_dir.encode('utf-8')).hexdigest()[:8]
+        path_hash = hashlib.md5(original_dir.encode('utf-8')).hexdigest()[:8]
         junction_dir = os.path.join(temp_dir, f"GCM_Launch_{path_hash}")
 
         # Remove old junction if it exists
@@ -532,13 +532,13 @@ class GameCheatsManager(QMainWindow):
         # If it doesn't exist (or was successfully removed), create the new junction
         if not os.path.exists(junction_dir):
             try:
-                command = f'mklink /J "{junction_dir}" "{exe_dir}"'
+                command = f'mklink /J "{junction_dir}" "{original_dir}"'
                 subprocess.run(command, shell=True, check=True, stdout=subprocess.DEVNULL, stderr=subprocess.DEVNULL)
             except Exception as e:
                 print(f"Failed to create ASCII junction fallback: {e}")
-                return original_exe_path
+                return original_path
 
-        return os.path.join(junction_dir, original_exe_name)
+        return os.path.join(junction_dir, original_name)
 
     def prompt_cheat_engine_install(self):
         if self.downloadingCE:
@@ -610,10 +610,17 @@ class GameCheatsManager(QMainWindow):
                         self.prompt_cheat_engine_install()
                         return
 
-                    print(f"Cheat table launch path: {originalPath}")
+                    if settings["safePath"]:
+                        ceExecutable = self.get_ascii_launch_path(ceExecutable)
+                        trainerPath = self.get_ascii_launch_path(originalPath)
+                    else:
+                        trainerPath = originalPath
+
+                    print(f"Cheat Engine launch path: {ceExecutable}")
+                    print(f"Cheat table launch path: {trainerPath}")
                     verb = "runas" if settings["launchCTAsAdmin"] else "open"
                     ctypes.windll.shell32.ShellExecuteW(
-                        None, verb, ceExecutable, f'"{originalPath}"', os.path.dirname(ceExecutable), 1
+                        None, verb, ceExecutable, f'"{trainerPath}"', os.path.dirname(ceExecutable), 1
                     )
                     return
 
@@ -625,8 +632,11 @@ class GameCheatsManager(QMainWindow):
                 print(f"Trainer launch path: {trainerPath}")
                 trainerDir = os.path.dirname(trainerPath)
 
-                # Use "runas" for exe files (run as admin), "open" for other files (use default app)
-                verb = "runas" if settings["launchAsAdmin"] and trainerExt == ".exe" else "open"
+                # Cheat Engine has its own administrator-launch setting
+                isCheatEngine = os.path.basename(originalPath).lower() == CE_EXECUTABLE.lower()
+
+                launchAsAdmin = settings["launchCTAsAdmin"] if isCheatEngine else settings["launchAsAdmin"]
+                verb = "runas" if launchAsAdmin and trainerExt == ".exe" else "open"
                 ctypes.windll.shell32.ShellExecuteW(
                     None, verb, trainerPath, None, trainerDir, 1
                 )

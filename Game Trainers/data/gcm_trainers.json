@@ -109,6 +109,12 @@
         "version": "2026.8.26"
     },
     {
+        "game_name": "Rhythm Doctor",
+        "origin": "gcm",
+        "gcm_url": "GCM/GCM Trainers/Rhythm Doctor Trainer.exe",
+        "version": "2026.9.18"
+    },
+    {
         "game_name": "Rubinite",
         "origin": "gcm",
         "gcm_url": "GCM/GCM Trainers/Rubinite Trainer.exe",
