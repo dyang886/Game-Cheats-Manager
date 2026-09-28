@@ -1,0 +1,662 @@
+#
+msgid ""
+msgstr ""
+"Project-Id-Version: Game Cheats Manager\n"
+"POT-Creation-Date: \n"
+"PO-Revision-Date: \n"
+"Last-Translator: \n"
+"Language-Team: Português do Brasil\n"
+"Language: pt_BR\n"
+"MIME-Version: 1.0\n"
+"Content-Type: text/plain; charset=UTF-8\n"
+"Content-Transfer-Encoding: 8bit\n"
+"Plural-Forms: nplurals=2; plural=(n != 1);\n"
+"X-Generator: Codex\n"
+
+msgid "Dark"
+msgstr "Escuro"
+
+msgid "Light"
+msgstr "Claro"
+
+msgid "Yearly Subscription"
+msgstr "Assinatura anual"
+
+msgid "Gifted Subscription"
+msgstr "Assinatura de presente"
+
+msgid "Search for installed trainers"
+msgstr "Pesquisar treinadores instalados"
+
+msgid "Enter keywords to download trainers"
+msgstr "Digite palavras-chave para baixar treinadores"
+
+msgid "Options"
+msgstr "Opções"
+
+msgid "Settings"
+msgstr "Configurações"
+
+msgid "Import Trainers"
+msgstr "Importar treinadores"
+
+msgid "Open Trainer Download Path"
+msgstr "Abrir pasta de download dos treinadores"
+
+msgid "Add Paths to Whitelist"
+msgstr "Adicionar caminhos à lista de permissões"
+
+msgid "About"
+msgstr "Sobre"
+
+msgid "Data Update"
+msgstr "Atualização de dados"
+
+msgid "Update Translation Data"
+msgstr "Atualizar dados de tradução"
+
+msgid "Update Trainer Search Data"
+msgstr "Atualizar dados de pesquisa de treinadores"
+
+msgid "Update Trainers"
+msgstr "Atualizar treinadores"
+
+msgid "Trainer Management"
+msgstr "Gerenciamento de treinadores"
+
+msgid "Upload Trainer"
+msgstr "Enviar treinador"
+
+msgid "Browse All Trainers"
+msgstr "Ver todos os treinadores"
+
+msgid "Launch"
+msgstr "Iniciar"
+
+msgid "Delete"
+msgstr "Excluir"
+
+msgid "Trainer download path:"
+msgstr "Caminho de download dos treinadores:"
+
+msgid "Failure"
+msgstr "Falha"
+
+msgid "Failed to update application"
+msgstr "Falha ao atualizar o aplicativo"
+
+msgid "Update Available"
+msgstr "Atualização disponível"
+
+msgid "New version found: {old_version} ➜ {new_version}"
+msgstr "Nova versão disponível: {old_version} ➜ {new_version}"
+
+msgid "Would you like to update now?"
+msgstr "Deseja atualizar agora?"
+
+msgid "Update Check Failed"
+msgstr "Falha ao verificar atualizações"
+
+msgid "Failed to check for software update. You can navigate to `Options` ➜ `About` to check for updates manually."
+msgstr "Falha ao verificar atualizações do aplicativo. Acesse `Opções` ➜ `Sobre` para verificar atualizações manualmente."
+
+msgid "Attention"
+msgstr "Atenção"
+
+msgid "Cheat Engine is already being downloaded, please wait for it to finish."
+msgstr "O Cheat Engine já está sendo baixado. Aguarde o término do download."
+
+msgid "Cheat Engine Required"
+msgstr "Cheat Engine necessário"
+
+msgid ".ct/.cetrainer files can only be launched through Cheat Engine, but no Cheat Engine installation is currently set."
+msgstr "Os arquivos .ct/.cetrainer só podem ser iniciados pelo Cheat Engine, mas nenhum caminho de instalação do Cheat Engine foi definido."
+
+msgid "If you already have Cheat Engine installed, select its installation path under '{trainer_management} → Cheat Engine'."
+msgstr "Se você já tem o Cheat Engine instalado, selecione o caminho de instalação em '{trainer_management} → Cheat Engine'."
+
+msgid "Otherwise, would you like to download Cheat Engine now?"
+msgstr "Caso contrário, deseja baixar o Cheat Engine agora?"
+
+msgid "Yes"
+msgstr "Sim"
+
+msgid "No"
+msgstr "Não"
+
+msgid "Success"
+msgstr "Sucesso"
+
+msgid "Cheat Engine has already been downloaded in GCM, its installation path has been updated."
+msgstr "O Cheat Engine já foi baixado pelo GCM e o caminho de instalação foi atualizado."
+
+msgid "Error"
+msgstr "Erro"
+
+msgid "Could not find Cheat Engine in the trainer database, please update GCM data and try again."
+msgstr "Não foi possível encontrar o Cheat Engine no banco de dados de treinadores. Atualize os dados do GCM e tente novamente."
+
+msgid "Delete trainer"
+msgstr "Excluir treinador"
+
+msgid "Are you sure you want to delete "
+msgstr "Tem certeza de que deseja excluir "
+
+msgid "Confirm"
+msgstr "Confirmar"
+
+msgid "Cancel"
+msgstr "Cancelar"
+
+msgid "Trainer is currently in use, please close any programs using the file and try again."
+msgstr "O treinador está em uso. Feche os programas que estejam usando o arquivo e tente novamente."
+
+msgid "Failed to delete {trainer_name}:"
+msgstr "Falha ao excluir {trainer_name}:"
+
+msgid "Change trainer download path"
+msgstr "Alterar pasta de download dos treinadores"
+
+msgid "Please choose a new path."
+msgstr "Selecione um novo caminho."
+
+msgid "Failed to change trainer download path."
+msgstr "Falha ao alterar o caminho de download dos treinadores."
+
+msgid "Migrating existing trainers..."
+msgstr "Migrando treinadores existentes..."
+
+msgid "No path selected."
+msgstr "Nenhum caminho selecionado."
+
+msgid "Error migrating trainers: "
+msgstr "Erro ao migrar treinadores: "
+
+msgid "Migration complete!"
+msgstr "Migração concluída!"
+
+msgid "Select trainers you want to import"
+msgstr "Selecione os treinadores que deseja importar"
+
+msgid "Failed to import trainer: "
+msgstr "Falha ao importar treinador: "
+
+msgid "Delete original trainers"
+msgstr "Excluir treinadores originais"
+
+msgid "Do you want to delete the original trainer files?"
+msgstr "Deseja excluir os arquivos originais dos treinadores?"
+
+msgid "Failed to delete original trainer: "
+msgstr "Falha ao excluir o treinador original: "
+
+msgid "Administrator Access Required"
+msgstr "Acesso de administrador necessário"
+
+msgid "To proceed with adding the trainer download paths to the Windows Defender whitelist, administrator rights are needed. A User Account Control (UAC) prompt will appear for permission."
+msgstr "Para adicionar os caminhos de download dos treinadores à lista de permissões do Windows Defender, são necessários privilégios de administrador. Uma solicitação do Controle de Conta de Usuário (UAC) pedirá sua autorização."
+
+msgid "Would you like to continue?"
+msgstr "Deseja continuar?"
+
+msgid "Successfully added paths to Windows Defender whitelist."
+msgstr "Caminhos adicionados à lista de permissões do Windows Defender com sucesso."
+
+msgid "Failed to add paths to Windows Defender whitelist."
+msgstr "Falha ao adicionar os caminhos à lista de permissões do Windows Defender."
+
+msgid "Search keyword is too short, please enter at least 2 characters."
+msgstr "A palavra-chave de pesquisa é curta demais. Digite pelo menos 2 caracteres."
+
+msgid "Failed to translate, please update translation data."
+msgstr "Falha ao traduzir. Atualize os dados de tradução."
+
+msgid "Searching..."
+msgstr "Pesquisando..."
+
+msgid "Translating search results..."
+msgstr "Traduzindo resultados da pesquisa..."
+
+msgid "No search results found."
+msgstr "Nenhum resultado de pesquisa encontrado."
+
+msgid "An error occurred while searching for trainers: "
+msgstr "Ocorreu um erro ao pesquisar treinadores: "
+
+msgid "Translating keywords..."
+msgstr "Traduzindo palavras-chave..."
+
+msgid "Search failed, please update trainer search data."
+msgstr "Falha na pesquisa. Atualize os dados de pesquisa de treinadores."
+
+msgid "Search from FLiNG success!"
+msgstr "Pesquisa na FLiNG concluída!"
+
+msgid "Search from XiaoXing success!"
+msgstr "Pesquisa na XiaoXing concluída!"
+
+msgid "Search from CT success!"
+msgstr "Pesquisa no CT concluída!"
+
+msgid "Search from GCM success!"
+msgstr "Pesquisa no GCM concluída!"
+
+msgid "Could not prepare the temporary download folder. Check its permissions and your antivirus software."
+msgstr "Não foi possível preparar a pasta temporária de download. Verifique as permissões e o antivírus."
+
+msgid "An error occurred when installing trainer: "
+msgstr "Ocorreu um erro ao instalar o treinador: "
+
+msgid "This trainer requires additional setup before use. Please check the opened folder for instructions.\nThe instructions are always stored in the 'gcm-instructions' folder."
+msgstr "Este treinador requer uma configuração adicional antes de ser usado. Consulte as instruções na pasta aberta.\nAs instruções também ficam armazenadas na pasta 'gcm-instructions'."
+
+msgid "Download success!"
+msgstr "Download concluído!"
+
+msgid "Could not prepare the downloaded trainer. Please try again and check your antivirus software."
+msgstr "Não foi possível preparar o treinador baixado. Tente novamente e verifique o antivírus."
+
+msgid "The downloaded archive is invalid or incomplete. Your antivirus software may have blocked or removed it."
+msgstr "O arquivo compactado baixado é inválido ou está incompleto. O antivírus pode tê-lo bloqueado ou removido."
+
+msgid "Could not install the trainer files. Close any running trainer and check your antivirus software."
+msgstr "Não foi possível instalar os arquivos do treinador. Feche qualquer treinador em execução e verifique o antivírus."
+
+msgid "Could not create a complete trainer backup. The existing installation was not changed. Your antivirus software may have interfered."
+msgstr "Não foi possível criar um backup completo do treinador. A instalação existente não foi alterada. O antivírus pode ter interferido."
+
+msgid "Could not remove the existing trainer. Close it if it is running, check your antivirus software, and try again."
+msgstr "Não foi possível remover o treinador existente. Feche-o se estiver em execução, verifique o antivírus e tente novamente."
+
+msgid "The previous trainer installation could not be fully restored. Check your antivirus quarantine and the '.gcm-backup' folder."
+msgstr "Não foi possível restaurar completamente a instalação anterior do treinador. Verifique a quarentena do antivírus e a pasta '.gcm-backup'."
+
+msgid "Internet request failed."
+msgstr "Falha na solicitação à internet."
+
+msgid "Updating "
+msgstr "Atualizando "
+
+msgid "Trainer already exists, aborted download."
+msgstr "O treinador já existe. Download cancelado."
+
+msgid "Downloading..."
+msgstr "Baixando..."
+
+msgid "Decompressing..."
+msgstr "Extraindo..."
+
+msgid "An error occurred while extracting downloaded trainer: "
+msgstr "Ocorreu um erro ao extrair o treinador baixado: "
+
+msgid "Removing trainer background music..."
+msgstr "Removendo a música de fundo do treinador..."
+
+msgid "Trainer files are missing or incomplete. Your antivirus software may have removed them."
+msgstr "Os arquivos do treinador estão ausentes ou incompletos. O antivírus pode tê-los removido."
+
+msgid "Patching..."
+msgstr "Aplicando patch..."
+
+msgid "Preparing update"
+msgstr "Preparando atualização"
+
+msgid "Update from GCM failed"
+msgstr "Falha ao atualizar pelo GCM"
+
+msgid "Updating data from GCM"
+msgstr "Atualizando os dados do GCM"
+
+msgid "Update from FLiNG failed"
+msgstr "Falha ao atualizar pela FLiNG"
+
+msgid "Updating data from FLiNG"
+msgstr "Atualizando os dados da FLiNG"
+
+msgid "Update from XiaoXing failed"
+msgstr "Falha ao atualizar pela XiaoXing"
+
+msgid "Updating data from XiaoXing"
+msgstr "Atualizando os dados da XiaoXing"
+
+msgid "Update from CT failed"
+msgstr "Falha ao atualizar pelo CT"
+
+msgid "Updating data from CT"
+msgstr "Atualizando os dados do CT"
+
+msgid "Fetch trainer translations failed"
+msgstr "Falha ao obter as traduções dos treinadores"
+
+msgid "Fetching trainer translations"
+msgstr "Obtendo as traduções dos treinadores"
+
+msgid "Failed to retrieve upload authorization."
+msgstr "Falha ao obter a autorização para envio."
+
+msgid "Failed to retrieve upload url."
+msgstr "Falha ao obter o endereço para envio."
+
+msgid "Upload successful! Thank you for your contribution.\nYour trainer will be available for download after passing a manual review."
+msgstr "Envio concluído! Obrigado por contribuir.\nSeu treinador ficará disponível para download após passar por uma análise manual."
+
+msgid "Upload failed: "
+msgstr "Falha no envio: "
+
+msgid "Wand is currently running,\nplease close the application first"
+msgstr "O Wand está em execução.\nFeche o aplicativo antes de continuar."
+
+msgid "Could not close Wand,\nplease close the application manually"
+msgstr "Não foi possível fechar o Wand.\nFeche o aplicativo manualmente."
+
+msgid "Failed to patch file:"
+msgstr "Falha ao aplicar patch no arquivo:"
+
+msgid "Failed to extract file:"
+msgstr "Falha ao extrair arquivo:"
+
+msgid "Wand Pro activated"
+msgstr "Wand Pro ativado"
+
+msgid "Failed to activate Wand Pro"
+msgstr "Falha ao ativar o Wand Pro"
+
+msgid "Wand Pro disabled"
+msgstr "Wand Pro desativado"
+
+msgid "Wand auto update disabled"
+msgstr "Atualizações automáticas do Wand desativadas"
+
+msgid "Wand auto update enabled"
+msgstr "Atualizações automáticas do Wand ativadas"
+
+msgid "Failed to enable Wand auto update,\nplease try reinstalling Wand"
+msgstr "Falha ao ativar as atualizações automáticas do Wand.\nTente reinstalar o Wand."
+
+msgid "Failed to process Wand update file:"
+msgstr "Falha ao processar o arquivo de atualização do Wand:"
+
+msgid "Deleted Wand version: "
+msgstr "Versão do Wand excluída: "
+
+msgid "Failed to delete Wand version: "
+msgstr "Falha ao excluir a versão do Wand: "
+
+msgid "Checking for trainer updates"
+msgstr "Verificando atualizações dos treinadores"
+
+msgid "Check trainer updates failed"
+msgstr "Falha ao verificar atualizações dos treinadores"
+
+msgid "Announcement"
+msgstr "Anúncio"
+
+msgid "Warning"
+msgstr "Aviso"
+
+msgid "This software is open source and provided free of charge.\nResale is strictly prohibited, and developers reserve the right to pursue legal responsibility against the violators.\nIf you have paid for this software unofficially, please report the seller immediately.\nBelow are official links."
+msgstr "Este software é de código aberto e oferecido gratuitamente.\nA revenda é estritamente proibida, e os desenvolvedores se reservam o direito de responsabilizar legalmente os infratores.\nSe você pagou por este software por meios não oficiais, denuncie o vendedor imediatamente.\nConfira abaixo os canais oficiais."
+
+msgid "Official Website: "
+msgstr "Site oficial: "
+
+msgid "GitHub: "
+msgstr "GitHub: "
+
+msgid "Bilibili: "
+msgstr "Bilibili: "
+
+msgid "Don't show again"
+msgstr "Não mostrar novamente"
+
+msgid "Theme:"
+msgstr "Tema:"
+
+msgid "Language:"
+msgstr "Idioma:"
+
+msgid "Launch app on system startup"
+msgstr "Iniciar o aplicativo com o Windows"
+
+msgid "Check for software update at startup"
+msgstr "Verificar atualizações do aplicativo ao iniciar"
+
+msgid "Always show search results in English"
+msgstr "Sempre exibir os resultados da pesquisa em inglês"
+
+msgid "Sort search results by origin"
+msgstr "Ordenar os resultados da pesquisa por origem"
+
+msgid "Apply"
+msgstr "Aplicar"
+
+msgid "Do you want to restart the application now to apply theme or language settings?"
+msgstr "Deseja reiniciar o aplicativo agora para aplicar as configurações de tema ou idioma?"
+
+msgid "Settings saved."
+msgstr "Configurações salvas."
+
+msgid "Current version: "
+msgstr "Versão atual: "
+
+msgid "Newest version: "
+msgstr "Versão mais recente: "
+
+msgid "Loading..."
+msgstr "Carregando..."
+
+msgid "Update Now"
+msgstr "Atualizar agora"
+
+msgid "Failed to load"
+msgstr "Falha ao carregar"
+
+msgid "Email"
+msgstr "E-mail"
+
+msgid "Contact Info (Optional):"
+msgstr "Informações de contato (opcional):"
+
+msgid "If you provide your Game-Zone Labs account email and your trainer is approved, a badge will be added to your account"
+msgstr "Se você informar o e-mail da sua conta Game-Zone Labs e seu treinador for aprovado, um selo será adicionado à sua conta"
+
+msgid "What game does it work for"
+msgstr "Para qual jogo ele funciona?"
+
+msgid "Trainer Name:"
+msgstr "Nome do treinador:"
+
+msgid "Original URL and author"
+msgstr "URL original e autor"
+
+msgid "Trainer Source (Optional):"
+msgstr "Fonte do treinador (opcional):"
+
+msgid "Please fill this in if possible to speed up the review process. If you made the trainer, please provide your author name"
+msgstr "Se possível, preencha este campo para agilizar a análise. Se você criou o treinador, informe o nome do autor"
+
+msgid "Select a trainer file"
+msgstr "Selecione um arquivo de treinador"
+
+msgid "Trainer File:"
+msgstr "Arquivo do treinador:"
+
+msgid "If the trainer consists of multiple files, please compress them into a single archive (zip/rar/7z) before uploading"
+msgstr "Se o treinador tiver vários arquivos, compacte-os em um único arquivo (ZIP/RAR/7z) antes do envio"
+
+msgid "Anything else to add..."
+msgstr "Mais alguma informação?"
+
+msgid "Additional Notes (Optional):"
+msgstr "Observações adicionais (opcional):"
+
+msgid "Please make sure the trainer you are about to upload is tested to be safe and functional."
+msgstr "Certifique-se de que o treinador que você está enviando foi testado e é seguro e funcional."
+
+msgid "Beyond trainers, you can upload other types of files, such as mods, tools, guides, or any other game-related resources. Please ensure instructions are provided for how to use them."
+msgstr "Além de treinadores, você pode enviar outros tipos de arquivos, como mods, ferramentas, guias ou outros recursos relacionados a jogos. Inclua instruções de uso."
+
+msgid "Upload"
+msgstr "Enviar"
+
+msgid "All Files (*)"
+msgstr "Todos os arquivos (*)"
+
+msgid "Please select a valid file."
+msgstr "Selecione um arquivo válido."
+
+msgid "Please provide a trainer name."
+msgstr "Informe o nome do treinador."
+
+msgid "Close"
+msgstr "Fechar"
+
+msgid "FLiNG"
+msgstr "FLiNG"
+
+msgid "XiaoXing"
+msgstr "XiaoXing"
+
+msgid "Enable search for GCM and Community trainers"
+msgstr "Ativar a pesquisa de treinadores do GCM e da comunidade"
+
+msgid "Update GCM data automatically"
+msgstr "Atualizar os dados do GCM automaticamente"
+
+msgid "Update GCM and Community trainers automatically"
+msgstr "Atualizar automaticamente os treinadores do GCM e da comunidade"
+
+msgid "Global Settings"
+msgstr "Configurações gerais"
+
+msgid "Update trainer translations automatically"
+msgstr "Atualizar automaticamente as traduções dos treinadores"
+
+msgid "Launch trainers as administrator"
+msgstr "Executar treinadores como administrador"
+
+msgid "Use safe launch path"
+msgstr "Usar um caminho seguro para iniciar"
+
+msgid "May fix trainers unable to launch"
+msgstr "Pode corrigir problemas que impedem a inicialização de alguns treinadores"
+
+msgid "Remove trainer background music"
+msgstr "Remover a música de fundo dos treinadores"
+
+msgid "Only works when downloading"
+msgstr "Funciona apenas durante o download"
+
+msgid "Update FLiNG data automatically"
+msgstr "Atualizar os dados da FLiNG automaticamente"
+
+msgid "Update FLiNG trainers automatically"
+msgstr "Atualizar automaticamente os treinadores da FLiNG"
+
+msgid "Enable search for XiaoXing trainers"
+msgstr "Ativar a pesquisa de treinadores da XiaoXing"
+
+msgid "Unlock all functions"
+msgstr "Desbloquear todas as funções"
+
+msgid "Only works when downloading, and only for some trainers"
+msgstr "Funciona apenas durante o download e somente com alguns treinadores"
+
+msgid "Update XiaoXing data automatically"
+msgstr "Atualizar os dados da XiaoXing automaticamente"
+
+msgid "Update XiaoXing trainers automatically"
+msgstr "Atualizar automaticamente os treinadores da XiaoXing"
+
+msgid "Cheat Table Sources: "
+msgstr "Fontes de tabelas de cheats: "
+
+msgid "Cheat Engine installation path:"
+msgstr "Caminho de instalação do Cheat Engine:"
+
+msgid "Reset to default"
+msgstr "Restaurar padrão"
+
+msgid "Add Simplified Chinese"
+msgstr "Adicionar tradução para chinês simplificado"
+
+msgid "Enable Search for Cheat Tables"
+msgstr "Ativar pesquisa de tabelas de cheats"
+
+msgid "Update Cheat Table data automatically"
+msgstr "Atualizar automaticamente os dados das tabelas de cheats"
+
+msgid "Update Cheat Tables automatically"
+msgstr "Atualizar tabelas de cheats automaticamente"
+
+msgid "Launch Cheat Tables as administrator"
+msgstr "Executar tabelas de cheats como administrador"
+
+msgid "Wand installation path:"
+msgstr "Caminho de instalação do Wand:"
+
+msgid "Installed Wand Versions:"
+msgstr "Versões do Wand instaladas:"
+
+msgid "Patch Method:"
+msgstr "Método do patch:"
+
+msgid "Activate Wand Pro"
+msgstr "Ativar o Wand Pro"
+
+msgid "Disable Wand Auto Update"
+msgstr "Desativar atualização automática do Wand"
+
+msgid "Delete All Other Wand Versions"
+msgstr "Excluir todas as outras versões do Wand"
+
+msgid "Cheat Evolution installation path:"
+msgstr "Caminho de instalação do Cheat Evolution:"
+
+msgid "Activate PRO"
+msgstr "Ativar o PRO"
+
+msgid "Please select Wand installation path"
+msgstr "Selecione a pasta de instalação do Wand"
+
+msgid "Please select Cheat Engine installation path"
+msgstr "Selecione a pasta de instalação do Cheat Engine"
+
+msgid "Cheat Engine is installed"
+msgstr "Cheat Engine está instalado"
+
+msgid "Wand not installed"
+msgstr "Wand não está instalado"
+
+msgid "Wand is currently running and must be closed before patching."
+msgstr "O Wand está em execução e precisa ser fechado antes de aplicar o patch."
+
+msgid "Would you like to close it now?"
+msgstr "Deseja fechá-lo agora?"
+
+msgid "To proceed with adding translation files, administrator rights are needed. A User Account Control (UAC) prompt will appear for permission."
+msgstr "Para adicionar os arquivos de tradução, são necessários privilégios de administrador. Uma solicitação do Controle de Conta de Usuário (UAC) pedirá sua autorização."
+
+msgid "Successfully added translation files"
+msgstr "Arquivos de tradução adicionados com sucesso"
+
+msgid "Failed to add translation files"
+msgstr "Falha ao adicionar os arquivos de tradução"
+
+msgid "Please select Cheat Evolution installation path"
+msgstr "Selecione a pasta de instalação do Cheat Evolution"
+
+msgid "Please launch Cheat Evolution using CheatEvolution_patched.exe"
+msgstr "Inicie o Cheat Evolution pelo arquivo CheatEvolution_patched.exe"
+
+msgid "Invalid Cheat Evolution installation path"
+msgstr "Caminho de instalação do Cheat Evolution inválido"
+
+msgid "Cheat Evolution is installed and ready to patch"
+msgstr "Cheat Evolution está instalado e pronto para receber o patch"
+
+msgid "Patch successful"
+msgstr "Patch aplicado com sucesso"
+
+msgid "Failed to patch"
+msgstr "Falha ao aplicar o patch"

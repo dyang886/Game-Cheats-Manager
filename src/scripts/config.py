@@ -95,7 +95,9 @@ def load_settings():
         "German_Italy": "de_DE",
         "German_Liechtenstein": "de_DE",
         "German_Luxembourg": "de_DE",
-        "German_Switzerland": "de_DE"
+        "German_Switzerland": "de_DE",
+        "Portuguese_Brazil": "pt_BR",
+        "pt_BR": "pt_BR"
     }
     app_locale = locale_mapping.get(system_locale, 'en_US')
 
@@ -283,7 +285,8 @@ language_options = {
     "English (US)": "en_US",
     "简体中文": "zh_CN",
     "繁體中文": "zh_TW",
-    "Deutsch": "de_DE"
+    "Deutsch": "de_DE",
+    "Português (Brasil)": "pt_BR"
 }
 
 theme_options = {
@@ -300,7 +303,8 @@ font_config = {
     "en_US": resource_path("assets/NotoSans-Regular.ttf"),
     "zh_CN": resource_path("assets/NotoSansSC-Regular.ttf"),
     "zh_TW": resource_path("assets/NotoSansTC-Regular.ttf"),
-    "de_DE": resource_path("assets/NotoSans-Regular.ttf")
+    "de_DE": resource_path("assets/NotoSans-Regular.ttf"),
+    "pt_BR": resource_path("assets/NotoSans-Regular.ttf")
 }
 
 ensure_trainer_download_path_is_valid()
