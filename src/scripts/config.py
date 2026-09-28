@@ -1,7 +1,6 @@
 import ctypes
 import gettext
 import json
-import locale
 import os
 import re
 import sys
@@ -10,6 +9,7 @@ import unicodedata
 
 import polib
 from packaging.version import InvalidVersion, Version
+from PyQt6.QtCore import QLocale
 import zhon.cedict as chinese_characters
 from pypinyin import lazy_pinyin
 
@@ -23,7 +23,7 @@ except ImportError:
         raise RuntimeError('Request signing is unavailable in this build')
 
 
-APP_VERSION = "2.5.1"
+APP_VERSION = "2.5.2-beta.1"
 
 
 def parse_version(version):
@@ -73,33 +73,26 @@ def apply_settings(settings):
         json.dump(settings, f, indent=4)
 
 
+def detect_app_language():
+    # Windows display-language preferences, most preferred first
+    APP_LANGUAGES = {
+        QLocale.Language.English: "en_US",
+        QLocale.Language.German: "de_DE",
+        QLocale.Language.Portuguese: "pt_BR",
+    }
+
+    for tag in QLocale.system().uiLanguages():
+        system_locale = QLocale(tag)
+        if system_locale.language() == QLocale.Language.Chinese:
+            return "zh_TW" if system_locale.script() == QLocale.Script.TraditionalHanScript else "zh_CN"
+        if system_locale.language() in APP_LANGUAGES:
+            return APP_LANGUAGES[system_locale.language()]
+    return "en_US"
+
+
 def load_settings():
     # Bound early so helpers that resolve defaults (e.g. `findCEInstallPath`) can read stored settings
     global settings
-
-    locale.setlocale(locale.LC_ALL, '')
-    system_locale = locale.getlocale()[0]
-    # print(f"System locale: {system_locale}")
-    locale_mapping = {
-        "English_United States": "en_US",
-        "Chinese (Simplified)_China": "zh_CN",
-        "Chinese (Simplified)_Hong Kong SAR": "zh_CN",
-        "Chinese (Simplified)_Macao SAR": "zh_CN",
-        "Chinese (Simplified)_Singapore": "zh_CN",
-        "Chinese (Traditional)_Hong Kong SAR": "zh_TW",
-        "Chinese (Traditional)_Macao SAR": "zh_TW",
-        "Chinese (Traditional)_Taiwan": "zh_TW",
-        "German_Austria": "de_DE",
-        "German_Belgium": "de_DE",
-        "de_DE": "de_DE",
-        "German_Italy": "de_DE",
-        "German_Liechtenstein": "de_DE",
-        "German_Luxembourg": "de_DE",
-        "German_Switzerland": "de_DE",
-        "Portuguese_Brazil": "pt_BR",
-        "pt_BR": "pt_BR"
-    }
-    app_locale = locale_mapping.get(system_locale, 'en_US')
 
     try:
         with open(SETTINGS_FILE, "r", encoding="utf-8") as f:
@@ -110,7 +103,7 @@ def load_settings():
 
     default_settings = {
         "downloadPath": os.path.join(os.environ["APPDATA"], "GCM Trainers"),
-        "language": app_locale,
+        "language": detect_app_language(),
         "theme": "dark",
         "enSearchResults": False,
         "sortByOrigin": True,
