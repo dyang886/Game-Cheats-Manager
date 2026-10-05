@@ -2013,7 +2013,7 @@
         "game_name": "Far Cry 3: Blood Dragon",
         "origin": "other",
         "author": "GamehacklabRu",
-        "official_url": "https://www.youtube.com/channel/UCsqglIFHyRDCeY6f5u-1TZw",
+        "official_url": "https://www.youtube.com/@gamehacklabru",
         "gcm_url": "GCM/GCM Trainers/Far Cry 3_Blood Dragon Trainer [GamehacklabRu].exe",
         "version": "2026.4.7"
     },
@@ -2050,7 +2050,7 @@
         "game_name": "Left 4 Dead 2",
         "origin": "other",
         "author": "GamehacklabRu",
-        "official_url": "https://www.youtube.com/channel/UCsqglIFHyRDCeY6f5u-1TZw",
+        "official_url": "https://www.youtube.com/@gamehacklabru",
         "gcm_url": "GCM/GCM Trainers/Left 4 Dead 2 Trainer [GamehacklabRu].exe",
         "version": "2026.4.7"
     },
@@ -3342,7 +3342,7 @@
         "author": "chenstack",
         "official_url": "https://chenstack.huotan.net/p/B6cSAG",
         "gcm_url": "GCM/GCM Trainers/Palworld Trainer [chenstack].zip",
-        "version": "2026.7.16"
+        "version": "2026.9.9"
     },
     {
         "game_name": "REYNATIS",
@@ -5760,5 +5760,281 @@
         "author": "HIHello",
         "gcm_url": "GCM/GCM Trainers/Minimalist Tower Defense Trainer [HIHello].ct",
         "version": "2026.9.17"
+    },
+    {
+        "game_name": "Call of Duty: WWII",
+        "origin": "other",
+        "author": "LinGon",
+        "official_url": "https://megagames.com/trainers/call-duty-wwii-v13-10-trainer-lingon",
+        "gcm_url": "GCM/GCM Trainers/Call of Duty_WWII Trainer [LinGon].exe",
+        "version": "2017.11.11"
+    },
+    {
+        "game_name": "DEMON GAZE EXTRA",
+        "origin": "ct_other",
+        "author": "Loah26",
+        "official_url": "https://fearlessrevolution.com/viewtopic.php?t=19887",
+        "gcm_url": "GCM/GCM Trainers/DEMON GAZE EXTRA Trainer [Loah26].zip",
+        "version": "2025.8.6"
+    },
+    {
+        "game_name": "DYNASTY WARRIORS 7: Xtreme Legends Definitive Edition",
+        "origin": "other",
+        "author": "Abolfazl.k",
+        "official_url": "https://megagames.com/trainers/dynasty-warriors-7-xtreme-legends-definitive-edition-6-trainer-abolfazlk",
+        "gcm_url": "GCM/GCM Trainers/DYNASTY WARRIORS 7_Xtreme Legends Definitive Edition Trainer [Abolfazl.k].exe",
+        "version": "2018.12.30"
+    },
+    {
+        "game_name": "Fable Anniversary",
+        "origin": "other",
+        "author": "MrAntiFun",
+        "official_url": "https://mrantifun.net/threads/fable-anniversary-trainer.1850",
+        "gcm_url": "GCM/GCM Trainers/Fable Anniversary Trainer [MrAntiFun].exe",
+        "version": "2018.10.18"
+    },
+    {
+        "game_name": "Flotsam",
+        "origin": "other",
+        "author": "瞎闹我44",
+        "official_url": "https://tieba.baidu.com/p/11044785798",
+        "gcm_url": "GCM/GCM Trainers/Flotsam Trainer [XiaNaoWo44].zip",
+        "extension": "none",
+        "version": "2026.9.22"
+    },
+    {
+        "game_name": "Grim Dawn",
+        "origin": "other",
+        "author": "mamba",
+        "custom_name_en": "Save Editor",
+        "custom_name_zh": "存档编辑器",
+        "official_url": "https://forums.crateentertainment.com/t/tool-gd-stash/29036",
+        "gcm_url": "GCM/GCM Trainers/Grim Dawn Save Editor [mamba].zip",
+        "version": "2026.9.19"
+    },
+    {
+        "game_name": "Graveyard Keeper 2",
+        "origin": "other",
+        "author": "东皇钟",
+        "official_url": "https://space.bilibili.com/238444",
+        "gcm_url": "GCM/GCM Trainers/Graveyard Keeper 2 Trainer [DongHuangZhong].exe",
+        "version": "2026.9.26"
+    },
+    {
+        "game_name": "Grim Dawn",
+        "origin": "ct_other",
+        "author": "迂腐15",
+        "official_url": "https://bbs.3dmgame.com/thread-6618543-1-1.html",
+        "gcm_url": "GCM/GCM Trainers/Grim Dawn Trainer [YuFu15].ct",
+        "version": "2025.9.10"
+    },
+    {
+        "game_name": "Grim Dawn",
+        "origin": "ct_other",
+        "author": "你看着办丶",
+        "official_url": "https://bbs.3dmgame.com/thread-6477039-1-1.html",
+        "gcm_url": "GCM/GCM Trainers/Grim Dawn Trainer [NiKanZheBan].ct",
+        "version": "2024.2.7"
+    },
+    {
+        "game_name": "Kingdom Rush 6: Genesis TD",
+        "origin": "ct_other",
+        "gcm_url": "GCM/GCM Trainers/Kingdom Rush 6_Genesis TD Trainer.ct",
+        "version": "2026.9.27"
+    },
+    {
+        "game_name": "Night of the Dead",
+        "origin": "ct_other",
+        "author": "随风的方向",
+        "official_url": "https://bbs.3dmgame.com/thread-6256183-1-1.html",
+        "gcm_url": "GCM/GCM Trainers/Night of the Dead Trainer [SuiFengDeFangXiang].ct",
+        "version": "2024.6.2"
+    },
+    {
+        "game_name": "Labyrinth of Galleria: The Moon Society",
+        "origin": "ct_other",
+        "author": "Arcansel",
+        "official_url": "https://fearlessrevolution.com/viewtopic.php?p=288939#p288939",
+        "gcm_url": "GCM/GCM Trainers/Labyrinth of Galleria_The Moon Society Trainer [Arcansel].zip",
+        "version": "2023.4.24"
+    },
+    {
+        "game_name": "Myastere -Ruins of Deazniff-",
+        "origin": "other",
+        "author": "Abolfazl.k",
+        "official_url": "https://www.trainerscity.com/en/pc/31281-Myastere--Ruins-of-Deazniff--Trainer+6",
+        "gcm_url": "GCM/GCM Trainers/Myastere -Ruins of Deazniff- Trainer [Abolfazl.k].exe",
+        "version": "2021.4.16"
+    },
+    {
+        "game_name": "Need for Speed: Hot Pursuit",
+        "origin": "other",
+        "author": "Abolfazl.k",
+        "official_url": "https://www.trainerscity.com/en/pc/28083-Need-for-Speed:-Hot-Pursuit-Trainer+4",
+        "gcm_url": "GCM/GCM Trainers/Need for Speed_Hot Pursuit Trainer [Abolfazl.k].exe",
+        "version": "2020.3.31"
+    },
+    {
+        "game_name": "Night of the Dead",
+        "origin": "ct_other",
+        "author": "Patka",
+        "official_url": "https://fearlessrevolution.com/viewtopic.php?t=35728",
+        "gcm_url": "GCM/GCM Trainers/Night of the Dead Trainer [Patka].zip",
+        "version": "2025.10.15"
+    },
+    {
+        "game_name": "POSTAL Redux",
+        "origin": "other",
+        "author": "Dov",
+        "gcm_url": "GCM/GCM Trainers/POSTAL Redux Trainer [Dov].exe",
+        "version": "2026.9.22"
+    },
+    {
+        "game_name": "Command & Conquer: Yuri's Revenge",
+        "origin": "other",
+        "author": "MrAntiFun",
+        "official_url": "https://mrantifun.net/threads/red-alert-yuri-revenge-trainer.1136",
+        "gcm_url": "GCM/GCM Trainers/Command & Conquer_Yuri's Revenge Trainer [MrAntiFun].exe",
+        "version": "2014.7.1"
+    },
+    {
+        "game_name": "StarCraft II: Legacy of the Void",
+        "origin": "ct_other",
+        "author": "ok2222991",
+        "official_url": "https://www.bilibili.com/video/BV1wJU4BNEsv",
+        "gcm_url": "GCM/GCM Trainers/StarCraft II_Legacy of the Void Trainer [ok2222991].ct",
+        "version": "2026.7.18"
+    },
+    {
+        "game_name": "Total War: SHOGUN 2",
+        "origin": "ct_other",
+        "author": "Recifense",
+        "official_url": "https://fearlessrevolution.com/viewtopic.php?p=444342#p444342",
+        "gcm_url": "GCM/GCM Trainers/Total War_SHOGUN 2 Trainer [Recifense].ct",
+        "version": "2026.2.26"
+    },
+    {
+        "game_name": "Slay the Spire",
+        "origin": "other",
+        "author": "SHadowKnight",
+        "gcm_url": "GCM/GCM Trainers/Slay the Spire Trainer [SHadowKnight].zip",
+        "extension": "启动杀戮尖塔修改器.cmd",
+        "version": "2026.9.26"
+    },
+    {
+        "game_name": "The Binding of Isaac: Rebirth",
+        "origin": "other",
+        "author": "Luneyra",
+        "gcm_url": "GCM/GCM Trainers/The Binding of Isaac_Rebirth Trainer [Luneyra].exe",
+        "version": "2026.9.25"
+    },
+    {
+        "game_name": "SILENT HILL: Townfall",
+        "origin": "ct_other",
+        "author": "3DM",
+        "official_url": "https://bbs.3dmgame.com/thread-6703738-1-1.html",
+        "gcm_url": "GCM/GCM Trainers/SILENT HILL_Townfall Trainer [3DM].ct",
+        "version": "2026.9.28"
+    },
+    {
+        "game_name": "Wall World",
+        "origin": "ct_other",
+        "author": "BabyGroot",
+        "official_url": "https://fearlessrevolution.com/viewtopic.php?p=320235#p320235",
+        "gcm_url": "GCM/GCM Trainers/Wall World Trainer [BabyGroot].ct",
+        "version": "2023.10.19"
+    },
+    {
+        "game_name": "Yakuza Kiwami 2",
+        "origin": "other",
+        "author": "DeylenX",
+        "gcm_url": "GCM/GCM Trainers/Yakuza Kiwami 2 Trainer [DeylenX].exe",
+        "version": "2026.9.26"
+    },
+    {
+        "game_name": "Left 4 Dead",
+        "origin": "other",
+        "author": "GamehacklabRu",
+        "official_url": "https://www.youtube.com/@gamehacklabru",
+        "gcm_url": "GCM/GCM Trainers/Left 4 Dead Trainer [GamehacklabRu].exe",
+        "version": "2026.9.28"
+    },
+    {
+        "game_name": "Silent Hill: Homecoming",
+        "origin": "other",
+        "author": "eXtreme",
+        "official_url": "https://gamecopyworld.com/games/pc_silent_hill_5.shtml",
+        "gcm_url": "GCM/GCM Trainers/Silent Hill_Homecoming Trainer [eXtreme].zip",
+        "version": "2008.12.2"
+    },
+    {
+        "game_name": "Creator Chronicles",
+        "origin": "other",
+        "author": "乐于助人小伍",
+        "official_url": "https://www.bilibili.com/video/BV1RYYy6PELx",
+        "gcm_url": "GCM/GCM Trainers/Creator Chronicles Trainer [LeYuZhuRenXiaoWu].exe",
+        "version": "2026.9.23"
+    },
+    {
+        "game_name": "Mirai's Midnight Stream",
+        "origin": "ct_other",
+        "gcm_url": "GCM/GCM Trainers/Mirai's Midnight Stream Trainer.ct",
+        "version": "2026.9.26"
+    },
+    {
+        "game_name": "SILENT HILL: Townfall",
+        "origin": "other",
+        "author": "羊咩的",
+        "official_url": "https://bbs.3dmgame.com/thread-6703842-1-1.html",
+        "gcm_url": "GCM/GCM Trainers/SILENT HILL_Townfall Trainer [YangMieDe].exe",
+        "version": "2026.9.23"
+    },
+    {
+        "game_name": "Command & Conquer: Mental Omega",
+        "origin": "other",
+        "author": "康康",
+        "official_url": "https://m.zhuqueyishu.com/xlzj336.html",
+        "gcm_url": "GCM/GCM Trainers/Command & Conquer_Mental Omega Trainer [KangKang].exe",
+        "version": "2026.9.23"
+    },
+    {
+        "game_name": "Jotunnslayer: Hordes of Hel",
+        "origin": "other",
+        "author": "Abolfazl.k",
+        "official_url": "https://www.trainerscity.com/en/pc/41691-Jotunnslayer:-Hordes-of-Hel-Trainer+4",
+        "gcm_url": "GCM/GCM Trainers/Jotunnslayer_Hordes of Hel Trainer [Abolfazl.k].exe",
+        "version": "2025.1.23"
+    },
+    {
+        "game_name": "Kingdom Rush - Tower Defense",
+        "origin": "other",
+        "author": "Gboxkit",
+        "official_url": "https://www.xiaoheihe.cn/app/bbs/link/cc9d727fd34f",
+        "gcm_url": "GCM/GCM Trainers/Kingdom Rush - Tower Defense Trainer [Gboxkit].exe",
+        "version": "2026.9.29"
+    },
+    {
+        "game_name": "Ved: Recure",
+        "origin": "ct_other",
+        "author": "ELYSIUM",
+        "official_url": "https://fearlessrevolution.com/viewtopic.php?t=40898",
+        "gcm_url": "GCM/GCM Trainers/Ved_Recure Trainer [ELYSIUM].zip",
+        "version": "2026.9.27"
+    },
+    {
+        "game_name": "Sacred 3",
+        "origin": "other",
+        "author": "GRIZZLY",
+        "official_url": "https://www.playground.ru/sacred_3/cheat/sacred_3_trejner_trainer_6_all_versions_grizzly_playground_ru-804286",
+        "gcm_url": "GCM/GCM Trainers/Sacred 3 Trainer [GRIZZLY].exe",
+        "version": "2014.8.10"
+    },
+    {
+        "game_name": "Easy Red 2",
+        "origin": "other",
+        "author": "阿静",
+        "gcm_url": "GCM/GCM Trainers/Easy Red 2 Trainer [AJing].zip",
+        "extension": "none",
+        "version": "2026.9.28"
     }
 ]

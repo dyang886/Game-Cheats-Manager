@@ -23,7 +23,7 @@ except ImportError:
         raise RuntimeError('Request signing is unavailable in this build')
 
 
-APP_VERSION = "2.5.2-beta.1"
+APP_VERSION = "2.5.2-beta.2"
 
 
 def parse_version(version):
@@ -321,4 +321,5 @@ updater_path = resource_path("Updater.exe")
 
 ARCHIVE_EXTENSIONS = (".zip", ".rar", ".7z")
 DEFAULT_TRAINER_EXTENSIONS = (".exe", ".ct", ".cetrainer")
-API_TIMEOUT = (5, 15)  # (connect, read) for every API call
+API_TIMEOUT = (10, 15)  # (connect, read) for every API call
+RETRY_STATUSES = (429, 500, 502, 503, 504, 520, 521, 522, 523, 524)  # transient, incl. Cloudflare's origin errors

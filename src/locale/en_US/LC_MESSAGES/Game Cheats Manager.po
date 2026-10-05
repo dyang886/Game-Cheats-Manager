@@ -299,6 +299,9 @@ msgstr "Removing trainer background music..."
 msgid "Trainer files are missing or incomplete. Your antivirus software may have removed them."
 msgstr "Trainer files are missing or incomplete. Your antivirus software may have removed them."
 
+msgid "Could not remove trainer background music."
+msgstr "Could not remove trainer background music."
+
 msgid "Patching..."
 msgstr "Patching..."
 

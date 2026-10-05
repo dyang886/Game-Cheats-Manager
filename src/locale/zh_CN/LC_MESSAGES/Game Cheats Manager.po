@@ -299,6 +299,9 @@ msgstr "删除修改器背景音乐中..."
 msgid "Trainer files are missing or incomplete. Your antivirus software may have removed them."
 msgstr "修改器文件缺失或不完整，可能已被杀毒软件删除。"
 
+msgid "Could not remove trainer background music."
+msgstr "无法删除修改器背景音乐。"
+
 msgid "Patching..."
 msgstr "打补丁中..."
 

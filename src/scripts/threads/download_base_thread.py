@@ -1,21 +1,41 @@
+import hashlib
 import json
 import os
 import queue
 import threading
 import time
 from concurrent.futures import ThreadPoolExecutor
-from urllib.parse import urlparse, unquote
+from urllib.parse import urlparse, unquote, unquote_plus
 import uuid
 
 from PyQt6.QtCore import QThread, pyqtSignal
 import requests
+from requests.adapters import HTTPAdapter
+from urllib3.util.retry import Retry
 
 from config import *
 from search_index import translation_index
 
 _PARALLEL_THRESHOLD = 2 * 1024 * 1024  # skip parallel for files < 2 MB
-_DOWNLOAD_TIMEOUT = (5, 30)
-_RANGE_DOWNLOAD_TIMEOUT = (5, 60)
+_MIN_SPLIT = 128 * 1024  # an idle worker splits a range in progress only when both parts get at least this
+_SPLIT_AFTER = 1.0  # seconds a range must have run before it can be split; its owner keeps about this much work
+_SPLIT_CHECK_INTERVAL = 0.2
+_DOWNLOAD_TIMEOUT = (10, 30)
+_RANGE_DOWNLOAD_TIMEOUT = (10, 60)
+
+
+def _create_session():
+    retry = Retry(total=3, backoff_factor=0.5, backoff_jitter=0.5, status_forcelist=RETRY_STATUSES,
+                  allowed_methods=frozenset({"GET"}), raise_on_status=False, respect_retry_after_header=False)
+    adapter = HTTPAdapter(max_retries=retry, pool_maxsize=16)
+    session = requests.Session()
+    session.mount("https://", adapter)
+    session.mount("http://", adapter)
+    return session
+
+
+# Shared so downloads reuse kept-alive connections instead of paying a new TLS handshake each time
+http_session = _create_session()
 
 
 class DownloadBaseThread(QThread):
@@ -37,9 +57,18 @@ class DownloadBaseThread(QThread):
     def request_download(self, url, download_path, raise_errors=False, atomic=False):
         """Set atomic=True when overwriting a file that may be read concurrently (e.g. the
         database JSONs), so readers never observe a truncated or partially written file."""
+        # The server's ETag is the file's MD5, so a local copy with the same MD5 is answered with an empty 304
+        headers = dict(self.headers)
+        cached_path = os.path.join(download_path, unquote_plus(os.path.basename(urlparse(url).path)))
+        try:
+            with open(cached_path, "rb") as cached_file:
+                headers["If-None-Match"] = f'"{hashlib.file_digest(cached_file, "md5").hexdigest()}"'
+        except OSError:
+            pass  # no readable local copy, so the file is downloaded in full
+
         req = None
         try:
-            req = requests.get(url, headers=self.headers, stream=True, timeout=_DOWNLOAD_TIMEOUT)
+            req = http_session.get(url, headers=headers, stream=True, timeout=_DOWNLOAD_TIMEOUT)
             req.raise_for_status()
         except Exception as e:
             if req is not None:
@@ -48,6 +77,12 @@ class DownloadBaseThread(QThread):
             if raise_errors:
                 raise
             return ""
+
+        if req.status_code == 304:
+            req.close()
+            print(f"Already up to date: {os.path.basename(cached_path)}")
+            self.downloaded_file_path = cached_path
+            return cached_path
 
         # Headers of this first response decide the file name, the size, and how it is fetched.
         file_path = os.path.join(download_path, os.path.basename(self.find_download_fname(req)))
@@ -93,6 +128,8 @@ class DownloadBaseThread(QThread):
         # Shared across workers, so every read and write of these goes through downloaded_lock
         total_downloaded = [0]
         completed_units = [0]
+        unit_count = [total_units]  # grows when an idle worker splits a range in progress
+        active_ranges = {}  # unit index -> [next byte to write, last byte, start time, first byte], for ranges being downloaded
         total_failures = [0]
         last_error = [None]
         ranges_ignored = [False]
@@ -106,7 +143,7 @@ class DownloadBaseThread(QThread):
         first_stream = [initial_req]
 
         def open_full_stream():
-            resp = requests.get(url, headers=self.headers, stream=True, timeout=_DOWNLOAD_TIMEOUT)
+            resp = http_session.get(url, headers=self.headers, stream=True, timeout=_DOWNLOAD_TIMEOUT)
             try:
                 resp.raise_for_status()
             except Exception:
@@ -123,6 +160,35 @@ class DownloadBaseThread(QThread):
         def emit_progress():
             self.progress.emit([(total_downloaded[0], total_size)])
 
+        def split_slow_range():
+            """Take over the tail of the range that would take longest to finish."""
+            with downloaded_lock:
+                now = time.monotonic()
+                slowest = None
+                for unit_idx, (position, last, started, first) in active_ranges.items():
+                    remaining = last - position + 1
+                    elapsed = now - started
+                    rate = (position - first) / elapsed if elapsed else 0.0
+                    # The owner keeps what it should finish in about _SPLIT_AFTER at its own speed
+                    keep = max(_MIN_SPLIT, int(rate * _SPLIT_AFTER))
+                    if elapsed < _SPLIT_AFTER or remaining - keep < _MIN_SPLIT:
+                        continue
+                    eta = remaining / rate if rate else float("inf")
+                    if slowest is None or eta > slowest[1]:
+                        slowest = (unit_idx, eta, position + keep, last)
+                if slowest is None:
+                    return None
+
+                unit_idx, _, split_at, last = slowest
+                active_ranges[unit_idx][1] = split_at - 1
+                new_idx = unit_count[0]
+                unit_count[0] += 1
+                return new_idx, split_at, last
+
+        def ranges_left_to_split():
+            with downloaded_lock:
+                return any(last - position + 1 >= 2 * _MIN_SPLIT for position, last, *_ in active_ranges.values())
+
         def discard_partial():
             try:
                 os.remove(write_path)
@@ -134,7 +200,6 @@ class DownloadBaseThread(QThread):
         emit_progress()
 
         def worker():
-            session = requests.Session() if num_workers > 1 else None
             f = open(write_path, 'r+b')
             try:
                 # Workers race for units rather than owning a fixed share, so a slow one holds nobody up
@@ -142,19 +207,33 @@ class DownloadBaseThread(QThread):
                     try:
                         unit_idx, start, end = unit_queue.get_nowait()
                     except queue.Empty:
-                        break
+                        # Nothing queued, so help with a slow range, waiting while the rest still run well
+                        unit = split_slow_range()
+                        if unit is None:
+                            if not ranges_left_to_split():
+                                break
+                            time.sleep(_SPLIT_CHECK_INTERVAL)
+                            continue
+                        unit_idx, start, end = unit
 
                     bytes_this_unit = 0
-                    expected_bytes = (end - start + 1) if start is not None else total_size
                     resp = None
+                    if start is not None:
+                        with downloaded_lock:
+                            active_ranges[unit_idx] = [start, end, time.monotonic(), start]
                     try:
                         if start is not None:
-                            resp = session.get(url, headers={**self.headers, 'Range': f'bytes={start}-{end}'}, stream=True, timeout=_RANGE_DOWNLOAD_TIMEOUT)
+                            resp = http_session.get(url, headers={**self.headers, 'Range': f'bytes={start}-{end}'}, stream=True, timeout=_RANGE_DOWNLOAD_TIMEOUT)
                             resp.raise_for_status()
                             # 200 means the range was ignored and the whole file is coming
                             if resp.status_code != 206:
                                 abandon_ranges()
                                 raise Exception(f"expected 206 for range {start}-{end}, got {resp.status_code}")
+                            # A status code is only a claim, so the bytes must be the ones asked for
+                            content_range = resp.headers.get('Content-Range', '')
+                            if content_range != f"bytes {start}-{end}/{total_size}":
+                                abandon_ranges()
+                                raise Exception(f"expected range {start}-{end}/{total_size}, got '{content_range}'")
                         elif first_stream[0] is not None:
                             resp, first_stream[0] = first_stream[0], None
                         else:
@@ -163,33 +242,52 @@ class DownloadBaseThread(QThread):
                         # Every unit writes at its own offset, which is why the file is pre-allocated
                         f.seek(start if start is not None else 0)
                         for piece in resp.iter_content(chunk_size=65536):
-                            if piece:
-                                # A status code is only a claim, so hold each unit to its byte count
-                                if expected_bytes and bytes_this_unit + len(piece) > expected_bytes:
-                                    if start is not None:
-                                        abandon_ranges()
-                                    raise Exception(f"unit {unit_idx} overran its {expected_bytes} byte slice")
-                                f.write(piece)
-                                bytes_this_unit += len(piece)
-                                with downloaded_lock:
-                                    total_downloaded[0] += len(piece)
-                                    now = time.monotonic()
-                                    if now - last_emit[0] >= EMIT_INTERVAL:  # throttle UI updates
-                                        last_emit[0] = now
-                                        emit_progress()
+                            if not piece:
+                                continue
+                            with downloaded_lock:
+                                if start is not None:
+                                    # The range may have been split meanwhile, so claim the bytes before writing them
+                                    position, last = active_ranges[unit_idx][:2]
+                                    piece = piece[:last - position + 1]
+                                    active_ranges[unit_idx][0] = position + len(piece)
+                                elif total_size and bytes_this_unit + len(piece) > total_size:
+                                    raise Exception(f"stream overran its {total_size} bytes")
+                            f.write(piece)
+                            bytes_this_unit += len(piece)
+                            with downloaded_lock:
+                                total_downloaded[0] += len(piece)
+                                now = time.monotonic()
+                                if now - last_emit[0] >= EMIT_INTERVAL:  # throttle UI updates
+                                    last_emit[0] = now
+                                    emit_progress()
+                            if start is not None and start + bytes_this_unit > last:
+                                break  # the rest of this response belongs to a range split off from it
 
                         # A short slice would otherwise leave a silent hole in the file
+                        with downloaded_lock:
+                            expected_bytes = active_ranges[unit_idx][1] - start + 1 if start is not None else total_size
                         if expected_bytes and bytes_this_unit != expected_bytes:
                             raise Exception(f"unit {unit_idx} got {bytes_this_unit} of {expected_bytes} bytes")
                         with downloaded_lock:
+                            active_ranges.pop(unit_idx, None)
                             completed_units[0] += 1
 
                     except Exception as e:
                         with downloaded_lock:
-                            total_downloaded[0] -= bytes_this_unit  # uncount it, the unit is redone
+                            if start is None:
+                                total_downloaded[0] -= bytes_this_unit  # uncount it, the stream is redone from the start
+                            else:
+                                end = active_ranges.pop(unit_idx)[1]  # a split may have moved it
                             total_failures[0] += 1
                             last_error[0] = e
                             failures = total_failures[0]
+                        # A range resumes where it stopped, since the bytes it already wrote stay in place
+                        if start is not None:
+                            start += bytes_this_unit
+                            if start > end:
+                                with downloaded_lock:
+                                    completed_units[0] += 1
+                                continue
                         # Failures are pooled, so one hopeless unit cannot retry forever
                         if failures >= MAX_FAILURES:
                             stop_event.set()
@@ -202,8 +300,6 @@ class DownloadBaseThread(QThread):
                             resp.close()
             finally:
                 f.close()
-                if session:
-                    session.close()
 
         with ThreadPoolExecutor(max_workers=num_workers) as executor:
             for _ in range(num_workers):
@@ -215,7 +311,7 @@ class DownloadBaseThread(QThread):
             discard_partial()
             return self.download_queued(None, url, file_path, total_size, 1, raise_errors, atomic)
 
-        if stop_event.is_set() or completed_units[0] < total_units:
+        if stop_event.is_set() or completed_units[0] < unit_count[0]:
             print(f"[Queue] download failed: {total_failures[0]} total failures", flush=True)
             discard_partial()
             if raise_errors and last_error[0] is not None:
@@ -280,7 +376,8 @@ class DownloadBaseThread(QThread):
                 filename = content_disposition.split("filename=")[-1].strip('";')
                 return filename
 
-        return urlparse(str(response.url)).path.split("/")[-1]
+        # CloudFront sends no Content-Disposition and its signed paths are encoded with quote_plus
+        return unquote_plus(urlparse(str(response.url)).path.split("/")[-1])
 
     @staticmethod
     def get_signed_download_url(file_path_on_s3, raise_errors=False):

@@ -12,7 +12,7 @@ from PyQt6.QtCore import QThread, pyqtSignal
 import requests
 
 from config import *
-from threads.download_base_thread import DownloadBaseThread
+from threads.download_base_thread import DownloadBaseThread, http_session
 
 
 class AnnouncementFetchWorker(QThread):
@@ -27,7 +27,7 @@ class AnnouncementFetchWorker(QThread):
                 self.fetchFailed.emit()
                 return
 
-            response = requests.get(signed_url, timeout=10)
+            response = http_session.get(signed_url, timeout=10)
             response.raise_for_status()
             data = response.json()
 

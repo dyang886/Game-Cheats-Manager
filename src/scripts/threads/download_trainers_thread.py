@@ -827,15 +827,20 @@ class DownloadTrainersThread(DownloadBaseThread):
             self.src_dst.insert(0, {"src": source_file, "dst": destination_file})
 
         # remove fling trainer bg music
-        if settings["removeFlingBgMusic"]:
-            self.modify_fling_settings(True)
-            for item in self.src_dst:
-                if item["src"].lower().endswith(".exe"):
-                    source = os.path.abspath(item["src"])
-                    self.remove_bgMusic(source)
-                    self.expected_source_files[source] = os.path.getsize(source)
-        else:
-            self.modify_fling_settings(False)
+        try:
+            if settings["removeFlingBgMusic"]:
+                self.modify_fling_settings(True)
+                for item in self.src_dst:
+                    if item["src"].lower().endswith(".exe"):
+                        source = os.path.abspath(item["src"])
+                        self.remove_bgMusic(source)
+                        self.expected_source_files[source] = os.path.getsize(source)
+            else:
+                self.modify_fling_settings(False)
+
+        except Exception as error:
+            print(f"Could not remove trainer background music: {error}")
+            self.message.emit(tr("Could not remove trainer background music."), None)
 
         if os.path.basename(trainerTemp) not in extractedTrainerNames:
             try:
