@@ -3,7 +3,7 @@ import sys
 import winreg as reg
 
 from PyQt6.QtCore import Qt
-from PyQt6.QtGui import QIcon
+from PyQt6.QtGui import QIcon, QTextCursor
 from PyQt6.QtWidgets import QCheckBox, QComboBox, QDialog, QFileDialog, QHBoxLayout, QLabel, QLayout, QLineEdit, QMessageBox, QProgressBar, QSizePolicy, QTextEdit, QVBoxLayout
 
 from config import *
@@ -409,6 +409,7 @@ class AboutDialog(QDialog):
 class TrainerUploadDialog(QDialog):
     _SECTION_SPACING = 20
     _FIELD_SPACING = 5
+    _NOTES_MAX_LENGTH = 150
 
     def __init__(self, parent=None):
         super().__init__(parent)
@@ -469,9 +470,19 @@ class TrainerUploadDialog(QDialog):
         self.notesEdit.setPlaceholderText(tr("Anything else to add..."))
         self.notesEdit.setMinimumHeight(100)
         self.notesEdit.setSizePolicy(QSizePolicy.Policy.Expanding, QSizePolicy.Policy.Expanding)
+        self.notesEdit.textChanged.connect(self.update_notes_count)
+
+        self.notesCountLabel = self.hint_label("")
+        self.notesCountLabel.setAlignment(Qt.AlignmentFlag.AlignRight)
+        self.update_notes_count()
+
+        notesLayout = QVBoxLayout()
+        notesLayout.setSpacing(self._FIELD_SPACING)
+        notesLayout.addWidget(self.notesEdit, 1)
+        notesLayout.addWidget(self.notesCountLabel)
         layout.addLayout(self.field_group(
             tr("Additional Notes (Optional):"),
-            self.notesEdit,
+            notesLayout,
             tr("Please make sure the trainer you are about to upload is tested to be safe and functional.") + "\n" +
             tr("Beyond trainers, you can upload other types of files, such as mods, tools, guides, or any other game-related resources. Please ensure instructions are provided for how to use them."),
             stretch=1
@@ -510,15 +521,32 @@ class TrainerUploadDialog(QDialog):
             group.addWidget(field, stretch)
 
         if hint:
-            hintLabel = QLabel(hint)
-            hintFont = hintLabel.font()
-            hintFont.setPointSize(9)
-            hintLabel.setFont(hintFont)
-            hintLabel.setStyleSheet("color: gray;")
+            hintLabel = self.hint_label(hint)
             hintLabel.setWordWrap(True)
             group.addWidget(hintLabel)
 
         return group
+
+    @staticmethod
+    def hint_label(text):
+        """A small gray label for secondary information"""
+        label = QLabel(text)
+        font = label.font()
+        font.setPointSize(9)
+        label.setFont(font)
+        label.setStyleSheet("color: gray;")
+        return label
+
+    def update_notes_count(self):
+        """Keep the notes within their limit and show how much of it is used"""
+        overflow = len(self.notesEdit.toPlainText()) - self._NOTES_MAX_LENGTH
+        if overflow > 0:
+            # What was just typed or pasted past the limit sits right before the cursor
+            cursor = self.notesEdit.textCursor()
+            cursor.movePosition(QTextCursor.MoveOperation.Left, QTextCursor.MoveMode.KeepAnchor, overflow)
+            cursor.removeSelectedText()  # changes the text again, which updates the count
+            return
+        self.notesCountLabel.setText(f"{len(self.notesEdit.toPlainText())}/{self._NOTES_MAX_LENGTH}")
 
     def fit_height(self):
         """Keep the dialog tall enough for its content"""

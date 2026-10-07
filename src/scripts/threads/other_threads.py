@@ -5,6 +5,7 @@ import re
 import shutil
 import stat
 import subprocess
+import tempfile
 import time
 import traceback
 
@@ -382,6 +383,9 @@ class WeModCustomization(QThread):
     confirmClose = pyqtSignal()
     finished = pyqtSignal()
 
+    PATCH_SCHEMA_VERSION = 2
+    NATIVE_HELPER_PATH = "resources/app.asar.unpacked/static/unpacked/auxiliary/WandAuxiliaryService.exe"
+
     def __init__(self, weModVersions, weModInstallPath, selectedWeModVersion, patchMethod, parent=None):
         super().__init__(parent)
         self.close_confirmed = False  # set by the main thread while `confirmClose` blocks
@@ -394,86 +398,29 @@ class WeModCustomization(QThread):
     def run(self):
         try:
             asar = os.path.join(self.selectedWeModPath, "resources", "app.asar")
-            asar_copy = os.path.join(WEMOD_TEMP_DIR, "app.asar")
-            asar_bak = os.path.join(self.selectedWeModPath, "resources", "app.asar.bak")
-
-            weModExe_WeMod = os.path.join(self.selectedWeModPath, "WeMod.exe")  # ->  WeMod.exe latest is 11.6.0
-            weModExe_Wand = os.path.join(self.selectedWeModPath, "Wand.exe")  # ->  Wand.exe newest is 12.0.3
-            if os.path.exists(weModExe_Wand):
-                weModExeName = "Wand.exe"
-                weModExe = weModExe_Wand
-            else:
-                weModExeName = "WeMod.exe"
-                weModExe = weModExe_WeMod
+            weModExeName = "Wand.exe" if os.path.exists(os.path.join(self.selectedWeModPath, "Wand.exe")) else "WeMod.exe"
+            weModExe = os.path.join(self.selectedWeModPath, weModExeName)
 
             # Terminate if WeMod is running
             if self.is_program_running(weModExeName):
                 self.confirmClose.emit()  # blocks until the user answers
                 if not self.close_confirmed:
                     self.message.emit(tr("Wand is currently running,\nplease close the application first"), "error")
-                    self.finished.emit()
                     return
 
                 if not self.close_program(weModExeName):
                     self.message.emit(tr("Could not close Wand,\nplease close the application manually"), "error")
-                    self.finished.emit()
                     return
 
             # ===========================================================================
             # Unlock WeMod Pro
             if self.parent().weModProCheckbox.isChecked():
-                patch_success = True
-
-                try:
-                    # 1. Remove asar integrity check
-                    self.disable_asar_integrity(weModExe)
-
-                    # 2. Patch app.asar
-                    os.makedirs(WEMOD_TEMP_DIR, exist_ok=True)
-                    if os.path.exists(asar_bak):
-                        if os.path.exists(asar):
-                            os.remove(asar)
-                        os.rename(asar_bak, asar)
-                    shutil.copyfile(asar, asar_copy)
-                except Exception as e:
-                    self.message.emit(tr("Failed to patch file:") + f"{str(e)}", "error")
-                    self.finished.emit()
-                    return
-
-                # Extract app.asar file
-                try:
-                    command = [unzip_path, 'e', '-y', asar_copy, "app*bundle.js", "index.js", f"-o{WEMOD_TEMP_DIR}"]
-                    subprocess.run(command, check=True, creationflags=subprocess.CREATE_NO_WINDOW)
-                except Exception as e:
-                    self.message.emit(tr("Failed to extract file:") + f"\n{asar_copy}", "error")
-                    patch_success = False
-
-                # Patching logic
-                patch_success = self.patch()
-
-                # pack patched js files back to app.asar
-                try:
-                    shutil.copyfile(asar, asar_bak)
-                    command = [unzip_path, 'a', '-y', asar_copy, os.path.join(WEMOD_TEMP_DIR, '*.js')]
-                    subprocess.run(command, check=True, creationflags=subprocess.CREATE_NO_WINDOW)
-                    shutil.move(asar_copy, asar)
-                except Exception as e:
-                    self.message.emit(tr("Failed to patch file:") + f"\n{asar}", "error")
-                    patch_success = False
-
-                # Clean up
-                shutil.rmtree(WEMOD_TEMP_DIR)
-                if patch_success:
-                    self.message.emit(tr("Wand Pro activated"), "success")
-                else:
-                    self.message.emit(tr("Failed to activate Wand Pro"), "error")
+                self.patch(asar, weModExe)
+                self.message.emit(tr("Wand Pro activated"), "success")
 
             else:
-                if os.path.exists(asar_bak):
-                    if os.path.exists(asar):
-                        os.remove(asar)
-                    os.rename(asar_bak, asar)
-
+                native_helper = os.path.join(self.selectedWeModPath, *self.NATIVE_HELPER_PATH.split("/"))
+                self.restore_files([asar, weModExe, native_helper])
                 self.message.emit(tr("Wand Pro disabled"), "success")
 
             # ===========================================================================
@@ -509,8 +456,8 @@ class WeModCustomization(QThread):
         except Exception as e:
             traceback.print_exc()
             self.message.emit(tr("Failed to patch file:") + f"\n{str(e)}", "error")
-
-        self.finished.emit()
+        finally:
+            self.finished.emit()
 
     def is_program_running(self, program_name):
         for proc in psutil.process_iter():
@@ -537,21 +484,104 @@ class WeModCustomization(QThread):
 
         return False
 
-    def apply_patch(self, file_path, pattern, replacement):
+    def load_patterns(self, enable_dev):
+        if not PATCH_PATTERNS_ENDPOINT or not CLIENT_API_KEY:
+            raise RuntimeError("Patch-patterns endpoint or API key is not configured")
+
+        params = {
+            'patchMethod': self.patchMethod,
+            'enableDev': 'true' if enable_dev else 'false',
+            'schemaVersion': str(self.PATCH_SCHEMA_VERSION),
+            'appVersion': self.selectedWeModVersion,
+        }
+        response = None
         try:
-            with open(file_path, 'r+', encoding='utf-8') as file:
-                content = file.read()
-                modified_content = re.sub(pattern, replacement, content)
-                file.seek(0)
-                file.write(modified_content)
-                file.truncate()
+            response = signed_get(PATCH_PATTERNS_ENDPOINT, params, API_TIMEOUT)
+            response.raise_for_status()
         except Exception as e:
-            self.message.emit(tr("Failed to patch file:") + f"\n{file_path}", "error")
+            status_code = response.status_code if response is not None else -1
+            raise RuntimeError(tr("Internet request failed.") + f" {status_code}") from e
+
+        patterns = response.json()
+        if not isinstance(patterns, dict) or patterns.get('schemaVersion') != self.PATCH_SCHEMA_VERSION:
+            raise ValueError("Unsupported patch schema; update the patch-patterns service")
+        if not isinstance(patterns.get('javascript'), list) or not isinstance(patterns.get('native'), list):
+            raise ValueError("Patch schema requires javascript and native lists")
+        return patterns
+
+    def patch(self, asar, exe_path, enable_dev=False):
+        """Stage and validate all patches before installing them."""
+        patterns = self.load_patterns(enable_dev)
+        native_targets = [entry['file'] for entry in patterns['native']]
+        if len(native_targets) != len(set(native_targets)):
+            raise ValueError("Native patch entries must target distinct files")
+
+        os.makedirs(WEMOD_TEMP_DIR, exist_ok=True)
+        with tempfile.TemporaryDirectory(prefix="patch-", dir=WEMOD_TEMP_DIR) as work_dir:
+            files = [self.patch_native(entry, work_dir) for entry in patterns['native']]
+
+            asar_copy = os.path.join(work_dir, "app.asar")
+            shutil.copyfile(self.original_file(asar), asar_copy)
+            command = [unzip_path, 'e', '-y', asar_copy, "app*bundle.js", "index.js", f"-o{work_dir}"]
+            subprocess.run(command, check=True, creationflags=subprocess.CREATE_NO_WINDOW)
+            self.patch_javascript(patterns['javascript'], work_dir)
+            command = [unzip_path, 'a', '-y', asar_copy, os.path.join(work_dir, '*.js')]
+            subprocess.run(command, check=True, creationflags=subprocess.CREATE_NO_WINDOW)
+
+            exe_copy = os.path.join(work_dir, os.path.basename(exe_path))
+            shutil.copyfile(self.original_file(exe_path), exe_copy)
+            if self.disable_asar_integrity(exe_copy):
+                files.append((exe_path, exe_copy))
+            files.append((asar, asar_copy))
+            self.install_files(files)
+
+    def patch_javascript(self, entries, work_dir):
+        contents = {}
+        for filename in sorted(os.listdir(work_dir)):
+            if filename.endswith('.js'):
+                with open(os.path.join(work_dir, filename), encoding='utf-8') as file:
+                    contents[filename] = file.read()
+
+        changed = set()
+        for index, entry in enumerate(entries):
+            for filename, content in contents.items():
+                patched, count = re.subn(entry['pattern'], entry['replacement'], content)
+                if count:
+                    contents[filename] = patched
+                    changed.add(filename)
+                    print(f"[{self.patchMethod}] patched JavaScript entry {index} in {filename}")
+                    break
+            else:
+                if entry.get('required'):
+                    raise ValueError(f"Required JavaScript patch {index} did not match")
+                print(f"[{self.patchMethod}] optional JavaScript entry {index} not found")
+
+        if not changed:
+            raise ValueError("No JavaScript patches matched")
+        for filename in sorted(changed):
+            with open(os.path.join(work_dir, filename), 'w', encoding='utf-8') as file:
+                file.write(contents[filename])
+
+    def patch_native(self, entry, work_dir):
+        # Native entries are always required and only target the auxiliary helper.
+        if entry['file'] != self.NATIVE_HELPER_PATH:
+            raise ValueError("Unsupported native patch target")
+        target = os.path.join(self.selectedWeModPath, *self.NATIVE_HELPER_PATH.split('/'))
+        with open(self.original_file(target), 'rb') as file:
+            content = file.read()
+        pattern = bytes.fromhex(entry['pattern'])
+        replacement = bytes.fromhex(entry['replacement'])
+        if not pattern or len(pattern) != len(replacement) or content.count(pattern) != 1:
+            raise ValueError("Native patch must match exactly once without changing file size")
+        staged = os.path.join(work_dir, os.path.basename(target))
+        with open(staged, 'wb') as file:
+            file.write(content.replace(pattern, replacement, 1))
+        return target, staged
 
     def disable_asar_integrity(self, exe_path):
         """
         Turn off Electron's asar integrity fuse so a patched app.asar loads.
-        Electron embeds its fuses as [32-byte sentinel][version][fuse count][N fuse chars], each char "0" or "1
+        Electron embeds its fuses as [32-byte sentinel][version][fuse count][N fuse chars], each char "0" or "1".
         """
         FUSE_SENTINEL = b"dL7pKGdnNz796PbbjQWNKmHXBZaB9tsX"
         FUSE_ASAR_INTEGRITY_INDEX = 4  # EnableEmbeddedAsarIntegrityValidation in the v1 fuse order
@@ -577,63 +607,31 @@ class WeModCustomization(QThread):
                 print("Disabled asar integrity validation")
                 return True
 
-    def load_patterns(self, enable_dev):
-        if not PATCH_PATTERNS_ENDPOINT or not CLIENT_API_KEY:
-            print("Error: patch-patterns endpoint or API key is not configured.")
-            return None
+    @staticmethod
+    def original_file(path):
+        return path + ".bak" if os.path.exists(path + ".bak") else path
 
-        params = {
-            'patchMethod': self.patchMethod,
-            'enableDev': 'true' if enable_dev else 'false'
-        }
-        response = None
-        try:
-            response = signed_get(PATCH_PATTERNS_ENDPOINT, params, API_TIMEOUT)
-            response.raise_for_status()
-            return response.json()
-        except Exception as e:
-            print(f"Error fetching patch patterns: {str(e)}")
-            status_code = response.status_code if response is not None else -1
-            self.message.emit(tr("Internet request failed.") + f" {status_code}", "error")
-            return None
+    @staticmethod
+    def install_files(files, *, create_backups=True):
+        """Back up every destination first, then install the staged files."""
+        if create_backups:
+            for destination, _ in files:
+                backup = destination + ".bak"
+                if os.path.exists(backup):
+                    continue
+                try:
+                    shutil.copyfile(destination, backup)
+                except Exception:
+                    if os.path.exists(backup):
+                        os.remove(backup)
+                    raise
 
-    def patch(self, enable_dev=False):
-        entries = self.load_patterns(enable_dev)
-        if not entries:
-            print(f"No patch patterns for method '{self.patchMethod}'.")
-            return False
+        for destination, source in files:
+            shutil.copyfile(source, destination)
 
-        required_ok = True
-        applied = False
-
-        try:
-            for i, entry in enumerate(entries):
-                pattern, replacement = entry["pattern"], entry["replacement"]
-
-                target = None
-                for filename in os.listdir(WEMOD_TEMP_DIR):
-                    if not filename.endswith('.js'):
-                        continue
-                    file_path = os.path.join(WEMOD_TEMP_DIR, filename)
-                    try:
-                        with open(file_path, 'r', encoding='utf-8') as file:
-                            content = file.read()
-                    except UnicodeDecodeError:
-                        continue
-                    if re.search(pattern, content):
-                        target = file_path
-                        break
-
-                if target:
-                    self.apply_patch(target, pattern, replacement)
-                    applied = True
-                    print(f"[{self.patchMethod}] patched entry {i} in {os.path.basename(target)}")
-                else:
-                    print(f"[{self.patchMethod}] entry {i} not found" + (" (required)" if entry.get("required") else ""))
-                    if entry.get("required"):
-                        required_ok = False
-        except Exception as e:
-            print(f"Error during {self.patchMethod} patching: {str(e)}")
-            return False
-
-        return required_ok and applied
+    @classmethod
+    def restore_files(cls, paths):
+        files = [(path, path + ".bak") for path in paths if os.path.exists(path + ".bak")]
+        cls.install_files(files, create_backups=False)
+        for _, backup in files:
+            os.remove(backup)

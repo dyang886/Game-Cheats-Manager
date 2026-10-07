@@ -1107,7 +1107,7 @@
         "author": "LHY1339",
         "official_url": "https://github.com/LHY1339/cheat_ready_or_not",
         "gcm_url": "GCM/GCM Trainers/Ready or Not Trainer [LHY1339].exe",
-        "version": "2026.9.4"
+        "version": "2026.10.5"
     },
     {
         "game_name": "Backrooms: Extractions",
@@ -1884,7 +1884,7 @@
         "origin": "ct_other",
         "author": "btmp",
         "official_url": "https://fearlessrevolution.com/viewtopic.php?t=1579&start=15",
-        "gcm_url": "GCM/GCM Trainers/Rise of the Tomb Raider Trainer [btmp].ct",
+        "gcm_url": "GCM/GCM Trainers/Rise of the Tomb Raider Trainer [btmp].zip",
         "version": "2023.2.17"
     },
     {
@@ -2629,7 +2629,7 @@
         "origin": "ct_other",
         "author": "fm-san爱好研究小组",
         "gcm_url": "GCM/GCM Trainers/Football Manager 2026 Trainer [fm-san].cetrainer",
-        "version": "2026.6.18"
+        "version": "2026.10.5"
     },
     {
         "game_name": "Call of Duty: Modern Warfare 3",
@@ -3292,9 +3292,9 @@
         "game_name": "Total War: Attila",
         "origin": "ct_other",
         "author": "Recifense",
-        "official_url": "https://www.patreon.com/u6383777/posts/total-war-attila-14269542",
-        "gcm_url": "GCM/GCM Trainers/Total War_Attila Trainer [Recifense].ct",
-        "version": "2023.9.27"
+        "official_url": "https://fearlessrevolution.com/viewtopic.php?p=467152#p467152",
+        "gcm_url": "GCM/GCM Trainers/Total War_Attila Trainer [Recifense].zip",
+        "version": "2026.9.24"
     },
     {
         "game_name": "Battlefield 1",
@@ -5016,7 +5016,7 @@
         "official_url": "https://www.bilibili.com/video/BV1c6hg6yE4M",
         "gcm_url": "GCM/GCM Trainers/How to Fish Trainer [XiongXiong].zip",
         "extension": "HowToFishTrainer.Wpf.exe",
-        "version": "2026.8.28"
+        "version": "2026.10.6"
     },
     {
         "game_name": "Last Breath",
@@ -5839,7 +5839,9 @@
     {
         "game_name": "Kingdom Rush 6: Genesis TD",
         "origin": "ct_other",
-        "gcm_url": "GCM/GCM Trainers/Kingdom Rush 6_Genesis TD Trainer.ct",
+        "author": "xpjianghao",
+        "official_url": "https://bbs.3dmgame.com/thread-6705268-1-1.html",
+        "gcm_url": "GCM/GCM Trainers/Kingdom Rush 6_Genesis TD Trainer [xpjianghao].ct",
         "version": "2026.9.27"
     },
     {
@@ -6019,7 +6021,7 @@
         "author": "ELYSIUM",
         "official_url": "https://fearlessrevolution.com/viewtopic.php?t=40898",
         "gcm_url": "GCM/GCM Trainers/Ved_Recure Trainer [ELYSIUM].zip",
-        "version": "2026.9.27"
+        "version": "2026.10.1"
     },
     {
         "game_name": "Sacred 3",
@@ -6036,5 +6038,190 @@
         "gcm_url": "GCM/GCM Trainers/Easy Red 2 Trainer [AJing].zip",
         "extension": "none",
         "version": "2026.9.28"
+    },
+    {
+        "game_name": "Dead Space 2",
+        "origin": "other",
+        "author": "KelSat",
+        "official_url": "https://www.gamepressure.com/download/dead-space-2-9-trainer/z676f3",
+        "gcm_url": "GCM/GCM Trainers/Dead Space 2 Trainer [KelSat].exe",
+        "version": "2011.2.4"
+    },
+    {
+        "game_name": "Minecraft Dungeons II",
+        "origin": "other",
+        "author": "乐于助人小伍",
+        "official_url": "https://www.bilibili.com/video/BV1SLaW6wEUo",
+        "gcm_url": "GCM/GCM Trainers/Minecraft Dungeons II Trainer [LeYuZhuRenXiaoWu].exe",
+        "version": "2026.9.30"
+    },
+    {
+        "game_name": "Fox Sex Farm",
+        "origin": "ct_other",
+        "author": "Firstlast2s100",
+        "official_url": "https://fearlessrevolution.com/viewtopic.php?t=37659",
+        "gcm_url": "GCM/GCM Trainers/Fox Sex Farm Trainer [Firstlast2s100].ct",
+        "version": "2025.12.14"
+    },
+    {
+        "game_name": "HELLDIVERS 2",
+        "origin": "ct_other",
+        "author": "JackorSeventhen",
+        "official_url": "https://www.unknowncheats.me/forum/helldivers-2-a/774740-hd2-ed-merge-reforged-7-1-1-a.html",
+        "gcm_url": "GCM/GCM Trainers/HELLDIVERS 2 Trainer [JackorSeventhen].zip",
+        "version": "2026.10.1"
+    },
+    {
+        "game_name": "Hero's Journey",
+        "origin": "other",
+        "author": "FutureX",
+        "gcm_url": "GCM/GCM Trainers/Hero's Journey Trainer [FutureX].exe",
+        "version": "2022.7.28"
+    },
+    {
+        "game_name": "ACE COMBAT 8: WINGS OF THEVE",
+        "origin": "other",
+        "author": "baisezhimao",
+        "official_url": "https://bbs.3dmgame.com/thread-6705933-1-1.html",
+        "gcm_url": "GCM/GCM Trainers/ACE COMBAT 8_WINGS OF THEVE Trainer [baisezhimao].exe",
+        "version": "2026.10.4"
+    },
+    {
+        "game_name": "ICEY",
+        "origin": "other",
+        "author": "Nemesis",
+        "official_url": "https://megagames.com/trainers/icey-x64-4-trainer-nemesis",
+        "gcm_url": "GCM/GCM Trainers/ICEY Trainer [Nemesis].exe",
+        "version": "2016.11.24"
+    },
+    {
+        "game_name": "Jotunnslayer: Hordes of Hel",
+        "origin": "ct_other",
+        "author": "鸣叶月",
+        "official_url": "https://www.bilibili.com/video/BV14okvBJEAC",
+        "gcm_url": "GCM/GCM Trainers/Jotunnslayer_Hordes of Hel Trainer [MingYeYue].ct",
+        "version": "2025.11.10"
+    },
+    {
+        "game_name": "Men of War: Assault Squad 2",
+        "origin": "other",
+        "author": "MrAntiFun",
+        "official_url": "https://mrantifun.net/threads/men-of-war-assault-squad-2-trainer.213",
+        "gcm_url": "GCM/GCM Trainers/Men of War_Assault Squad 2 Trainer [MrAntiFun].exe",
+        "version": "2018.11.12"
+    },
+    {
+        "game_name": "Ravenfield",
+        "origin": "other",
+        "author": "MrAntiFun",
+        "official_url": "https://mrantifun.net/threads/ravenfield-trainer.12037",
+        "gcm_url": "GCM/GCM Trainers/Ravenfield Trainer [MrAntiFun].exe",
+        "version": "2018.7.11"
+    },
+    {
+        "game_name": "RoadCraft",
+        "origin": "other",
+        "author": "RifaiV",
+        "custom_name_en": "Save Editor",
+        "custom_name_zh": "存档编辑器",
+        "official_url": "https://github.com/RifaiV/roadcraft-save-editor",
+        "gcm_url": "GCM/GCM Trainers/RoadCraft Save Editor [RifaiV].zip",
+        "version": "2025.10.4"
+    },
+    {
+        "game_name": "Trinity Trigger",
+        "origin": "ct_other",
+        "author": "cavantan",
+        "official_url": "https://www.playground.ru/trinity_trigger/cheat/trinity_trigger_tablitsa_dlya_cheat_engine_1_0_5_cavantan-1699005",
+        "gcm_url": "GCM/GCM Trainers/Trinity Trigger Trainer [cavantan].zip",
+        "version": "2024.5.15"
+    },
+    {
+        "game_name": "Wanderburg",
+        "origin": "other",
+        "gcm_url": "GCM/GCM Trainers/Wanderburg Trainer.exe",
+        "version": "2026.10.1"
+    },
+    {
+        "game_name": "World Apart",
+        "origin": "other",
+        "author": "这是好事儿啊",
+        "gcm_url": "GCM/GCM Trainers/World Apart Trainer [ZheShiHaoShiErA].exe",
+        "version": "2026.10.5"
+    },
+    {
+        "game_name": "World Apart",
+        "origin": "other",
+        "author": "iuchueng",
+        "gcm_url": "GCM/GCM Trainers/World Apart Trainer [iuchueng].zip",
+        "version": "2026.10.4"
+    },
+    {
+        "game_name": "Bulletstorm",
+        "origin": "other",
+        "author": "Razor1911",
+        "gcm_url": "GCM/GCM Trainers/Bulletstorm Trainer [Razor1911].exe",
+        "version": "2011.2.27"
+    },
+    {
+        "game_name": "Rock Bottom",
+        "origin": "ct_other",
+        "author": "JuineC",
+        "gcm_url": "GCM/GCM Trainers/Rock Bottom Trainer [JuineC].ct",
+        "version": "2026.9.30"
+    },
+    {
+        "game_name": "The Long Dark",
+        "origin": "other",
+        "author": "风寒",
+        "official_url": "https://www.bilibili.com/video/BV1g1ovBZE9o",
+        "gcm_url": "GCM/GCM Trainers/The Long Dark Trainer [FengHan].exe",
+        "version": "2026.5.2"
+    },
+    {
+        "game_name": "Yan Long Qi Shi Tuan",
+        "origin": "other",
+        "author": "银河漫步",
+        "official_url": "http://www.cheatmaker.org",
+        "gcm_url": "GCM/GCM Trainers/Yan Long Qi Shi Tuan Trainer [YinHeManBu].exe",
+        "version": "2014.1.13"
+    },
+    {
+        "game_name": "Kingdom Rush 6: Genesis TD",
+        "origin": "other",
+        "gcm_url": "GCM/GCM Trainers/Kingdom Rush 6_Genesis TD Trainer.exe",
+        "version": "2026.9.27"
+    },
+    {
+        "game_name": "Dynasty Warriors 6",
+        "origin": "other",
+        "author": "allEnL",
+        "custom_name_en": "JPN Version Trainer",
+        "custom_name_zh": "日文版修改器",
+        "official_url": "https://patch.ali213.net/showpatch/5747.html",
+        "gcm_url": "GCM/GCM Trainers/Dynasty Warriors 6 JPN Version Trainer [allEnL].zip",
+        "version": "2008.8.24"
+    },
+    {
+        "game_name": "Fang Zhi Zhan Mo Lu",
+        "origin": "ct_other",
+        "author": "ping",
+        "gcm_url": "GCM/GCM Trainers/Fang Zhi Zhan Mo Lu Trainer [ping].ct",
+        "version": "2026.10.2"
+    },
+    {
+        "game_name": "How to Fish",
+        "origin": "ct_other",
+        "author": "wangwangsss",
+        "gcm_url": "GCM/GCM Trainers/How to Fish Trainer [wangwangsss].ct",
+        "version": "2026.10.5"
+    },
+    {
+        "game_name": "Kingdom Rush 6: Genesis TD",
+        "origin": "other",
+        "author": "baisezhimao",
+        "official_url": "https://bbs.3dmgame.com/thread-6704725-1-1.html",
+        "gcm_url": "GCM/GCM Trainers/Kingdom Rush 6_Genesis TD Trainer [baisezhimao].exe",
+        "version": "2026.9.27"
     }
 ]
