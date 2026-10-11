@@ -10,6 +10,7 @@ import unicodedata
 import polib
 from packaging.version import InvalidVersion, Version
 from PyQt6.QtCore import QLocale
+from urllib3.util import connection as urllib3_connection
 import zhon.cedict as chinese_characters
 from pypinyin import lazy_pinyin
 
@@ -23,7 +24,7 @@ except ImportError:
         raise RuntimeError('Request signing is unavailable in this build')
 
 
-APP_VERSION = "2.5.3"
+APP_VERSION = "2.5.4"
 
 
 def parse_version(version):
@@ -73,6 +74,12 @@ def apply_settings(settings):
         json.dump(settings, f, indent=4)
 
 
+def apply_ipv4_only():
+    """Follow the IPv4-only setting for every request the app makes. Chinese resolvers can answer the API's IPv6
+    lookup with ::1, and Windows' combined lookup then returns a bogus IPv4 address too, so every request fails."""
+    urllib3_connection.HAS_IPV6 = _SYSTEM_HAS_IPV6 and not settings["ipv4Only"]
+
+
 def detect_app_language():
     # Windows display-language preferences, most preferred first
     APP_LANGUAGES = {
@@ -109,6 +116,7 @@ def load_settings():
         "sortByOrigin": True,
         "checkAppUpdate": True,
         "launchAppOnStartup": False,
+        "ipv4Only": True,
         "showWarning": True,
         "lastSeenAnnouncementId": "",
 
@@ -324,3 +332,5 @@ ARCHIVE_EXTENSIONS = (".zip", ".rar", ".7z")
 DEFAULT_TRAINER_EXTENSIONS = (".exe", ".ct", ".cetrainer")
 API_TIMEOUT = (10, 15)  # (connect, read) for every API call
 RETRY_STATUSES = (429, 500, 502, 503, 504, 520, 521, 522, 523, 524)  # transient, incl. Cloudflare's origin errors
+_SYSTEM_HAS_IPV6 = urllib3_connection.HAS_IPV6  # restored when the IPv4-only setting is turned off
+apply_ipv4_only()

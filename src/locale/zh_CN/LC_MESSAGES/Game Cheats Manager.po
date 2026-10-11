@@ -452,6 +452,9 @@ msgstr "始终以英文显示搜索结果"
 msgid "Sort search results by origin"
 msgstr "按修改器来源排序"
 
+msgid "Use IPv4 only for network connections"
+msgstr "网络连接仅使用 IPv4"
+
 msgid "Apply"
 msgstr "应用"
 

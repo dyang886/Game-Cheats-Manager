@@ -452,6 +452,9 @@ msgstr "Suchergebnisse immer auf Englisch anzeigen"
 msgid "Sort search results by origin"
 msgstr "Suchergebnisse nach Herkunft sortieren"
 
+msgid "Use IPv4 only for network connections"
+msgstr "Nur IPv4 für Netzwerkverbindungen verwenden"
+
 msgid "Apply"
 msgstr "Anwenden"
 
