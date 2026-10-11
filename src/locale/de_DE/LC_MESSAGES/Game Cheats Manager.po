@@ -368,17 +368,8 @@ msgstr ""
 "Wand konnte nicht geschlossen werden,\n"
 "bitte schließen Sie die Anwendung manuell"
 
-msgid "Failed to patch file:"
-msgstr "Datei konnte nicht gepatcht werden:"
-
-msgid "Failed to extract file:"
-msgstr "Datei konnte nicht extrahiert werden:"
-
 msgid "Wand Pro activated"
 msgstr "Wand Pro aktiviert"
-
-msgid "Failed to activate Wand Pro"
-msgstr "Wand Pro konnte nicht aktiviert werden"
 
 msgid "Wand Pro disabled"
 msgstr "Wand Pro deaktiviert"
@@ -404,6 +395,9 @@ msgstr "Wand-Version gelöscht: "
 
 msgid "Failed to delete Wand version: "
 msgstr "Wand-Version konnte nicht gelöscht werden: "
+
+msgid "Failed to patch file:"
+msgstr "Datei konnte nicht gepatcht werden:"
 
 msgid "Checking for trainer updates"
 msgstr "Suche nach Trainer-Updates"
@@ -571,6 +565,9 @@ msgstr "Sicheren Startpfad verwenden"
 
 msgid "May fix trainers unable to launch"
 msgstr "Kann Probleme beim Starten von Trainern beheben"
+
+msgid "Enable search for FLiNG trainers"
+msgstr "Suche nach FLiNG-Trainern aktivieren"
 
 msgid "Remove trainer background music"
 msgstr "Trainer-Hintergrundmusik entfernen"

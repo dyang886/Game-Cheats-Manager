@@ -368,17 +368,8 @@ msgstr ""
 "無法關閉 Wand，\n"
 "請手動關閉該應用程式"
 
-msgid "Failed to patch file:"
-msgstr "修補文件失敗："
-
-msgid "Failed to extract file:"
-msgstr "提取文件失敗："
-
 msgid "Wand Pro activated"
 msgstr "Wand 專業版已啟用"
-
-msgid "Failed to activate Wand Pro"
-msgstr "Wand 專業版啟用失敗"
 
 msgid "Wand Pro disabled"
 msgstr "Wand 專業版已停用"
@@ -404,6 +395,9 @@ msgstr "已刪除 Wand 版本："
 
 msgid "Failed to delete Wand version: "
 msgstr "刪除 Wand 版本失敗："
+
+msgid "Failed to patch file:"
+msgstr "修補文件失敗："
 
 msgid "Checking for trainer updates"
 msgstr "正在檢查修改器更新"
@@ -571,6 +565,9 @@ msgstr "使用安全啟動路徑"
 
 msgid "May fix trainers unable to launch"
 msgstr "可能修復修改器無法啟動的問題"
+
+msgid "Enable search for FLiNG trainers"
+msgstr "允許搜尋風靈月影修改器"
 
 msgid "Remove trainer background music"
 msgstr "刪除修改器背景音樂"

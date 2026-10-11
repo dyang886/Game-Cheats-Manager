@@ -39,13 +39,14 @@ class UpdateTrainers(DownloadBaseThread):
             if not current_version:
                 return None
 
+            # A manual check covers every source; an automatic one only those set to update automatically
             origin_to_file = {
-                "gcm": "gcm_trainers.json" if (self.auto_check and settings["autoUpdateGCMTrainers"]) or not self.auto_check else None,
-                "other": "gcm_trainers.json" if (self.auto_check and settings["autoUpdateGCMTrainers"]) or not self.auto_check else None,
-                "ct_other": "gcm_trainers.json" if (self.auto_check and settings["autoUpdateGCMTrainers"]) or not self.auto_check else None,
-                "fling_main": "fling_main.json" if (self.auto_check and settings["autoUpdateFlingTrainers"]) or not self.auto_check else None,
-                "xiaoxing": "xiaoxing.json" if (self.auto_check and settings["autoUpdateXiaoXingTrainers"]) or not self.auto_check else None,
-                "the_cheat_script": "cheat_table.json" if (self.auto_check and settings["autoUpdateCTTrainers"]) or not self.auto_check else None
+                "gcm": "gcm_trainers.json" if not self.auto_check or settings["autoUpdateGCMTrainers"] else None,
+                "other": "gcm_trainers.json" if not self.auto_check or settings["autoUpdateGCMTrainers"] else None,
+                "ct_other": "gcm_trainers.json" if not self.auto_check or settings["autoUpdateGCMTrainers"] else None,
+                "fling_main": "fling_main.json" if not self.auto_check or settings["autoUpdateFlingTrainers"] else None,
+                "xiaoxing": "xiaoxing.json" if not self.auto_check or settings["autoUpdateXiaoXingTrainers"] else None,
+                "the_cheat_script": "cheat_table.json" if not self.auto_check or settings["autoUpdateCTTrainers"] else None
             }
             origin_database = origin_to_file.get(origin)
             if not origin_database:

@@ -35,7 +35,7 @@ jobs:
         run: |
           gh release download ${{ github.event.release.tag_name }} --pattern "${{ steps.get_version.outputs.local_installer_name }}"
 
-      - name: Delete previous stable installers from S3
+      - name: Delete previous installers from S3
         env:
           S3_BUCKET_NAME: ${{ secrets.S3_BUCKET_NAME }}
           S3_GCM_PREFIX: "GCM"
@@ -43,9 +43,8 @@ jobs:
           aws s3 rm "s3://${S3_BUCKET_NAME}/${S3_GCM_PREFIX}/" \
             --recursive \
             --exclude "*" \
-            --include "Game Cheats Manager Setup*.exe" \
-            --exclude "*beta*"
-          echo "Previous stable installers deleted from s3://${S3_BUCKET_NAME}/${S3_GCM_PREFIX}/"
+            --include "Game Cheats Manager Setup*.exe"
+          echo "Previous stable and beta installers deleted from s3://${S3_BUCKET_NAME}/${S3_GCM_PREFIX}/"
 
       - name: Upload new installer to AWS S3
         env:

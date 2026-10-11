@@ -43,14 +43,21 @@ class TrainerManagementDialog(QDialog):
         while self.active_alerts:
             self.active_alerts[0].close()
 
-        oldEnableXiaoXing = settings["enableXiaoXing"]
-        newEnableXiaoXing = self.enableXiaoXingCheckbox.isChecked()
-        if not oldEnableXiaoXing and newEnableXiaoXing:
-            self.parent().fetch_xiaoxing_data()
+        # A source switched on may have stale or missing data, so fetch it right away
+        sourceToggles = (
+            ("enableGCM", self.enableGCMCheckbox, self.parent().fetch_gcm_data),
+            ("enableFling", self.enableFlingCheckbox, self.parent().fetch_fling_data),
+            ("enableXiaoXing", self.enableXiaoXingCheckbox, self.parent().fetch_xiaoxing_data),
+            ("enableCT", self.enableCTCheckbox, self.parent().fetch_ct_data),
+        )
+        for settingName, checkbox, fetchData in sourceToggles:
+            if not settings[settingName] and checkbox.isChecked():
+                fetchData()
 
         settings["enableGCM"] = self.enableGCMCheckbox.isChecked()
         settings["autoUpdateGCMData"] = self.autoUpdateGCMDataCheckbox.isChecked()
         settings["autoUpdateGCMTrainers"] = self.autoUpdateGCMTrainersCheckbox.isChecked()
+        settings["enableFling"] = self.enableFlingCheckbox.isChecked()
         settings["removeFlingBgMusic"] = self.removeFlingBgMusicCheckbox.isChecked()
         settings["autoUpdateFlingData"] = self.autoUpdateFlingDataCheckbox.isChecked()
         settings["autoUpdateFlingTrainers"] = self.autoUpdateFlingTrainersCheckbox.isChecked()
@@ -179,6 +186,11 @@ class TrainerManagementDialog(QDialog):
         column2.addStretch(1)
         columns.addLayout(column2, stretch=3)
         columns.setAlignment(column2, Qt.AlignmentFlag.AlignLeft)
+
+        # Enable Fling trainer
+        self.enableFlingCheckbox = QCheckBox(tr("Enable search for FLiNG trainers"))
+        self.enableFlingCheckbox.setChecked(settings["enableFling"])
+        column2.addWidget(self.enableFlingCheckbox)
 
         # Remove Fling trainer background music when downloading
         removeFlingBgMusicLayout = QHBoxLayout()

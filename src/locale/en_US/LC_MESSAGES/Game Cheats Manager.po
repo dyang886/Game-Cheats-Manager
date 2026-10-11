@@ -368,17 +368,8 @@ msgstr ""
 "Could not close Wand,\n"
 "please close the application manually"
 
-msgid "Failed to patch file:"
-msgstr "Failed to patch file:"
-
-msgid "Failed to extract file:"
-msgstr "Failed to extract file:"
-
 msgid "Wand Pro activated"
 msgstr "Wand Pro activated"
-
-msgid "Failed to activate Wand Pro"
-msgstr "Failed to activate Wand Pro"
 
 msgid "Wand Pro disabled"
 msgstr "Wand Pro disabled"
@@ -404,6 +395,9 @@ msgstr "Deleted Wand version: "
 
 msgid "Failed to delete Wand version: "
 msgstr "Failed to delete Wand version: "
+
+msgid "Failed to patch file:"
+msgstr "Failed to patch file:"
 
 msgid "Checking for trainer updates"
 msgstr "Checking for trainer updates"
@@ -571,6 +565,9 @@ msgstr "Use safe launch path"
 
 msgid "May fix trainers unable to launch"
 msgstr "May fix trainers unable to launch"
+
+msgid "Enable search for FLiNG trainers"
+msgstr "Enable search for FLiNG trainers"
 
 msgid "Remove trainer background music"
 msgstr "Remove trainer background music"

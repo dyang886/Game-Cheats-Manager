@@ -23,7 +23,7 @@ except ImportError:
         raise RuntimeError('Request signing is unavailable in this build')
 
 
-APP_VERSION = "2.5.2"
+APP_VERSION = "2.5.3"
 
 
 def parse_version(version):
@@ -116,6 +116,7 @@ def load_settings():
         "enableGCM": True,
         "autoUpdateGCMData": True,
         "autoUpdateGCMTrainers": True,
+        "enableFling": True,
         "removeFlingBgMusic": True,
         "autoUpdateFlingData": True,
         "autoUpdateFlingTrainers": True,

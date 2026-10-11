@@ -32,28 +32,29 @@ class DownloadDisplayThread(DownloadBaseThread):
 
             # ======================================================
             # Fling
-            status = self.search_from_fling_archive(keywordList)
-            if not status:
-                self.finished.emit(1)
-                return
-            status = self.search_from_fling_main(keywordList)
-            if not status:
-                self.finished.emit(1)
-                return
+            if settings["enableFling"]:
+                status = self.search_from_fling_archive(keywordList)
+                if not status:
+                    self.finished.emit(1)
+                    return
+                status = self.search_from_fling_main(keywordList)
+                if not status:
+                    self.finished.emit(1)
+                    return
 
-            # Filter and prioritize trainers from the FLiNG main catalog
-            filtered_trainer_urls = {}
-            for trainer in DownloadBaseThread.trainer_urls:
-                norm_name = sanitize(trainer["game_name"])
+                # Filter and prioritize trainers from the FLiNG main catalog
+                filtered_trainer_urls = {}
+                for trainer in DownloadBaseThread.trainer_urls:
+                    norm_name = sanitize(trainer["game_name"])
 
-                # Add trainer if not already present or replace only if from fling_main and current is from fling_archive
-                if norm_name not in filtered_trainer_urls:
-                    filtered_trainer_urls[norm_name] = trainer
-                elif trainer["origin"] == "fling_main" and filtered_trainer_urls[norm_name]["origin"] == "fling_archive":
-                    filtered_trainer_urls[norm_name] = trainer
+                    # Add trainer if not already present or replace only if from fling_main and current is from fling_archive
+                    if norm_name not in filtered_trainer_urls:
+                        filtered_trainer_urls[norm_name] = trainer
+                    elif trainer["origin"] == "fling_main" and filtered_trainer_urls[norm_name]["origin"] == "fling_archive":
+                        filtered_trainer_urls[norm_name] = trainer
 
-            # Update trainer_urls with filtered and deduplicated results
-            DownloadBaseThread.trainer_urls = list(filtered_trainer_urls.values())
+                # Update trainer_urls with filtered and deduplicated results
+                DownloadBaseThread.trainer_urls = list(filtered_trainer_urls.values())
 
             # ======================================================
             # XiaoXing

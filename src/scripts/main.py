@@ -69,6 +69,7 @@ class GameCheatsManager(QMainWindow):
         self.downloadingCE = False  # Cheat Engine download queued or in progress
         self.lastInstalledTrainers = []  # highlighted in the installed list once the download ends
         self.currentlyUpdatingTrainers = False
+        self.trainerUpdatePending = False  # an interval's trainer update, waiting for its data fetches to finish
         self.currentlyUpdatingGCM = False
         self.currentlyUpdatingFling = False
         self.currentlyUpdatingXiaoXing = False
@@ -129,7 +130,7 @@ class GameCheatsManager(QMainWindow):
         dataMenu.addAction(updateTrainerSearchData)
 
         updateTrainers = QAction(tr("Update Trainers"), self)
-        updateTrainers.triggered.connect(self.update_trainers)
+        updateTrainers.triggered.connect(lambda: self.update_trainers(auto_check=False))
         dataMenu.addAction(updateTrainers)
 
         # Trainer management menu
@@ -779,8 +780,19 @@ class GameCheatsManager(QMainWindow):
             trainer_update_thread.finished.connect(self.on_interval_finished)
             trainer_update_thread.start()
 
+    def run_pending_trainer_update(self):
+        """Start the interval's trainer update once no data file is still being fetched, since it reads them."""
+        dataFetchRunning = (
+            self.currentlyUpdatingGCM or self.currentlyUpdatingFling or self.currentlyUpdatingXiaoXing or
+            self.currentlyUpdatingCT or self.currentlyUpdatingTrans
+        )
+        if self.trainerUpdatePending and not dataFetchRunning:
+            self.trainerUpdatePending = False
+            self.update_trainers(True)
+
     def fetch_trainer_search_data(self):
-        self.fetch_fling_data()
+        if settings["enableFling"]:
+            self.fetch_fling_data()
         if settings["enableXiaoXing"]:
             self.fetch_xiaoxing_data()
         if settings["enableCT"]:
@@ -800,7 +812,8 @@ class GameCheatsManager(QMainWindow):
         if settings["autoUpdateCTData"]:
             self.fetch_ct_data()
         if settings["autoUpdateGCMTrainers"] or settings["autoUpdateFlingTrainers"] or settings["autoUpdateXiaoXingTrainers"] or settings["autoUpdateCTTrainers"]:
-            self.update_trainers(True)
+            self.trainerUpdatePending = True
+            self.run_pending_trainer_update()
 
     def download_trainers(self, index):
         self.enqueue_download(index, self.trainers, self.trainerDownloadPath, None)
@@ -1004,6 +1017,8 @@ class GameCheatsManager(QMainWindow):
             self.currentlyUpdatingApp = False
         elif widgetName == "trainerUpdate":
             self.currentlyUpdatingTrainers = False
+
+        self.run_pending_trainer_update()
 
     # ===========================================================================
     # Menu functions
