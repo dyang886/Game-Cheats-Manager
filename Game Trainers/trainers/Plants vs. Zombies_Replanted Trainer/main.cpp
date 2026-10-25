@@ -103,49 +103,49 @@ void toggle_callback(Fl_Widget *widget, void *data)
         if (button->value())
             status = trainer->noPlantCooldown();
         else
-            status = trainer->disableNamedHook(optionName);
+            status = trainer->disable(optionName);
     }
     else if (optionName == "NoPlantCost")
     {
         if (button->value())
             status = trainer->noPlantCost();
         else
-            status = trainer->disableNamedHook("NoPlantCost1") && trainer->disableNamedHook("NoPlantCost2") && trainer->disableNamedHook("NoPlantCost3");
+            status = trainer->disable("NoPlantCost1") && trainer->disable("NoPlantCost2") && trainer->disable("NoPlantCost3");
     }
     else if (optionName == "AddSun")
     {
         if (button->value())
             status = trainer->addSun(std::stoi(inputValue));
         else
-            status = trainer->disableNamedHook(optionName);
+            status = trainer->disable(optionName);
     }
     else if (optionName == "SetCoin")
     {
         if (button->value())
             status = trainer->setCoin(std::stoi(inputValue) / 10);
         else
-            status = trainer->disableNamedHook(optionName);
+            status = trainer->disable(optionName);
     }
     else if (optionName == "SetFertilizerAndBugSpray")
     {
         if (button->value())
             status = trainer->setFertilizerAndBugSpray(std::stoi(inputValue) + 1000);
         else
-            status = trainer->disableNamedHook("SetFertilizerAndBugSprayInc") && trainer->disableNamedHook("SetFertilizerDec") && trainer->disableNamedHook("SetBugSprayDec");
+            status = trainer->disable("SetFertilizerAndBugSprayInc") && trainer->disable("SetFertilizerDec") && trainer->disable("SetBugSprayDec");
     }
     else if (optionName == "SetChocolate")
     {
         if (button->value())
             status = trainer->setChocolate(std::stoi(inputValue) + 1000);
         else
-            status = trainer->disableNamedHook("SetChocolateInc") && trainer->disableNamedHook("SetChocolateDec");
+            status = trainer->disable("SetChocolateInc") && trainer->disable("SetChocolateDec");
     }
     else if (optionName == "SetTreeFood")
     {
         if (button->value())
             status = trainer->setTreeFood(std::stoi(inputValue) + 1000);
         else
-            status = trainer->disableNamedHook("TreeFoodInc") && trainer->disableNamedHook("TreeFoodDec");
+            status = trainer->disable("TreeFoodInc") && trainer->disable("TreeFoodDec");
     }
 
     // Finalize

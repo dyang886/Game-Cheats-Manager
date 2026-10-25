@@ -13,55 +13,46 @@ public:
 
     inline bool setLife(int newVal)
     {
-        std::vector<unsigned int> offsets = {0x16BB04};
-        return createPointerToggle(moduleName, "Life", offsets, newVal);
+        return holdValue("Life", {moduleName, {0x16BB04}}, newVal);
     }
 
     inline bool setShield(int newVal)
     {
-        std::vector<unsigned int> offsets = {0x16BB0C};
-        return createPointerToggle(moduleName, "Shield", offsets, newVal);
+        return holdValue("Shield", {moduleName, {0x16BB0C}}, newVal);
     }
 
     inline bool setNuke(int newVal)
     {
-        std::vector<unsigned int> offsets = {0x16BB08};
-        return createPointerToggle(moduleName, "Nuke", offsets, newVal);
+        return holdValue("Nuke", {moduleName, {0x16BB08}}, newVal);
     }
 
     inline bool setDefenseOrbs(int newVal)
     {
-        std::vector<unsigned int> offsets = {0x16BB20};
-        return createPointerToggle(moduleName, "DefenseOrbs", offsets, newVal);
+        return holdValue("DefenseOrbs", {moduleName, {0x16BB20}}, newVal);
     }
 
     inline bool setHomingMissile(int newVal)
     {
-        std::vector<unsigned int> offsets = {0x16BB24};
-        return createPointerToggle(moduleName, "HomingMissile", offsets, newVal);
+        return holdValue("HomingMissile", {moduleName, {0x16BB24}}, newVal);
     }
 
     inline bool setLaser(int newVal)
     {
-        std::vector<unsigned int> offsets = {0x16BB28};
-        return createPointerToggle(moduleName, "Laser", offsets, newVal);
+        return holdValue("Laser", {moduleName, {0x16BB28}}, newVal);
     }
 
     inline bool setRockets(int newVal)
     {
-        std::vector<unsigned int> offsets = {0x16BB2C};
-        return createPointerToggle(moduleName, "Rockets", offsets, newVal);
+        return holdValue("Rockets", {moduleName, {0x16BB2C}}, newVal);
     }
 
     inline bool setFlakCannon(int newVal)
     {
-        std::vector<unsigned int> offsets = {0x16BB30};
-        return createPointerToggle(moduleName, "FlakCannon", offsets, newVal);
+        return holdValue("FlakCannon", {moduleName, {0x16BB30}}, newVal);
     }
 
     inline bool setThunderStrike(int newVal)
     {
-        std::vector<unsigned int> offsets = {0x16BB34};
-        return createPointerToggle(moduleName, "ThunderStrike", offsets, newVal);
+        return holdValue("ThunderStrike", {moduleName, {0x16BB34}}, newVal);
     }
 };

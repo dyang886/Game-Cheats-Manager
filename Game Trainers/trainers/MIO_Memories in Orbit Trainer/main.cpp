@@ -89,13 +89,13 @@ void toggle_callback(Fl_Widget *widget, void *data)
     try
     {
         if (optionName == "InfiniteHealth")
-            status = enabled ? trainer->infiniteHealth() : trainer->disableNamedHook("InfiniteHealth");
+            status = enabled ? trainer->infiniteHealth() : trainer->disable("InfiniteHealth");
         else if (optionName == "UnlimitedModifierAllocation")
-            status = enabled ? trainer->unlimitedModifierAllocation() : trainer->disableNamedHook("UnlimitedModifierAllocation");
+            status = enabled ? trainer->unlimitedModifierAllocation() : trainer->disable("UnlimitedModifierAllocation");
         else if (optionName == "InfiniteJumps")
-            status = enabled ? trainer->infiniteJumps() : trainer->disableNamedHook("InfiniteJumps");
+            status = enabled ? trainer->infiniteJumps() : trainer->disable("InfiniteJumps");
         else if (optionName == "InfiniteStamina")
-            status = enabled ? trainer->infiniteStamina() : trainer->disableNamedPointerToggle("InfiniteStamina");
+            status = enabled ? trainer->infiniteStamina() : trainer->disable("InfiniteStamina");
         else if (optionName == "MovementSpeedMultiplier")
         {
             if (enabled)
@@ -105,8 +105,8 @@ void toggle_callback(Fl_Widget *widget, void *data)
             }
             else
             {
-                bool d1 = trainer->disableNamedHook("MovementSpeedMultiplierH1");
-                bool d2 = trainer->disableNamedHook("MovementSpeedMultiplierH2");
+                bool d1 = trainer->disable("MovementSpeedMultiplierH1");
+                bool d2 = trainer->disable("MovementSpeedMultiplierH2");
                 status = d1 && d2;
             }
         }

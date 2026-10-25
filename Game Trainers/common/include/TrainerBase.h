@@ -1,69 +1,85 @@
 // TrainerBase.h
+// The base for trainers that change the game from outside it (RUNTIME none), and the process layer
+// the Mono, IL2CPP and UE bases build on.
+//
+// Every cheat changes the game through a named modification, and disable(name) undoes any of them:
+//
+//   patchCode(name, site, bytes)                 overwrite instructions in place
+//   hookCode(name, site, overwriteLen, body)     jump to a code cave the body assembles (CaveBuilder.h)
+//   holdValue(name, chain, value)                keep the value at a pointer chain's end at `value`
+//   freezeValue<T>(name, chain)                  keep it at what it was when the cheat was enabled
+//   scaleValues(name, chain, fields, factor)     keep floats at original x factor, restored on disable
+//
+// Code is found by a CodeSite - an AOB as Cheat Engine prints it, or an offset into a module - and
+// data through a PointerChain. readValue / writeValue are one-off reads and writes through a chain,
+// writeCaveData changes a value a live cave reads. Each failure writes its reason to std::cerr,
+// which TrainerApp shows under "Failed to activate."; see docs/native_trainer_discovery.md for how
+// sites and chains are found.
 #pragma once
 
 #include <Windows.h>
 #include <TlHelp32.h>
-#include <any>
+#include <algorithm>
+#include <atomic>
+#include <cctype>
+#include <chrono>
+#include <cstring>
 #include <functional>
 #include <iostream>
 #include <map>
+#include <memory>
 #include <regex>
+#include <sstream>
+#include <stdexcept>
+#include <string>
 #include <thread>
+#include <type_traits>
+#include <vector>
 
-/***********************************************************************
- * HOOK_INFO: Track data about one named hook
- ***********************************************************************/
-struct HookInfo
+#include "CaveBuilder.h"
+
+/// Where a patch or hook goes.
+///
+/// A module name starting with "$re$" is a regular expression over module names, for games that
+/// load their code under a generated name.
+struct CodeSite
 {
-    std::string hookName;  // e.g., "ArrowFrequency"
-    uintptr_t hookAddress; // Where we overwrite bytes
-    size_t overwriteLen;   // Number of bytes overwritten
-    std::vector<BYTE> originalBytes;
-    bool active = false;
-
-    LPVOID allocatedMem = nullptr;
-    size_t allocSize = 0;
-};
-
-/***********************************************************************
- * WILDCARD PATTERN BYTE
- *  If text == "??" => wildcard
- *  Otherwise, parse hex
- ***********************************************************************/
-struct PatternByte
-{
-    bool wildcard;
-    BYTE value;
-};
-
-/***********************************************************************
- * POINTER_TOGGLE_INFO: Track data about one pointer-based toggle
- ***********************************************************************/
-struct PointerToggleInfo
-{
-    std::string toggleName;
-    std::vector<unsigned int> offsets;
-    std::any desiredValue;
-    size_t valueSize;
-    bool active = false;
-    std::thread toggleThread;
-
-    // Destructor to ensure the thread is joined
-    ~PointerToggleInfo()
+    /// The first match of an AOB, written as Cheat Engine prints it ("8B 40 ?? C3"); offset is how
+    /// far into the match the instruction starts. A null module searches all executable memory,
+    /// which is where JIT-compiled code lives.
+    static CodeSite aob(const wchar_t *module, std::string signature, size_t offset = 0)
     {
-        active = false;
-        if (toggleThread.joinable())
-            toggleThread.join();
+        return CodeSite{module, std::move(signature), offset, 0};
     }
+
+    /// A fixed offset into a module - for code no AOB pins down uniquely.
+    static CodeSite rva(const wchar_t *module, uintptr_t rva)
+    {
+        return CodeSite{module, "", 0, rva};
+    }
+
+    const wchar_t *module = nullptr;
+    std::string signature;
+    size_t offset = 0;
+    uintptr_t moduleOffset = 0; // used when signature is empty
+};
+
+/// [[module + offsets[0]] + offsets[1]] ... + offsets[n]. Each offset after the first is added to
+/// the pointer read at the address before it, so a single offset is a static address in the module.
+struct PointerChain
+{
+    const wchar_t *module = nullptr;
+    std::vector<uintptr_t> offsets;
 };
 
 class TrainerBase
 {
 public:
+    /// processIdentifier is the game's exe name, or its window title when useWindowTitle is set.
     TrainerBase(const std::wstring &processIdentifier, bool useWindowTitle = false)
         : processName(processIdentifier), useWindowTitle(useWindowTitle)
     {
-        SetConsoleOutputCP(CP_UTF8);
+        prepareConsole();
     }
 
     virtual ~TrainerBase()
@@ -71,43 +87,25 @@ public:
         cleanUp();
     }
 
-    std::wstring getProcessName() const
-    {
-        return processName;
-    }
+    std::wstring getProcessName() const { return processName; }
+    DWORD getProcessId() const { return procId; }
 
-    DWORD getProcessId() const
-    {
-        return procId;
-    }
-
-    virtual void cleanUp()
-    {
-        disableAllHooks();
-        disableAllPointerToggles();
-        if (hProcess)
-            CloseHandle(hProcess);
-        hProcess = nullptr;
-    }
-
-    // Check if the target process is running and open a handle
+    /// Finds the game and opens it. A game that has exited or restarted drops whatever the trainer
+    /// had changed in it.
     bool isProcessRunning()
     {
-        if (useWindowTitle)
-        {
-            procId = getProcIdByWindowTitle(processName);
-        }
-        else
-        {
-            procId = getProcId(processName.c_str());
-        }
-
-        if (procId == 0)
+        DWORD pid = findProcessId();
+        if (pid == 0)
         {
             std::wcerr << L"[!] Could not find process: " << processName << std::endl;
             cleanUp();
+            procId = 0;
             return false;
         }
+
+        if (hProcess && pid != procId)
+            cleanUp();
+        procId = pid;
 
         if (!hProcess)
         {
@@ -122,184 +120,58 @@ public:
         return true;
     }
 
-    // Disable a specific named hook
-    inline bool disableNamedHook(const std::string &name)
+    /// Undoes every modification and closes the process handle.
+    virtual void cleanUp()
     {
-        auto it = hooks.find(name);
-        if (it == hooks.end())
-            return false; // Not found
+        disableAll();
+        if (hProcess)
+            CloseHandle(hProcess);
+        hProcess = nullptr;
+    }
 
-        HookInfo &hi = it->second;
-        if (!hi.active)
-            return false;
-
-        // Restore original bytes
-        WriteProcessMemory(hProcess, reinterpret_cast<LPVOID>(hi.hookAddress), hi.originalBytes.data(), hi.overwriteLen, nullptr);
-        FlushInstructionCache(hProcess, reinterpret_cast<LPCVOID>(hi.hookAddress), hi.overwriteLen);
-
-        // Free allocated memory
-        if (hi.allocatedMem)
+    /// Undoes the modification made under name: restores overwritten code and frees its cave, or
+    /// stops a held value. False, with the reason on stderr, when nothing is active under that name.
+    bool disable(const std::string &name)
+    {
+        auto it = modifications.find(name);
+        if (it == modifications.end())
         {
-            VirtualFreeEx(hProcess, hi.allocatedMem, 0, MEM_RELEASE);
-            hi.allocatedMem = nullptr;
+            std::cerr << "[!] '" << name << "' is not active.\n";
+            return false;
         }
-
-        hi.active = false;
-        std::cout << "[-] Disabled hook '" << name << "'\n";
+        undo(it->second);
+        modifications.erase(it);
+        std::cout << "[-] Disabled '" << name << "'\n";
         return true;
     }
 
-    // Disable all active hooks
-    inline void disableAllHooks()
+    void disableAll()
     {
-        for (auto &kv : hooks)
-        {
-            HookInfo &hi = kv.second;
-            if (hi.active)
-            {
-                // Restore original bytes
-                WriteProcessMemory(hProcess, reinterpret_cast<LPVOID>(hi.hookAddress), hi.originalBytes.data(), hi.overwriteLen, nullptr);
-                FlushInstructionCache(hProcess, reinterpret_cast<LPCVOID>(hi.hookAddress), hi.overwriteLen);
-
-                // Free allocated memory
-                if (hi.allocatedMem)
-                {
-                    VirtualFreeEx(hProcess, hi.allocatedMem, 0, MEM_RELEASE);
-                    hi.allocatedMem = nullptr;
-                }
-                hi.active = false;
-                std::cout << "[-] Disabled hook '" << kv.first << "'\n";
-            }
-        }
-        hooks.clear();
+        for (auto &[name, modification] : modifications)
+            undo(modification);
+        modifications.clear();
     }
 
-    // Disable a specific pointer-based toggle
-    inline bool disableNamedPointerToggle(const std::string &name)
+    bool isActive(const std::string &name) const
     {
-        auto it = pointerToggles.find(name);
-        if (it == pointerToggles.end())
-            return false; // Not found
-
-        auto pti = it->second;
-        if (!pti->active)
-            return false;
-
-        pti->active = false; // Signal the thread to stop
-
-        if (pti->toggleThread.joinable())
-            pti->toggleThread.join();
-
-        std::cout << "[-] Disabled pointer toggle '" << name << "'\n";
-        pointerToggles.erase(it);
-        return true;
-    }
-
-    // Disable all active pointer-based toggles
-    inline void disableAllPointerToggles()
-    {
-        for (auto &kv : pointerToggles)
-        {
-            auto pti = kv.second;
-            if (pti->active)
-            {
-                pti->active = false;
-                if (pti->toggleThread.joinable())
-                    pti->toggleThread.join();
-                std::cout << "[-] Disabled pointer toggle '" << kv.first << "'\n";
-            }
-        }
-        pointerToggles.clear();
+        return modifications.count(name) != 0;
     }
 
 protected:
-    // Process and module information
-    const std::wstring processName; // This can be either an exe name or a window title
-    bool useWindowTitle = false;    // Set to true if processName is a window title
+    const std::wstring processName;
+    const bool useWindowTitle;
     HANDLE hProcess = nullptr;
     DWORD procId = 0;
 
-    // Maps to store hooks and pointer toggles by name
-    std::map<std::string, HookInfo> hooks;
-    std::map<std::string, std::shared_ptr<PointerToggleInfo>> pointerToggles;
+    // ------------------------------------------------------------------------------------------------
+    // Modules
+    // ------------------------------------------------------------------------------------------------
 
-    /***********************************************************************
-     * Helper Functions
-     ***********************************************************************/
-
-    /** Converts std::wstring to std::string
-     * @param wstr The wide string to convert
-     * @return Converted narrow string
-     */
-    std::string wstringToString(const std::wstring &wstr)
+    /// A "$re$" prefix makes the name a regular expression over module names.
+    bool getModuleInfo(const wchar_t *module, uintptr_t &base, size_t &size)
     {
-        if (wstr.empty())
-            return "";
-        int size = WideCharToMultiByte(CP_ACP, 0, &wstr[0], (int)wstr.size(), NULL, 0, NULL, NULL);
-        std::string str(size, 0);
-        WideCharToMultiByte(CP_ACP, 0, &wstr[0], (int)wstr.size(), &str[0], size, NULL, NULL);
-        return str;
-    }
-
-    // Get Process ID by executable name
-    inline DWORD getProcId(const wchar_t *exeName)
-    {
-        DWORD pid = 0;
-        HANDLE snap = CreateToolhelp32Snapshot(TH32CS_SNAPPROCESS, 0);
-        if (snap == INVALID_HANDLE_VALUE)
-            return 0;
-
-        PROCESSENTRY32W pe;
-        pe.dwSize = sizeof(pe);
-        if (Process32FirstW(snap, &pe))
-        {
-            do
-            {
-                if (!_wcsicmp(pe.szExeFile, exeName))
-                {
-                    pid = pe.th32ProcessID;
-                    break;
-                }
-            } while (Process32NextW(snap, &pe));
-        }
-        CloseHandle(snap);
-        return pid;
-    }
-
-    struct EnumWindowsData
-    {
-        std::wstring targetTitle;
-        DWORD foundPID = 0;
-    };
-
-    static BOOL CALLBACK EnumWindowsProcCallback(HWND hwnd, LPARAM lParam)
-    {
-        EnumWindowsData *data = reinterpret_cast<EnumWindowsData *>(lParam);
-        if (!IsWindowVisible(hwnd))
-            return TRUE;
-
-        const int bufferSize = 256;
-        wchar_t windowTitle[bufferSize] = {0};
-        GetWindowTextW(hwnd, windowTitle, bufferSize);
-        if (data->targetTitle == windowTitle)
-        {
-            GetWindowThreadProcessId(hwnd, &(data->foundPID));
-            return FALSE;
-        }
-        return TRUE;
-    }
-
-    inline DWORD getProcIdByWindowTitle(const std::wstring &title)
-    {
-        EnumWindowsData data;
-        data.targetTitle = title;
-        EnumWindows(EnumWindowsProcCallback, reinterpret_cast<LPARAM>(&data));
-        return data.foundPID;
-    }
-
-    // Get Module Base Address and Size
-    inline bool getModuleInfo(const wchar_t *modName, uintptr_t &modBase, size_t &modSize)
-    {
+        if (!module)
+            return false;
         HANDLE snap = CreateToolhelp32Snapshot(TH32CS_SNAPMODULE | TH32CS_SNAPMODULE32, procId);
         if (snap == INVALID_HANDLE_VALUE)
         {
@@ -307,553 +179,647 @@ protected:
             return false;
         }
 
-        MODULEENTRY32W me;
+        static const std::wstring regexPrefix = L"$re$";
+        const std::wstring name(module);
+        const bool isRegex = name.rfind(regexPrefix, 0) == 0;
+        const std::wregex pattern(isRegex ? name.substr(regexPrefix.size()) : L"");
+
+        MODULEENTRY32W me{};
         me.dwSize = sizeof(me);
         bool found = false;
-
-        // Check if the module name starts with "$re$" for regex matching
-        bool useRegex = false;
-        std::wstring patternStr;
-        const wchar_t *prefix = L"$re$";
-        size_t prefixLen = wcslen(prefix);
-        if (wcsncmp(modName, prefix, prefixLen) == 0)
+        for (BOOL more = Module32FirstW(snap, &me); more && !found; more = Module32NextW(snap, &me))
         {
-            useRegex = true;
-            patternStr = std::wstring(modName).substr(prefixLen);
-        }
-
-        if (Module32FirstW(snap, &me))
-        {
-            do
+            found = isRegex ? std::regex_match(me.szModule, pattern) : _wcsicmp(me.szModule, module) == 0;
+            if (found)
             {
-                // std::wcout << L"Module: " << me.szModule << std::endl;
-                if ((!useRegex && _wcsicmp(me.szModule, modName) == 0) || (useRegex && std::regex_match(me.szModule, std::wregex(patternStr))))
-                {
-                    modBase = (uintptr_t)me.modBaseAddr;
-                    modSize = (size_t)me.modBaseSize;
-                    found = true;
-                    break;
-                }
-            } while (Module32NextW(snap, &me));
+                base = reinterpret_cast<uintptr_t>(me.modBaseAddr);
+                size = me.modBaseSize;
+            }
         }
         CloseHandle(snap);
         return found;
     }
 
-    // Resolve dynamic address via pointer chaining
-    inline uintptr_t resolveModuleDynamicAddress(const wchar_t *moduleName, const std::vector<unsigned int> &offsets)
+    /// The module's base plus rva - an absolute address a cave compares against, such as a vtable.
+    /// 0, with the reason on stderr, when the module is not loaded.
+    uintptr_t moduleAddress(const wchar_t *module, uintptr_t rva)
     {
-        uintptr_t modBase = 0;
-        size_t modSize = 0;
-        if (!getModuleInfo(moduleName, modBase, modSize))
+        uintptr_t base = 0;
+        size_t size = 0;
+        if (!getModuleInfo(module, base, size))
         {
-            std::wcerr << L"[!] Could not find module: " << moduleName << std::endl;
+            std::wcerr << L"[!] Module not loaded: " << (module ? module : L"(none)") << std::endl;
             return 0;
         }
+        return base + rva;
+    }
 
-        // First offset is relative to moduleBase
-        uintptr_t currentAddr = modBase + offsets[0];
+    // ------------------------------------------------------------------------------------------------
+    // Memory
+    // ------------------------------------------------------------------------------------------------
 
-        // Subsequent offsets are pointer dereferences
-        for (size_t i = 1; i < offsets.size(); i++)
-        {
-            if (!ReadProcessMemory(hProcess, (LPCVOID)currentAddr, &currentAddr, sizeof(currentAddr), nullptr))
-            {
-                std::cerr << "[!] Failed dereference pointer at 0x" << std::hex << currentAddr << std::dec << std::endl;
-                return 0;
-            }
-            currentAddr += offsets[i];
-        }
+    bool readBytes(uintptr_t address, void *buffer, size_t size)
+    {
+        SIZE_T read = 0;
+        return ReadProcessMemory(hProcess, reinterpret_cast<LPCVOID>(address), buffer, size, &read) && read == size;
+    }
 
-        std::cout << "[+] Pointer dereferenced to 0x" << std::hex << currentAddr << std::dec << std::endl;
-        return currentAddr;
+    bool writeBytes(uintptr_t address, const void *buffer, size_t size)
+    {
+        SIZE_T written = 0;
+        return WriteProcessMemory(hProcess, reinterpret_cast<LPVOID>(address), buffer, size, &written) && written == size;
     }
 
     template <typename T>
-    bool WriteToDynamicAddress(const wchar_t *moduleName, const std::vector<unsigned int> &offsets, T value)
+    bool readMemory(uintptr_t address, T &out)
     {
-        uintptr_t targetAddr = resolveModuleDynamicAddress(moduleName, offsets);
-        if (targetAddr == 0)
+        static_assert(std::is_trivially_copyable_v<T>, "readMemory needs a plain value type");
+        return readBytes(address, &out, sizeof(T));
+    }
+
+    template <typename T>
+    bool writeMemory(uintptr_t address, const T &value)
+    {
+        static_assert(std::is_trivially_copyable_v<T>, "writeMemory needs a plain value type");
+        return writeBytes(address, &value, sizeof(T));
+    }
+
+    /// The address a chain ends at, or 0 with the reason on stderr when the module is not loaded or a
+    /// link reads as unreadable or null.
+    uintptr_t resolve(const PointerChain &chain)
+    {
+        uintptr_t base = moduleAddress(chain.module, 0);
+        return base ? followChain(base, chain.offsets, true) : 0;
+    }
+
+    template <typename T>
+    bool readValue(const PointerChain &chain, T &out)
+    {
+        uintptr_t address = resolve(chain);
+        if (address == 0)
+            return false;
+        if (!readMemory(address, out))
         {
+            std::cerr << "[!] Could not read 0x" << std::hex << address << std::dec << ".\n";
             return false;
         }
-
-        if (!WriteProcessMemory(hProcess, reinterpret_cast<LPVOID>(targetAddr), &value, sizeof(T), nullptr))
-        {
-            std::cerr << "[!] WriteProcessMemory failed at address 0x" << std::hex << targetAddr << std::dec << ". Error: " << GetLastError() << std::endl;
-            return false;
-        }
-
         return true;
     }
 
     template <typename T>
-    T ReadFromDynamicAddress(const wchar_t *moduleName, const std::vector<unsigned int> &offsets)
+    bool writeValue(const PointerChain &chain, const T &value)
     {
-        uintptr_t targetAddr = resolveModuleDynamicAddress(moduleName, offsets);
-        if (targetAddr == 0)
+        uintptr_t address = resolve(chain);
+        if (address == 0)
+            return false;
+        if (!writeMemory(address, value))
         {
-            return T();
+            std::cerr << "[!] Could not write 0x" << std::hex << address << std::dec << ".\n";
+            return false;
         }
-
-        T value;
-        if (!ReadProcessMemory(hProcess, reinterpret_cast<LPCVOID>(targetAddr), &value, sizeof(T), nullptr))
-        {
-            std::cerr << "[!] ReadProcessMemory failed at address 0x" << std::hex << targetAddr << std::dec << ". Error: " << GetLastError() << std::endl;
-            return T();
-        }
-
-        return value;
+        return true;
     }
 
-    // Find pattern with wildcards
-    inline uintptr_t findPatternWild(const wchar_t *moduleName, const std::vector<std::string> &pattern)
+    // ------------------------------------------------------------------------------------------------
+    // Code
+    // ------------------------------------------------------------------------------------------------
+
+    /// The address a site names, or 0 with the reason on stderr. An AOB is matched against executable
+    /// memory only - inside its module, or anywhere for a null module - and the first match wins;
+    /// scripts/native/verify_aobs.py checks offline that a signature matches exactly once.
+    uintptr_t findCode(const CodeSite &site)
     {
-        // Parse pattern
-        std::vector<PatternByte> pat;
-        for (const auto &token : pattern)
-        {
-            pat.push_back((token == "??" || token == "?") ? PatternByte{true, 0} : PatternByte{false, (BYTE)std::stoul(token, nullptr, 16)});
-        }
-        size_t patSize = pat.size();
+        if (site.signature.empty())
+            return moduleAddress(site.module, site.moduleOffset);
 
-        if (moduleName == nullptr || wcslen(moduleName) == 0)
-        {
-            uintptr_t currentAddress = 0;
-            MEMORY_BASIC_INFORMATION mbi;
+        const std::vector<SignatureByte> signature = parseSignature(site.signature);
 
-            // Loop through all memory pages in the process
-            while (VirtualQueryEx(hProcess, (LPCVOID)currentAddress, &mbi, sizeof(mbi)))
+        uintptr_t start = 0, end = UINTPTR_MAX;
+        if (site.module)
+        {
+            size_t size = 0;
+            if (!getModuleInfo(site.module, start, size))
             {
-                // We only care about memory that is committed and executable (where JIT code lives)
-                if (mbi.State == MEM_COMMIT && (mbi.Protect & PAGE_EXECUTE_READ || mbi.Protect & PAGE_EXECUTE_READWRITE))
-                {
-                    std::vector<BYTE> buffer(mbi.RegionSize);
-                    SIZE_T bytesRead;
-                    if (ReadProcessMemory(hProcess, mbi.BaseAddress, buffer.data(), mbi.RegionSize, &bytesRead))
-                    {
-                        for (size_t i = 0; i + patSize <= bytesRead; ++i)
-                        {
-                            bool found = true;
-                            for (size_t j = 0; j < patSize; ++j)
-                            {
-                                if (!pat[j].wildcard && pat[j].value != buffer[i + j])
-                                {
-                                    found = false;
-                                    break;
-                                }
-                            }
-                            if (found)
-                            {
-                                return (uintptr_t)mbi.BaseAddress + i;
-                            }
-                        }
-                    }
-                }
-                currentAddress = (uintptr_t)mbi.BaseAddress + mbi.RegionSize;
+                std::wcerr << L"[!] Module not loaded: " << site.module << std::endl;
+                return 0;
             }
+            end = start + size;
         }
-        else
+
+        uintptr_t match = scanExecutable(start, end, signature);
+        if (match == 0)
+        {
+            std::cerr << "[!] Signature not found: " << site.signature.substr(0, 47) << (site.signature.size() > 47 ? " ..." : "") << "\n";
+            return 0;
+        }
+        return match + site.offset;
+    }
+
+    /// Overwrites the instructions at site with bytes.
+    bool patchCode(const std::string &name, const CodeSite &site, const std::vector<BYTE> &bytes)
+    {
+        if (!claimName(name))
+            return false;
+        uintptr_t address = findCode(site);
+        if (address == 0)
+            return false;
+
+        Modification patch;
+        patch.address = address;
+        patch.originalBytes.resize(bytes.size());
+        if (!readBytes(address, patch.originalBytes.data(), bytes.size()) || !writeCode(address, bytes))
+        {
+            std::cerr << "[!] Could not patch '" << name << "' at 0x" << std::hex << address << std::dec << ".\n";
+            return false;
+        }
+
+        modifications[name] = std::move(patch);
+        std::cout << "[+] Patched '" << name << "' at 0x" << std::hex << address << std::dec << "\n";
+        return true;
+    }
+
+    /// Replaces the first overwriteLen bytes at site with a jump to a code cave, whose code body
+    /// assembles. overwriteLen covers whole instructions and is at least the jump's five bytes; what
+    /// is left over is filled with NOPs. The cave is allocated within rel32 reach of site.
+    bool hookCode(const std::string &name, const CodeSite &site, size_t overwriteLen, const std::function<void(CaveBuilder &)> &body)
+    {
+        if (overwriteLen < 5)
+        {
+            std::cerr << "[!] '" << name << "' overwrites " << overwriteLen << " bytes; a hook's jump needs 5.\n";
+            return false;
+        }
+        if (!claimName(name))
+            return false;
+        uintptr_t address = findCode(site);
+        if (address == 0)
+            return false;
+
+        Modification hook;
+        hook.address = address;
+        hook.originalBytes.resize(overwriteLen);
+        if (!readBytes(address, hook.originalBytes.data(), overwriteLen))
+        {
+            std::cerr << "[!] Could not read the code '" << name << "' overwrites.\n";
+            return false;
+        }
+
+        hook.cave = allocateCave(address);
+        if (!hook.cave)
+        {
+            std::cerr << "[!] No free memory within reach of '" << name << "' for its cave.\n";
+            return false;
+        }
+
+        // The cave is freed if building it throws, and the throw goes on to the alert.
+        const uintptr_t caveAddress = reinterpret_cast<uintptr_t>(hook.cave);
+        std::vector<BYTE> code;
+        try
+        {
+            CaveBuilder cave(caveAddress, address, hook.originalBytes);
+            body(cave);
+            code = cave.build();
+            hook.caveLabels = cave.labels();
+        }
+        catch (...)
+        {
+            VirtualFreeEx(hProcess, hook.cave, 0, MEM_RELEASE);
+            throw;
+        }
+
+        std::vector<BYTE> jump(overwriteLen, 0x90);
+        jump[0] = 0xE9;
+        int32_t rel = static_cast<int32_t>(caveAddress - (address + 5));
+        std::memcpy(&jump[1], &rel, 4);
+
+        if (code.size() > CAVE_SIZE || !writeCode(caveAddress, code) || !writeCode(address, jump))
+        {
+            std::cerr << "[!] Could not install '" << name << "' (" << code.size() << " cave bytes).\n";
+            writeCode(address, hook.originalBytes);
+            VirtualFreeEx(hProcess, hook.cave, 0, MEM_RELEASE);
+            return false;
+        }
+
+        modifications[name] = std::move(hook);
+        std::cout << "[+] Hooked '" << name << "' at 0x" << std::hex << address << std::dec << "\n";
+        return true;
+    }
+
+    /// Changes data a live cave reads - a label its body bound - without rebuilding the hook.
+    template <typename T>
+    bool writeCaveData(const std::string &name, const std::string &label, const T &value)
+    {
+        uintptr_t address = caveLabelAddress(name, label);
+        if (address == 0)
+            return false;
+        if (!writeMemory(address, value))
+        {
+            std::cerr << "[!] Could not write '" << label << "' in the cave of '" << name << "'.\n";
+            return false;
+        }
+        return true;
+    }
+
+    /// Reads data a live cave holds - for example a pointer the cave stashed there.
+    template <typename T>
+    bool readCaveData(const std::string &name, const std::string &label, T &out)
+    {
+        uintptr_t address = caveLabelAddress(name, label);
+        return address != 0 && readMemory(address, out);
+    }
+
+    // ------------------------------------------------------------------------------------------------
+    // Held values
+    // ------------------------------------------------------------------------------------------------
+    // A held value is rewritten every HOLD_INTERVAL until disabled, and its chain's pointers are
+    // followed again each time, so an object the game frees and reallocates - a reload, a level
+    // change - is tracked rather than written over. The module base is resolved once, when the
+    // value starts being held.
+
+    /// Keeps the value at chain's end at value. Disabling leaves the last value in place.
+    template <typename T>
+    bool holdValue(const std::string &name, const PointerChain &chain, T value)
+    {
+        static_assert(std::is_trivially_copyable_v<T>, "holdValue needs a plain value type");
+        if (!claimName(name) || resolve(chain) == 0)
+            return false;
+        const uintptr_t base = moduleAddress(chain.module, 0);
+        return startValueLock(name, [this, base, offsets = chain.offsets, value]()
+                              {
+                                  if (uintptr_t address = followChain(base, offsets, false))
+                                      writeMemory(address, value);
+                              },
+                              nullptr);
+    }
+
+    /// Keeps the value at chain's end at what it is now.
+    template <typename T>
+    bool freezeValue(const std::string &name, const PointerChain &chain)
+    {
+        if (!claimName(name))
+            return false;
+        T current{};
+        if (!readValue(chain, current))
+            return false;
+        return holdValue(name, chain, current);
+    }
+
+    /// Keeps each float at chain's end + field at its original value x factor - for tunables such as
+    /// a speed scale, where one fixed value would be wrong for another object of the same kind. An
+    /// object's originals are read the first time the chain reaches it and written back on disable.
+    /// An object the chain has moved off is assumed freed and left alone.
+    bool scaleValues(const std::string &name, const PointerChain &chain, const std::vector<uintptr_t> &fields, float factor)
+    {
+        if (!claimName(name) || resolve(chain) == 0)
+            return false;
+
+        struct Scaled
         {
             uintptr_t base = 0;
-            size_t modSize = 0;
-            if (!getModuleInfo(moduleName, base, modSize))
-                return 0;
+            std::vector<float> originals;
+        };
+        auto scaled = std::make_shared<Scaled>();
+        const uintptr_t moduleBase = moduleAddress(chain.module, 0);
 
-            // Read module bytes
-            std::vector<BYTE> buf(modSize);
-            SIZE_T bytesRead = 0;
-            if (!ReadProcessMemory(hProcess, (LPCVOID)base, buf.data(), modSize, &bytesRead))
-                return 0;
-
-            for (size_t i = 0; i + patSize <= bytesRead; i++)
+        auto tick = [this, moduleBase, offsets = chain.offsets, fields, factor, scaled]()
+        {
+            uintptr_t base = followChain(moduleBase, offsets, false);
+            if (base == 0)
+                return;
+            if (base != scaled->base)
             {
-                bool matched = true;
-                for (size_t j = 0; j < patSize; j++)
-                {
-                    if (!pat[j].wildcard && pat[j].value != buf[i + j])
-                    {
-                        matched = false;
-                        break;
-                    }
-                }
-                if (matched)
-                {
-                    return base + i;
-                }
+                std::vector<float> originals(fields.size());
+                for (size_t i = 0; i < fields.size(); i++)
+                    if (!readMemory(base + fields[i], originals[i]))
+                        return;
+                scaled->base = base;
+                scaled->originals = std::move(originals);
             }
+            for (size_t i = 0; i < fields.size(); i++)
+                writeMemory(base + fields[i], scaled->originals[i] * factor);
+        };
+
+        auto restore = [this, fields, scaled]()
+        {
+            for (size_t i = 0; scaled->base && i < fields.size(); i++)
+                writeMemory(scaled->base + fields[i], scaled->originals[i]);
+        };
+
+        return startValueLock(name, tick, restore);
+    }
+
+    // ------------------------------------------------------------------------------------------------
+    // Text
+    // ------------------------------------------------------------------------------------------------
+
+    std::string wstringToString(const std::wstring &wstr)
+    {
+        if (wstr.empty())
+            return "";
+        int size = WideCharToMultiByte(CP_ACP, 0, wstr.data(), static_cast<int>(wstr.size()), nullptr, 0, nullptr, nullptr);
+        std::string str(size, 0);
+        WideCharToMultiByte(CP_ACP, 0, wstr.data(), static_cast<int>(wstr.size()), str.data(), size, nullptr, nullptr);
+        return str;
+    }
+
+private:
+    static constexpr size_t CAVE_SIZE = 0x1000;
+    static constexpr std::chrono::milliseconds HOLD_INTERVAL{10};
+
+    struct SignatureByte
+    {
+        bool wildcard;
+        BYTE value;
+    };
+
+    struct ValueLock
+    {
+        std::atomic<bool> running{true};
+        std::thread thread;
+        std::function<void()> onStop;
+    };
+
+    /// What one name changed. Code modifications keep the bytes they overwrote and, for a hook, the
+    /// cave; a held value keeps the thread that rewrites it.
+    struct Modification
+    {
+        uintptr_t address = 0;
+        std::vector<BYTE> originalBytes;
+        LPVOID cave = nullptr;
+        std::map<std::string, size_t> caveLabels;
+        std::unique_ptr<ValueLock> lock;
+    };
+
+    std::map<std::string, Modification> modifications;
+
+    /// base + offsets[0], then each later offset added to the pointer read at the address before it.
+    uintptr_t followChain(uintptr_t base, const std::vector<uintptr_t> &offsets, bool reportFailure)
+    {
+        if (offsets.empty())
+            return base;
+        uintptr_t address = base + offsets[0];
+        for (size_t i = 1; i < offsets.size(); i++)
+        {
+            uintptr_t next = 0;
+            const bool readable = readMemory(address, next);
+            if (!readable || next == 0)
+            {
+                if (reportFailure)
+                    std::cerr << "[!] Pointer chain broke at link " << i << ": 0x" << std::hex << address << std::dec
+                              << (readable ? " holds null" : " is unreadable") << " - is the game past its menus?\n";
+                return 0;
+            }
+            address = next + offsets[i];
+        }
+        return address;
+    }
+
+    bool claimName(const std::string &name)
+    {
+        if (!isActive(name))
+            return true;
+        std::cerr << "[!] '" << name << "' is already active.\n";
+        return false;
+    }
+
+    void undo(Modification &modification)
+    {
+        if (modification.lock)
+        {
+            modification.lock->running = false;
+            if (modification.lock->thread.joinable())
+                modification.lock->thread.join();
+            if (modification.lock->onStop)
+                modification.lock->onStop();
+            return;
         }
 
+        writeCode(modification.address, modification.originalBytes);
+        if (modification.cave)
+            VirtualFreeEx(hProcess, modification.cave, 0, MEM_RELEASE);
+    }
+
+    bool startValueLock(const std::string &name, std::function<void()> tick, std::function<void()> onStop)
+    {
+        Modification held;
+        held.lock = std::make_unique<ValueLock>();
+        held.lock->onStop = std::move(onStop);
+        ValueLock *lock = held.lock.get();
+        lock->thread = std::thread([lock, tick = std::move(tick)]()
+                                   {
+                                       while (lock->running)
+                                       {
+                                           tick();
+                                           std::this_thread::sleep_for(HOLD_INTERVAL);
+                                       }
+                                   });
+        modifications[name] = std::move(held);
+        std::cout << "[+] Holding '" << name << "'\n";
+        return true;
+    }
+
+    bool writeCode(uintptr_t address, const std::vector<BYTE> &bytes)
+    {
+        if (!writeBytes(address, bytes.data(), bytes.size()))
+            return false;
+        FlushInstructionCache(hProcess, reinterpret_cast<LPCVOID>(address), bytes.size());
+        return true;
+    }
+
+    uintptr_t caveLabelAddress(const std::string &name, const std::string &label)
+    {
+        auto it = modifications.find(name);
+        if (it == modifications.end() || !it->second.cave)
+        {
+            std::cerr << "[!] '" << name << "' is not an active hook.\n";
+            return 0;
+        }
+        auto offset = it->second.caveLabels.find(label);
+        if (offset == it->second.caveLabels.end())
+        {
+            std::cerr << "[!] The cave of '" << name << "' has no label '" << label << "'.\n";
+            return 0;
+        }
+        return reinterpret_cast<uintptr_t>(it->second.cave) + offset->second;
+    }
+
+    static std::vector<SignatureByte> parseSignature(const std::string &signature)
+    {
+        std::vector<SignatureByte> bytes;
+        std::istringstream in(signature);
+        for (std::string token; in >> token;)
+        {
+            if (token == "??" || token == "?")
+            {
+                bytes.push_back({true, 0});
+                continue;
+            }
+            if (token.size() != 2 || !std::isxdigit(static_cast<unsigned char>(token[0])) || !std::isxdigit(static_cast<unsigned char>(token[1])))
+                throw std::invalid_argument("Bad AOB token '" + token + "' in \"" + signature + "\"");
+            bytes.push_back({false, static_cast<BYTE>(std::stoul(token, nullptr, 16))});
+        }
+        if (bytes.empty() || bytes.front().wildcard)
+            throw std::invalid_argument("An AOB has to start with a concrete byte: \"" + signature + "\"");
+        return bytes;
+    }
+
+    /// The first match in committed executable memory between start and end.
+    uintptr_t scanExecutable(uintptr_t start, uintptr_t end, const std::vector<SignatureByte> &signature)
+    {
+        constexpr DWORD executable = PAGE_EXECUTE | PAGE_EXECUTE_READ | PAGE_EXECUTE_READWRITE | PAGE_EXECUTE_WRITECOPY;
+        constexpr size_t chunk = 16 * 1024 * 1024;
+        const size_t length = signature.size();
+        std::vector<BYTE> buffer;
+
+        MEMORY_BASIC_INFORMATION mbi{};
+        for (uintptr_t at = start; at < end && VirtualQueryEx(hProcess, reinterpret_cast<LPCVOID>(at), &mbi, sizeof(mbi));)
+        {
+            const uintptr_t regionStart = (std::max)(reinterpret_cast<uintptr_t>(mbi.BaseAddress), start);
+            const uintptr_t regionEnd = (std::min)(static_cast<uintptr_t>(reinterpret_cast<uintptr_t>(mbi.BaseAddress) + mbi.RegionSize), end);
+            at = static_cast<uintptr_t>(reinterpret_cast<uintptr_t>(mbi.BaseAddress) + mbi.RegionSize);
+            if (at <= reinterpret_cast<uintptr_t>(mbi.BaseAddress))
+                break; // wrapped past the top of the address space
+            if (mbi.State != MEM_COMMIT || !(mbi.Protect & executable) || (mbi.Protect & PAGE_GUARD))
+                continue;
+
+            // Chunks overlap by the signature's length so a match across a boundary is still seen.
+            for (uintptr_t from = regionStart; from + length <= regionEnd; from += chunk)
+            {
+                const size_t size = (std::min)(chunk + length - 1, regionEnd - from);
+                buffer.resize(size);
+                SIZE_T read = 0;
+                if (!ReadProcessMemory(hProcess, reinterpret_cast<LPCVOID>(from), buffer.data(), size, &read))
+                    continue;
+                if (size_t found = findInBuffer(buffer.data(), read, signature); found != SIZE_MAX)
+                    return from + found;
+            }
+        }
         return 0;
     }
 
-    // Allocate memory near a specific address (±2GB)
-    inline LPVOID allocNearAddress(uintptr_t addr, size_t sizeNeeded)
+    static size_t findInBuffer(const BYTE *data, size_t size, const std::vector<SignatureByte> &signature)
     {
-        const size_t TWO_GB = (1ULL << 31);
-        const size_t step = 0x10000; // 64KB
-
-        uintptr_t start = (addr > TWO_GB) ? (addr - TWO_GB) : 0;
-        uintptr_t end = addr + TWO_GB;
-
-        auto alignDown = [&](uintptr_t x)
-        { return (x / step) * step; };
-        start = alignDown(start);
-        end = alignDown(end);
-
-        for (uintptr_t curr = start; curr + sizeNeeded < end; curr += step)
+        const size_t length = signature.size();
+        const BYTE first = signature[0].value;
+        for (size_t i = 0; i + length <= size;)
         {
-            LPVOID p = VirtualAllocEx(
-                hProcess,
-                (LPVOID)curr,
-                sizeNeeded,
-                MEM_COMMIT | MEM_RESERVE,
-                PAGE_EXECUTE_READWRITE);
-            if (p)
-            {
-                uintptr_t diff = (curr > addr) ? (curr - addr) : (addr - curr);
-                if (diff <= TWO_GB)
-                    return p;
+            const void *hit = std::memchr(data + i, first, size - length + 1 - i);
+            if (!hit)
+                return SIZE_MAX;
+            i = static_cast<const BYTE *>(hit) - data;
+            size_t j = 1;
+            while (j < length && (signature[j].wildcard || signature[j].value == data[i + j]))
+                j++;
+            if (j == length)
+                return i;
+            i++;
+        }
+        return SIZE_MAX;
+    }
 
-                VirtualFreeEx(hProcess, p, 0, MEM_RELEASE);
+    /// One page for a cave, within rel32 reach of hookAddress: x86 reaches everything, x64 searches the
+    /// free regions within 2 GB above hookAddress, then below it.
+    LPVOID allocateCave(uintptr_t hookAddress)
+    {
+#if !defined(_WIN64)
+        (void)hookAddress;
+        return VirtualAllocEx(hProcess, nullptr, CAVE_SIZE, MEM_COMMIT | MEM_RESERVE, PAGE_EXECUTE_READWRITE);
+#else
+        SYSTEM_INFO si{};
+        GetSystemInfo(&si);
+        const uintptr_t granularity = si.dwAllocationGranularity;
+        const uintptr_t reach = 0x7FFF0000;
+        const uintptr_t lowest = (std::max)(reinterpret_cast<uintptr_t>(si.lpMinimumApplicationAddress), hookAddress > reach ? hookAddress - reach : 0);
+        const uintptr_t highest = (std::min)(reinterpret_cast<uintptr_t>(si.lpMaximumApplicationAddress), hookAddress + reach);
+        auto alignUp = [granularity](uintptr_t x) { return (x + granularity - 1) / granularity * granularity; };
+        auto alignDown = [granularity](uintptr_t x) { return x / granularity * granularity; };
+        auto tryAt = [this](uintptr_t candidate) -> LPVOID
+        { return VirtualAllocEx(hProcess, reinterpret_cast<LPVOID>(candidate), CAVE_SIZE, MEM_COMMIT | MEM_RESERVE, PAGE_EXECUTE_READWRITE); };
+
+        MEMORY_BASIC_INFORMATION mbi{};
+        for (uintptr_t at = hookAddress; at < highest && VirtualQueryEx(hProcess, reinterpret_cast<LPCVOID>(at), &mbi, sizeof(mbi));)
+        {
+            const uintptr_t base = reinterpret_cast<uintptr_t>(mbi.BaseAddress);
+            if (mbi.State == MEM_FREE)
+            {
+                const uintptr_t candidate = alignUp(base);
+                if (candidate + CAVE_SIZE <= base + mbi.RegionSize && candidate + CAVE_SIZE <= highest)
+                    if (LPVOID cave = tryAt(candidate))
+                        return cave;
             }
+            at = base + mbi.RegionSize;
+        }
+        for (uintptr_t at = hookAddress; at > lowest && VirtualQueryEx(hProcess, reinterpret_cast<LPCVOID>(at - 1), &mbi, sizeof(mbi));)
+        {
+            const uintptr_t base = reinterpret_cast<uintptr_t>(mbi.BaseAddress);
+            if (mbi.State == MEM_FREE && base + mbi.RegionSize >= CAVE_SIZE)
+            {
+                const uintptr_t candidate = alignDown(base + mbi.RegionSize - CAVE_SIZE);
+                if (candidate >= base && candidate >= lowest)
+                    if (LPVOID cave = tryAt(candidate))
+                        return cave;
+            }
+            at = base;
         }
         return nullptr;
+#endif
     }
 
-    /***********************************************************************
-     * createBytePatch
-     * - name: Unique string name, e.g., "NoCooldownPatch"
-     * - pattern: AOB to search for
-     * - patchOffset: Offset from the start of the pattern to begin patching
-     * - newBytes: The vector of bytes to write
-     * This function is for simple, in-place memory patches (like JNE -> JE).
-     * It stores the original bytes and is automatically reversible
-     * by the existing 'disableNamedHook' function.
-     ***********************************************************************/
-    inline bool createBytePatch(
-        const wchar_t *moduleName,
-        const std::string &name,
-        const std::vector<std::string> &pattern,
-        size_t patchOffset,
-        const std::vector<BYTE> &newBytes)
+    /// UTF-8 output, and QuickEdit off until exit: a selection in a Debug trainer's console blocks
+    /// its logging, which freezes the UI.
+    static void prepareConsole()
     {
-        // 1. Find pattern
-        uintptr_t matchAddr = findPatternWild(moduleName, pattern);
-        if (!matchAddr)
+        struct QuickEditOff
         {
-            std::cerr << "[!] Could not find pattern for byte patch '" << name << "'.\n";
-            return false;
-        }
+            HANDLE input = GetStdHandle(STD_INPUT_HANDLE);
+            DWORD saved = 0;
+            bool changed = GetConsoleMode(input, &saved) &&
+                           SetConsoleMode(input, (saved & ~ENABLE_QUICK_EDIT_MODE) | ENABLE_EXTENDED_FLAGS);
 
-        uintptr_t patchAddr = matchAddr + patchOffset;
-        size_t overwriteLen = newBytes.size();
-
-        // 2. Read original bytes
-        std::vector<BYTE> originalBytes(overwriteLen);
-        if (!ReadProcessMemory(hProcess, (LPCVOID)patchAddr, originalBytes.data(), overwriteLen, nullptr))
-        {
-            std::cerr << "[!] Failed to read original bytes for patch '" << name << "'.\n";
-            return false;
-        }
-
-        // 3. Write new bytes
-        if (!WriteProcessMemory(hProcess, (LPVOID)patchAddr, newBytes.data(), overwriteLen, nullptr))
-        {
-            std::cerr << "[!] WriteProcessMemory failed for patch '" << name << "'.\n";
-            return false;
-        }
-        FlushInstructionCache(hProcess, (LPCVOID)patchAddr, overwriteLen);
-
-        // 4. Store HookInfo
-        HookInfo hi;
-        hi.hookName = name;
-        hi.hookAddress = patchAddr;
-        hi.overwriteLen = overwriteLen;
-        hi.active = true;
-        hi.originalBytes = originalBytes;
-        hi.allocatedMem = nullptr;
-        hi.allocSize = 0;
-
-        hooks[name] = hi;
-
-        std::cout << "[+] Byte patch '" << name << "' created at " << std::hex << patchAddr << std::dec << std::endl;
-        return true;
-    }
-
-    /***********************************************************************
-     * createNamedHook
-     *    - name: Unique string name, e.g., "ArrowFrequency"
-     *    - pattern: e.g., {"0F", "28", "CE", "F3", "0F", "11", "73", "4C", ...}
-     *      with "??" for wildcards
-     *    - patternOffset: How far into that found pattern we actually place the hook
-     *      e.g., if the pattern is 12 bytes, but the instruction to hook starts at offset 3
-     *    - overwriteLen: How many bytes we overwrite
-     *    - codeSize: How many bytes to allocate for code cave
-     *    - buildFunc: A lambda that, given the base address of the allocated block,
-     *      and the hookAddr where the original instruction started,
-     *      returns the final code bytes (which can also embed data).
-     ***********************************************************************/
-    inline bool createNamedHook(
-        const wchar_t *moduleName,
-        const std::string &name,
-        const std::vector<std::string> &pattern,
-        size_t patternOffset,
-        size_t overwriteLen,
-        size_t codeSize,
-        std::function<std::vector<BYTE>(uintptr_t codeCaveAddr, uintptr_t hookAddr, const std::vector<BYTE> &originalBytes)> buildFunc)
-    {
-        // A) Find pattern with wildcards
-        uintptr_t matchAddr = findPatternWild(moduleName, pattern);
-        if (!matchAddr)
-        {
-            std::cerr << "[!] Could not find pattern for hook '" << name << "'.\n";
-            return false;
-        }
-        // The actual instruction address is matchAddr + patternOffset
-        uintptr_t hookAddr = matchAddr + patternOffset;
-
-        // B) Read original bytes
-        std::vector<BYTE> originalBytes(overwriteLen);
-        if (!ReadProcessMemory(hProcess, (LPCVOID)hookAddr, originalBytes.data(), overwriteLen, nullptr))
-        {
-            std::cerr << "[!] Failed to read original bytes for hook '" << name << "'.\n";
-            return false;
-        }
-
-        // C) Allocate near memory
-        LPVOID nearMem = allocNearAddress(hookAddr, codeSize);
-        if (!nearMem)
-        {
-            std::cerr << "[!] allocNearAddress failed for hook '" << name << "'.\n";
-            return false;
-        }
-
-        // D) Build injection code
-        uintptr_t codeCaveAddr = reinterpret_cast<uintptr_t>(nearMem);
-        std::vector<BYTE> code = buildFunc(codeCaveAddr, hookAddr, originalBytes);
-        if (code.empty())
-        {
-            std::cerr << "[!] buildFunc returned empty code for '" << name << "'.\n";
-            VirtualFreeEx(hProcess, nearMem, 0, MEM_RELEASE);
-            return false;
-        }
-
-        // E) Write code to nearMem
-        SIZE_T written = 0;
-        if (!WriteProcessMemory(hProcess, nearMem, code.data(), code.size(), &written))
-        {
-            std::cerr << "[!] WriteProcessMemory code failed for hook '" << name << "'.\n";
-            VirtualFreeEx(hProcess, nearMem, 0, MEM_RELEASE);
-            return false;
-        }
-        FlushInstructionCache(hProcess, nearMem, code.size());
-
-        // F) Overwrite the original instructions with a JMP
-        //    If overwriteLen > 5, fill the rest with NOP
-        std::vector<BYTE> patch(overwriteLen, 0x90); // Fill with NOP
-        patch[0] = 0xE9;                             // JMP opcode
-        int32_t rel = static_cast<int32_t>(reinterpret_cast<uintptr_t>(nearMem) - (hookAddr + 5));
-        std::memcpy(&patch[1], &rel, 4);
-
-        if (!WriteProcessMemory(hProcess, reinterpret_cast<LPVOID>(hookAddr), patch.data(), patch.size(), nullptr))
-        {
-            std::cerr << "[!] Overwrite instruction failed for '" << name << "'.\n";
-            VirtualFreeEx(hProcess, nearMem, 0, MEM_RELEASE);
-            return false;
-        }
-        FlushInstructionCache(hProcess, reinterpret_cast<LPCVOID>(hookAddr), patch.size());
-
-        // G) Store HookInfo
-        HookInfo hi;
-        hi.hookName = name;
-        hi.hookAddress = hookAddr;
-        hi.overwriteLen = overwriteLen;
-        hi.active = true;
-        hi.originalBytes = originalBytes;
-        hi.allocatedMem = nearMem;
-        hi.allocSize = codeSize;
-
-        hooks[name] = hi; // Store in map by name
-
-        std::cout << "[+] Hook '" << name << "' created at " << std::hex << hookAddr << std::dec << std::endl;
-        return true;
-    }
-
-    inline bool createNamedHookByOffset(
-        const wchar_t *moduleName,
-        const std::string &name,
-        uintptr_t offset,
-        size_t overwriteLen,
-        size_t codeSize,
-        std::function<std::vector<BYTE>(uintptr_t codeCaveAddr, uintptr_t hookAddr, const std::vector<BYTE> &originalBytes)> buildFunc)
-    {
-        uintptr_t modBase = 0;
-        size_t modSize = 0;
-        if (!getModuleInfo(moduleName, modBase, modSize))
-        {
-            std::cerr << "[!] Could not find module for hook '" << name << "'.\n";
-            return false;
-        }
-
-        uintptr_t hookAddr = modBase + offset;
-
-        // Read original bytes
-        std::vector<BYTE> originalBytes(overwriteLen);
-        if (!ReadProcessMemory(hProcess, (LPCVOID)hookAddr, originalBytes.data(), overwriteLen, nullptr))
-        {
-            std::cerr << "[!] Failed to read original bytes for hook '" << name << "'.\n";
-            return false;
-        }
-
-        // Allocate near memory
-        LPVOID nearMem = allocNearAddress(hookAddr, codeSize);
-        if (!nearMem) return false;
-
-        // Build injection code
-        uintptr_t codeCaveAddr = reinterpret_cast<uintptr_t>(nearMem);
-        std::vector<BYTE> code = buildFunc(codeCaveAddr, hookAddr, originalBytes);
-
-        if (code.empty()) {
-            VirtualFreeEx(hProcess, nearMem, 0, MEM_RELEASE);
-            return false;
-        }
-
-        // Write code to nearMem
-        SIZE_T written = 0;
-        WriteProcessMemory(hProcess, nearMem, code.data(), code.size(), &written);
-        FlushInstructionCache(hProcess, nearMem, code.size());
-
-        // Overwrite the original instructions with a JMP
-        std::vector<BYTE> patch(overwriteLen, 0x90);
-        patch[0] = 0xE9; 
-        int32_t rel = static_cast<int32_t>(codeCaveAddr - (hookAddr + 5));
-        std::memcpy(&patch[1], &rel, 4);
-
-        WriteProcessMemory(hProcess, reinterpret_cast<LPVOID>(hookAddr), patch.data(), patch.size(), nullptr);
-        FlushInstructionCache(hProcess, reinterpret_cast<LPCVOID>(hookAddr), patch.size());
-
-        HookInfo hi;
-        hi.hookName = name;
-        hi.hookAddress = hookAddr;
-        hi.overwriteLen = overwriteLen;
-        hi.active = true;
-        hi.originalBytes = originalBytes;
-        hi.allocatedMem = nearMem;
-        hi.allocSize = codeSize;
-        hooks[name] = hi;
-
-        std::cout << "[+] Hook '" << name << "' created at offset 0x" << std::hex << offset << std::dec << std::endl;
-        return true;
-    }
-
-    /***********************************************************************
-     * createPointerToggle
-     *    - name: Unique string name, e.g., "HealthToggle"
-     *    - offsets: Pointer chain offsets to reach the target value
-     *    - desiredValue: The value to maintain at the target address
-     *    - valueType: (optional) Type hint for freezing current value
-     ***********************************************************************/
-    template <typename T, typename ValueType = T>
-    inline bool createPointerToggle(
-        const wchar_t *moduleName,
-        const std::string &name,
-        const std::vector<unsigned int> &offsets,
-        const T desiredValue,
-        const ValueType *typeHint = nullptr)
-    {
-        if (pointerToggles.find(name) != pointerToggles.end())
-        {
-            std::cerr << "[!] Pointer toggle with name '" << name << "' already exists.\n";
-            return false;
-        }
-
-        // Resolve the address once
-        uintptr_t targetAddr = resolveModuleDynamicAddress(moduleName, offsets);
-        if (targetAddr == 0)
-        {
-            std::cerr << "[!] Failed to resolve address for pointer toggle '" << name << "'.\n";
-            return false;
-        }
-
-        // Create a shared_ptr for PointerToggleInfo
-        auto pti = std::make_shared<PointerToggleInfo>();
-        pti->toggleName = name;
-        pti->offsets = offsets;
-        pti->active = true;
-
-        // Check if desiredValue is nullptr (freeze current value mode)
-        if constexpr (std::is_same_v<T, std::nullptr_t>)
-        {
-            // Read current value from memory using the type hint size
-            ValueType readValue{};
-            if (!ReadProcessMemory(hProcess, reinterpret_cast<LPVOID>(targetAddr), &readValue, sizeof(ValueType), nullptr))
+            ~QuickEditOff()
             {
-                std::cerr << "[!] Failed to read initial value for pointer toggle '" << name << "'.\n";
-                return false;
+                if (changed)
+                    SetConsoleMode(input, saved | ENABLE_EXTENDED_FLAGS);
             }
-            pti->desiredValue = readValue;
-            pti->valueSize = sizeof(ValueType);
-        }
-        else
+        };
+        static QuickEditOff quickEditOff;
+        SetConsoleOutputCP(CP_UTF8);
+    }
+
+    DWORD findProcessId()
+    {
+        if (useWindowTitle)
         {
-            pti->desiredValue = desiredValue;
-            pti->valueSize = sizeof(T); // Store the size of the desired value
+            WindowSearch search{&processName};
+            EnumWindows(matchWindowTitle, reinterpret_cast<LPARAM>(&search));
+            return search.pid;
         }
 
-        // Insert into the map before starting the thread to ensure the pti remains valid
-        pointerToggles[name] = pti;
+        DWORD pid = 0;
+        HANDLE snap = CreateToolhelp32Snapshot(TH32CS_SNAPPROCESS, 0);
+        if (snap == INVALID_HANDLE_VALUE)
+            return 0;
+        PROCESSENTRY32W pe{};
+        pe.dwSize = sizeof(pe);
+        for (BOOL more = Process32FirstW(snap, &pe); more && pid == 0; more = Process32NextW(snap, &pe))
+            if (_wcsicmp(pe.szExeFile, processName.c_str()) == 0)
+                pid = pe.th32ProcessID;
+        CloseHandle(snap);
+        return pid;
+    }
 
-        // Create a weak_ptr to avoid circular references
-        std::weak_ptr<PointerToggleInfo> weak_pti = pti;
+    struct WindowSearch
+    {
+        const std::wstring *title;
+        DWORD pid = 0;
+    };
 
-        // Start a thread to continuously write the desired value
-        pti->toggleThread = std::thread([this, weak_pti, targetAddr]()
-                                        {
-        // Attempt to lock the weak_ptr
-        if (auto shared_pti = weak_pti.lock())
-        {
-            while (shared_pti->active)
-            {
-                if (shared_pti->desiredValue.type() == typeid(BYTE))
-                {
-                    BYTE value = std::any_cast<BYTE>(shared_pti->desiredValue);
-                    WriteProcessMemory(hProcess, reinterpret_cast<LPVOID>(targetAddr), &value, sizeof(BYTE), nullptr);
-                }
-                else if (shared_pti->desiredValue.type() == typeid(int))
-                {
-                    int value = std::any_cast<int>(shared_pti->desiredValue);
-                    WriteProcessMemory(hProcess, reinterpret_cast<LPVOID>(targetAddr), &value, sizeof(int), nullptr);
-                }
-                else if (shared_pti->desiredValue.type() == typeid(float))
-                {
-                    float value = std::any_cast<float>(shared_pti->desiredValue);
-                    WriteProcessMemory(hProcess, reinterpret_cast<LPVOID>(targetAddr), &value, sizeof(float), nullptr);
-                }
-                else if (shared_pti->desiredValue.type() == typeid(double))
-                {
-                    double value = std::any_cast<double>(shared_pti->desiredValue);
-                    WriteProcessMemory(hProcess, reinterpret_cast<LPVOID>(targetAddr), &value, sizeof(double), nullptr);
-                }
-                // Add more types as needed
-                else
-                {
-                    std::cerr << "[!] Unsupported type for toggle '" << shared_pti->toggleName << "'.\n";
-                }
-
-                // Flush the instruction cache with the correct size
-                FlushInstructionCache(hProcess, reinterpret_cast<LPCVOID>(targetAddr), shared_pti->valueSize);
-
-                // Sleep for 10 milliseconds
-                std::this_thread::sleep_for(std::chrono::milliseconds(10));
-            }
-        }
-        else
-        {
-            std::cerr << "[!] PointerToggleInfo for toggle has been destroyed.\n";
-        } });
-
-        std::cout << "[+] Pointer toggle '" << name << "' activated.\n";
-        return true;
+    static BOOL CALLBACK matchWindowTitle(HWND hwnd, LPARAM param)
+    {
+        auto *search = reinterpret_cast<WindowSearch *>(param);
+        wchar_t title[256] = {0};
+        if (!IsWindowVisible(hwnd) || !GetWindowTextW(hwnd, title, 256) || *search->title != title)
+            return TRUE;
+        GetWindowThreadProcessId(hwnd, &search->pid);
+        return FALSE;
     }
 };

@@ -6,6 +6,7 @@ obj/
 tools/
 docs/*
 !docs/create_trainer.md
+!docs/native_trainer_discovery.md
 *.sln
 MonoBridge.dll
 Mono.dll

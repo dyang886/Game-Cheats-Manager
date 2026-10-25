@@ -74,7 +74,7 @@ void toggle_callback(Fl_Widget *widget, void *data)
         }
         else
         {
-            status = trainer->disableNamedPointerToggle(optionName);
+            status = trainer->disable(optionName);
         }
     }
     else if (optionName == "Health")
@@ -85,7 +85,7 @@ void toggle_callback(Fl_Widget *widget, void *data)
         }
         else
         {
-            status = trainer->disableNamedPointerToggle(optionName);
+            status = trainer->disable(optionName);
         }
     }
     else if (optionName == "HorizontalSpeed")
@@ -96,7 +96,7 @@ void toggle_callback(Fl_Widget *widget, void *data)
         }
         else
         {
-            status = trainer->disableNamedHook(optionName);
+            status = trainer->disable(optionName);
         }
     }
     else if (optionName == "ArrowDamage")
@@ -107,7 +107,7 @@ void toggle_callback(Fl_Widget *widget, void *data)
         }
         else
         {
-            status = trainer->disableNamedHook(optionName);
+            status = trainer->disable(optionName);
         }
     }
     else if (optionName == "ArrowFrequency")
@@ -118,7 +118,7 @@ void toggle_callback(Fl_Widget *widget, void *data)
         }
         else
         {
-            status = trainer->disableNamedHook(optionName);
+            status = trainer->disable(optionName);
         }
     }
     else if (optionName == "ArrowSpeed")
@@ -129,7 +129,7 @@ void toggle_callback(Fl_Widget *widget, void *data)
         }
         else
         {
-            status = trainer->disableNamedHook(optionName);
+            status = trainer->disable(optionName);
         }
     }
     else if (optionName == "ArrowDistance")
@@ -140,7 +140,7 @@ void toggle_callback(Fl_Widget *widget, void *data)
         }
         else
         {
-            status = trainer->disableNamedHook(optionName);
+            status = trainer->disable(optionName);
         }
     }
     else if (optionName == "ArrowCount")
@@ -151,7 +151,7 @@ void toggle_callback(Fl_Widget *widget, void *data)
         }
         else
         {
-            status = trainer->disableNamedHook(optionName);
+            status = trainer->disable(optionName);
         }
     }
     else if (optionName == "SwordDamage")
@@ -162,7 +162,7 @@ void toggle_callback(Fl_Widget *widget, void *data)
         }
         else
         {
-            status = trainer->disableNamedHook(optionName);
+            status = trainer->disable(optionName);
         }
     }
     else if (optionName == "SwordCoolDown")
@@ -173,7 +173,7 @@ void toggle_callback(Fl_Widget *widget, void *data)
         }
         else
         {
-            status = trainer->disableNamedHook(optionName);
+            status = trainer->disable(optionName);
         }
     }
     else if (optionName == "SwordSpeed")
@@ -184,7 +184,7 @@ void toggle_callback(Fl_Widget *widget, void *data)
         }
         else
         {
-            status = trainer->disableNamedHook(optionName);
+            status = trainer->disable(optionName);
         }
     }
     else if (optionName == "SwordDistance")
@@ -195,7 +195,7 @@ void toggle_callback(Fl_Widget *widget, void *data)
         }
         else
         {
-            status = trainer->disableNamedHook(optionName);
+            status = trainer->disable(optionName);
         }
     }
 

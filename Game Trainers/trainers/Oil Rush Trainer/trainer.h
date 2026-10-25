@@ -12,10 +12,7 @@ public:
     // Constants
     static inline const wchar_t *moduleName = L"Unigine_x86.dll";
 
-    uintptr_t internal_OilFreeze_Address = 0;
-    uintptr_t internal_UpgradeFreeze_Address = 0;
-
-    // Internal state trackers
+    // Internal state trackers: the value each resource is forced to, -1 when it is not
     int currentOilTarget = -1;
     int currentAbilityTarget = -1;
 
@@ -33,6 +30,8 @@ public:
     }
 
 private:
+    static inline const std::string HOOK = "MasterResourceHook";
+
     // Hook Overview: Hijacks the engine's globally shared Sync_Component_Value read instruction (Unigine_x86.dll+90336) to intercept all resource updates.
     // Pointer Traversal: Dynamically traverses static pointer chains inside the code cave (7 levels for Oil, 3 for Upgrades) to find the player's exact HUD values.
     // Filtering: Identifies player resources by matching the current object's value against the HUD value and verifying the Team ID is 0.
@@ -40,239 +39,66 @@ private:
     // Memory Hijack: Forcefully overwrites the entity's real resource base with the custom target value and updates eax to instantly sync the visual UI mirror.
     inline bool setMasterResources(int targetOil, int targetAbilityPoints)
     {
-        // 1. If both are -1, safely kill the hook and exit.
+        // 1. Neither resource forced: remove the hook.
         if (targetOil == -1 && targetAbilityPoints == -1)
-        {
-            disableNamedHook("MasterResourceHook");
-            internal_OilFreeze_Address = 0;
-            internal_UpgradeFreeze_Address = 0;
-            return true;
-        }
+            return !isActive(HOOK) || disable(HOOK);
 
-        // 2. If the hook is active, just update the live memory targets!
-        auto it = hooks.find("MasterResourceHook");
-        if (it != hooks.end() && it->second.active)
-        {
-            if (internal_OilFreeze_Address != 0)
-                WriteProcessMemory(hProcess, (LPVOID)internal_OilFreeze_Address, &targetOil, sizeof(int), nullptr);
+        // 2. Hook already in place: change the targets it reads.
+        if (isActive(HOOK))
+            return writeCaveData(HOOK, "oilTarget", targetOil) && writeCaveData(HOOK, "upgradeTarget", targetAbilityPoints);
 
-            if (internal_UpgradeFreeze_Address != 0)
-                WriteProcessMemory(hProcess, (LPVOID)internal_UpgradeFreeze_Address, &targetAbilityPoints, sizeof(int), nullptr);
-
-            return true;
-        }
-
-        // 3. Create the Master Hook.
-        uintptr_t modBase = 0;
-        size_t modSize = 0;
-        if (!getModuleInfo(moduleName, modBase, modSize))
+        // 3. Create the hook.
+        const uint32_t playerRoot = static_cast<uint32_t>(moduleAddress(moduleName, 0x00671B28));
+        if (playerRoot == 0)
             return false;
 
-        uintptr_t staticPtrBase = modBase + 0x00671B28;
-        size_t overwriteLen = 6;
-        size_t codeSize = 0x300;
+        return hookCode(HOOK, CodeSite::rva(moduleName, 0x90336), 6,
+                        [playerRoot, targetOil, targetAbilityPoints](CaveBuilder &cave)
+                        {
+                            // Walks [playerRoot] + offsets with ebx and bails unless the value being
+                            // synced (eax) is that HUD value and belongs to team 0.
+                            auto matchesHud = [&](std::initializer_list<uint32_t> offsets, uint32_t hudOffset, const std::string &bail)
+                            {
+                                cave.bytes({0x8B, 0x1D}).value(playerRoot) // mov ebx,[playerRoot]
+                                    .bytes({0x85, 0xDB}).jumpTo(CaveBuilder::Jcc::E, bail);
+                                for (uint32_t offset : offsets)
+                                {
+                                    if (offset < 0x80)
+                                        cave.bytes({0x8B, 0x5B, static_cast<BYTE>(offset)}); // mov ebx,[ebx+disp8]
+                                    else
+                                        cave.bytes({0x8B, 0x9B}).value(offset); // mov ebx,[ebx+disp32]
+                                    cave.bytes({0x85, 0xDB}).jumpTo(CaveBuilder::Jcc::E, bail); // test ebx,ebx
+                                }
+                                cave.bytes({0x8B, 0x9B}).value(hudOffset)                     // mov ebx,[ebx+hud]
+                                    .bytes({0x39, 0xD8}).jumpTo(CaveBuilder::Jcc::NE, bail)   // cmp eax,ebx
+                                    .bytes({0x83, 0x7E, 0xE0, 0x00}).jumpTo(CaveBuilder::Jcc::NE, bail); // cmp dword ptr [esi-20],0
+                            };
+                            // Forces the synced value to the target, unless the target is -1.
+                            auto force = [&](const std::string &target, const std::string &bail)
+                            {
+                                cave.bytes({0x8B, 0x1D}).address(target)                   // mov ebx,[target]
+                                    .bytes({0x83, 0xFB, 0xFF}).jumpTo(CaveBuilder::Jcc::E, bail) // cmp ebx,-1
+                                    .bytes({0x89, 0x5E, 0x10})                             // mov [esi+10],ebx
+                                    .bytes({0x8B, 0xC3});                                  // mov eax,ebx
+                            };
 
-        auto buildFunc = [this, staticPtrBase, targetOil, targetAbilityPoints](uintptr_t codeCaveAddr, uintptr_t hookAddr, const std::vector<BYTE> &originalBytes) -> std::vector<BYTE>
-        {
-            std::vector<BYTE> code;
-            code.reserve(0x300);
+                            cave.bytes({0x8B, 0x46, 0x10, 0x53}); // mov eax,[esi+10] ; push ebx
 
-            std::vector<size_t> oil_jump_offsets;
-            std::vector<size_t> cleanup_jump_offsets;
+                            matchesHud({0x0D8, 0x00C, 0x120, 0x77C, 0x6A0, 0x064}, 0xCCC, "upgrades");
+                            force("oilTarget", "upgrades");
+                            cave.jumpTo(CaveBuilder::Jcc::Always, "cleanup");
 
-            auto emit_je = [&](std::vector<size_t> &jump_list)
-            {
-                code.push_back(0x0F);
-                code.push_back(0x84);
-                jump_list.push_back(code.size());
-                code.insert(code.end(), 4, 0x00);
-            };
-            auto emit_jne = [&](std::vector<size_t> &jump_list)
-            {
-                code.push_back(0x0F);
-                code.push_back(0x85);
-                jump_list.push_back(code.size());
-                code.insert(code.end(), 4, 0x00);
-            };
+                            cave.label("upgrades");
+                            matchesHud({0x844, 0x0A4}, 0x620, "cleanup");
+                            force("upgradeTarget", "cleanup");
 
-            // Read Master Value (EAX) & Save ebx
-            code.push_back(0x8B);
-            code.push_back(0x46);
-            code.push_back(0x10);
-            code.push_back(0x53);
-
-            // ==========================================
-            // BLOCK 1: OIL CHECK
-            // ==========================================
-            code.push_back(0x8B);
-            code.push_back(0x1D);
-            const BYTE *pStatic = reinterpret_cast<const BYTE *>(&staticPtrBase);
-            code.insert(code.end(), pStatic, pStatic + 4);
-            code.push_back(0x85);
-            code.push_back(0xDB);
-            emit_je(oil_jump_offsets);
-
-            std::vector<uint32_t> oil_offsets = {0x0D8, 0x00C, 0x120, 0x77C, 0x6A0, 0x064};
-            for (uint32_t off : oil_offsets)
-            {
-                if (off < 0x80)
-                {
-                    code.push_back(0x8B);
-                    code.push_back(0x5B);
-                    code.push_back(static_cast<BYTE>(off));
-                }
-                else
-                {
-                    code.push_back(0x8B);
-                    code.push_back(0x9B);
-                    code.insert(code.end(), reinterpret_cast<BYTE *>(&off), reinterpret_cast<BYTE *>(&off) + 4);
-                }
-                code.push_back(0x85);
-                code.push_back(0xDB);
-                emit_je(oil_jump_offsets);
-            }
-            uint32_t oilFinalOff = 0xCCC;
-            code.push_back(0x8B);
-            code.push_back(0x9B);
-            code.insert(code.end(), reinterpret_cast<BYTE *>(&oilFinalOff), reinterpret_cast<BYTE *>(&oilFinalOff) + 4);
-
-            code.push_back(0x39);
-            code.push_back(0xD8);
-            emit_jne(oil_jump_offsets);
-            code.push_back(0x83);
-            code.push_back(0x7E);
-            code.push_back(0xE0);
-            code.push_back(0x00);
-            emit_jne(oil_jump_offsets);
-
-            // --- FIXED HACK OIL ---
-            // mov ebx, ds:[OilTarget]
-            code.push_back(0x8B);
-            code.push_back(0x1D);
-            size_t oil_var_inst_offset = code.size();
-            code.insert(code.end(), 4, 0x00);
-
-            // cmp ebx, -1 (Safeguard: If -1, jump to Upgrade Check, leaving EAX perfectly intact!)
-            code.push_back(0x83);
-            code.push_back(0xFB);
-            code.push_back(0xFF);
-            emit_je(oil_jump_offsets);
-
-            // mov [esi+10], ebx (Force Hack)
-            code.push_back(0x89);
-            code.push_back(0x5E);
-            code.push_back(0x10);
-            // mov eax, ebx (Update EAX so the UI mirrors the hack)
-            code.push_back(0x8B);
-            code.push_back(0xC3);
-
-            code.push_back(0xE9);
-            cleanup_jump_offsets.push_back(code.size());
-            code.insert(code.end(), 4, 0x00);
-
-            // ==========================================
-            // BLOCK 2: UPGRADE POINTS CHECK
-            // ==========================================
-            size_t check_upgrades_pos = code.size();
-
-            code.push_back(0x8B);
-            code.push_back(0x1D);
-            code.insert(code.end(), pStatic, pStatic + 4);
-            code.push_back(0x85);
-            code.push_back(0xDB);
-            emit_je(cleanup_jump_offsets);
-
-            std::vector<uint32_t> up_offsets = {0x844, 0x0A4};
-            for (uint32_t off : up_offsets)
-            {
-                code.push_back(0x8B);
-                code.push_back(0x9B);
-                code.insert(code.end(), reinterpret_cast<BYTE *>(&off), reinterpret_cast<BYTE *>(&off) + 4);
-                code.push_back(0x85);
-                code.push_back(0xDB);
-                emit_je(cleanup_jump_offsets);
-            }
-            uint32_t upFinalOff = 0x620;
-            code.push_back(0x8B);
-            code.push_back(0x9B);
-            code.insert(code.end(), reinterpret_cast<BYTE *>(&upFinalOff), reinterpret_cast<BYTE *>(&upFinalOff) + 4);
-
-            code.push_back(0x39);
-            code.push_back(0xD8);
-            emit_jne(cleanup_jump_offsets);
-            code.push_back(0x83);
-            code.push_back(0x7E);
-            code.push_back(0xE0);
-            code.push_back(0x00);
-            emit_jne(cleanup_jump_offsets);
-
-            // --- FIXED HACK UPGRADE ---
-            // mov ebx, ds:[UpTarget]
-            code.push_back(0x8B);
-            code.push_back(0x1D);
-            size_t up_var_inst_offset = code.size();
-            code.insert(code.end(), 4, 0x00);
-
-            // cmp ebx, -1 (Safeguard)
-            code.push_back(0x83);
-            code.push_back(0xFB);
-            code.push_back(0xFF);
-            emit_je(cleanup_jump_offsets);
-
-            // mov [esi+10], ebx
-            code.push_back(0x89);
-            code.push_back(0x5E);
-            code.push_back(0x10);
-            // mov eax, ebx
-            code.push_back(0x8B);
-            code.push_back(0xC3);
-
-            // ==========================================
-            // CLEANUP & DATA SECTION
-            // ==========================================
-            size_t cleanup_pos = code.size();
-            code.push_back(0x5B); // pop ebx
-            code.push_back(0x89);
-            code.push_back(0x47);
-            code.push_back(0x10);
-
-            code.push_back(0xE9);
-            size_t jmp_offset = code.size();
-            code.insert(code.end(), 4, 0x00);
-
-            size_t oil_data_pos = code.size();
-            const BYTE *pOilVal = reinterpret_cast<const BYTE *>(&targetOil);
-            code.insert(code.end(), pOilVal, pOilVal + 4);
-
-            size_t up_data_pos = code.size();
-            const BYTE *pUpVal = reinterpret_cast<const BYTE *>(&targetAbilityPoints);
-            code.insert(code.end(), pUpVal, pUpVal + 4);
-
-            this->internal_OilFreeze_Address = static_cast<uint32_t>(codeCaveAddr + oil_data_pos);
-            this->internal_UpgradeFreeze_Address = static_cast<uint32_t>(codeCaveAddr + up_data_pos);
-
-            std::memcpy(&code[oil_var_inst_offset], &this->internal_OilFreeze_Address, 4);
-            std::memcpy(&code[up_var_inst_offset], &this->internal_UpgradeFreeze_Address, 4);
-
-            uintptr_t currentPos = codeCaveAddr + jmp_offset + 4;
-            int32_t relJump = static_cast<int32_t>((hookAddr + 6) - currentPos);
-            std::memcpy(&code[jmp_offset], &relJump, 4);
-
-            for (size_t off : oil_jump_offsets)
-            {
-                int32_t rel = static_cast<int32_t>(check_upgrades_pos - (off + 4));
-                std::memcpy(&code[off], &rel, 4);
-            }
-
-            for (size_t off : cleanup_jump_offsets)
-            {
-                int32_t rel = static_cast<int32_t>(cleanup_pos - (off + 4));
-                std::memcpy(&code[off], &rel, 4);
-            }
-
-            return code;
-        };
-
-        return createNamedHookByOffset(moduleName, "MasterResourceHook", 0x90336, overwriteLen, codeSize, buildFunc);
+                            cave.label("cleanup")
+                                .bytes({0x5B, 0x89, 0x47, 0x10}) // pop ebx ; mov [edi+10],eax
+                                .jmpBack()
+                                .label("oilTarget")
+                                .value(targetOil)
+                                .label("upgradeTarget")
+                                .value(targetAbilityPoints);
+                        });
     }
 };

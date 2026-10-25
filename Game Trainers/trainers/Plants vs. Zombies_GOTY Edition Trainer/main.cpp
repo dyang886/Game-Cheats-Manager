@@ -72,7 +72,7 @@ void toggle_callback(Fl_Widget *widget, void *data)
         }
         else
         {
-            status = trainer->disableNamedHook(optionName);
+            status = trainer->disable(optionName);
         }
     }
     else if (optionName == "AddSun")
@@ -83,7 +83,7 @@ void toggle_callback(Fl_Widget *widget, void *data)
         }
         else
         {
-            status = trainer->disableNamedHook(optionName);
+            status = trainer->disable(optionName);
         }
     }
     else if (optionName == "SetFertilizer")
@@ -94,7 +94,7 @@ void toggle_callback(Fl_Widget *widget, void *data)
         }
         else
         {
-            status = trainer->disableNamedPointerToggle(optionName);
+            status = trainer->disable(optionName);
         }
     }
     else if (optionName == "SetBugSpray")
@@ -105,7 +105,7 @@ void toggle_callback(Fl_Widget *widget, void *data)
         }
         else
         {
-            status = trainer->disableNamedPointerToggle(optionName);
+            status = trainer->disable(optionName);
         }
     }
     else if (optionName == "SetChocolate")
@@ -116,7 +116,7 @@ void toggle_callback(Fl_Widget *widget, void *data)
         }
         else
         {
-            status = trainer->disableNamedPointerToggle(optionName);
+            status = trainer->disable(optionName);
         }
     }
     else if (optionName == "SetTreeFood")
@@ -127,7 +127,7 @@ void toggle_callback(Fl_Widget *widget, void *data)
         }
         else
         {
-            status = trainer->disableNamedPointerToggle(optionName);
+            status = trainer->disable(optionName);
         }
     }
 

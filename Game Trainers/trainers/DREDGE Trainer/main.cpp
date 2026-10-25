@@ -139,7 +139,7 @@ void toggle_callback(Fl_Widget *widget, void *data)
         }
         else
         {
-            status = trainer->disableNamedHook("SetSanity_1") && trainer->disableNamedHook("SetSanity_2");
+            status = trainer->disable("SetSanity_1") && trainer->disable("SetSanity_2");
         }
     }
     else if (optionName == "SetMovementSpeed")
@@ -150,7 +150,7 @@ void toggle_callback(Fl_Widget *widget, void *data)
         }
         else
         {
-            status = trainer->disableNamedHook(optionName);
+            status = trainer->disable(optionName);
         }
     }
 

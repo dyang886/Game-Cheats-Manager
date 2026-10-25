@@ -96,7 +96,7 @@ void toggle_callback(Fl_Widget *widget, void *data)
                     if (otherData->button->value())
                     {
                         otherData->button->value(0);          // Visual OFF
-                        trainer->disableNamedHook(otherName); // Logical OFF
+                        trainer->disable(otherName); // Logical OFF
                         if (otherData->input)
                             otherData->input->readonly(0);
                     }
@@ -115,14 +115,14 @@ void toggle_callback(Fl_Widget *widget, void *data)
         if (button->value())
             status = trainer->freezeHealth();
         else
-            status = trainer->disableNamedPointerToggle(optionName);
+            status = trainer->disable(optionName);
     }
     else if (optionName == "FreezeMana")
     {
         if (button->value())
             status = trainer->freezeMana();
         else
-            status = trainer->disableNamedPointerToggle(optionName);
+            status = trainer->disable(optionName);
     }
     else if (optionName == "SetExp")
     {
@@ -130,21 +130,21 @@ void toggle_callback(Fl_Widget *widget, void *data)
             // real value encrypted with "inputValue ^ 0xa7b3c9d5"
             status = trainer->setExp(std::stoi(inputValue));
         else
-            status = trainer->disableNamedHook(optionName);
+            status = trainer->disable(optionName);
     }
     else if (optionName == "SetStatPoints")
     {
         if (button->value())
             status = trainer->setStatPoints(std::stoi(inputValue));
         else
-            status = trainer->disableNamedHook(optionName);
+            status = trainer->disable(optionName);
     }
     else if (optionName == "SetSkillPoints")
     {
         if (button->value())
             status = trainer->setSkillPoints(std::stoi(inputValue));
         else
-            status = trainer->disableNamedHook(optionName);
+            status = trainer->disable(optionName);
     }
 
     // Finalize

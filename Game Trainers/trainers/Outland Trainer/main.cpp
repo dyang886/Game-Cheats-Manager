@@ -61,21 +61,21 @@ void toggle_callback(Fl_Widget *widget, void *data)
         if (button->value())
             status = trainer->setHealth(std::stof(inputValue));
         else
-            status = trainer->disableNamedPointerToggle(optionName);
+            status = trainer->disable(optionName);
     }
     else if (optionName == "SetMaxHealth")
     {
         if (button->value())
             status = trainer->setMaxHealth(std::stof(inputValue));
         else
-            status = trainer->disableNamedPointerToggle(optionName);
+            status = trainer->disable(optionName);
     }
     else if (optionName == "SetCoins")
     {
         if (button->value())
             status = trainer->setCoins(std::stoi(inputValue));
         else
-            status = trainer->disableNamedPointerToggle(optionName);
+            status = trainer->disable(optionName);
     }
 
     // Finalize

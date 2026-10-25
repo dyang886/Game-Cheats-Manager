@@ -14,13 +14,11 @@ public:
 
     inline bool setLives(int newVal)
     {
-        std::vector<unsigned int> offsets = {0x001AC624, 0x3C, 0x10};
-        return createPointerToggle(moduleName, "SetLives", offsets, newVal);
+        return holdValue("SetLives", {moduleName, {0x001AC624, 0x3C, 0x10}}, newVal);
     }
 
     inline bool setGrowth(int newVal)
     {
-        std::vector<unsigned int> offsets = {0x001AC624, 0x3C, 0x40};
-        return WriteToDynamicAddress(moduleName, offsets, newVal);
+        return writeValue(PointerChain{moduleName, {0x001AC624, 0x3C, 0x40}}, newVal);
     }
 };

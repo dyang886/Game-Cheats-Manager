@@ -41,20 +41,15 @@ Runtime is decided by what is on disk:
 | Electron / NW.js / Chromium layout, `resources/app.asar` | `cdp` | `CDPBase` |
 | A native executable with none of the above | `none` | `TrainerBase` |
 
-> ### ⚠ Stop if the runtime is `none`
+> ### ⚠ A `none` trainer is found live, never invented
 >
-> A `none` trainer has no managed metadata and no injected payload. It reaches the game by writing to addresses found through pointer chains, AOB scans and byte patches — literals like this, from [Outland Trainer/trainer.h](../trainers/Outland%20Trainer/trainer.h):
+> A `none` trainer has no managed metadata and no injected payload. It reaches the game through AOB-located code caves and byte patches and through pointer chains from static roots — and none of that is derivable from the files on disk. It comes from a live session: the game running, the user changing a value when asked, Cheat Engine scanning and watching for what changed.
 >
-> ```cpp
-> std::vector<unsigned int> offsets = {0x005024F0, 0x5C, 0x14, 0x0, 0x14, 0x18, 0x3C};
-> return createPointerToggle(moduleName, "SetHealth", offsets, newVal);
-> ```
+> **Follow [native_trainer_discovery.md](native_trainer_discovery.md) for this runtime.** Do not invent offsets, do not copy a pointer chain or signature from another game or another build, and do not ship a cheat that was not proven in the running game before it went into `trainer.h`. A cheat that cannot be found that way is reported to the user as not done, with what was tried.
 >
-> Those numbers come from a live debugging session — running the game, changing a value, scanning memory for what changed, and walking the pointer back to a static base. None of it is derivable from the files on disk, and there is no static analysis that substitutes for it.
->
-> **Report to the user that you cannot implement this one, and say why.** Do not invent offsets, do not copy a pointer chain from another game, and do not ship a trainer whose addresses you have not verified. A Cheat Engine MCP might make this tractable later; until one is actually available, `none` is out of scope.
+> `none` needs the user at the game for the whole session — they make the game change state, and the session cannot proceed without them. Say so up front.
 
-For the other four, confirm you have the tool you need before promising anything. `tools/` is **gitignored**, so a fresh clone has none of them:
+For every runtime, confirm you have the tool you need before promising anything. `tools/` is **gitignored**, so a fresh clone has none of them:
 
 | Runtime | Tool | Produces |
 |---|---|---|
@@ -62,6 +57,7 @@ For the other four, confirm you have the tool you need before promising anything
 | `il2cpp` | `tools/Il2CppDumper/Il2CppDumper.exe`, or `tools/Cpp2IL/` | `dump.cs`, method addresses, metadata |
 | `ue` | `tools/Dumper-7/` | a C++ SDK of the game's reflected classes |
 | `cdp` | the game's own DevTools endpoint | live JS objects, read at runtime |
+| `none` | `tools/native/` from `.\scripts\native\tools.ps1 -Setup`; the scripts in `scripts/native/` | RTTI class map, then live scans, watches and verified patches |
 
 Put the tool's output in a folder **inside the game's install directory**, not in this repo — dumps are large, game-specific and disposable.
 
@@ -213,7 +209,7 @@ Then confirm the source folder is still clean — `git status` should show your 
 
 1. Game path and feature list obtained from the user — **ask and stop if either is missing**
 2. Architecture and runtime determined from the install directory
-3. `none` runtime → report that it cannot be implemented, and why
+3. `none` runtime → [native_trainer_discovery.md](native_trainer_discovery.md): every cheat proven live, CE patches released, `verify_aobs.py` clean
 4. Dump tool run, artifacts left inside the game's install directory
 5. Folder created with the seven files, named `<Game Name> Trainer`, `_` for any `": "`
 6. Manifest complete — every required field explicit

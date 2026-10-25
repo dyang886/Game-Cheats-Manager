@@ -47,6 +47,7 @@ public:
     CDPBase(const std::string &settingsKey, CDPLaunchMethod method = CDPLaunchMethod::WebView2EnvVar, const std::string &steamAppId = "")
         : settingsKey_(settingsKey), launchMethod_(method), steamAppId_(steamAppId)
     {
+        prepareConsole();
         loadSettings();
     }
 
@@ -346,6 +347,27 @@ private:
     HINTERNET wsConnect_ = nullptr;
     HINTERNET wsHandle_ = nullptr;
     int nextMsgId_ = 1;
+
+    /// UTF-8 output, and QuickEdit off until exit: a selection in a Debug trainer's console blocks
+    /// its logging, which freezes the UI.
+    static void prepareConsole()
+    {
+        struct QuickEditOff
+        {
+            HANDLE input = GetStdHandle(STD_INPUT_HANDLE);
+            DWORD saved = 0;
+            bool changed = GetConsoleMode(input, &saved) &&
+                           SetConsoleMode(input, (saved & ~ENABLE_QUICK_EDIT_MODE) | ENABLE_EXTENDED_FLAGS);
+
+            ~QuickEditOff()
+            {
+                if (changed)
+                    SetConsoleMode(input, saved | ENABLE_EXTENDED_FLAGS);
+            }
+        };
+        static QuickEditOff quickEditOff;
+        SetConsoleOutputCP(CP_UTF8);
+    }
 
     std::string getSettingsFilePath()
     {

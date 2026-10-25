@@ -1,0 +1,38 @@
+{
+    "en_US": {
+        "English": "English",
+        "Please run the game first.": "Please run the game first.",
+        "Load a save first.": "Load a save first.",
+        "Failed to activate.": "Failed to activate.",
+        "Failed to activate / deactivate.": "Failed to activate / deactivate.",
+        "Process Name:": "Process Name:",
+        "Process ID:": "Process ID:",
+        "Ratchet & Clank: Rift Apart Trainer": "Ratchet & Clank: Rift Apart Trainer",
+        "Apply": "Apply",
+        "Set Bolts": "Set Bolts",
+        "Set Raritanium": "Set Raritanium",
+        "Set Ammo": "Set Ammo",
+        "Infinite Health": "Infinite Health",
+        "God Mode": "God Mode",
+        "Unlimited Jumps": "Unlimited Jumps",
+        "Movement Speed Multiplier": "Movement Speed Multiplier"
+    },
+    "zh_CN": {
+        "简体中文": "简体中文",
+        "Please run the game first.": "请先运行游戏。",
+        "Load a save first.": "请先读取存档。",
+        "Failed to activate.": "激活失败。",
+        "Failed to activate / deactivate.": "激活 / 停用失败。",
+        "Process Name:": "进程名称：",
+        "Process ID:": "进程 ID:",
+        "Ratchet & Clank: Rift Apart Trainer": "《瑞奇与叮当：时空跳转》修改器",
+        "Apply": "应用",
+        "Set Bolts": "设置螺丝",
+        "Set Raritanium": "设置拉利安金属",
+        "Set Ammo": "设置弹药",
+        "Infinite Health": "无限生命",
+        "God Mode": "无敌模式",
+        "Unlimited Jumps": "无限跳跃",
+        "Movement Speed Multiplier": "移动速度倍率"
+    }
+}

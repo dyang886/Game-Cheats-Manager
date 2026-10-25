@@ -72,7 +72,7 @@ void toggle_callback(Fl_Widget *widget, void *data)
         }
         else
         {
-            status = trainer->disableNamedPointerToggle(optionName);
+            status = trainer->disable(optionName);
         }
     }
     else if (optionName == "SetXP")
@@ -83,7 +83,7 @@ void toggle_callback(Fl_Widget *widget, void *data)
         }
         else
         {
-            status = trainer->disableNamedHook(optionName);
+            status = trainer->disable(optionName);
         }
     }
     else if (optionName == "SetWins")
@@ -94,7 +94,7 @@ void toggle_callback(Fl_Widget *widget, void *data)
         }
         else
         {
-            status = trainer->disableNamedPointerToggle(optionName);
+            status = trainer->disable(optionName);
         }
     }
 

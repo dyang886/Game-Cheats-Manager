@@ -14,19 +14,16 @@ public:
 
     inline bool setHealth(float newVal)
     {
-        std::vector<unsigned int> offsets = {0x005024F0, 0x5C, 0x14, 0x0, 0x14, 0x18, 0x3C};
-        return createPointerToggle(moduleName, "SetHealth", offsets, newVal);
+        return holdValue("SetHealth", {moduleName, {0x005024F0, 0x5C, 0x14, 0x0, 0x14, 0x18, 0x3C}}, newVal);
     }
 
     inline bool setMaxHealth(float newVal)
     {
-        std::vector<unsigned int> offsets = {0x005024F0, 0x5C, 0x14, 0x0, 0x14, 0x18, 0x40};
-        return createPointerToggle(moduleName, "SetMaxHealth", offsets, newVal);
+        return holdValue("SetMaxHealth", {moduleName, {0x005024F0, 0x5C, 0x14, 0x0, 0x14, 0x18, 0x40}}, newVal);
     }
 
     inline bool setCoins(int newVal)
     {
-        std::vector<unsigned int> offsets = {0x004C72A0, 0x4C, 0x44, 0x0, 0x4, 0x14, 0x0, 0xF8};
-        return createPointerToggle(moduleName, "SetCoins", offsets, newVal);
+        return holdValue("SetCoins", {moduleName, {0x004C72A0, 0x4C, 0x44, 0x0, 0x4, 0x14, 0x0, 0xF8}}, newVal);
     }
 };

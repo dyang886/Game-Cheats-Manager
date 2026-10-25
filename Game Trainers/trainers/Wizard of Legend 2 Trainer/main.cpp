@@ -75,7 +75,7 @@ void toggle_callback(Fl_Widget *widget, void *data)
         }
         else
         {
-            status = trainer->disableNamedPointerToggle(optionName);
+            status = trainer->disable(optionName);
         }
     }
     else if (optionName == "SetMaxHealth")
@@ -86,7 +86,7 @@ void toggle_callback(Fl_Widget *widget, void *data)
         }
         else
         {
-            status = trainer->disableNamedPointerToggle(optionName);
+            status = trainer->disable(optionName);
         }
     }
     else if (optionName == "SetMovementSpeed")
@@ -97,7 +97,7 @@ void toggle_callback(Fl_Widget *widget, void *data)
         }
         else
         {
-            status = trainer->disableNamedPointerToggle(optionName);
+            status = trainer->disable(optionName);
         }
     }
     else if (optionName == "SetCoins")
@@ -108,7 +108,7 @@ void toggle_callback(Fl_Widget *widget, void *data)
         }
         else
         {
-            status = trainer->disableNamedPointerToggle(optionName);
+            status = trainer->disable(optionName);
         }
     }
     else if (optionName == "SetGems")
@@ -119,7 +119,7 @@ void toggle_callback(Fl_Widget *widget, void *data)
         }
         else
         {
-            status = trainer->disableNamedPointerToggle(optionName);
+            status = trainer->disable(optionName);
         }
     }
     else if (optionName == "SetArcaneChromo")
@@ -130,7 +130,7 @@ void toggle_callback(Fl_Widget *widget, void *data)
         }
         else
         {
-            status = trainer->disableNamedPointerToggle(optionName);
+            status = trainer->disable(optionName);
         }
     }
 

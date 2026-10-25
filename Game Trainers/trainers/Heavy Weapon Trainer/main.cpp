@@ -77,7 +77,7 @@ void toggle_callback(Fl_Widget *widget, void *data)
         }
         else
         {
-            status = trainer->disableNamedPointerToggle(optionName);
+            status = trainer->disable(optionName);
         }
     }
     else if (optionName == "Shield")
@@ -88,7 +88,7 @@ void toggle_callback(Fl_Widget *widget, void *data)
         }
         else
         {
-            status = trainer->disableNamedPointerToggle(optionName);
+            status = trainer->disable(optionName);
         }
     }
     else if (optionName == "Nuke")
@@ -99,7 +99,7 @@ void toggle_callback(Fl_Widget *widget, void *data)
         }
         else
         {
-            status = trainer->disableNamedPointerToggle(optionName);
+            status = trainer->disable(optionName);
         }
     }
     else if (optionName == "DefenseOrbs")
@@ -110,7 +110,7 @@ void toggle_callback(Fl_Widget *widget, void *data)
         }
         else
         {
-            status = trainer->disableNamedPointerToggle(optionName);
+            status = trainer->disable(optionName);
         }
     }
     else if (optionName == "HomingMissile")
@@ -121,7 +121,7 @@ void toggle_callback(Fl_Widget *widget, void *data)
         }
         else
         {
-            status = trainer->disableNamedPointerToggle(optionName);
+            status = trainer->disable(optionName);
         }
     }
     else if (optionName == "Laser")
@@ -132,7 +132,7 @@ void toggle_callback(Fl_Widget *widget, void *data)
         }
         else
         {
-            status = trainer->disableNamedPointerToggle(optionName);
+            status = trainer->disable(optionName);
         }
     }
     else if (optionName == "Rockets")
@@ -143,7 +143,7 @@ void toggle_callback(Fl_Widget *widget, void *data)
         }
         else
         {
-            status = trainer->disableNamedPointerToggle(optionName);
+            status = trainer->disable(optionName);
         }
     }
     else if (optionName == "FlakCannon")
@@ -154,7 +154,7 @@ void toggle_callback(Fl_Widget *widget, void *data)
         }
         else
         {
-            status = trainer->disableNamedPointerToggle(optionName);
+            status = trainer->disable(optionName);
         }
     }
     else if (optionName == "ThunderStrike")
@@ -165,7 +165,7 @@ void toggle_callback(Fl_Widget *widget, void *data)
         }
         else
         {
-            status = trainer->disableNamedPointerToggle(optionName);
+            status = trainer->disable(optionName);
         }
     }
 
