@@ -53,32 +53,40 @@ class UpdateTrainers(DownloadBaseThread):
                 return None
             database = self.load_json_content(origin_database)
 
-            # For other/ct_other origins, match by gcm_url to handle multiple trainers for the same game
-            stored_gcm_url = info.get('gcm_url')
+            # other/ct_other trainers are matched by game name and gcm_url
+            match_by_url = origin in ["other", "ct_other"]
+            if match_by_url:
+                stored_gcm_url = info.get('gcm_url')
+                if not stored_gcm_url:
+                    return None
+                stored_url_stem = os.path.splitext(stored_gcm_url)[0]
 
             for entry in database:
-                if entry['game_name'] == game_name:
-                    if origin in ["other", "ct_other"]:
-                        if not stored_gcm_url or entry.get('gcm_url') != stored_gcm_url:
-                            continue
+                if entry['game_name'] != game_name:
+                    continue
+                if match_by_url:
+                    if os.path.splitext(entry.get('gcm_url', ''))[0] != stored_url_stem:
+                        continue
+                elif entry.get('origin') != origin:
+                    continue
 
-                    new_version = entry['version']
-                    gcm_url = entry['gcm_url']
-                    if current_version and new_version != current_version:
-                        update_info = {
-                            "game_name": game_name,
-                            "trainer_name": trainer_name,
-                            "trainer_dir": trainer_dir,
-                            "origin": origin,
-                            "url": gcm_url,
-                            "version": new_version
-                        }
-                        if entry.get('extension'):
-                            update_info["extension"] = entry['extension']
-                        if entry.get('custom_name'):
-                            update_info["custom_name"] = entry['custom_name']
-                        return update_info
-                    return None
+                new_version = entry['version']
+                gcm_url = entry['gcm_url']
+                if current_version and new_version != current_version:
+                    update_info = {
+                        "game_name": game_name,
+                        "trainer_name": trainer_name,
+                        "trainer_dir": trainer_dir,
+                        "origin": origin,
+                        "url": gcm_url,
+                        "version": new_version
+                    }
+                    if entry.get('extension'):
+                        update_info["extension"] = entry['extension']
+                    if entry.get('custom_name'):
+                        update_info["custom_name"] = entry['custom_name']
+                    return update_info
+                return None
             return None
 
         except Exception as e:

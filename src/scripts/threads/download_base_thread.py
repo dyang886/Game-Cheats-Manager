@@ -83,20 +83,23 @@ class DownloadBaseThread(QThread):
             # Headers of this first response decide the file name, the size, and how it is fetched.
             file_path = os.path.join(download_path, os.path.basename(self.find_download_fname(req)))
             total_size = int(req.headers.get('content-length', 0))
-            supports_ranges = req.headers.get('accept-ranges', '').lower() == 'bytes'
+            # Byte offsets only line up with what gets written when the body arrives uncompressed
+            supports_ranges = req.headers.get('accept-ranges', '').lower() == 'bytes' and not req.headers.get('content-encoding')
 
             # One worker per MB, capped, and only when the server claims to serve byte ranges
             if supports_ranges and total_size >= _PARALLEL_THRESHOLD:
                 num_workers = min(total_size // (1024 * 1024), 6)
             else:
                 num_workers = 1
-            return self.download_queued(session, req, url, file_path, total_size, num_workers, raise_errors, atomic)
+            return self.download_queued(session, req, url, file_path, total_size, num_workers, raise_errors, atomic,
+                                        resumable=supports_ranges and total_size > 0)
 
-    def download_queued(self, session, initial_req, url, file_path, total_size, num_workers, raise_errors=False, atomic=False):
+    def download_queued(self, session, initial_req, url, file_path, total_size, num_workers, raise_errors=False, atomic=False, resumable=False):
         total_units = min(total_size // (1024 * 1024), 24) if num_workers > 1 else 1
         print(f"[Queue] starting: {total_units} units, {num_workers} workers, {total_size / (1024 * 1024):.1f} MB", flush=True)
 
-        # Split the file into byte ranges workers pull from, or one unit that streams it whole
+        # Split the file into byte ranges workers pull from. A single stream is one range covering the whole file
+        # when the server serves ranges, so a dropped connection resumes where it stopped instead of starting over.
         unit_queue = queue.Queue()
         if num_workers > 1:
             unit_size = total_size // total_units
@@ -107,6 +110,8 @@ class DownloadBaseThread(QThread):
             if initial_req is not None:
                 initial_req.close()  # its body is unused, every unit fetches its own range instead
                 initial_req = None
+        elif resumable:
+            unit_queue.put((0, 0, total_size - 1))
         else:
             unit_queue.put((0, None, None))
 
@@ -126,6 +131,7 @@ class DownloadBaseThread(QThread):
         completed_units = [0]
         total_failures = [0]
         last_error = [None]
+        ranges_confirmed = [False]
         ranges_ignored = [False]
         MAX_FAILURES = total_units + 10
         stop_event = threading.Event()
@@ -146,10 +152,12 @@ class DownloadBaseThread(QThread):
             return resp
 
         def abandon_ranges():
-            """Worth redoing the download without ranges only while nothing has succeeded yet."""
-            if completed_units[0] == 0:
-                ranges_ignored[0] = True
-                stop_event.set()
+            """Worth redoing the download without ranges only until a range response has shown they work.
+            After that, a bad response is one failed attempt, retried like any other."""
+            with downloaded_lock:
+                if not ranges_confirmed[0]:
+                    ranges_ignored[0] = True
+                    stop_event.set()
 
         def emit_progress():
             self.progress.emit([(total_downloaded[0], total_size)])
@@ -179,7 +187,10 @@ class DownloadBaseThread(QThread):
                     expected_bytes = (end - start + 1) if start is not None else total_size
                     resp = None
                     try:
-                        if start is not None:
+                        # A single stream's first attempt reads the response that started the download
+                        if first_stream[0] is not None:
+                            resp, first_stream[0] = first_stream[0], None
+                        elif start is not None:
                             resp = session.get(url, headers={**self.headers, 'Range': f'bytes={start}-{end}'}, stream=True, timeout=_DOWNLOAD_TIMEOUT)
                             resp.raise_for_status()
                             # 200 means the range was ignored and the whole file is coming
@@ -191,8 +202,8 @@ class DownloadBaseThread(QThread):
                             if content_range != f"bytes {start}-{end}/{total_size}":
                                 abandon_ranges()
                                 raise Exception(f"expected range {start}-{end}/{total_size}, got '{content_range}'")
-                        elif first_stream[0] is not None:
-                            resp, first_stream[0] = first_stream[0], None
+                            with downloaded_lock:
+                                ranges_confirmed[0] = True
                         else:
                             resp = open_full_stream()
 
