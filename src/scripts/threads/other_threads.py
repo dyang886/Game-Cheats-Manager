@@ -365,7 +365,7 @@ class TrainerUploadWorker(QThread):
             wrapped_file = ProgressFileObject(self.file_path, self.progress.emit, lambda: self._is_cancelled)
 
             # Send the PUT request
-            response = requests.put(upload_url, data=wrapped_file, headers=required_headers, timeout=300)
+            response = requests.put(upload_url, data=wrapped_file, headers=required_headers, timeout=(10, 300))
             wrapped_file.close()
             response.raise_for_status()
             self.finished.emit(True, tr("Upload successful! Thank you for your contribution.\nYour trainer will be available for download after passing a manual review."))

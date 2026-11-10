@@ -201,11 +201,6 @@ class SettingsDialog(QDialog):
         self.sortByOriginCheckbox.setChecked(settings["sortByOrigin"])
         settingsWidgetsLayout.addWidget(self.sortByOriginCheckbox)
 
-        # IPv4 only
-        self.ipv4OnlyCheckbox = QCheckBox(tr("Use IPv4 only for network connections"))
-        self.ipv4OnlyCheckbox.setChecked(settings["ipv4Only"])
-        settingsWidgetsLayout.addWidget(self.ipv4OnlyCheckbox)
-
         # Apply button
         applyButtonLayout = QHBoxLayout()
         applyButtonLayout.setContentsMargins(0, 0, 10, 10)
@@ -245,9 +240,7 @@ class SettingsDialog(QDialog):
         settings["sortByOrigin"] = self.sortByOriginCheckbox.isChecked()
         settings["checkAppUpdate"] = self.checkAppUpdateCheckbox.isChecked()
         settings["launchAppOnStartup"] = self.launchAppOnStarupCheckbox.isChecked()
-        settings["ipv4Only"] = self.ipv4OnlyCheckbox.isChecked()
         apply_settings(settings)
-        apply_ipv4_only()
 
         if sys.argv[0].endswith('.exe'):
             app_name = "Game Cheats Manager"
