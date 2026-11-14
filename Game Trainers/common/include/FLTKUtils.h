@@ -58,6 +58,7 @@ struct ToggleData
     std::string optionName;
     Fl_Check_Button *button;
     Fl_Input *input;
+    std::vector<Fl_Widget *> subRows = {}; // indented rows under the toggle, locked while it is on
 };
 
 // Structure to hold a widget pair (button and input)

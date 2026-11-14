@@ -42,6 +42,12 @@
         "version": "2025.11.27"
     },
     {
+        "game_name": "Geometry Dash",
+        "origin": "gcm",
+        "gcm_url": "GCM/GCM Trainers/Geometry Dash Trainer.exe",
+        "version": "2026.11.14"
+    },
+    {
         "game_name": "Headbangers: Rhythm Royale",
         "origin": "gcm",
         "gcm_url": "GCM/GCM Trainers/Headbangers_Rhythm Royale Trainer.exe",

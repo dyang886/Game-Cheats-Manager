@@ -94,6 +94,7 @@ Each cheat is a named modification on [TrainerBase.h](../common/include/TrainerB
 | Keep tunables at original × factor | `scaleValues(name, chain, {fieldOffsets}, factor)` — originals restored on disable |
 | One-off read or write | `readValue(chain, out)` / `writeValue(chain, value)` |
 | Change a live cave's data | `writeCaveData(name, label, value)` |
+| Let a second cave reach the first's data | `caveLabelAddress(name, label)` — name the second so it sorts first; `disableAll()` goes in name order |
 
 A `CodeSite` is an AOB as Cheat Engine prints it — the only signature format, and the one `verify_aobs.py` reads — or `CodeSite::rva(module, rva)` for code no signature pins down. A null module searches all executable memory, which is where JIT-compiled code lives.
 

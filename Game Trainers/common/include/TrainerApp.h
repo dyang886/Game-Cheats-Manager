@@ -43,6 +43,21 @@
 //           ui.subApply("Relock All", handler);   // a second action on the same subject
 //       }
 //
+//       // Under a toggle, the sub-rows are what the handler reads when the toggle is switched on,
+//       // so they lock while it is on - as the toggle's own input does. A sub-toggle can start on.
+//       {
+//           static SubToggle first, second;
+//
+//           ui.toggle(
+//               "Auto Pickup Coins",
+//               [](Trainer &t, bool enable, const Value &, std::string &message)
+//               { return t.toggleCoins(enable, first.on(), second.on(), message); }
+//           );
+//
+//           first = ui.subToggle("Coin 1", true);
+//           second = ui.subToggle("Coin 2", true);
+//       }
+//
 //       ui.column(2);    // everything after this goes to the second column
 //       ui.separator();  // blank row
 //   }
@@ -335,15 +350,18 @@ public:
     }
 
     /// A checkbox indented under the option above, with no handler of its own - that option's
-    /// handler reads it when it fires.
-    SubToggle subToggle(const char *label)
+    /// handler reads it when it fires. It starts ticked when on is set.
+    SubToggle subToggle(const char *label, bool on = false)
     {
         Fl_Flex *target = active();
         Fl_Group *previous = Fl_Group::current();
         Fl_Group::current(target);
         WidgetPair pair = place_indented_toggle_widget(target, label);
         Fl_Group::current(previous);
-        return SubToggle{dynamic_cast<Fl_Check_Button *>(pair.button)};
+        Fl_Check_Button *box = dynamic_cast<Fl_Check_Button *>(pair.button);
+        box->value(on ? 1 : 0);
+        lockWithToggle(box->parent());
+        return SubToggle{box};
     }
 
     /// An Apply button indented under the option above, for a second action on the same subject.
@@ -373,6 +391,7 @@ public:
         Fl_Input *field = place_indented_input_widget(target, label, input.value, input.min,
                                                       input.max, input.type, hover);
         Fl_Group::current(previous);
+        lockWithToggle(field->parent());
         return SubInput{field};
     }
 
@@ -392,6 +411,14 @@ public:
 
 private:
     Fl_Flex *active() const { return columns_[current_]; }
+
+    /// Ties a sub-row to the toggle it sits under, so toggle_callback locks it while that toggle is
+    /// on. Under an apply option there is nothing to tie it to, and it stays editable.
+    void lockWithToggle(Fl_Widget *row)
+    {
+        if (lastToggle_ && row)
+            lastToggle_->subRows.push_back(row);
+    }
 
     void place(const char *label, Input input, Info info, bool isToggle)
     {
@@ -414,9 +441,13 @@ private:
         else if (info.text)
             affordance = create_info_hover(info.text, info_image());
 
+        lastToggle_ = nullptr;
         if (isToggle)
-            place_toggle_widget(target, trainer_, label, label, field,
-                                input.value, input.min, input.max, input.type, affordance);
+        {
+            Fl_Check_Button *button = place_toggle_widget(target, trainer_, label, label, field,
+                                                          input.value, input.min, input.max, input.type, affordance);
+            lastToggle_ = static_cast<ToggleData *>(button->user_data());
+        }
         else
             place_apply_widget(target, trainer_, label, label, field,
                                input.value, input.min, input.max, input.type, affordance);
@@ -444,6 +475,7 @@ private:
     Trainer *trainer_ = nullptr;
     std::vector<Fl_Flex *> columns_;
     int current_ = 0;
+    ToggleData *lastToggle_ = nullptr; // the option sub-rows are being placed under, when a toggle
 };
 
 // The one thing the trainer supplies.
@@ -515,9 +547,13 @@ void toggle_callback(Fl_Widget *, void *data)
         trainer_alert(failure_message("Failed to activate / deactivate.", message, errCapture.str()));
         button->value(isEnabled ? 0 : 1);
     }
-    else if (toggleData->input)
+    else
     {
-        toggleData->input->readonly(isEnabled ? 1 : 0);
+        // What the handler just read stays as it read it until the toggle is off again.
+        if (toggleData->input)
+            toggleData->input->readonly(isEnabled ? 1 : 0);
+        for (Fl_Widget *row : toggleData->subRows)
+            isEnabled ? row->deactivate() : row->activate();
     }
 }
 

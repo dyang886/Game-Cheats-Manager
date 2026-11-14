@@ -427,6 +427,26 @@ protected:
         return address != 0 && readMemory(address, out);
     }
 
+    /// Where a label of a live cave sits - for a second cave that reads or writes the first one's
+    /// data. 0, with the reason on stderr, when there is no such hook or label. Undo the second cave
+    /// before the first: disableAll() goes in name order.
+    uintptr_t caveLabelAddress(const std::string &name, const std::string &label)
+    {
+        auto it = modifications.find(name);
+        if (it == modifications.end() || !it->second.cave)
+        {
+            std::cerr << "[!] '" << name << "' is not an active hook.\n";
+            return 0;
+        }
+        auto offset = it->second.caveLabels.find(label);
+        if (offset == it->second.caveLabels.end())
+        {
+            std::cerr << "[!] The cave of '" << name << "' has no label '" << label << "'.\n";
+            return 0;
+        }
+        return reinterpret_cast<uintptr_t>(it->second.cave) + offset->second;
+    }
+
     // ------------------------------------------------------------------------------------------------
     // Held values
     // ------------------------------------------------------------------------------------------------
@@ -623,23 +643,6 @@ private:
             return false;
         FlushInstructionCache(hProcess, reinterpret_cast<LPCVOID>(address), bytes.size());
         return true;
-    }
-
-    uintptr_t caveLabelAddress(const std::string &name, const std::string &label)
-    {
-        auto it = modifications.find(name);
-        if (it == modifications.end() || !it->second.cave)
-        {
-            std::cerr << "[!] '" << name << "' is not an active hook.\n";
-            return 0;
-        }
-        auto offset = it->second.caveLabels.find(label);
-        if (offset == it->second.caveLabels.end())
-        {
-            std::cerr << "[!] The cave of '" << name << "' has no label '" << label << "'.\n";
-            return 0;
-        }
-        return reinterpret_cast<uintptr_t>(it->second.cave) + offset->second;
     }
 
     static std::vector<SignatureByte> parseSignature(const std::string &signature)
