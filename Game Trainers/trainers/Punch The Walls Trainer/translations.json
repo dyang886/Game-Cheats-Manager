@@ -1,0 +1,42 @@
+{
+    "en_US": {
+        "English": "English",
+        "Please run the game first.": "Please run the game first.",
+        "Please restart the game and the trainer.": "Please restart the game and the trainer.",
+        "Failed to activate.": "Failed to activate.",
+        "Failed to activate / deactivate.": "Failed to activate / deactivate.",
+        "Process Name:": "Process Name:",
+        "Process ID:": "Process ID:",
+        "Punch The Walls Trainer": "Punch The Walls Trainer",
+        "Apply": "Apply",
+        "Set Coins": "Set Coins",
+        "Set Dynamite": "Set Dynamite",
+        "Set C4": "Set C4",
+        "Set Vacuum Capacity": "Set Vacuum Capacity",
+        "Clear Vacuum": "Clear Vacuum",
+        "No Debris": "No Debris",
+        "Please load a save first.": "Please load a save first.",
+        "No Charge Cooldown": "No Charge Cooldown",
+        "Shredder Payouts Multiplier": "Shredder Payouts Multiplier"
+    },
+    "zh_CN": {
+        "简体中文": "简体中文",
+        "Please run the game first.": "请先运行游戏。",
+        "Please restart the game and the trainer.": "请重启游戏和修改器。",
+        "Failed to activate.": "激活失败。",
+        "Failed to activate / deactivate.": "激活 / 停用失败。",
+        "Process Name:": "进程名称：",
+        "Process ID:": "进程 ID:",
+        "Punch The Walls Trainer": "Punch The Walls 修改器",
+        "Apply": "应用",
+        "Set Coins": "设置金币",
+        "Set Dynamite": "设置炸药",
+        "Set C4": "设置 C4",
+        "Set Vacuum Capacity": "设置集尘桶容量",
+        "Clear Vacuum": "清空集尘桶",
+        "No Debris": "不掉落方块",
+        "Please load a save first.": "请先读取存档。",
+        "No Charge Cooldown": "蓄力拳无冷却",
+        "Shredder Payouts Multiplier": "粉碎机收益倍率"
+    }
+}

@@ -41,6 +41,8 @@ Runtime is decided by what is on disk:
 | Electron / NW.js / Chromium layout, `resources/app.asar` | `cdp` | `CDPBase` |
 | A native executable with none of the above | `none` | `TrainerBase` |
 
+For `mono`, the same listing answers one more question: **which .NET level the game was built at.** Look in `<Game>_Data/Managed/` for `netstandard.dll`. With it, the game is at Unity's .NET Standard level; with only `mscorlib.dll`, it is at the .NET Framework level. This decides the payload's target framework — see [The payload](#the-payload) — and getting it wrong produces a payload that builds cleanly and fails on every cheat in-game.
+
 > ### ⚠ A `none` trainer is found live, never invented
 >
 > A `none` trainer has no managed metadata and no injected payload. It reaches the game through AOB-located code caves and byte patches and through pointer chains from static roots — and none of that is derivable from the files on disk. It comes from a live session: the game running, the user changing a value when asked, Cheat Engine scanning and watching for what changed.
@@ -61,7 +63,9 @@ For every runtime, confirm you have the tool you need before promising anything.
 
 Put the tool's output in a folder **inside the game's install directory**, not in this repo — dumps are large, game-specific and disposable.
 
-Report the architecture, the runtime and your go/no-go before you start writing code.
+For `mono`, install the decompiler with `dotnet tool install ilspycmd --version 9.1.0.7988 --tool-path tools/ILSpy` — the unpinned install fails — and dump with `tools\ILSpy\ilspycmd.exe -p -o "<game dir>\GCM_Dump" "<Game>_Data\Managed\Assembly-CSharp.dll"`. The install also brings the Mono.Cecil that [the payload check](#step-6--build-and-verify) runs on.
+
+Report the architecture, the runtime (and for `mono`, the .NET level) and your go/no-go before you start writing code.
 
 ---
 
@@ -143,9 +147,22 @@ When you trace the game's logic, **take the clean path**. If flipping a private 
 
 #### The payload
 
-For `mono`, `Mono.cs` is compiled to `Mono.dll` and injected. `MonoBase` calls `GCMInjection.Initialize()` once, so that class is the entry point; `SendData` logs and `SendResponse` answers the trainer. Copy the dispatcher, `RunCheat` and `Tick` from [Rhythm Doctor Trainer/Mono.cs](../trainers/Rhythm%20Doctor%20Trainer/Mono.cs) — that plumbing is final and should not be redesigned per game.
+For `mono`, `Mono.cs` is compiled to `Mono.dll` and injected. `MonoBase` calls `GCMInjection.Initialize()` once, so that class is the entry point; `SendData` logs and `SendResponse` answers the trainer. Copy the dispatcher, `RunCheat` and `Tick` from [Rhythm Doctor Trainer/Mono.cs](../trainers/Rhythm%20Doctor%20Trainer/Mono.cs) — that plumbing is final and should not be redesigned per game, with the one exception below for games that stop in the background.
 
 `Mono.csproj` references the game's own assemblies by absolute `HintPath`. Point them at the install directory the user gave you, and include whatever the cheats actually touch — typically `UnityEngine`, `UnityEngine.CoreModule` and `Assembly-CSharp`.
+
+**Its target framework follows the game's .NET level** (found in Step 2), not a house default:
+
+| `<Game>_Data/Managed/` has | Game built at | `Mono.csproj` | Example |
+|---|---|---|---|
+| `netstandard.dll` | .NET Standard | `<TargetFramework>netstandard2.1</TargetFramework>` | [Rhythm Doctor](../trainers/Rhythm%20Doctor%20Trainer/Mono.csproj) |
+| `mscorlib.dll`, no `netstandard.dll` | .NET Framework | `<TargetFramework>net472</TargetFramework>` and `<GenerateTargetFrameworkAttribute>false</GenerateTargetFrameworkAttribute>` | [Punch The Walls](../trainers/Punch%20The%20Walls%20Trainer/Mono.csproj) |
+
+A `netstandard2.1` payload in a game without `netstandard.dll` cannot resolve even `System.Object`, so none of its classes load: the build is clean, the injection succeeds, and every cheat fails with MonoBridge's `Failed to find class`. `net472` references `mscorlib` directly, which is what such a game has. The extra property drops the `TargetFrameworkAttribute` the SDK stamps on the assembly, since that type is stripped from these games too. `add_trainer()` builds with `dotnet build -o`, so the output path does not depend on the framework.
+
+**The game's assemblies are also stripped, overload by overload.** Unity removes everything the game itself never calls, so the `mscorlib` a payload runs against is far smaller than the one it compiles against. In Punch The Walls, `Math.Min(double, double)` is gone while `Math.Max(double, double)` and `Math.Round` remain. A call like that compiles, then throws `MissingMethodException` when the cheat reaches it. Prefer plain arithmetic and comparisons to BCL helpers in a payload, and let the payload check in Step 6 confirm the rest.
+
+**Some games stop running frames when they lose focus.** The reference `RunCheat` queues each cheat for the game's main thread, and the trainer waits up to 5 seconds for the reply. A Unity game with *Run In Background* turned off runs no frames while unfocused — and the trainer always has the focus when it is clicked. The symptom: every click freezes the trainer until the user switches back to the game, or fails after 5 seconds if they don't. `Application.runInBackground` cannot simply be switched on, because the game never sets it and its setter is stripped. Instead, each entry point records the request in a single field and answers on the trainer's own thread, and `Tick()` applies it on the main thread the next time the game runs a frame — see [Punch The Walls](../trainers/Punch%20The%20Walls%20Trainer/Mono.cs). That suits cheats that hold a value or a switch. A cheat that has to act on game state at the moment of the click, or refuse because of it, still needs the queued form, and so the focus problem with it.
 
 ---
 
@@ -193,6 +210,17 @@ Beyond your own option labels, the framework itself needs these keys:
 
 Build **Debug and Release** before calling it done; they have diverged before. The executable lands in `build/bin/<Game> Trainer/`.
 
+For `mono`, **check the payload against the game** after the build:
+
+```powershell
+.\tools\mono\verify_payload.ps1 "<Game> Trainer"
+.\tools\mono\verify_payload.ps1 -Payload <Mono.dll> -Managed "<Game>_Data\Managed"   # anything else
+```
+
+It resolves every type and member `Mono.dll` references against the game's `Managed` folder — the folder `Mono.csproj`'s `HintPath`s point at — and nothing else, and lists whatever is not there. A wrong target framework shows up as a missing `netstandard.dll`, with the fix printed beneath; a stripped member shows up by its full signature. Neither is visible at build time, and both are certain failures in-game, so it must end on `OK` (exit code 0) before the trainer goes to the user. It finds both the `add_trainer()` build output and the `Mono.dll` older trainers check in, so it works on those too — and a game update that removes something an existing trainer uses shows up the same way.
+
+Like everything under `tools/`, the script is local to this machine and not in git.
+
 Then confirm the source folder is still clean — `git status` should show your seven files and nothing else. A stray `bin/`, `obj/` or `Mono.dll` in the trainer folder means an IDE design-time build leaked into it.
 
 > ### ⚠ Do not run the trainer
@@ -202,13 +230,15 @@ Then confirm the source folder is still clean — `git status` should show your 
 > Running it proves very little anyway: trainers embed `requireAdministrator`, so they run elevated, and synthetic input from a non-elevated shell is blocked by UIPI. You cannot click a widget, and nothing happening tells you nothing about your code.
 >
 > Report what you built and what you could not check, and let the user exercise it against the running game.
+>
+> When you hand back a **payload fix** for `mono`, tell the user to restart the game first. The injected assembly stays loaded for the life of the process and a new one with the same name is not loaded over it, so the old payload — and any state it left behind — keeps running until the game restarts.
 
 ---
 
 ### Checklist
 
 1. Game path and feature list obtained from the user — **ask and stop if either is missing**
-2. Architecture and runtime determined from the install directory
+2. Architecture and runtime determined from the install directory; for `mono`, the .NET level too (`netstandard.dll` in `Managed/` or not)
 3. `none` runtime → [native_trainer_discovery.md](native_trainer_discovery.md): every cheat proven live, CE patches released, `verify_aobs.py` clean
 4. Dump tool run, artifacts left inside the game's install directory
 5. Folder created with the seven files, named `<Game Name> Trainer`, `_` for any `": "`
@@ -217,4 +247,5 @@ Then confirm the source folder is still clean — `git status` should show your 
 8. Every failure path carries its real reason through to the alert
 9. `translations.json` complete in both languages, framework keys included
 10. Debug and Release both build; source folder clean
-11. Trainer not launched; layout and behaviour handed to the user to confirm
+11. `mono` → `Mono.csproj` targets the game's .NET level, and `tools\mono\verify_payload.ps1` ends on `OK`
+12. Trainer not launched; layout and behaviour handed to the user to confirm

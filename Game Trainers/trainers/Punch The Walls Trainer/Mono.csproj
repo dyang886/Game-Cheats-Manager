@@ -1,0 +1,31 @@
+<Project Sdk="Microsoft.NET.Sdk">
+  <PropertyGroup>
+    <!-- The game is built at Unity's .NET Framework level: its Managed folder has mscorlib but no
+         netstandard.dll, so a netstandard payload cannot resolve System.Object and its classes
+         never load. net472 references mscorlib directly. -->
+    <TargetFramework>net472</TargetFramework>
+    <!-- That mscorlib is also stripped, and TargetFrameworkAttribute is not in it. -->
+    <GenerateTargetFrameworkAttribute>false</GenerateTargetFrameworkAttribute>
+    <OutputType>Library</OutputType>
+    <DebugType>none</DebugType>
+    <DebugSymbols>false</DebugSymbols>
+    <EnableDefaultCompileItems>false</EnableDefaultCompileItems>
+  </PropertyGroup>
+  <ItemGroup>
+    <Compile Include="Mono.cs" />
+  </ItemGroup>
+  <ItemGroup>
+    <Reference Include="UnityEngine">
+      <HintPath>F:/SteamLibrary/steamapps/common/Punch The Walls/PunchTheWalls_Data/Managed/UnityEngine.dll</HintPath>
+      <Private>false</Private>
+    </Reference>
+    <Reference Include="UnityEngine.CoreModule">
+      <HintPath>F:/SteamLibrary/steamapps/common/Punch The Walls/PunchTheWalls_Data/Managed/UnityEngine.CoreModule.dll</HintPath>
+      <Private>false</Private>
+    </Reference>
+    <Reference Include="Assembly-CSharp">
+      <HintPath>F:/SteamLibrary/steamapps/common/Punch The Walls/PunchTheWalls_Data/Managed/Assembly-CSharp.dll</HintPath>
+      <Private>false</Private>
+    </Reference>
+  </ItemGroup>
+</Project>
