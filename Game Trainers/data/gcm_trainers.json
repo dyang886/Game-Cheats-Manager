@@ -900,7 +900,7 @@
         "author": "简简单单2022",
         "official_url": "https://bbs.3dmgame.com/thread-6653672-1-1.html",
         "gcm_url": "GCM/GCM Trainers/Long Yin Li Zhi Zhuan Trainer [JianJianDanDan2022].ct",
-        "version": "2026.7.28"
+        "version": "2026.8.21"
     },
     {
         "game_name": "Loot of Baal",
@@ -1152,7 +1152,7 @@
         "author": "LHY1339",
         "official_url": "https://github.com/LHY1339/cheat_escape_the_backrooms",
         "gcm_url": "GCM/GCM Trainers/Escape the Backrooms Trainer [LHY1339].exe",
-        "version": "2026.9.1"
+        "version": "2026.11.16"
     },
     {
         "game_name": "Castlevania Advance Collection",
@@ -4597,7 +4597,7 @@
         "origin": "ct_other",
         "author": "Cidrow",
         "official_url": "https://fearlessrevolution.com/viewtopic.php?p=443065#p443065",
-        "gcm_url": "GCM/GCM Trainers/FRONT MISSION 3_Remake Trainer [Cidrow].ct",
+        "gcm_url": "GCM/GCM Trainers/FRONT MISSION 3_Remake Trainer [Cidrow].zip",
         "version": "2026.2.16"
     },
     {
@@ -5812,7 +5812,7 @@
         "origin": "ct_other",
         "author": "HIHello",
         "gcm_url": "GCM/GCM Trainers/Minimalist Tower Defense Trainer [HIHello].ct",
-        "version": "2026.9.17"
+        "version": "2026.11.20"
     },
     {
         "game_name": "Call of Duty: WWII",
@@ -6517,7 +6517,7 @@
         "author": "LKong621",
         "official_url": "https://github.com/lengkonglovelife/Sora2Tools, https://www.bilibili.com/video/BV1coh86vEAt",
         "gcm_url": "GCM/GCM Trainers/Trails in the Sky 2nd Chapter Trainer [LKong621].zip",
-        "version": "2026.10.5"
+        "version": "2026.10.31"
     },
     {
         "game_name": "Tale of Wuxia",
@@ -7407,5 +7407,461 @@
         "author": "CT1",
         "gcm_url": "GCM/GCM Trainers/Wanderburg Trainer [CT1].ct",
         "version": "2026.10.28"
+    },
+    {
+        "game_name": "Grand Theft Auto: Vice City",
+        "origin": "other",
+        "author": "Tweis",
+        "official_url": "https://mod.3dmgame.com/mod/204382",
+        "gcm_url": "GCM/GCM Trainers/Grand Theft Auto_Vice City Trainer [Tweis].exe",
+        "version": "2023.11.29"
+    },
+    {
+        "game_name": "Sid Meier's Civilization: Beyond Earth",
+        "origin": "other",
+        "author": "游侠网",
+        "official_url": "https://patch.ali213.net/showpatch/48085.html",
+        "gcm_url": "GCM/GCM Trainers/Sid Meier's Civilization_Beyond Earth Trainer [YouXiaWang].zip",
+        "version": "2015.10.12"
+    },
+    {
+        "game_name": "Robolife-Days with Aino",
+        "origin": "other",
+        "author": "OT1",
+        "gcm_url": "GCM/GCM Trainers/Robolife-Days with Aino Trainer [OT1].zip",
+        "version": "2026.11.6"
+    },
+    {
+        "game_name": "ALL WILL FALL",
+        "origin": "other",
+        "author": "OT1",
+        "custom_name_en": "Save Editor",
+        "custom_name_zh": "存档编辑器",
+        "gcm_url": "GCM/GCM Trainers/ALL WILL FALL Save Editor [OT1].zip",
+        "extension": "run.bat",
+        "version": "2026.11.3"
+    },
+    {
+        "game_name": "Age of Wonders III",
+        "origin": "other",
+        "author": "OT1",
+        "gcm_url": "GCM/GCM Trainers/Age of Wonders III Trainer [OT1].exe",
+        "version": "2026.11.13"
+    },
+    {
+        "game_name": "Brick by Brick: Tidy Up the Small Town!",
+        "origin": "other",
+        "author": "OT1",
+        "gcm_url": "GCM/GCM Trainers/Brick by Brick_Tidy Up the Small Town! Trainer [OT1].zip",
+        "version": "2026.10.16"
+    },
+    {
+        "game_name": "Chained Beasts",
+        "origin": "other",
+        "author": "Rabbit1623",
+        "gcm_url": "GCM/GCM Trainers/Chained Beasts Trainer [Rabbit1623].exe",
+        "version": "2026.11.10"
+    },
+    {
+        "game_name": "Danganronpa: Trigger Happy Havoc",
+        "origin": "ct_other",
+        "author": "jaxsonbateman",
+        "official_url": "https://fearlessrevolution.com/viewtopic.php?p=165734#p165734, https://bbs.3dmgame.com/thread-6676825-1-1.html",
+        "gcm_url": "GCM/GCM Trainers/Danganronpa_Trigger Happy Havoc Trainer [jaxsonbateman].zip",
+        "version": "2020.11.18"
+    },
+    {
+        "game_name": "Darksiders II Deathinitive Edition",
+        "origin": "other",
+        "author": "MrAntiFun",
+        "official_url": "https://mrantifun.net/threads/darksiders-ii-deathinitive-edition-trainer.5971",
+        "gcm_url": "GCM/GCM Trainers/Darksiders II Deathinitive Edition Trainer [MrAntiFun].exe",
+        "version": "2015.11.8"
+    },
+    {
+        "game_name": "Deadly Days",
+        "origin": "ct_other",
+        "author": "Karina",
+        "gcm_url": "GCM/GCM Trainers/Deadly Days Trainer [Karina].ct",
+        "version": "2026.11.6"
+    },
+    {
+        "game_name": "Pankapu",
+        "origin": "other",
+        "author": "OT1",
+        "gcm_url": "GCM/GCM Trainers/Pankapu Trainer [OT1].zip",
+        "extension": "潘卡普守梦人修改器.bat",
+        "version": "2026.11.3"
+    },
+    {
+        "game_name": "Dragon Cliff",
+        "origin": "other",
+        "author": "OT1",
+        "gcm_url": "GCM/GCM Trainers/Dragon Cliff Trainer [OT1].exe",
+        "version": "2026.11.18"
+    },
+    {
+        "game_name": "Tales of Eternia Remastered",
+        "origin": "ct_other",
+        "author": "Sora3100",
+        "official_url": "https://github.com/Sora3100/Tales_of_Cheat_Tables",
+        "gcm_url": "GCM/GCM Trainers/Tales of Eternia Remastered Trainer [Sora3100].zip",
+        "version": "2026.10.30"
+    },
+    {
+        "game_name": "Fire Emblem: Fortune's Weave",
+        "origin": "other",
+        "author": "Antiadvocate",
+        "custom_name_en": "Save Editor",
+        "custom_name_zh": "存档编辑器",
+        "official_url": "https://github.com/Antiadvocate/fefw-editor",
+        "gcm_url": "GCM/GCM Trainers/Fire Emblem_Fortune's Weave Save Editor [Antiadvocate].zip",
+        "version": "2026.11.7"
+    },
+    {
+        "game_name": "Farm & Feast",
+        "origin": "ct_other",
+        "author": "Tahtawy",
+        "official_url": "https://fearlessrevolution.com/viewtopic.php?t=41446",
+        "gcm_url": "GCM/GCM Trainers/Farm & Feast Trainer [Tahtawy].ct",
+        "version": "2026.11.15"
+    },
+    {
+        "game_name": "Flotsam",
+        "origin": "other",
+        "author": "天堂没有黄焖鸡",
+        "official_url": "https://www.bilibili.com/video/BV1iq4p68Ern",
+        "gcm_url": "GCM/GCM Trainers/Flotsam Trainer [TianTangMeiYouHuangMenJi].zip",
+        "version": "2026.11.12"
+    },
+    {
+        "game_name": "Hordes of Azeroth",
+        "origin": "other",
+        "author": "OT1",
+        "custom_name_en": "Save Editor",
+        "custom_name_zh": "存档编辑器",
+        "gcm_url": "GCM/GCM Trainers/Hordes of Azeroth Save Editor [OT1].exe",
+        "version": "2026.11.4"
+    },
+    {
+        "game_name": "I Am Legion: Stand Survivors",
+        "origin": "other",
+        "author": "OT1",
+        "gcm_url": "GCM/GCM Trainers/I Am Legion_Stand Survivors Trainer [OT1].exe",
+        "version": "2026.11.12"
+    },
+    {
+        "game_name": "Kingdom Rush Origins - Tower Defense",
+        "origin": "other",
+        "author": "GLycs",
+        "official_url": "https://github.com/GLycs/KR3OriginsTrainer",
+        "gcm_url": "GCM/GCM Trainers/Kingdom Rush Origins - Tower Defense Trainer [GLycs].exe",
+        "version": "2026.11.3"
+    },
+    {
+        "game_name": "Lost Castle 2",
+        "origin": "other",
+        "author": "kkk",
+        "gcm_url": "GCM/GCM Trainers/Lost Castle 2 Trainer [kkk].zip",
+        "extension": "none",
+        "version": "2026.11.16"
+    },
+    {
+        "game_name": "LARA CROFT AND THE TEMPLE OF OSIRIS",
+        "origin": "other",
+        "author": "OT1",
+        "gcm_url": "GCM/GCM Trainers/LARA CROFT AND THE TEMPLE OF OSIRIS Trainer [OT1].zip",
+        "version": "2026.11.18"
+    },
+    {
+        "game_name": "Mayday Airways",
+        "origin": "other",
+        "author": "OT1",
+        "gcm_url": "GCM/GCM Trainers/Mayday Airways Trainer [OT1].zip",
+        "version": "2026.11.17"
+    },
+    {
+        "game_name": "Nova Drift",
+        "origin": "ct_other",
+        "author": "QCNX",
+        "gcm_url": "GCM/GCM Trainers/Nova Drift Trainer [QCNX].ct",
+        "version": "2026.11.16"
+    },
+    {
+        "game_name": "Persona 3 Reload",
+        "origin": "ct_other",
+        "author": "Tuuuup!",
+        "official_url": "https://fearlessrevolution.com/viewtopic.php?t=27607",
+        "gcm_url": "GCM/GCM Trainers/Persona 3 Reload Trainer [Tuuuup!].zip",
+        "version": "2025.12.28"
+    },
+    {
+        "game_name": "Phantom Blade Zero",
+        "origin": "other",
+        "author": "qry6868",
+        "custom_name_en": "Save Editor",
+        "custom_name_zh": "存档编辑器",
+        "official_url": "https://github.com/qry6868/PBZ-Editor",
+        "gcm_url": "GCM/GCM Trainers/Phantom Blade Zero Save Editor [qry6868].zip",
+        "version": "2026.11.1"
+    },
+    {
+        "game_name": "Chinese Paladin: Sword and Fairy",
+        "origin": "other",
+        "author": "ZNONE",
+        "custom_name_en": "Save Editor",
+        "custom_name_zh": "存档编辑器",
+        "gcm_url": "GCM/GCM Trainers/Chinese Paladin_Sword and Fairy Save Editor [ZNONE].exe",
+        "version": "2006.3.5"
+    },
+    {
+        "game_name": "Palworld",
+        "origin": "other",
+        "author": "oMaN-Rod",
+        "custom_name_en": "Save Editor",
+        "custom_name_zh": "存档编辑器",
+        "official_url": "https://github.com/oMaN-Rod/palstudio",
+        "gcm_url": "GCM/GCM Trainers/Palworld Save Editor [oMaN-Rod].zip",
+        "version": "2026.9.14"
+    },
+    {
+        "game_name": "Phantom Blade Zero",
+        "origin": "other",
+        "author": "Veechen",
+        "official_url": "https://www.nexusmods.com/phantombladezero/mods/145",
+        "gcm_url": "GCM/GCM Trainers/Phantom Blade Zero Trainer [Veechen].exe",
+        "version": "2026.11.4"
+    },
+    {
+        "game_name": "Project Tomorrow",
+        "origin": "other",
+        "author": "含蓄的大鲨鱼",
+        "gcm_url": "GCM/GCM Trainers/Project Tomorrow Trainer [HanXuDeDaShaYu].exe",
+        "version": "2026.11.9"
+    },
+    {
+        "game_name": "SCUM",
+        "origin": "other",
+        "author": "Ares",
+        "custom_name_en": "Admin Helper",
+        "custom_name_zh": "管理员助手",
+        "official_url": "https://scumadminhelper.com",
+        "gcm_url": "GCM/GCM Trainers/SCUM Admin Helper [Ares].zip",
+        "extension": "SCUM Admin Helper.exe",
+        "version": "2026.11.13"
+    },
+    {
+        "game_name": "Silver Pines",
+        "origin": "other",
+        "author": "OT1",
+        "gcm_url": "GCM/GCM Trainers/Silver Pines Trainer [OT1].exe",
+        "version": "2026.11.10"
+    },
+    {
+        "game_name": "Slotbound",
+        "origin": "other",
+        "author": "Rabbit1623",
+        "gcm_url": "GCM/GCM Trainers/Slotbound Trainer [Rabbit1623].exe",
+        "version": "2026.11.13"
+    },
+    {
+        "game_name": "Slotbound",
+        "origin": "ct_other",
+        "author": "DhaosCollider",
+        "official_url": "https://fearlessrevolution.com/viewtopic.php?t=41449",
+        "gcm_url": "GCM/GCM Trainers/Slotbound Trainer [DhaosCollider].ct",
+        "version": "2026.11.14"
+    },
+    {
+        "game_name": "Transport Fever 3",
+        "origin": "other",
+        "author": "hk9992221",
+        "official_url": "https://github.com/hk9992221/transport-fever-3-modifier",
+        "gcm_url": "GCM/GCM Trainers/Transport Fever 3 Trainer [hk9992221].exe",
+        "version": "2026.10.31"
+    },
+    {
+        "game_name": "VOID/BREAKER",
+        "origin": "other",
+        "author": "鸽子不吃比目鱼",
+        "official_url": "https://www.bilibili.com/video/BV1Jj4q63EJq",
+        "gcm_url": "GCM/GCM Trainers/VOID_BREAKER Trainer [GeZiBuChiBiMuYu].zip",
+        "version": "2026.11.12"
+    },
+    {
+        "game_name": "WARNO",
+        "origin": "ct_other",
+        "author": "shearerc",
+        "official_url": "https://fearlessrevolution.com/viewtopic.php?t=29921",
+        "gcm_url": "GCM/GCM Trainers/WARNO Trainer [shearerc].ct",
+        "version": "2026.8.25"
+    },
+    {
+        "game_name": "World Apart",
+        "origin": "other",
+        "author": "czdsdo",
+        "custom_name_en": "Save Editor",
+        "custom_name_zh": "存档编辑器",
+        "official_url": "https://github.com/czdsdo/WorldApartSaveEditor",
+        "gcm_url": "GCM/GCM Trainers/World Apart Save Editor [czdsdo].exe",
+        "version": "2026.11.14"
+    },
+    {
+        "game_name": "GUNTOUCHABLES",
+        "origin": "ct_other",
+        "author": "HIHello",
+        "gcm_url": "GCM/GCM Trainers/GUNTOUCHABLES Trainer [HIHello].ct",
+        "version": "2026.11.4"
+    },
+    {
+        "game_name": "Summer Memories",
+        "origin": "other",
+        "author": "OT1",
+        "custom_name_en": "Save Editor",
+        "custom_name_zh": "存档编辑器",
+        "gcm_url": "GCM/GCM Trainers/Summer Memories Save Editor [OT1].zip",
+        "version": "2026.11.16"
+    },
+    {
+        "game_name": "Cry of Fear",
+        "origin": "other",
+        "author": "OT1",
+        "gcm_url": "GCM/GCM Trainers/Cry of Fear Trainer [OT1].zip",
+        "version": "2026.10.20"
+    },
+    {
+        "game_name": "World Apart",
+        "origin": "other",
+        "author": "好吃",
+        "official_url": "https://github.com/vjc9wrh9r9-boop/WorldApart-GUI-Trainer",
+        "gcm_url": "GCM/GCM Trainers/World Apart Trainer [HaoChi].zip",
+        "version": "2026.11.14"
+    },
+    {
+        "game_name": "Wall World Strategy",
+        "origin": "ct_other",
+        "author": "0Garad0",
+        "gcm_url": "GCM/GCM Trainers/Wall World Strategy Trainer [0Garad0].ct",
+        "version": "2026.11.15"
+    },
+    {
+        "game_name": "Dream Town Island",
+        "origin": "other",
+        "author": "OT1",
+        "gcm_url": "GCM/GCM Trainers/Dream Town Island Trainer [OT1].zip",
+        "version": "2026.11.3"
+    },
+    {
+        "game_name": "Leap of Fate",
+        "origin": "other",
+        "author": "OT1",
+        "gcm_url": "GCM/GCM Trainers/Leap of Fate Trainer [OT1].exe",
+        "version": "2026.11.9"
+    },
+    {
+        "game_name": "Empires of the Undergrowth",
+        "origin": "ct_other",
+        "author": "尘明",
+        "gcm_url": "GCM/GCM Trainers/Empires of the Undergrowth Trainer [ChenMing].ct",
+        "version": "2026.10.22"
+    },
+    {
+        "game_name": "Age of Wonders 4",
+        "origin": "ct_other",
+        "author": "缤纷颜色",
+        "official_url": "https://www.bilibili.com/video/BV1cGpczCENk",
+        "gcm_url": "GCM/GCM Trainers/Age of Wonders 4 Trainer [BinFenYanSe].ct",
+        "version": "2025.9.14"
+    },
+    {
+        "game_name": "Demon's Souls",
+        "origin": "other",
+        "author": "U0xCODE",
+        "official_url": "https://www.bilibili.com/video/BV1o1sA6vEur",
+        "gcm_url": "GCM/GCM Trainers/Demon's Souls Trainer [U0xCODE].exe",
+        "version": "2026.11.16"
+    },
+    {
+        "game_name": "Warriors Orochi Z",
+        "origin": "other",
+        "author": "kaien",
+        "gcm_url": "GCM/GCM Trainers/Warriors Orochi Z Trainer [kaien].exe",
+        "version": "2009.12.29"
+    },
+    {
+        "game_name": "Plants vs. Zombies",
+        "origin": "other",
+        "author": "mtohoem",
+        "gcm_url": "GCM/GCM Trainers/Plants vs. Zombies Trainer [mtohoem].exe",
+        "version": "2017.10.2"
+    },
+    {
+        "game_name": "Protean Fox",
+        "origin": "other",
+        "author": "Mr.差不多",
+        "gcm_url": "GCM/GCM Trainers/Protean Fox Trainer [Mr.ChaBuDuo].zip",
+        "version": "2026.11.10"
+    },
+    {
+        "game_name": "Zuma's Revenge!",
+        "origin": "other",
+        "author": "OT1",
+        "gcm_url": "GCM/GCM Trainers/Zuma's Revenge! Trainer [OT1].exe",
+        "version": "2026.11.18"
+    },
+    {
+        "game_name": "Slotbound",
+        "origin": "other",
+        "author": "OT1",
+        "gcm_url": "GCM/GCM Trainers/Slotbound Trainer [OT1].exe",
+        "version": "2026.11.17"
+    },
+    {
+        "game_name": "Slotbound",
+        "origin": "other",
+        "author": "OT2",
+        "gcm_url": "GCM/GCM Trainers/Slotbound Trainer [OT2].zip",
+        "extension": "转运军团修改器.bat",
+        "version": "2026.11.19"
+    },
+    {
+        "game_name": "Re2 I Rise Alone",
+        "origin": "other",
+        "author": "茶可力豆",
+        "gcm_url": "GCM/GCM Trainers/Re2 I Rise Alone Trainer [ChaKeLiDou].exe",
+        "version": "2026.11.16"
+    },
+    {
+        "game_name": "BM game Co.",
+        "origin": "other",
+        "author": "Ray",
+        "custom_name_en": "Save Editor",
+        "custom_name_zh": "存档编辑器",
+        "gcm_url": "GCM/GCM Trainers/BM game Co. Save Editor [Ray].zip",
+        "version": "2026.11.19"
+    },
+    {
+        "game_name": "Magicraft",
+        "origin": "other",
+        "author": "Jim97",
+        "official_url": "https://mod.3dmgame.com/mod/204543",
+        "gcm_url": "GCM/GCM Trainers/Magicraft Trainer [Jim97].exe",
+        "version": "2026.10.17"
+    },
+    {
+        "game_name": "Phantom Blade Zero",
+        "origin": "ct_other",
+        "author": "Fedskay",
+        "official_url": "https://www.nexusmods.com/phantombladezero/mods/343",
+        "gcm_url": "GCM/GCM Trainers/Phantom Blade Zero Trainer [Fedskay].zip",
+        "version": "2026.11.1"
+    },
+    {
+        "game_name": "Worst Class Ever",
+        "origin": "other",
+        "author": "Yeah_s肥羊",
+        "official_url": "https://www.bilibili.com/video/BV1JTW26tEdA",
+        "gcm_url": "GCM/GCM Trainers/Worst Class Ever Trainer [Yeah_sFeiYang].zip",
+        "version": "2026.11.11"
     }
 ]
