@@ -616,6 +616,10 @@ class DownloadBaseThread(QThread):
         elif not is_chinese(target_name) and target_language == 'en':
             return None
 
+        # Fail without translation data, so a name is never returned untranslated
+        if not translation_index.has_data():
+            raise ValueError("translations.json is missing or empty in the database path.")
+
         # Exact (cached dict) lookup first, fuzzy fallback within the index
         return translation_index.translate(target_name, target_language, threshold)
 

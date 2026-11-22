@@ -209,20 +209,24 @@ class TranslationIndex:
             data = json.loads(raw) if raw else []
         except ValueError:
             data = []
-        self.en_to_zh, self.zh_to_en = {}, {}
-        self.en_items, self.zh_items, self.zh_pinyin = [], [], []
+        en_to_zh, zh_to_en = {}, {}
+        en_items, zh_items, zh_pinyin = [], [], []
         for trainer in data:
             en, zh = trainer.get('en_US'), trainer.get('zh_CN')
             if not en or not zh:
                 continue
             se, sz = sanitize(en), sanitize(zh)
-            self.en_to_zh.setdefault(se, zh)
-            self.zh_to_en.setdefault(sz, en)
-            self.en_items.append((se, zh))
-            self.zh_items.append((sz, en))
+            en_to_zh.setdefault(se, zh)
+            zh_to_en.setdefault(sz, en)
+            en_items.append((se, zh))
+            zh_items.append((sz, en))
             concat, tokens = pinyin_forms(zh)
-            self.zh_pinyin.append((concat, tokens, en))
-        self.en_keys, self.zh_keys = list(self.en_to_zh), list(self.zh_to_en)
+            zh_pinyin.append((concat, tokens, en))
+
+        # Swapped in whole, so another thread never sees a half-built index
+        self.en_to_zh, self.zh_to_en = en_to_zh, zh_to_en
+        self.en_items, self.zh_items, self.zh_pinyin = en_items, zh_items, zh_pinyin
+        self.en_keys, self.zh_keys = list(en_to_zh), list(zh_to_en)
         self._hash, self._built = digest, True
 
     def has_data(self):
@@ -233,10 +237,12 @@ class TranslationIndex:
         """Translate name into target_language ('en'/'zh'): exact dict, then fuzzy fallback."""
         self._ensure_built()
         key = sanitize(name)
-        if target_language == 'zh':
-            mapping, keys = self.en_to_zh, self.en_keys
-        else:
-            mapping, keys = self.zh_to_en, self.zh_keys
+        # Read together, so both come from the same build
+        with self._lock:
+            if target_language == 'zh':
+                mapping, keys = self.en_to_zh, self.en_keys
+            else:
+                mapping, keys = self.zh_to_en, self.zh_keys
         if key in mapping:
             return mapping[key]
         if not keys:

@@ -23,7 +23,7 @@ except ImportError:
         raise RuntimeError('Request signing is unavailable in this build')
 
 
-APP_VERSION = "2.5.5"
+APP_VERSION = "2.5.6-beta.1"
 
 
 def parse_version(version):

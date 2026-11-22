@@ -73,18 +73,18 @@ class UpdateTrainers(DownloadBaseThread):
                 new_version = entry['version']
                 gcm_url = entry['gcm_url']
                 if current_version and new_version != current_version:
+                    # Includes the fields a fresh install is named from
                     update_info = {
                         "game_name": game_name,
                         "trainer_name": trainer_name,
-                        "trainer_dir": trainer_dir,
-                        "origin": origin,
+                        "trainer_dirs": [trainer_dir],
+                        "origin": entry.get('origin') or origin,
                         "url": gcm_url,
                         "version": new_version
                     }
-                    if entry.get('extension'):
-                        update_info["extension"] = entry['extension']
-                    if entry.get('custom_name'):
-                        update_info["custom_name"] = entry['custom_name']
+                    for field in ("extension", "author", "custom_name", "custom_name_en", "custom_name_zh"):
+                        if entry.get(field):
+                            update_info[field] = entry[field]
                     return update_info
                 return None
             return None
@@ -102,6 +102,7 @@ class UpdateTrainers(DownloadBaseThread):
                 shutil.rmtree(VERSION_TEMP_DIR)
 
             futures = []
+            results = []
             with concurrent.futures.ThreadPoolExecutor(max_workers=5) as executor:
                 for _, trainer_path in self.trainers.items():
                     future = executor.submit(self.check_trainer_update, trainer_path)
@@ -110,7 +111,19 @@ class UpdateTrainers(DownloadBaseThread):
                 for future in concurrent.futures.as_completed(futures):
                     result = future.result()
                     if result:
-                        self.updateTrainer.emit(result)
+                        results.append(result)
+
+            # One update per trainer, covering all of its installed folders
+            updates = {}
+            for result in sorted(results, key=lambda update: update["trainer_name"]):
+                key = (result["origin"], result["url"])
+                if key in updates:
+                    updates[key]["trainer_dirs"] += result["trainer_dirs"]
+                else:
+                    updates[key] = result
+
+            for update in updates.values():
+                self.updateTrainer.emit(update)
 
         except Exception:
             traceback.print_exc()

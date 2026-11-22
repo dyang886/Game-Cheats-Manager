@@ -10,6 +10,7 @@ from ctypes import wintypes
 from PyQt6.QtCore import pyqtSignal
 
 from config import *
+from search_index import translation_index
 from threads.download_base_thread import DownloadBaseThread
 
 
@@ -48,6 +49,11 @@ class DownloadTrainersThread(DownloadBaseThread):
                 selected_trainer = DownloadBaseThread.trainer_urls[self.index]
             else:
                 selected_trainer = self.update_entry
+                # Folders removed since the check are left out
+                selected_trainer["trainer_dirs"] = [path for path in selected_trainer["trainer_dirs"] if os.path.isdir(path)]
+                if not selected_trainer["trainer_dirs"]:
+                    self.finished.emit(0)
+                    return
             origin = selected_trainer["origin"]
 
             result = True
@@ -60,6 +66,9 @@ class DownloadTrainersThread(DownloadBaseThread):
 
             if not result:
                 return
+
+            if self.update_entry:
+                self.keep_installed_names_if_taken()
 
             try:
                 self.install_prepared_trainer(selected_trainer)
@@ -232,7 +241,8 @@ class DownloadTrainersThread(DownloadBaseThread):
 
     def install_prepared_trainer(self, selected_trainer):
         """Install verified content and restore a verified backup directly on failure."""
-        trainer_directory = os.path.abspath(self.update_entry["trainer_dir"]) if self.update_entry else None
+        # An update replaces every installed folder of its trainer
+        trainer_directories = [os.path.abspath(path) for path in self.update_entry["trainer_dirs"]] if self.update_entry else []
         download_root = os.path.abspath(self.trainerDownloadPath)
         backup_root = os.path.join(download_root, TRAINER_BACKUP_DIRECTORY)
         backup_paths = []
@@ -281,9 +291,7 @@ class DownloadTrainersThread(DownloadBaseThread):
                 if root not in destination_roots:
                     destination_roots.append(root)
 
-            existing_directories = []
-            if trainer_directory:
-                existing_directories.append(trainer_directory)
+            existing_directories = list(trainer_directories)
             for root in destination_roots:
                 if os.path.lexists(root) and not any(
                     os.path.normcase(root) == os.path.normcase(path) for path in existing_directories
@@ -469,6 +477,63 @@ class DownloadTrainersThread(DownloadBaseThread):
                 names.append(name)
         return names
 
+    def trainer_folder_name(self, selected_trainer):
+        """The folder name to install under, or None once the reason for stopping has been reported."""
+        if self.update_entry:
+            self.message.emit(tr("Updating ") + selected_trainer["trainer_name"] + "...", None)
+
+            # Named like a fresh install, whatever the installed folder is called
+            translation_index.refresh()
+            trainerName_trans = self.translate_trainer(selected_trainer)
+
+            if not trainerName_trans:
+                self.message.emit(tr("Failed to translate, please update translation data."), "failure")
+                time.sleep(self.download_finish_delay)
+                self.finished.emit(1)
+                return None
+
+            self.freshName = self.symbol_replacement(trainerName_trans)
+            return self.freshName
+
+        # Version folders carry a suffix, so a partly installed set can still be downloaded again
+        trainerName_display = self.symbol_replacement(selected_trainer["trainer_name"])
+        if trainerName_display in self.trainers:
+            self.message.emit(tr("Trainer already exists, aborted download."), "failure")
+            time.sleep(self.download_finish_delay)
+            self.finished.emit(1)
+            return None
+
+        return trainerName_display
+
+    def keep_installed_names_if_taken(self):
+        """Update under the installed folder names when the fresh name belongs to a different trainer."""
+        def relative(destination):
+            return os.path.relpath(destination, self.trainerDownloadPath)
+
+        def identity(folder):
+            info = self.load_json_content(os.path.join(folder, "gcm_info.json"), False) or {}
+            return info.get("game_name"), info.get("origin"), os.path.splitext(info.get("gcm_url") or "")[0]
+
+        def renamed(destination):
+            return os.path.join(self.trainerDownloadPath, base + relative(destination)[len(self.freshName):])
+
+        own = {identity(folder) for folder in self.update_entry["trainer_dirs"]}
+        planned = {os.path.join(self.trainerDownloadPath, relative(item["dst"]).split(os.sep)[0]) for item in self.src_dst}
+        # Without gcm_info.json a folder is not an installed trainer
+        if not any(os.path.isfile(os.path.join(folder, "gcm_info.json")) and identity(folder) not in own for folder in planned):
+            return
+
+        # The installed name without its own suffix
+        installed = sorted(os.path.basename(folder) for folder in self.update_entry["trainer_dirs"])
+        suffixes = sorted({os.path.basename(folder)[len(self.freshName):] for folder in planned} - {""}, key=len, reverse=True)
+        bases = (name[:-len(suffix)] for suffix in suffixes for name in installed if name.endswith(suffix))
+        base = next(bases, installed[0])
+
+        for item in self.src_dst:
+            item["dst"] = renamed(item["dst"])
+        if self.instructionDst:
+            self.instructionDst = renamed(self.instructionDst)
+
     def handle_multi_version_archive(self, extractedContentPath, trainerName_display, selected_trainer):
         # An extension points at one trainer file, so it can never describe a multi-version package
         if selected_trainer.get("extension", "").strip():
@@ -497,18 +562,9 @@ class DownloadTrainersThread(DownloadBaseThread):
         return True
 
     def download_default(self, selected_trainer):
-        if self.update_entry:
-            trainerName_display = selected_trainer["trainer_name"]
-            self.message.emit(tr("Updating ") + trainerName_display + "...", None)
-        else:
-            trainerName_display = self.symbol_replacement(selected_trainer["trainer_name"])
-            # Trainer duplication check
-            for trainerPath in self.trainers.keys():
-                if self.symbol_replacement(selected_trainer["trainer_name"]) == os.path.splitext(os.path.basename(trainerPath))[0]:
-                    self.message.emit(tr("Trainer already exists, aborted download."), "failure")
-                    time.sleep(self.download_finish_delay)
-                    self.finished.emit(1)
-                    return False
+        trainerName_display = self.trainer_folder_name(selected_trainer)
+        if not trainerName_display:
+            return False
 
         self.message.emit(tr("Downloading..."), "download")
         extractedContentPath = os.path.join(DOWNLOAD_TEMP_DIR, "extracted")
@@ -727,18 +783,9 @@ class DownloadTrainersThread(DownloadBaseThread):
         return True
 
     def download_fling(self, selected_trainer):
-        if self.update_entry:
-            trainerName_display = selected_trainer["trainer_name"]
-            self.message.emit(tr("Updating ") + trainerName_display + "...", None)
-        else:
-            trainerName_display = self.symbol_replacement(selected_trainer["trainer_name"])
-            # Trainer duplication check
-            for trainerPath in self.trainers.keys():
-                if trainerName_display == os.path.splitext(os.path.basename(trainerPath))[0]:
-                    self.message.emit(tr("Trainer already exists, aborted download."), "failure")
-                    time.sleep(self.download_finish_delay)
-                    self.finished.emit(1)
-                    return False
+        trainerName_display = self.trainer_folder_name(selected_trainer)
+        if not trainerName_display:
+            return False
 
         # Download trainer
         self.message.emit(tr("Downloading..."), "download")
@@ -793,14 +840,6 @@ class DownloadTrainersThread(DownloadBaseThread):
         # Map each trainer version to its destination folder
         os.makedirs(self.trainerDownloadPath, exist_ok=True)
         if len(extractedTrainerNames) > 1:
-            if self.update_entry:
-                trainerName_trans = self.translate_trainer(selected_trainer)
-                if not trainerName_trans:
-                    self.message.emit(tr("Failed to translate, please update translation data."), "failure")
-                    self.finished.emit(1)
-                    return
-                trainerName_display = self.symbol_replacement(trainerName_trans)
-
             for extractedTrainerName in extractedTrainerNames:
                 trainer_details = ""
                 if selected_trainer['origin'] == "fling_main":
@@ -930,18 +969,9 @@ class DownloadTrainersThread(DownloadBaseThread):
                     print(f"An error occurred during XiaoXing patching: {e}")
 
     def download_xiaoxing(self, selected_trainer):
-        if self.update_entry:
-            trainerName_display = selected_trainer["trainer_name"]
-            self.message.emit(tr("Updating ") + trainerName_display + "...", None)
-        else:
-            trainerName_display = self.symbol_replacement(selected_trainer["trainer_name"])
-            # Trainer duplication check
-            for trainerPath in self.trainers.keys():
-                if self.symbol_replacement(selected_trainer["trainer_name"]) == os.path.splitext(os.path.basename(trainerPath))[0]:
-                    self.message.emit(tr("Trainer already exists, aborted download."), "failure")
-                    time.sleep(self.download_finish_delay)
-                    self.finished.emit(1)
-                    return False
+        trainerName_display = self.trainer_folder_name(selected_trainer)
+        if not trainerName_display:
+            return False
 
         self.message.emit(tr("Downloading..."), "download")
         extractedContentPath = os.path.join(DOWNLOAD_TEMP_DIR, "extracted")
